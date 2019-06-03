@@ -1,0 +1,6 @@
+2019-06-04:
+- Bot set up.
+- Bot connecting to Discord.
+- Added config file class.
+- Added default JDA-Utilities commands.
+- Added onReady event with "ready"-message.
