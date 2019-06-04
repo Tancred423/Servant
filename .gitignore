@@ -29,5 +29,5 @@ hs_err_pid*
 *.iml
 /src/main/resources/*
 
-# Personalized settings
+# Personalized Settings
 /resources/*
