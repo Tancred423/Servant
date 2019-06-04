@@ -1,4 +1,17 @@
 2019-06-04:
+- Added interaction commands. (Beg, Cookie, Dab, Highfive, Hug, Kiss, Pat, Slap)
+- Added abtract class for interaction commands.
+- Added user setting (color) command.
+- Added database connection.
+- Added interaction counter on database.
+- Added user setting (color) on database.
+- Added table for interaction gifs.
+- Added table for custom emotes. (Not yet supported)
+- Added Log class for easy error handling.
+- Added parser class. Currently parses only color codes.
+- Turned static user class into instance class.
+
+2019-06-03:
 - Bot set up.
 - Bot connecting to Discord.
 - Added config file class.

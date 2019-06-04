@@ -7,19 +7,21 @@ import com.jagrosh.jdautilities.examples.command.GuildlistCommand;
 import com.jagrosh.jdautilities.examples.command.PingCommand;
 import com.jagrosh.jdautilities.examples.command.ShutdownCommand;
 import config.ConfigFile;
-import net.dv8tion.jda.core.AccountType;
-import net.dv8tion.jda.core.JDABuilder;
-import net.dv8tion.jda.core.OnlineStatus;
-import net.dv8tion.jda.core.Permission;
+import interaction.*;
+import net.dv8tion.jda.core.*;
 import net.dv8tion.jda.core.entities.Game;
+import settings.UserSettingsCommand;
 
 import javax.security.auth.login.LoginException;
 import java.awt.*;
 import java.io.IOException;
 
 public class Servant {
+    public static JDA jda;
+    public static ConfigFile config;
+
     public static void main(String[] args) throws IOException, LoginException {
-        ConfigFile config = new ConfigFile();
+        config = new ConfigFile();
         if (config.isMissing()) {
             System.out.println("The bot was shut down.");
             return;
@@ -30,17 +32,30 @@ public class Servant {
 
         client.useDefaultGame();
         client.setOwnerId(config.getBotOwnerId());
-        client.setEmojis("\uD83D\uDE03", "\uD83D\uDE2E", "\uD83D\uDE26"); // 😃, 😮, 😦.
+        client.setEmojis("✅", "⚠", "❌"); // ✅, ⚠, ❌.
         client.setPrefix(config.getDefaultPrefix());
 
         client.addCommands(
                 // Default JDA utilities commands.
                 new AboutCommand(Color.decode(config.getDefaultColorCode()), "your multifuntional bot",
-                        new String[] { "Cool Commands", "Nice Examples", "Lots of fun!" },
+                        new String[]{"Cool Commands", "Nice Examples", "Lots of fun!"},
                         Permission.ADMINISTRATOR), // !about
                 new GuildlistCommand(waiter), // !guildlist
                 new PingCommand(), // !ping
-                new ShutdownCommand() // !shutdown
+                new ShutdownCommand(), // !shutdown
+
+                // Interaction commands.
+                new HugCommand(),
+                new SlapCommand(),
+                new BegCommand(),
+                new CookieCommand(),
+                new KissCommand(),
+                new PatCommand(),
+                new HighfiveCommand(),
+                new DabCommand(),
+
+                // Settings
+                new UserSettingsCommand()
         );
 
         new JDABuilder(AccountType.BOT)
