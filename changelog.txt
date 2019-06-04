@@ -1,3 +1,8 @@
+2019-06-04.2:
+- Added "AddGif"-Command for easy interaction gif management.
+- Added clear command to delete messages.
+- Removed command editing cooldown.
+
 2019-06-04:
 - Added interaction commands. (Beg, Cookie, Dab, Highfive, Hug, Kiss, Pat, Slap)
 - Added abtract class for interaction commands.

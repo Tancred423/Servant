@@ -1,6 +1,7 @@
 package utilities;
 
 import java.awt.*;
+import java.time.OffsetDateTime;
 
 public class Parser {
     public static String parseColor(String colorCode) {
@@ -37,5 +38,10 @@ public class Parser {
         }
 
         return colorCode;
+    }
+
+    public static boolean isOlderThanTwoWeeks(OffsetDateTime creationTime) {
+        long twoWeeksAgo = System.currentTimeMillis() - 1000 * 3600 * 24 * 14; // 2 weeks
+        return creationTime.toEpochSecond() * 1000 < twoWeeksAgo;
     }
 }

@@ -1,5 +1,6 @@
 package servant;
 
+import moderation.ClearCommand;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.jagrosh.jdautilities.examples.command.AboutCommand;
@@ -55,7 +56,13 @@ public class Servant {
                 new DabCommand(),
 
                 // Settings
-                new UserSettingsCommand()
+                new UserSettingsCommand(),
+
+                // Moderation
+                new ClearCommand(),
+
+                // Owner
+                new AddGifCommand()
         );
 
         new JDABuilder(AccountType.BOT)

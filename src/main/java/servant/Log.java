@@ -30,4 +30,19 @@ public class Log {
                         "Error: " + e.getMessage() + "\n" +
                         "```").queue());
     }
+
+    public void sendLogHttp() {
+        e.printStackTrace();
+        event.reply("Something went wrong connecting to HTTP.\n" +
+                "A report was sent to the bot owner.");
+        event.getJDA().getUserById(config.getBotOwnerId()).openPrivateChannel().queue(privateChannel ->
+                privateChannel.sendMessage("```c\n" +
+                        "Error\n" +
+                        "-----\n" +
+                        "Guild: " + event.getGuild().getName() + " (" + event.getGuild().getIdLong() + ")\n" +
+                        "User: " + event.getAuthor().getName() + " (" + event.getAuthor().getIdLong() + ")\n" +
+                        "Command: " + name + "\n" +
+                        "Error: " + e.getMessage() + "\n" +
+                        "```").queue());
+    }
 }

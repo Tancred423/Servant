@@ -4,6 +4,10 @@ import nu.studer.java.util.OrderedProperties;
 
 import java.io.*;
 
+/*
+ * You may ask how big my autism is.
+ * My answer is yes.
+ */
 public class ConfigFile {
     private String botToken        ;
     private String defaultLanguage ;
@@ -15,7 +19,6 @@ public class ConfigFile {
     private String databaseUrl     ;
     private String databaseUsername;
     private String databasePassword;
-    private String editCommMillis  ;
     private String supportGuildInv ;
     private String botVersion      ;
 
@@ -52,7 +55,6 @@ public class ConfigFile {
         config.setProperty("databaseUrl"     , ""        );
         config.setProperty("databaseUsername", "root"    );
         config.setProperty("databasePassword", ""        );
-        config.setProperty("editCommMillis"  , "60000"   ); // 1 minute.
         config.setProperty("supportGuildInv" , ""        );
         config.setProperty("botVersion"      , "4.0.0"   );
 
@@ -79,7 +81,6 @@ public class ConfigFile {
         this.databaseUrl      = config.getProperty("databaseUrl"     );
         this.databaseUsername = config.getProperty("databaseUsername");
         this.databasePassword = config.getProperty("databasePassword");
-        this.editCommMillis   = config.getProperty("editCommMillis"  );
         this.supportGuildInv  = config.getProperty("supportGuildInv" );
         this.botVersion       = config.getProperty("botVersion"      );
     }
@@ -95,7 +96,6 @@ public class ConfigFile {
     public void setDatabaseUrl      (String databaseUrl     ) { this.databaseUrl      = databaseUrl     ; }
     public void setDatabaseUsername (String databaseUsername) { this.databaseUsername = databaseUsername; }
     public void setDatabasePassword (String databasePassword) { this.databasePassword = databasePassword; }
-    public void setEditCommMillis   (String editCommMillis  ) { this.editCommMillis   = editCommMillis  ; }
     public void setSupportGuildInv  (String supportGuildInv ) { this.supportGuildInv  = supportGuildInv ; }
     public void setBotVersion       (String botVersion      ) { this.botVersion       = botVersion      ; }
 
@@ -110,7 +110,6 @@ public class ConfigFile {
     public String getDatabaseUrl     () { return databaseUrl     ; }
     public String getDatabaseUsername() { return databaseUsername; }
     public String getDatabasePassword() { return databasePassword; }
-    public String getEditCommMillis  () { return editCommMillis  ; }
     public String getSupportGuildInv () { return supportGuildInv ; }
     public String getBotVersion      () { return botVersion      ; }
 
@@ -138,7 +137,6 @@ public class ConfigFile {
         if (getDatabaseUrl()      == null) corrupted = true;
         if (getDatabaseUsername() == null) corrupted = true;
         if (getDatabasePassword() == null) corrupted = true;
-        if (getEditCommMillis()   == null) corrupted = true;
         if (getSupportGuildInv()  == null) corrupted = true;
         if (getBotVersion()       == null) corrupted = true;
 
@@ -191,11 +189,6 @@ public class ConfigFile {
 
             if (getDatabasePassword().isEmpty()) {
                 System.out.println(String.format(errorMessage, "database password"));
-                missing = true;
-            }
-
-            if (getEditCommMillis().isEmpty()) {
-                System.out.println(String.format(errorMessage, "time frame for editing commands in milliseconds"));
                 missing = true;
             }
 

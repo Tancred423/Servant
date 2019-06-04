@@ -10,10 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class InteractionDatabase {
-    public static String getGifUrl(String commandName) throws SQLException {
+class InteractionDatabase {
+    static String getGifUrl(String commandName) throws SQLException {
         Connection connection = Database.getConnection();
-        PreparedStatement select = connection.prepareStatement("SELECT gif FROM interaction WHERE command=?");
+        PreparedStatement select = connection.prepareStatement("SELECT gif FROM interaction WHERE interaction=?");
         select.setString(1, commandName);
         ResultSet resultSet = select.executeQuery();
         String gif = null;
