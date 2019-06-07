@@ -5,7 +5,9 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.doc.standard.CommandInfo;
 import com.jagrosh.jdautilities.examples.doc.Author;
 import servant.Database;
+import servant.Guild;
 import servant.Log;
+import servant.User;
 
 import java.io.IOException;
 import java.net.URL;
@@ -57,7 +59,7 @@ public class AddGifCommand extends Command {
             url = new URL(gifUrl);
              c = url.openConnection();
         } catch (IOException e) {
-            new Log(e, event, name).sendLogHttp();
+            new Log(e, event, name).sendLogHttpCommandEvent();
             return;
         }
         String contentType = c.getContentType();
@@ -74,10 +76,18 @@ public class AddGifCommand extends Command {
             insert.executeUpdate();
             connection.close();
         } catch (SQLException e) {
-           new Log(e, event, name).sendLogSQL();
+           new Log(e, event, name).sendLogSqlCommandEvent(true);
            return;
         }
 
         event.reactSuccess();
+
+        // Statistics.
+        try {
+            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
+            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
+        } catch (SQLException e) {
+            new Log(e, event, name).sendLogSqlCommandEvent(false);
+        }
     }
 }

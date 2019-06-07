@@ -11,12 +11,14 @@ import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.MessageHistory;
+import servant.Guild;
+import servant.Log;
+import servant.User;
 import utilities.MessageHandler;
 import utilities.Parser;
 
+import java.sql.SQLException;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 @CommandInfo(
         name = {"Clear", "Clean"},
@@ -38,8 +40,8 @@ public class ClearCommand extends Command {
         this.category = new Category("Moderation");
         this.arguments = "[1 - 100]";
         this.botPermissions = new Permission[]{Permission.MESSAGE_MANAGE};
-        this.guildOnly = true;
         this.userPermissions = new Permission[]{Permission.MESSAGE_MANAGE};
+        this.guildOnly = true;
     }
 
     @Override
@@ -78,8 +80,16 @@ public class ClearCommand extends Command {
 
         new MessageHandler().sendAndExpire(
                 channel,
-                new MessageBuilder().setContent(actuallyCleared + "messages cleared").build(),
+                new MessageBuilder().setContent(actuallyCleared + " messages cleared").build(),
                 5 * 1000 // 5 seconds.
         );
+
+        // Statistics.
+        try {
+            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
+            new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
+        } catch (SQLException e) {
+            new Log(e, event, name).sendLogSqlCommandEvent(false);
+        }
     }
 }

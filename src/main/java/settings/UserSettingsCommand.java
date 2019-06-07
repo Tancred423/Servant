@@ -3,6 +3,7 @@ package settings;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.core.Permission;
+import servant.Guild;
 import servant.Log;
 import servant.User;
 
@@ -47,7 +48,7 @@ public class UserSettingsCommand extends Command {
                 try {
                     internalUser = new User(userId);
                 } catch (SQLException e) {
-                    new Log(e, event, name).sendLogSQL();
+                    new Log(e, event, name).sendLogSqlCommandEvent(true);
                     return;
                 }
 
@@ -61,7 +62,7 @@ public class UserSettingsCommand extends Command {
                         try {
                             internalUser.setColor(value);
                         } catch (SQLException e) {
-                            new Log(e, event, name).sendLogSQL();
+                            new Log(e, event, name).sendLogSqlCommandEvent(true);
                             return;
                         }
 
@@ -87,7 +88,7 @@ public class UserSettingsCommand extends Command {
                 try {
                     internalUser = new User(userId);
                 } catch (SQLException e) {
-                    new Log(e, event, name).sendLogSQL();
+                    new Log(e, event, name).sendLogSqlCommandEvent(true);
                     return;
                 }
 
@@ -97,7 +98,7 @@ public class UserSettingsCommand extends Command {
                         try {
                             wasUnset = internalUser.unsetColor();
                         } catch (SQLException e) {
-                            new Log(e, event, name).sendLogSQL();
+                            new Log(e, event, name).sendLogSqlCommandEvent(true);
                             return;
                         }
 
@@ -113,6 +114,14 @@ public class UserSettingsCommand extends Command {
 
             default:
                 event.reply("The first argument has to be either `set` or `unset`.");
+        }
+
+        // Statistics.
+        try {
+            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
+            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
+        } catch (SQLException e) {
+            new Log(e, event, name).sendLogSqlCommandEvent(false);
         }
     }
 }

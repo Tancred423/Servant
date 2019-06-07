@@ -1,5 +1,13 @@
+2019-06-07:
+- Added "StealAvatar"-command.
+- Added coin flip command.
+- Added feature counters for future statistics (user and guild).
+- Added level feature. (LevelCommand, related db tables, LevelListener)
+- Added autorole feature. ((Un)setting role, automatically receiving role)
+- Added file only channel feature. (Set up channels in which users only can post links and files)
+
 2019-06-04.2:
-- Added "AddGif"-Command for easy interaction gif management.
+- Added "AddGif"-command for easy interaction gif management.
 - Added clear command to delete messages.
 - Removed command editing cooldown.
 

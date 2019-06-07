@@ -4,7 +4,9 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.core.entities.Emote;
 import net.dv8tion.jda.core.entities.User;
+import servant.Guild;
 import servant.Log;
+import utilities.Parser;
 
 import java.sql.SQLException;
 
@@ -13,20 +15,14 @@ public abstract class InteractionCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        // Get mentioned user.
-        if (event.getArgs().isEmpty()) {
-            event.reply("You have to mention a user.");
-            return;
-        }
-        User mentioned;
-        try {
-            mentioned = event.getMessage().getMentionedUsers().get(0);
-        } catch (IndexOutOfBoundsException e) {
+        // Check mentioned user.
+        if (!Parser.hasMentionedUser(event.getMessage())) {
             event.reply("Invalid mention.");
             return;
         }
 
         // Get users.
+        User mentioned = event.getMessage().getMentionedMembers().get(0).getUser();
         User author = event.getAuthor();
         servant.User internalAuthor;
         servant.User internalMentioned;
@@ -34,7 +30,7 @@ public abstract class InteractionCommand extends Command {
             internalAuthor = new servant.User(author.getIdLong());
             internalMentioned = new servant.User(mentioned.getIdLong());
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSQL();
+            new Log(e, event, name).sendLogSqlCommandEvent(true);
             return;
         }
 
@@ -43,7 +39,7 @@ public abstract class InteractionCommand extends Command {
         try {
             gif = InteractionDatabase.getGifUrl(name.toLowerCase());
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSQL();
+            new Log(e, event, name).sendLogSqlCommandEvent(true);
             return;
         }
 
@@ -52,7 +48,7 @@ public abstract class InteractionCommand extends Command {
             internalAuthor.incrementInteractionCount(name, true);
             internalMentioned.incrementInteractionCount(name, false);
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSQL();
+            new Log(e, event, name).sendLogSqlCommandEvent(true);
             return;
         }
 
@@ -63,7 +59,7 @@ public abstract class InteractionCommand extends Command {
             authorCount = internalAuthor.getInteractionCount(name, true);
             mentionedCount = internalMentioned.getInteractionCount(name, false);
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSQL();
+            new Log(e, event, name).sendLogSqlCommandEvent(true);
             return;
         }
 
@@ -72,7 +68,7 @@ public abstract class InteractionCommand extends Command {
         try {
             emote = servant.Emote.getEmote(name);
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSQL();
+            new Log(e, event, name).sendLogSqlCommandEvent(true);
             return;
         }
 
@@ -80,10 +76,18 @@ public abstract class InteractionCommand extends Command {
         try {
             embed = new InteractionEmbed(name, emote, emoji, gif, author, mentioned, authorCount, mentionedCount);
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSQL();
+            new Log(e, event, name).sendLogSqlCommandEvent(true);
             return;
         }
 
         event.reply(embed.getEmbed());
+
+        // Statistics.
+        try {
+            new servant.User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
+            new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
+        } catch (SQLException e) {
+            new Log(e, event, name).sendLogSqlCommandEvent(false);
+        }
     }
 }

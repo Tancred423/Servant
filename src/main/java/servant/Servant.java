@@ -1,6 +1,10 @@
 package servant;
 
-import moderation.ClearCommand;
+import moderation.*;
+import freeToAll.CoinflipCommand;
+import freeToAll.StealAvatarCommand;
+import level.LevelCommand;
+import level.LevelListener;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.jagrosh.jdautilities.examples.command.AboutCommand;
@@ -45,6 +49,21 @@ public class Servant {
                 new PingCommand(), // !ping
                 new ShutdownCommand(), // !shutdown
 
+                // Owner
+                new AddGifCommand(),
+
+                // Moderation
+                new ClearCommand(),
+                new AutoroleCommand(),
+                new FileOnlyChannelCommand(),
+
+                // Settings
+                new UserSettingsCommand(),
+
+                // Free to all
+                new StealAvatarCommand(),
+                new CoinflipCommand(),
+
                 // Interaction commands.
                 new HugCommand(),
                 new SlapCommand(),
@@ -55,14 +74,8 @@ public class Servant {
                 new HighfiveCommand(),
                 new DabCommand(),
 
-                // Settings
-                new UserSettingsCommand(),
-
-                // Moderation
-                new ClearCommand(),
-
-                // Owner
-                new AddGifCommand()
+                // Level
+                new LevelCommand()
         );
 
         new JDABuilder(AccountType.BOT)
@@ -76,6 +89,9 @@ public class Servant {
                 .addEventListener(waiter)
                 .addEventListener(client.build())
                 .addEventListener(new ReadyListener())
+                .addEventListener(new LevelListener())
+                .addEventListener(new AutoroleListener())
+                .addEventListener(new FileOnlyChannelListener())
 
                 // Start.
                 .build();
