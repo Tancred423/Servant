@@ -9,10 +9,8 @@ import com.jagrosh.jdautilities.examples.doc.Author;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.*;
 import servant.Log;
-import utilities.Parser;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 @CommandInfo(

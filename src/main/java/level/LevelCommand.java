@@ -55,10 +55,10 @@ public class LevelCommand extends Command {
                 return;
             }
             int currentLevel = Parser.getLevelFromExp(currentExp);
-            int nextLevel = currentLevel + 1;
-            int neededExp = Parser.getExpFromLevel(nextLevel);
+            int neededExp = Parser.getLevelExp(currentLevel);
+            int currentExpOnThisLevel = currentExp - Parser.getTotalLevelExp(currentLevel - 1);
 
-            event.reply(author.getAsMention() + "'s current level: " + currentLevel + " (" + currentExp + "/" + neededExp + ")");
+            event.reply(author.getAsMention() + "'s current level: " + currentLevel + " (" + currentExpOnThisLevel + "/" + neededExp + " XP)");
         } else {
             String[] args = arg.split(" ");
             List<String> aliasLeaderboard = new ArrayList<>() {{
@@ -126,10 +126,10 @@ public class LevelCommand extends Command {
                     return;
                 }
                 int currentLevel = Parser.getLevelFromExp(currentExp);
-                int nextLevel = currentLevel + 1;
-                int neededExp = Parser.getExpFromLevel(nextLevel);
+                int neededExp = Parser.getLevelExp(currentLevel);
+                int currentExpOnThisLevel = currentExp - Parser.getTotalLevelExp(currentLevel - 1);
 
-                event.reply(mentioned.getAsMention() + "'s current level: " + currentLevel + " (" + currentExp + "/" + neededExp + ")");
+                event.reply(mentioned.getAsMention() + "'s current level: " + currentLevel + " (" + currentExpOnThisLevel + "/" + neededExp + " XP)");
             } else {
                 event.reply("Invalid argument.\n" +
                         "Leave it blank to view your own level, mention someone to view their level or type \"leaderboard\" to check the current guild's leaderboard.");

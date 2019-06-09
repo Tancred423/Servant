@@ -62,18 +62,41 @@ public class Parser {
     }
 
     // Level
-    private static int multiplicator = 5;
+//    private static int multiplicator = 5;
+//
+//    public static int getLevelFromExp(int y) {
+//        double p = (double) 50 / multiplicator;
+//        double q = ((double) 100 - y) / multiplicator;
+//        int currentLevel = (int) Math.floor(-(p/2) + Math.sqrt(Math.pow((p/2), 2)-q));
+//        if (currentLevel < 0) return 0;
+//        else return currentLevel;
+//    }
+//
+//    public static int getExpFromLevel(int x) {
+//        return multiplicator*((int) Math.pow(x, 2))+50*x+100;
+//    }
+    public static int getTotalLevelExp(int level) {
+        int totalExp = 0;
 
-    public static int getLevelFromExp(int y) {
-        double p = (double) 50 / multiplicator;
-        double q = ((double) 100 - y) / multiplicator;
-        int currentLevel = (int) Math.floor(-(p/2) + Math.sqrt(Math.pow((p/2), 2)-q));
-        if (currentLevel < 0) return 0;
-        else return currentLevel;
+        for (int i = level; i >= 0; i--) {
+            totalExp += getLevelExp(i);
+        }
+
+        return totalExp;
     }
 
-    public static int getExpFromLevel(int x) {
-        return multiplicator*((int) Math.pow(x, 2))+50*x+100;
+    public static int getLevelExp(int level) {
+        return 5*(level*level)+50*level+100;
+    }
+
+    public static int getLevelFromExp(int exp) {
+        int remaining_exp = exp;
+        int level = 0;
+        while (remaining_exp >= getLevelExp(level)) {
+            remaining_exp -= getLevelExp(level);
+            level++;
+        }
+        return level;
     }
 
     // Autorole

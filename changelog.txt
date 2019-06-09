@@ -1,3 +1,6 @@
+2019-06-09:
+- Fixed level formula.
+
 2019-06-07:
 - Added "StealAvatar"-command.
 - Added coin flip command.
