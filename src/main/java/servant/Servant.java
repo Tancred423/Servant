@@ -16,6 +16,7 @@ import interaction.*;
 import net.dv8tion.jda.core.*;
 import net.dv8tion.jda.core.entities.Game;
 import settings.UserSettingsCommand;
+import toggle.ToggleCommand;
 
 import javax.security.auth.login.LoginException;
 import java.awt.*;
@@ -51,6 +52,9 @@ public class Servant {
 
                 // Owner
                 new AddGifCommand(),
+
+                // Admin
+                new ToggleCommand(),
 
                 // Moderation
                 new ClearCommand(),

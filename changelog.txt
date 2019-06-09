@@ -1,5 +1,6 @@
 2019-06-09:
 - Fixed level formula.
+- Added toggle command. (Only level feature yet -> Default: off)
 
 2019-06-07:
 - Added "StealAvatar"-command.

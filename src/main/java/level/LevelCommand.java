@@ -34,6 +34,14 @@ public class LevelCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
+        // Enabled?
+        try {
+            if (!new servant.Guild(event.getGuild().getIdLong()).getStatus("level")) return;
+        } catch (SQLException e) {
+            new Log(e, event, name).sendLogSqlReceiveEvent(false);
+            return;
+        }
+
         User author = event.getAuthor();
         servant.User internalAuthor;
         try {

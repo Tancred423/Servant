@@ -221,4 +221,52 @@ public class Guild {
         connection.close();
         return channels;
     }
+
+    // Toggle
+    public boolean toggleHasEntry(String feature) throws SQLException {
+        Connection connection = Database.getConnection();
+        PreparedStatement select = connection.prepareStatement("SELECT * FROM toggle WHERE guild_id=? AND feature=?");
+        select.setLong(1, guildId);
+        select.setString(2, feature);
+        ResultSet resultSet = select.executeQuery();
+        if (resultSet.first()) {
+            connection.close();
+            return true;
+        } else {
+            connection.close();
+            return false;
+        }
+    }
+
+    public boolean getStatus(String feature) throws SQLException {
+        Connection connection = Database.getConnection();
+        PreparedStatement select = connection.prepareStatement("SELECT is_enabled FROM toggle WHERE guild_id=? AND feature=?");
+        select.setLong(1, guildId);
+        select.setString(2, feature);
+        ResultSet resultSet = select.executeQuery();
+        boolean isEnabled = false;
+        if (resultSet.first()) isEnabled = resultSet.getBoolean("is_enabled");
+
+        connection.close();
+        return isEnabled;
+    }
+
+    public void setStatus(String feature, boolean status) throws SQLException {
+        Connection connection = Database.getConnection();
+        if (toggleHasEntry(feature)) {
+            // Update.
+            PreparedStatement update = connection.prepareStatement("UPDATE toggle SET is_enabled=? WHERE guild_id=?");
+            update.setBoolean(1, status);
+            update.setLong(2, guildId);
+            update.executeUpdate();
+        } else {
+            // Insert.
+            PreparedStatement insert = connection.prepareStatement("INSERT INTO toggle (guild_id,feature,is_enabled) VALUES (?,?,?)");
+            insert.setLong(1, guildId);
+            insert.setString(2, feature);
+            insert.setBoolean(3, status);
+            insert.executeUpdate();
+        }
+        connection.close();
+    }
 }

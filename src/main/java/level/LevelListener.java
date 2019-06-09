@@ -30,6 +30,14 @@ public class LevelListener extends ListenerAdapter {
 
         if (author.isBot()) return;
 
+        // Enabled?
+        try {
+            if (!new servant.Guild(guild.getIdLong()).getStatus("level")) return;
+        } catch (SQLException e) {
+            new Log(e, event, name).sendLogSqlReceiveEvent(false);
+            return;
+        }
+
         Map<User, ZonedDateTime> userCd = guildCds.get(guild);
 
         if (userCd != null) {
