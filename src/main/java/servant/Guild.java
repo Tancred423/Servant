@@ -223,7 +223,7 @@ public class Guild {
     }
 
     // Toggle
-    public boolean toggleHasEntry(String feature) throws SQLException {
+    private boolean toggleHasEntry(String feature) throws SQLException {
         Connection connection = Database.getConnection();
         PreparedStatement select = connection.prepareStatement("SELECT * FROM toggle WHERE guild_id=? AND feature=?");
         select.setLong(1, guildId);
@@ -255,9 +255,10 @@ public class Guild {
         Connection connection = Database.getConnection();
         if (toggleHasEntry(feature)) {
             // Update.
-            PreparedStatement update = connection.prepareStatement("UPDATE toggle SET is_enabled=? WHERE guild_id=?");
+            PreparedStatement update = connection.prepareStatement("UPDATE toggle SET is_enabled=? WHERE guild_id=? AND feature=?");
             update.setBoolean(1, status);
             update.setLong(2, guildId);
+            update.setString(3, feature);
             update.executeUpdate();
         } else {
             // Insert.
