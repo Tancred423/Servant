@@ -36,7 +36,7 @@ public class LevelCommand extends Command {
     protected void execute(CommandEvent event) {
         // Enabled?
         try {
-            if (!new servant.Guild(event.getGuild().getIdLong()).getStatus("level")) return;
+            if (!new servant.Guild(event.getGuild().getIdLong()).getToggleStatus("level")) return;
         } catch (SQLException e) {
             new Log(e, event, name).sendLogSqlReceiveEvent(false);
             return;

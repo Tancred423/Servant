@@ -1,3 +1,6 @@
+2019-06-11:
+- Added Member Join / Leave Notifications.
+
 2019-06-09:
 - Fixed level formula.
 - Added toggle command. (Only level feature yet -> Default: off)

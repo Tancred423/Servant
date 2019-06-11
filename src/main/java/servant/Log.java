@@ -3,6 +3,7 @@ package servant;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import config.ConfigFile;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
+import net.dv8tion.jda.core.events.guild.member.GuildMemberLeaveEvent;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 
 public class Log {
@@ -10,6 +11,7 @@ public class Log {
     private CommandEvent commandEvent;
     private GuildMessageReceivedEvent receivedEvent;
     private GuildMemberJoinEvent memberJoinEvent;
+    private GuildMemberLeaveEvent memberLeaveEvent;
     private ConfigFile config;
     private String name;
 
@@ -30,6 +32,13 @@ public class Log {
     public Log(Exception e, GuildMemberJoinEvent memberJoinEvent, String commandName) {
         this.e = e;
         this.memberJoinEvent = memberJoinEvent;
+        this.config = Servant.config;
+        this.name = commandName;
+    }
+
+    public Log(Exception e, GuildMemberLeaveEvent memberLeaveEvent, String commandName) {
+        this.e = e;
+        this.memberLeaveEvent = memberLeaveEvent;
         this.config = Servant.config;
         this.name = commandName;
     }
@@ -88,6 +97,20 @@ public class Log {
                         "-----\n" +
                         "Guild: " + memberJoinEvent.getGuild().getName() + " (" + memberJoinEvent.getGuild().getIdLong() + ")\n" +
                         "User: " + memberJoinEvent.getUser().getName() + " (" + memberJoinEvent.getUser().getIdLong() + ")\n" +
+                        "Command: " + name + "\n" +
+                        "Error: " + e.getMessage() + "\n" +
+                        "```").queue());
+    }
+
+    // memberLeaveEvent
+    public void sendLogSqlMemberLeaveEvent() {
+        e.printStackTrace();
+        memberLeaveEvent.getJDA().getUserById(config.getBotOwnerId()).openPrivateChannel().queue(privateChannel ->
+                privateChannel.sendMessage("```c\n" +
+                        "Error\n" +
+                        "-----\n" +
+                        "Guild: " + memberLeaveEvent.getGuild().getName() + " (" + memberLeaveEvent.getGuild().getIdLong() + ")\n" +
+                        "User: " + memberLeaveEvent.getUser().getName() + " (" + memberLeaveEvent.getUser().getIdLong() + ")\n" +
                         "Command: " + name + "\n" +
                         "Error: " + e.getMessage() + "\n" +
                         "```").queue());

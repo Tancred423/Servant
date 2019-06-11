@@ -1,6 +1,5 @@
 package level;
 
-import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
@@ -32,7 +31,7 @@ public class LevelListener extends ListenerAdapter {
 
         // Enabled?
         try {
-            if (!new servant.Guild(guild.getIdLong()).getStatus("level")) return;
+            if (!new servant.Guild(guild.getIdLong()).getToggleStatus("level")) return;
         } catch (SQLException e) {
             new Log(e, event, name).sendLogSqlReceiveEvent(false);
             return;

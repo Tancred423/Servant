@@ -238,7 +238,7 @@ public class Guild {
         }
     }
 
-    public boolean getStatus(String feature) throws SQLException {
+    public boolean getToggleStatus(String feature) throws SQLException {
         Connection connection = Database.getConnection();
         PreparedStatement select = connection.prepareStatement("SELECT is_enabled FROM toggle WHERE guild_id=? AND feature=?");
         select.setLong(1, guildId);
@@ -251,7 +251,7 @@ public class Guild {
         return isEnabled;
     }
 
-    public void setStatus(String feature, boolean status) throws SQLException {
+    public void setToggleStatus(String feature, boolean status) throws SQLException {
         Connection connection = Database.getConnection();
         if (toggleHasEntry(feature)) {
             // Update.
@@ -269,5 +269,63 @@ public class Guild {
             insert.executeUpdate();
         }
         connection.close();
+    }
+
+    // JoinNotifier
+    private boolean joinNotifierHasEntry() throws SQLException {
+        Connection connection = Database.getConnection();
+        PreparedStatement select = connection.prepareStatement("SELECT * FROM join_notifier WHERE guild_id=?");
+        select.setLong(1, guildId);
+        ResultSet resultSet = select.executeQuery();
+        if (resultSet.first()) {
+            connection.close();
+            return true;
+        } else {
+            connection.close();
+            return false;
+        }
+    }
+
+    public MessageChannel getJoinNotifierChannel() throws SQLException {
+        Connection connection = Database.getConnection();
+        PreparedStatement select = connection.prepareStatement("SELECT channel_id FROM join_notifier WHERE guild_id=?");
+        select.setLong(1, guildId);
+        ResultSet resultSet = select.executeQuery();
+        MessageChannel channel = null;
+        if (resultSet.first()) channel = Servant.jda.getGuildById(guildId).getTextChannelById(resultSet.getLong("channel_id"));
+
+        connection.close();
+        return channel;
+    }
+
+    public void setJoinNotifierChannel(MessageChannel channel) throws SQLException {
+        Connection connection = Database.getConnection();
+        if (joinNotifierHasEntry()) {
+            // Update.
+            PreparedStatement update = connection.prepareStatement("UPDATE join_notifier SET channel_id=? WHERE guild_id=?");
+            update.setLong(1, channel.getIdLong());
+            update.setLong(2, guildId);
+            update.executeUpdate();
+        } else {
+            // Insert.
+            PreparedStatement insert = connection.prepareStatement("INSERT INTO join_notifier (guild_id,channel_id) VALUES (?,?)");
+            insert.setLong(1, guildId);
+            insert.setLong(2, channel.getIdLong());
+            insert.executeUpdate();
+        }
+        connection.close();
+    }
+
+    public boolean unsetJoinNotifierChannel() throws SQLException {
+        if (joinNotifierHasEntry()) {
+            Connection connection = Database.getConnection();
+            PreparedStatement delete = connection.prepareStatement("DELETE FROM join_notifier WHERE guild_id=?");
+            delete.setLong(1, guildId);
+            delete.executeUpdate();
+            connection.close();
+            return true;
+        } else {
+            return false;
+        }
     }
 }

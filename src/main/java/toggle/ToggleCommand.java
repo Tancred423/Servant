@@ -57,7 +57,7 @@ public class ToggleCommand extends Command {
 
         if (status.equals("status")) {
             try {
-                boolean statusB = new Guild(event.getGuild().getIdLong()).getStatus(feature);
+                boolean statusB = new Guild(event.getGuild().getIdLong()).getToggleStatus(feature);
                 event.reply(feature + "'s status: " + (statusB ? "on" : "off"));
             } catch (SQLException e) {
                 new Log(e, event, name).sendLogSqlCommandEvent(true);
@@ -69,7 +69,7 @@ public class ToggleCommand extends Command {
         statusBool = status.equals("on");
 
         try {
-            new Guild(event.getGuild().getIdLong()).setStatus(feature, statusBool);
+            new Guild(event.getGuild().getIdLong()).setToggleStatus(feature, statusBool);
         } catch (SQLException e) {
             new Log(e, event, name).sendLogSqlCommandEvent(true);
             return;

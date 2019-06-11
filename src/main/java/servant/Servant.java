@@ -1,5 +1,6 @@
 package servant;
 
+import moderation.JoinListener;
 import moderation.*;
 import freeToAll.CoinflipCommand;
 import freeToAll.StealAvatarCommand;
@@ -51,35 +52,36 @@ public class Servant {
                 new ShutdownCommand(), // !shutdown
 
                 // Owner
-                new AddGifCommand(),
+                new AddGifCommand(), // !addgif [interaction] [gif url]
 
                 // Admin
-                new ToggleCommand(),
+                new ToggleCommand(), // !toggle [feature] [on|off|status]
 
                 // Moderation
-                new ClearCommand(),
-                new AutoroleCommand(),
-                new FileOnlyChannelCommand(),
+                new AutoroleCommand(), // !autorole [@role|role ID]
+                new ClearCommand(), // !clear [1 - 100]
+                new FileOnlyChannelCommand(), // !fo [set|unset] #channel
+                new JoinCommand(), // !join [set|unset|status] [set: #channel]
 
                 // Settings
-                new UserSettingsCommand(),
+                new UserSettingsCommand(), // !user [set|unset|show] [feature] [optional parameter like color code]
 
                 // Free to all
-                new StealAvatarCommand(),
-                new CoinflipCommand(),
+                new StealAvatarCommand(), // !avatar @user
+                new CoinflipCommand(), // !coinflip
 
                 // Interaction commands.
-                new HugCommand(),
-                new SlapCommand(),
-                new BegCommand(),
-                new CookieCommand(),
-                new KissCommand(),
-                new PatCommand(),
-                new HighfiveCommand(),
-                new DabCommand(),
+                new HugCommand(), // !hug @user
+                new SlapCommand(), // !slap @user
+                new BegCommand(), // !beg @user
+                new CookieCommand(), // !cookie @user
+                new KissCommand(), // !kiss @user
+                new PatCommand(), // !pat @user
+                new HighfiveCommand(), // !highfive @user
+                new DabCommand(), // !dab @user
 
                 // Level
-                new LevelCommand()
+                new LevelCommand() // level [optional: leaderboard|@user]
         );
 
         new JDABuilder(AccountType.BOT)
@@ -96,6 +98,7 @@ public class Servant {
                 .addEventListener(new LevelListener())
                 .addEventListener(new AutoroleListener())
                 .addEventListener(new FileOnlyChannelListener())
+                .addEventListener(new JoinListener())
 
                 // Start.
                 .build();
