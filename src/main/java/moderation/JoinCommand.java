@@ -51,7 +51,7 @@ public class JoinCommand extends Command {
                     return;
                 }
 
-                channel = guild.getTextChannelById(args[1]);
+                channel = event.getMessage().getMentionedChannels().get(0);
 
                 try {
                     internalGuild.setJoinNotifierChannel(channel);

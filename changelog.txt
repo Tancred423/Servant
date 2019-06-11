@@ -1,5 +1,6 @@
 2019-06-11:
 - Added Member Join / Leave Notifications.
+- Added database structure.
 
 2019-06-09:
 - Fixed level formula.
