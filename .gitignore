@@ -31,3 +31,6 @@ hs_err_pid*
 
 # Personalized Settings
 /resources/*
+
+# Database Backups
+/database/*
