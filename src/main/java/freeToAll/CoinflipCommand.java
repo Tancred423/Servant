@@ -2,9 +2,6 @@ package freeToAll;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.doc.standard.CommandInfo;
-import com.jagrosh.jdautilities.doc.standard.RequiredPermissions;
-import com.jagrosh.jdautilities.examples.doc.Author;
 import net.dv8tion.jda.core.Permission;
 import servant.Guild;
 import servant.Log;
@@ -13,13 +10,6 @@ import servant.User;
 import java.sql.SQLException;
 import java.util.concurrent.ThreadLocalRandom;
 
-@CommandInfo(
-        name = {"Coinflip", "Cointoss"},
-        description = "Flip a coin!",
-        usage = "coinflip"
-)
-@RequiredPermissions({Permission.MESSAGE_EMBED_LINKS})
-@Author("Tancred")
 public class CoinflipCommand extends Command {
     public CoinflipCommand() {
         this.name = "coinflip";
@@ -32,6 +22,13 @@ public class CoinflipCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
+        // Enabled?
+        try {
+            if (event.getGuild() != null) if (!new servant.Guild(event.getGuild().getIdLong()).getToggleStatus("coinflip")) return;
+        } catch (SQLException e) {
+            new Log(e, event, name).sendLogSqlCommandEvent(false);
+        }
+
         int coinflip = ThreadLocalRandom.current().nextInt(0, 2); // 0 or 1.
         if (coinflip == 0) event.reply("Head!");
         else event.reply("Tail!");

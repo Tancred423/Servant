@@ -15,7 +15,7 @@ class InteractionEmbed {
         EmbedBuilder eb = new EmbedBuilder();
         eb.setColor(internalUser.getColor());
         eb.setAuthor(commandName.substring(0, 1).toUpperCase() + commandName.substring(1), null, null);
-        eb.setDescription("**" + author.getName() + "** " + (commandEmote == null ? commandEmoji : commandEmote.getAsMention()) + " **" + mentioned.getName() + "**\n\n" +
+        eb.setDescription("**" + author.getName() + "** " + (commandEmote == null ? commandEmoji : commandEmote.getAsMention()) + " **" + (commandName.toLowerCase().equals("dab") ? "on " : "") +  mentioned.getName() + "**\n\n" +
                 author.getAsMention() + "'s shared " + commandName.toLowerCase() + " counter: `" + authorCount + "`\n" +
                 mentioned.getAsMention() + "'s received " + commandName.toLowerCase() + " counter: `" + mentionedCount + "`");
         eb.setImage(commandGif);

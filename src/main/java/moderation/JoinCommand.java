@@ -2,26 +2,20 @@ package moderation;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.doc.standard.CommandInfo;
-import com.jagrosh.jdautilities.examples.doc.Author;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import servant.Log;
+import servant.Servant;
+import utilities.UsageEmbed;
 
 import java.sql.SQLException;
 
-@CommandInfo(
-        name = {"Join", "Leave"},
-        description = "Set up a channel for join and leave messages!",
-        usage = "join [set|unset|status] [on set: #channel]"
-)
-@Author("Tancred")
 public class JoinCommand extends Command {
     public JoinCommand() {
         this.name = "join";
         this.aliases = new String[]{"leave"};
-        this.help = "set up a channel for join and leave messages";
+        this.help = "set up a channel for join and leave messages | **MANAGE CHANNELS**";
         this.category = new Category("Moderation");
         this.arguments = "[set|unset|status] [on set: #channel]";
         this.userPermissions = new Permission[]{Permission.MANAGE_CHANNEL};
@@ -30,18 +24,47 @@ public class JoinCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        String[] args = event.getArgs().split(" ");
-
-        if (args.length < 1) {
-            event.reply("No arguments!\n" +
-                    "`join [set|unset|status] [on set: #channel]`\n" +
-                    "e.g. `join set #channel`");
-            return;
+        // Enabled?
+        try {
+            if (!new servant.Guild(event.getGuild().getIdLong()).getToggleStatus("join")) return;
+        } catch (SQLException e) {
+            new Log(e, event, name).sendLogSqlCommandEvent(false);
         }
 
         Guild guild = event.getGuild();
+        servant.Guild internalGuild;
+        try {
+            internalGuild = new servant.Guild(guild.getIdLong());
+        } catch (SQLException e) {
+            new Log(e, event, name).sendLogSqlCommandEvent(true);
+            return;
+        }
+        String prefix = Servant.config.getDefaultPrefix();
+        // Usage
+        if (event.getArgs().isEmpty()) {
+            try {
+                String usage = "**Setting up a join and leave notification channel**\n" +
+                        "Command: `" + prefix + name + " set [#channel]`\n" +
+                        "Example: `" + prefix + name + " set #welcome`\n" +
+                        "\n" +
+                        "**Unsetting this channel**\n" +
+                        "Command: `" + prefix + name + " unset`\n" +
+                        "\n" +
+                        "**Showing current notification channel**\n" +
+                        "Command: `" + prefix + name + " show`";
+
+                String hint = "Shows a message like \"Name#1234 just joined GuildName!\"\n" +
+                        "or \"Name#1234 just left GuildName!\"";
+
+                event.reply(new UsageEmbed(name, event.getAuthor(), ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+            } catch (SQLException e) {
+                new Log(e, event, name).sendLogSqlCommandEvent(true);
+            }
+            return;
+        }
+
+        String[] args = event.getArgs().split(" ");
         MessageChannel channel;
-        servant.Guild internalGuild = new servant.Guild(guild.getIdLong());
 
         switch (args[0].toLowerCase()) {
             case "set":

@@ -2,36 +2,22 @@ package moderation;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.doc.standard.CommandInfo;
-import com.jagrosh.jdautilities.doc.standard.Error;
-import com.jagrosh.jdautilities.doc.standard.RequiredPermissions;
-import com.jagrosh.jdautilities.examples.doc.Author;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.*;
 import servant.Log;
+import servant.Servant;
+import utilities.UsageEmbed;
 
 import java.sql.SQLException;
 import java.util.List;
 
-@CommandInfo(
-        name = {"FileOnlyChannel"},
-        description = "Set up channels where only files and links can be posted!",
-        usage = "fileonly [set|unset] #channel",
-        requirements = {"The bot has all required permissions."}
-)
-@Error(
-        value = "If arguments are provided, but they are not a mention.",
-        response = "[Argument] is not a valid channel mention!"
-)
-@RequiredPermissions({Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_MANAGE})
-@Author("Tancred")
-public class FileOnlyChannelCommand extends Command {
-    public FileOnlyChannelCommand() {
-        this.name = "fileonlychannel";
-        this.aliases = new String[]{"fileonly", "foc", "fo"};
-        this.help = "set up channels where only files and links can be posted";
+public class MediaOnlyChannelCommand extends Command {
+    public MediaOnlyChannelCommand() {
+        this.name = "mediaonlychannel";
+        this.aliases = new String[]{"mediaonly", "moc", "mo"};
+        this.help = "set up channels where only images, videos and links to images or videos can be posted | **MANAGE CHANNELS**";
         this.category = new Category("Moderation");
-        this.arguments = "[set|unset|show] #channel";
+        this.arguments = "[set|unset|show] [on (un)set: #channel]";
         this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_MANAGE};
         this.userPermissions = new Permission[]{Permission.MANAGE_CHANNEL};
         this.guildOnly = true;
@@ -39,16 +25,46 @@ public class FileOnlyChannelCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
+        // Enabled?
+        try {
+            if (!new servant.Guild(event.getGuild().getIdLong()).getToggleStatus("mediaonlychannel")) return;
+        } catch (SQLException e) {
+            new Log(e, event, name).sendLogSqlCommandEvent(false);
+        }
+
+        Guild guild = event.getGuild();
+        servant.Guild internalGuild;
+        try {
+            internalGuild = new servant.Guild(guild.getIdLong());
+        } catch (SQLException e) {
+            new Log(e, event, name).sendLogSqlCommandEvent(true);
+            return;
+        }
+        String prefix = Servant.config.getDefaultPrefix();
+        // Usage
         if (event.getArgs().isEmpty()) {
-            event.reply("You provided no arguments.\n" +
-                    "You have to `set`, `unset` or `show`.");
+            try {
+                String usage = "**Setting up an media only channel**\n" +
+                        "Command: `" + prefix + name + " set [#channel]`\n" +
+                        "Example: `" + prefix + name + " set #images`\n" +
+                        "\n" +
+                        "**Unsetting an media only channel**\n" +
+                        "Command: `" + prefix + name + " unset [#channel]`\n" +
+                        "Example: `" + prefix + name + " unset #images`\n" +
+                        "\n" +
+                        "**Showing current media only channels**\n" +
+                        "Command: `" + prefix + name + " show`";
+
+                String hint = "You can have multiple media only channels.";
+
+                event.reply(new UsageEmbed(name, event.getAuthor(), ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+            } catch (SQLException e) {
+                new Log(e, event, name).sendLogSqlCommandEvent(true);
+            }
             return;
         }
 
         String[] args = event.getArgs().split(" ");
-
-        Guild guild = event.getGuild();
-        servant.Guild internalGuild = new servant.Guild(guild.getIdLong());
         MessageChannel channel;
 
         switch (args[0].toLowerCase()) {
@@ -67,13 +83,11 @@ public class FileOnlyChannelCommand extends Command {
                 }
 
                 try {
-                    internalGuild.addFileOnlyChannel(channel);
+                    internalGuild.addMediaOnlyChannel(channel);
                 } catch (SQLException e) {
                     new Log(e, event, name).sendLogSqlCommandEvent(true);
                     return;
                 }
-
-                ((TextChannel) channel).getManager().setTopic("‼ File-only channel ‼").queue();
 
                 event.reactSuccess();
                 break;
@@ -94,29 +108,26 @@ public class FileOnlyChannelCommand extends Command {
 
                 boolean wasUnset;
                 try {
-                    wasUnset = internalGuild.unsetFileOnlyChannel(channel);
+                    wasUnset = internalGuild.unsetMediaOnlyChannel(channel);
                 } catch (SQLException e) {
                     new Log(e, event, name).sendLogSqlCommandEvent(true);
                     return;
                 }
 
-                if (wasUnset) {
-                    ((TextChannel) channel).getManager().setTopic("").queue();
-                    event.reactSuccess();
-                }
-                else event.reply("This channel was not set as an file only channel.");
+                if (wasUnset) event.reactSuccess();
+                else event.reply("This channel was not set as an media only channel.");
                 break;
 
             case "show":
             case "sh":
                 List<MessageChannel> channels;
                 try {
-                    channels = internalGuild.getFileOnlyChannels();
+                    channels = internalGuild.getMediaOnlyChannels();
                 } catch (SQLException e) {
                     new Log(e, event, name).sendLogSqlCommandEvent(true);
                     return;
                 }
-                if (channels == null) event.reply("There are not file only channels.");
+                if (channels == null) event.reply("There are not media only channels.");
                 else {
                     StringBuilder sb = new StringBuilder();
                     for (MessageChannel chan : channels)

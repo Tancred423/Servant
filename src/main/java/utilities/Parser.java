@@ -23,7 +23,7 @@ public class Parser {
                 break;
 
             case 7:
-                colorCode = "#" + colorCode;
+                colorCode = colorCode.replaceAll("#", "0x");
                 try {
                     Color.decode(colorCode);
                 } catch (NumberFormatException e) {
@@ -61,20 +61,6 @@ public class Parser {
         return ChronoUnit.MILLIS.between(z1, z2);
     }
 
-    // Level
-//    private static int multiplicator = 5;
-//
-//    public static int getLevelFromExp(int y) {
-//        double p = (double) 50 / multiplicator;
-//        double q = ((double) 100 - y) / multiplicator;
-//        int currentLevel = (int) Math.floor(-(p/2) + Math.sqrt(Math.pow((p/2), 2)-q));
-//        if (currentLevel < 0) return 0;
-//        else return currentLevel;
-//    }
-//
-//    public static int getExpFromLevel(int x) {
-//        return multiplicator*((int) Math.pow(x, 2))+50*x+100;
-//    }
     public static int getTotalLevelExp(int level) {
         int totalExp = 0;
 
@@ -116,5 +102,20 @@ public class Parser {
         }
 
         return role;
+    }
+
+    // Guild
+    public static boolean isValidOffset(String offset) {
+        boolean isValidOffset = true;
+        if (offset.length() != 6) isValidOffset = false;
+        if (!offset.startsWith("+") && !offset.startsWith("-")) isValidOffset = false;
+        if (!offset.substring(1, 3).matches("[0-9]+")) isValidOffset = false;
+        int hours = Integer.parseInt(offset.substring(1, 3));
+        if (hours < 0 || hours > 14) isValidOffset = false;
+        if (!offset.substring(3, 4).equals(":")) isValidOffset = false;
+        if (!offset.substring(4, 6).matches("[0-9]+")) isValidOffset = false;
+        int minutes = Integer.parseInt(offset.substring(4, 6));
+        if (minutes < 0 || minutes > 59) isValidOffset = false;
+        return isValidOffset;
     }
 }

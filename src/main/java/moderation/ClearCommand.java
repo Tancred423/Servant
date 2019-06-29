@@ -2,10 +2,6 @@ package moderation;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.doc.standard.CommandInfo;
-import com.jagrosh.jdautilities.doc.standard.Error;
-import com.jagrosh.jdautilities.doc.standard.RequiredPermissions;
-import com.jagrosh.jdautilities.examples.doc.Author;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Message;
@@ -13,30 +9,20 @@ import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.MessageHistory;
 import servant.Guild;
 import servant.Log;
+import servant.Servant;
 import servant.User;
 import utilities.MessageHandler;
 import utilities.Parser;
+import utilities.UsageEmbed;
 
 import java.sql.SQLException;
 import java.util.List;
 
-@CommandInfo(
-        name = {"Clear", "Clean"},
-        description = "Delete up to 100 messages.",
-        usage = "moderation [1 - 100]",
-        requirements = {"The bot is allowed to delete messages (Manage Messages)."}
-)
-@Error(
-        value = "If arguments are provided, but they are not a integer.",
-        response = "[Argument] is not a valid integer!"
-)
-@RequiredPermissions({Permission.MESSAGE_MANAGE})
-@Author("Tancred")
 public class ClearCommand extends Command {
     public ClearCommand() {
         this.name = "clear";
-        this.aliases = new String[]{"clean"};
-        this.help = "delete messages";
+        this.aliases = new String[]{"clean", "delete"};
+        this.help = "delete messages | **MANAGE MESSAGES**";
         this.category = new Category("Moderation");
         this.arguments = "[1 - 100]";
         this.botPermissions = new Permission[]{Permission.MESSAGE_MANAGE};
@@ -46,10 +32,28 @@ public class ClearCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        String arg = event.getArgs();
+        // Enabled?
+        try {
+            if (!new servant.Guild(event.getGuild().getIdLong()).getToggleStatus("clear")) return;
+        } catch (SQLException e) {
+            new Log(e, event, name).sendLogSqlCommandEvent(false);
+        }
 
+        String arg = event.getArgs();
+        String prefix = Servant.config.getDefaultPrefix();
+        // Usage
         if (arg.isEmpty()) {
-            event.reply("You have to declare how many messages you want to delete. (1 - 100)");
+            try {
+                String usage = "**Delete some messages**\n" +
+                        "Command: `" + prefix + name + " [1 - 100]`\n" +
+                        "Example: `" + prefix + name + " 50`";
+
+                String hint = "The range is inclusively, so you can also delete just 1 or a total of 100 messages.";
+
+                event.reply(new UsageEmbed(name, event.getAuthor(), ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+            } catch (SQLException e) {
+                new Log(e, event, name).sendLogSqlCommandEvent(true);
+            }
             return;
         }
 

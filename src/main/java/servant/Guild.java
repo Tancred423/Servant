@@ -3,7 +3,6 @@ package servant;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.Role;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,9 +14,83 @@ import java.util.Map;
 
 public class Guild {
     private long guildId;
+    private String offset;
 
-    public Guild(long guildId) {
+    public Guild(long guildId) throws SQLException {
         this.guildId = guildId;
+        thisOffset();
+    }
+
+    // Color.
+    public String getOffset() { return offset; }
+
+    private boolean offsetHasEntry() throws SQLException {
+        Connection connection = Database.getConnection();
+        PreparedStatement select = connection.prepareStatement("SELECT * FROM guild_settings WHERE guild_id=? AND setting=?");
+        select.setLong(1, guildId);
+        select.setString(2, "offset");
+        ResultSet resultSet = select.executeQuery();
+        if (resultSet.first()) {
+            connection.close();
+            return true;
+        } else {
+            connection.close();
+            return false;
+        }
+    }
+
+    private void thisOffset() throws SQLException {
+        Connection connection = Database.getConnection();
+        PreparedStatement select = connection.prepareStatement("SELECT value FROM guild_settings WHERE guild_id=? AND setting=?");
+        select.setLong(1, guildId);
+        select.setString(2, "offset");
+        ResultSet resultSet = select.executeQuery();
+        String prefix = null;
+        if (resultSet.first()) prefix = resultSet.getString("value");
+        if (prefix == null) this.offset = Servant.config.getDefaultOffset();
+        else this.offset = prefix;
+        connection.close();
+    }
+
+    public void setOffset(String offset) throws SQLException {
+        this.offset = offset;
+
+        Connection connection = Database.getConnection();
+        if (offsetHasEntry()) {
+            //  Update.
+            PreparedStatement update = connection.prepareStatement("UPDATE guild_settings SET value=? WHERE guild_id=? AND setting=?");
+            update.setString(1, offset);
+            update.setLong(2, guildId);
+            update.setString(3, "offset");
+            update.executeUpdate();
+        } else {
+            // Insert.
+            PreparedStatement insert = connection.prepareStatement("INSERT INTO guild_settings (guild_id,setting,value) VALUES (?,?,?)");
+            insert.setLong(1, guildId);
+            insert.setString(2, "offset");
+            insert.setString(3, offset);
+            insert.executeUpdate();
+        }
+        connection.close();
+    }
+
+    public boolean unsetOffset() throws SQLException {
+        this.offset = Servant.config.getDefaultOffset();
+
+        Connection connection = Database.getConnection();
+        if (offsetHasEntry()) {
+            //  Delete.
+            PreparedStatement delete = connection.prepareStatement("DELETE FROM guild_settings WHERE guild_id=? AND setting=?");
+            delete.setLong(1, guildId);
+            delete.setString(2, "offset");
+            delete.executeUpdate();
+            connection.close();
+            return true;
+        } else {
+            // Nothing to delete.
+            connection.close();
+            return false;
+        }
     }
 
     // DB
@@ -165,10 +238,10 @@ public class Guild {
         } else return false;
     }
 
-    // FileOnlyChannel
-    public boolean fileonlychannelHasEntry(MessageChannel channel) throws SQLException {
+    // MeidaOnlyChannel
+    public boolean mediaOnlyChannelHasEntry(MessageChannel channel) throws SQLException {
         Connection connection = Database.getConnection();
-        PreparedStatement select = connection.prepareStatement("SELECT * FROM fileonlychannel WHERE guild_id=? AND channel_id=?");
+        PreparedStatement select = connection.prepareStatement("SELECT * FROM mediaonlychannel WHERE guild_id=? AND channel_id=?");
         select.setLong(1, guildId);
         select.setLong(2, channel.getIdLong());
         ResultSet resultSet = select.executeQuery();
@@ -181,19 +254,19 @@ public class Guild {
         }
     }
 
-    public void addFileOnlyChannel(MessageChannel channel) throws SQLException {
+    public void addMediaOnlyChannel(MessageChannel channel) throws SQLException {
         Connection connection = Database.getConnection();
-        PreparedStatement insert = connection.prepareStatement("INSERT INTO fileonlychannel (guild_id,channel_id) VALUES (?,?)");
+        PreparedStatement insert = connection.prepareStatement("INSERT INTO mediaonlychannel (guild_id,channel_id) VALUES (?,?)");
         insert.setLong(1, guildId);
         insert.setLong(2, channel.getIdLong());
         insert.executeUpdate();
         connection.close();
     }
 
-    public boolean unsetFileOnlyChannel(MessageChannel channel) throws SQLException {
-        if (fileonlychannelHasEntry(channel)) {
+    public boolean unsetMediaOnlyChannel(MessageChannel channel) throws SQLException {
+        if (mediaOnlyChannelHasEntry(channel)) {
             Connection connection = Database.getConnection();
-            PreparedStatement delete = connection.prepareStatement("DELETE FROM fileonlychannel WHERE guild_id=? AND channel_id=?");
+            PreparedStatement delete = connection.prepareStatement("DELETE FROM mediaonlychannel WHERE guild_id=? AND channel_id=?");
             delete.setLong(1, guildId);
             delete.setLong(2, channel.getIdLong());
             delete.executeUpdate();
@@ -204,9 +277,9 @@ public class Guild {
         }
     }
 
-    public List<MessageChannel> getFileOnlyChannels() throws SQLException {
+    public List<MessageChannel> getMediaOnlyChannels() throws SQLException {
         Connection connection = Database.getConnection();
-        PreparedStatement select = connection.prepareStatement("SELECT * FROM fileonlychannel WHERE guild_id=?");
+        PreparedStatement select = connection.prepareStatement("SELECT * FROM mediaonlychannel WHERE guild_id=?");
         select.setLong(1, guildId);
         ResultSet resultSet = select.executeQuery();
         List<MessageChannel> channels = new ArrayList<>();
@@ -244,8 +317,9 @@ public class Guild {
         select.setLong(1, guildId);
         select.setString(2, feature);
         ResultSet resultSet = select.executeQuery();
-        boolean isEnabled = false;
+        boolean isEnabled;
         if (resultSet.first()) isEnabled = resultSet.getBoolean("is_enabled");
+        else isEnabled = Servant.toggle.get(feature);
 
         connection.close();
         return isEnabled;

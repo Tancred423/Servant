@@ -1,5 +1,6 @@
 package servant;
 
+import config.ToggleFile;
 import moderation.JoinListener;
 import moderation.*;
 import freeToAll.CoinflipCommand;
@@ -16,6 +17,7 @@ import config.ConfigFile;
 import interaction.*;
 import net.dv8tion.jda.core.*;
 import net.dv8tion.jda.core.entities.Game;
+import settings.GuildSettingsCommand;
 import settings.UserSettingsCommand;
 import toggle.ToggleCommand;
 
@@ -26,6 +28,7 @@ import java.io.IOException;
 public class Servant {
     public static JDA jda;
     public static ConfigFile config;
+    public static ToggleFile toggle;
 
     public static void main(String[] args) throws IOException, LoginException {
         config = new ConfigFile();
@@ -34,10 +37,12 @@ public class Servant {
             return;
         }
 
+        toggle = new ToggleFile();
+
         EventWaiter waiter = new EventWaiter(); // Has to be added to JDABuilder.
         CommandClientBuilder client = new CommandClientBuilder(); // Command management by JDA utilities.
 
-        client.useDefaultGame();
+        client.setGame(Game.playing(config.getDefaultPrefix() + "help | v" + config.getBotVersion()));
         client.setOwnerId(config.getBotOwnerId());
         client.setEmojis("✅", "⚠", "❌"); // ✅, ⚠, ❌.
         client.setPrefix(config.getDefaultPrefix());
@@ -45,43 +50,36 @@ public class Servant {
         client.addCommands(
                 // Default JDA utilities commands.
                 new AboutCommand(Color.decode(config.getDefaultColorCode()), "your multifuntional bot",
-                        new String[]{"Cool Commands", "Nice Examples", "Lots of fun!"},
-                        Permission.ADMINISTRATOR), // !about
-                new GuildlistCommand(waiter), // !guildlist
-                new PingCommand(), // !ping
-                new ShutdownCommand(), // !shutdown
-
-                // Owner
-                new AddGifCommand(), // !addgif [interaction] [gif url]
-
-                // Admin
-                new ToggleCommand(), // !toggle [feature] [on|off|status]
+                        new String[]{"Moderation Tools", "Informative Commands", "Shit-post Features", "Interactive Features"},
+                        Permission.ADMINISTRATOR),
+                new GuildlistCommand(waiter), // BOT OWNER
+                new PingCommand(),
+                new ShutdownCommand(), // BOT OWNER
 
                 // Moderation
-                new AutoroleCommand(), // !autorole [@role|role ID]
-                new ClearCommand(), // !clear [1 - 100]
-                new FileOnlyChannelCommand(), // !fo [set|unset] #channel
-                new JoinCommand(), // !join [set|unset|status] [set: #channel]
-
-                // Settings
-                new UserSettingsCommand(), // !user [set|unset|show] [feature] [optional parameter like color code]
+                new AutoroleCommand(), // MANAGE ROLES
+                new ClearCommand(), // MANAGE MESSAGES
+                new GuildSettingsCommand(), // ADMINISTRATOR
+                new JoinCommand(), // MANAGE CHANNEL
+                new MediaOnlyChannelCommand(), // MANAGE CHANNEL
+                new ToggleCommand(), // ADMINISTRATOR
 
                 // Free to all
-                new StealAvatarCommand(), // !avatar @user
-                new CoinflipCommand(), // !coinflip
+                new CoinflipCommand(),
+                new LevelCommand(),
+                new StealAvatarCommand(),
+                new UserSettingsCommand(),
 
                 // Interaction commands.
-                new HugCommand(), // !hug @user
-                new SlapCommand(), // !slap @user
-                new BegCommand(), // !beg @user
-                new CookieCommand(), // !cookie @user
-                new KissCommand(), // !kiss @user
-                new PatCommand(), // !pat @user
-                new HighfiveCommand(), // !highfive @user
-                new DabCommand(), // !dab @user
-
-                // Level
-                new LevelCommand() // level [optional: leaderboard|@user]
+                new AddGifCommand(), // BOT OWNER
+                new HugCommand(),
+                new SlapCommand(),
+                new BegCommand(),
+                new CookieCommand(),
+                new KissCommand(),
+                new PatCommand(),
+                new HighfiveCommand(),
+                new DabCommand()
         );
 
         new JDABuilder(AccountType.BOT)
@@ -97,7 +95,7 @@ public class Servant {
                 .addEventListener(new ReadyListener())
                 .addEventListener(new LevelListener())
                 .addEventListener(new AutoroleListener())
-                .addEventListener(new FileOnlyChannelListener())
+                .addEventListener(new MediaOnlyChannelListener())
                 .addEventListener(new JoinListener())
 
                 // Start.

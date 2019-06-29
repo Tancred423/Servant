@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Erstellungszeit: 11. Jun 2019 um 18:34
+-- Erstellungszeit: 29. Jun 2019 um 15:22
 -- Server-Version: 5.6.34-log
 -- PHP-Version: 7.1.5
 
@@ -19,7 +19,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Datenbank: `123456`
+-- Datenbank: `servant_structure`
 --
 
 -- --------------------------------------------------------
@@ -60,12 +60,13 @@ CREATE TABLE `feature_count` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `fileonlychannel`
+-- Tabellenstruktur für Tabelle `guild_settings`
 --
 
-CREATE TABLE `fileonlychannel` (
+CREATE TABLE `guild_settings` (
   `guild_id` bigint(18) NOT NULL,
-  `channel_id` bigint(18) NOT NULL
+  `setting` varchar(32) NOT NULL,
+  `value` varchar(200) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -99,6 +100,17 @@ CREATE TABLE `interaction_count` (
 --
 
 CREATE TABLE `join_notifier` (
+  `guild_id` bigint(18) NOT NULL,
+  `channel_id` bigint(18) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `mediaonlychannel`
+--
+
+CREATE TABLE `mediaonlychannel` (
   `guild_id` bigint(18) NOT NULL,
   `channel_id` bigint(18) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -162,10 +174,10 @@ ALTER TABLE `feature_count`
   ADD PRIMARY KEY (`id`,`feature`);
 
 --
--- Indizes für die Tabelle `fileonlychannel`
+-- Indizes für die Tabelle `guild_settings`
 --
-ALTER TABLE `fileonlychannel`
-  ADD PRIMARY KEY (`guild_id`,`channel_id`);
+ALTER TABLE `guild_settings`
+  ADD PRIMARY KEY (`guild_id`,`setting`);
 
 --
 -- Indizes für die Tabelle `interaction_count`
@@ -178,6 +190,12 @@ ALTER TABLE `interaction_count`
 --
 ALTER TABLE `join_notifier`
   ADD PRIMARY KEY (`guild_id`);
+
+--
+-- Indizes für die Tabelle `mediaonlychannel`
+--
+ALTER TABLE `mediaonlychannel`
+  ADD PRIMARY KEY (`guild_id`,`channel_id`);
 
 --
 -- Indizes für die Tabelle `toggle`

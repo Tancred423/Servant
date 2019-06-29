@@ -1,12 +1,22 @@
-2019-06-11:
+2019-06-29 (v4.5.0):
+- Updated README.
+- Renamed FileOnlyChannel to MediaOnlyChannel.
+- MediaOnlyChannels now allow images, videos, audio files, youtube videos and soundcloud urls.
+- Any feature except bot owners and JDA utilties standard ones can be toggled.
+- Default toggle values are in the toggle.ini file.
+- Guilds can now set a custom timezone offset. (from UTC)
+- Servant now checks database connection on boot.
+- Any command has a detailed help on using that command without any arguments.
+
+2019-06-11 (v4.4.0):
 - Added Member Join / Leave Notifications.
 - Added database structure.
 
-2019-06-09:
+2019-06-09 (v4.3.1):
 - Fixed level formula.
 - Added toggle command. (Only level feature yet -> Default: off)
 
-2019-06-07:
+2019-06-07 (v4.3.0):
 - Added "StealAvatar"-command.
 - Added coin flip command.
 - Added feature counters for future statistics (user and guild).
@@ -14,12 +24,12 @@
 - Added autorole feature. ((Un)setting role, automatically receiving role)
 - Added file only channel feature. (Set up channels in which users only can post links and files)
 
-2019-06-04.2:
+2019-06-04 (v4.2.0):
 - Added "AddGif"-command for easy interaction gif management.
 - Added clear command to delete messages.
 - Removed command editing cooldown.
 
-2019-06-04:
+2019-06-04 (v4.1.0):
 - Added interaction commands. (Beg, Cookie, Dab, Highfive, Hug, Kiss, Pat, Slap)
 - Added abtract class for interaction commands.
 - Added user setting (color) command.
@@ -32,7 +42,7 @@
 - Added parser class. Currently parses only color codes.
 - Turned static user class into instance class.
 
-2019-06-03:
+2019-06-03 (v4.0.0):
 - Bot set up.
 - Bot connecting to Discord.
 - Added config file class.

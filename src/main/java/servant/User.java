@@ -1,7 +1,6 @@
 package servant;
 
 import java.awt.*;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,6 +17,19 @@ public class User {
 
     // Color.
     public Color getColor() { return color; }
+
+    public String getColorCode() throws SQLException {
+        Connection connection = Database.getConnection();
+        PreparedStatement select = connection.prepareStatement("SELECT value FROM user_settings WHERE user_id=? AND setting=?");
+        select.setLong(1, userId);
+        select.setString(2, "color");
+        ResultSet resultSet = select.executeQuery();
+        String colorCode = null;
+        if (resultSet.first()) colorCode = resultSet.getString("value");
+        if (colorCode == null) colorCode = Servant.config.getDefaultColorCode();
+        connection.close();
+        return colorCode;
+    }
 
     private void thisColor() throws SQLException {
         Connection connection = Database.getConnection();

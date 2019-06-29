@@ -2,33 +2,27 @@ package level;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.doc.standard.CommandInfo;
-import com.jagrosh.jdautilities.examples.doc.Author;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.User;
 import servant.Guild;
 import servant.Log;
+import servant.Servant;
 import utilities.Parser;
 import utilities.StringFormat;
+import utilities.UsageEmbed;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@CommandInfo(
-        name = {"Level", "Lvl", "Experience", "Exp"},
-        description = "Check your level or the current guild's leaderboard!",
-        usage = "level [blank, \"leaderboard\" or mention]"
-)
-@Author("Tancred")
 public class LevelCommand extends Command {
     public LevelCommand() {
         this.name = "level";
         this.aliases = new String[]{"lvl", "experience", "exp"};
         this.help = "check your level or the current guild's leaderboard";
-        this.category = new Category("Level");
-        this.arguments = "[blank, \"leaderboard\" or mention]";
+        this.category = new Category("Free to all");
+        this.arguments = "[show, @user or \"leaderboard\"]";
         this.guildOnly = true;
     }
 
@@ -42,6 +36,38 @@ public class LevelCommand extends Command {
             return;
         }
 
+        net.dv8tion.jda.core.entities.Guild guild = event.getGuild();
+        servant.Guild internalGuild;
+        try {
+            internalGuild = new Guild(guild.getIdLong());
+        } catch (SQLException e) {
+            new Log(e, event, name).sendLogSqlCommandEvent(true);
+            return;
+        }
+        String prefix = Servant.config.getDefaultPrefix();
+        // Usage
+        if (event.getArgs().isEmpty()) {
+            try {
+                String usage = "**Show your own current level**\n" +
+                        "Command: `" + prefix + name + " show`\n" +
+                        "\n" +
+                        "**Show someone else's current level**\n" +
+                        "Command: `" + prefix + name + " [@user]`\n" +
+                        "Example: `" + prefix + name + " @Servant`\n" +
+                        "\n" +
+                        "**Showing guild's current leaderboard**\n" +
+                        "Command: `" + prefix + name + " leaderboard`";
+
+                String hint = "You will get 15 - 25 exp inclusively per message (" + Servant.config.getExpCdMillis() + "ms CD)\n" +
+                        "Aliases for `leaderboard`: `leaderboards`, `lb` and `lbs`.";
+
+                event.reply(new UsageEmbed(name, event.getAuthor(), ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+            } catch (SQLException e) {
+                new Log(e, event, name).sendLogSqlCommandEvent(true);
+            }
+            return;
+        }
+
         User author = event.getAuthor();
         servant.User internalAuthor;
         try {
@@ -52,33 +78,32 @@ public class LevelCommand extends Command {
         }
 
         String arg = event.getArgs();
+        int currentExp;
+        int currentLevel;
+        int neededExp;
+        int currentExpOnThisLevel;
 
-        if (arg.isEmpty()) {
-            // Show own level.
-            int currentExp;
-            try {
-                currentExp = internalAuthor.getExp(event.getGuild().getIdLong());
-            } catch (SQLException e) {
-                new Log(e, event, name).sendLogSqlCommandEvent(true);
-                return;
-            }
-            int currentLevel = Parser.getLevelFromExp(currentExp);
-            int neededExp = Parser.getLevelExp(currentLevel);
-            int currentExpOnThisLevel = currentExp - Parser.getTotalLevelExp(currentLevel - 1);
+        switch (arg.toLowerCase()) {
+            case "show":
+            case "sh":
 
-            event.reply(author.getAsMention() + "'s current level: " + currentLevel + " (" + currentExpOnThisLevel + "/" + neededExp + " XP)");
-        } else {
-            String[] args = arg.split(" ");
-            List<String> aliasLeaderboard = new ArrayList<>() {{
-                add("leaderboard");
-                add("leaderboards");
-                add("lb");
-                add("lbs");
-            }};
+                try {
+                    currentExp = internalAuthor.getExp(event.getGuild().getIdLong());
+                } catch (SQLException e) {
+                    new Log(e, event, name).sendLogSqlCommandEvent(true);
+                    return;
+                }
+                currentLevel = Parser.getLevelFromExp(currentExp);
+                neededExp = Parser.getLevelExp(currentLevel);
+                currentExpOnThisLevel = currentExp - Parser.getTotalLevelExp(currentLevel - 1);
 
-            if (aliasLeaderboard.contains(args[0].toLowerCase())) {
-                // Show leaderboard.
-                Guild internalGuild = new Guild(event.getGuild().getIdLong());
+                event.reply(author.getAsMention() + "'s current level: " + currentLevel + " (" + currentExpOnThisLevel + "/" + neededExp + " XP)");
+                break;
+
+            case "leaderboard":
+            case "leaderboards":
+            case "lb":
+            case "lbs":
                 Map<Long, Integer> userExp;
                 try {
                     userExp = internalGuild.getLeaderboard();
@@ -109,39 +134,42 @@ public class LevelCommand extends Command {
                 leaderboard.append("```");
 
                 event.reply(leaderboard.toString());
-            } else if (Parser.hasMentionedUser(event.getMessage())) {
-                // Show mentioned user's level.
-                Message message = event.getMessage();
-                User mentioned = message.getMentionedMembers().get(0).getUser();
+                break;
 
-                if (mentioned.isBot()) {
-                    event.reply("Bots cannot collect experience.");
-                    return;
-                }
+            default:
+                if (Parser.hasMentionedUser(event.getMessage())) {
+                    // Show mentioned user's level.
+                    Message message = event.getMessage();
+                    User mentioned = message.getMentionedMembers().get(0).getUser();
 
-                servant.User internalMentioned;
-                try {
-                    internalMentioned = new servant.User(mentioned.getIdLong());
-                } catch (SQLException e) {
-                    new Log(e, event, name).sendLogSqlCommandEvent(true);
-                    return;
-                }
-                int currentExp;
-                try {
-                    currentExp = internalMentioned.getExp(event.getGuild().getIdLong());
-                } catch (SQLException e) {
-                    new Log(e, event, name).sendLogSqlCommandEvent(true);
-                    return;
-                }
-                int currentLevel = Parser.getLevelFromExp(currentExp);
-                int neededExp = Parser.getLevelExp(currentLevel);
-                int currentExpOnThisLevel = currentExp - Parser.getTotalLevelExp(currentLevel - 1);
+                    if (mentioned.isBot()) {
+                        event.reply("Bots cannot collect experience.");
+                        return;
+                    }
 
-                event.reply(mentioned.getAsMention() + "'s current level: " + currentLevel + " (" + currentExpOnThisLevel + "/" + neededExp + " XP)");
-            } else {
-                event.reply("Invalid argument.\n" +
-                        "Leave it blank to view your own level, mention someone to view their level or type \"leaderboard\" to check the current guild's leaderboard.");
-            }
+                    servant.User internalMentioned;
+                    try {
+                        internalMentioned = new servant.User(mentioned.getIdLong());
+                    } catch (SQLException e) {
+                        new Log(e, event, name).sendLogSqlCommandEvent(true);
+                        return;
+                    }
+                    try {
+                        currentExp = internalMentioned.getExp(event.getGuild().getIdLong());
+                    } catch (SQLException e) {
+                        new Log(e, event, name).sendLogSqlCommandEvent(true);
+                        return;
+                    }
+                    currentLevel = Parser.getLevelFromExp(currentExp);
+                    neededExp = Parser.getLevelExp(currentLevel);
+                    currentExpOnThisLevel = currentExp - Parser.getTotalLevelExp(currentLevel - 1);
+
+                    event.reply(mentioned.getAsMention() + "'s current level: " + currentLevel + " (" + currentExpOnThisLevel + "/" + neededExp + " XP)");
+                } else {
+                    event.reply("Invalid argument.\n" +
+                            "Type `show` to view your own level, mention someone to view their level or type \"leaderboard\" to check the current guild's leaderboard.");
+                }
+                break;
         }
 
         // Statistics.

@@ -2,37 +2,24 @@ package freeToAll;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.doc.standard.CommandInfo;
-import com.jagrosh.jdautilities.doc.standard.Error;
-import com.jagrosh.jdautilities.doc.standard.RequiredPermissions;
-import com.jagrosh.jdautilities.examples.doc.Author;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.User;
 import servant.Guild;
 import servant.Log;
+import servant.Servant;
 import utilities.MessageHandler;
 import utilities.Parser;
+import utilities.UsageEmbed;
 
 import java.awt.*;
 import java.sql.SQLException;
 
-@CommandInfo(
-        name = {"Avatar", "StealAvatar"},
-        description = "Steal someone's avatar!",
-        usage = "avatar @user"
-)
-@Error(
-        value = "If arguments are provided, but they are not a mention.",
-        response = "[Argument] is not a valid mention!"
-)
-@RequiredPermissions({Permission.MESSAGE_EMBED_LINKS})
-@Author("Tancred")
 public class StealAvatarCommand extends Command {
     public StealAvatarCommand() {
         this.name = "avatar";
-        this.aliases = new String[]{"ava", "StealAvatar"};
+        this.aliases = new String[]{"ava", "stealavatar", "stealava"};
         this.help = "returns mentioned user's avatar.";
         this.category = new Category("Free to all");
         this.arguments = "@user";
@@ -42,6 +29,28 @@ public class StealAvatarCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
+        // Enabled?
+        try {
+            if (event.getGuild() != null) if (!new servant.Guild(event.getGuild().getIdLong()).getToggleStatus("avatar")) return;
+        } catch (SQLException e) {
+            new Log(e, event, name).sendLogSqlCommandEvent(false);
+        }
+
+        String prefix = Servant.config.getDefaultPrefix();
+        // Usage
+        if (event.getArgs().isEmpty()) {
+            try {
+                String usage = "**Stealing someones avatar**\n" +
+                        "Command: `" + prefix + name + " [@user]`\n" +
+                        "Example: `" + prefix + name + " @Servant`\n";
+
+                event.reply(new UsageEmbed(name, event.getAuthor(), ownerCommand, userPermissions, aliases, usage, null).getEmbed());
+            } catch (SQLException e) {
+                new Log(e, event, name).sendLogSqlCommandEvent(true);
+            }
+            return;
+        }
+
         // Check mentioned user.
         if (!Parser.hasMentionedUser(event.getMessage())) {
             event.reply("Invalid mention.");

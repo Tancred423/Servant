@@ -2,12 +2,8 @@ package interaction;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.doc.standard.CommandInfo;
-import com.jagrosh.jdautilities.examples.doc.Author;
-import servant.Database;
-import servant.Guild;
-import servant.Log;
-import servant.User;
+import servant.*;
+import utilities.UsageEmbed;
 
 import java.io.IOException;
 import java.net.URL;
@@ -16,19 +12,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-@CommandInfo(
-        name = {"AddGif"},
-        description = "Add a gif for an interaction command.",
-        usage = "addgif [interaction] [gifUrl]",
-        requirements = {"Gif has to be a direct link!"}
-)
-@Author("Tancred")
 public class AddGifCommand extends Command {
     public AddGifCommand() {
-        this.name = "AddGif";
-        this.aliases = new String[]{"AddJif"};
-        this.help = "adds a gif for the interaction commands";
-        this.category = new Category("Owner");
+        this.name = "addgif";
+        this.aliases = new String[]{"addjif"};
+        this.help = "adds a gif for the interaction commands | **BOT OWNER**";
+        this.category = new Category("Interaction");
         this.arguments = "[interaction] [gifUrl]";
         this.guildOnly = false;
         this.ownerCommand = true;
@@ -36,6 +25,23 @@ public class AddGifCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
+        String prefix = Servant.config.getDefaultPrefix();
+        // Usage
+        if (event.getArgs().isEmpty()) {
+            try {
+                String usage = "**Add a gif**\n" +
+                        "Command: `" + prefix + name + " [interaction] [gifUrl]`\n" +
+                        "Example: `" + prefix + name + " slap https://i.imgur.com/bbXmAx2.gif`\n";
+
+                String hint = "Image url has to be a [direct link](https://www.urbandictionary.com/define.php?term=direct%20link).";
+
+                event.reply(new UsageEmbed(name, event.getAuthor(), ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+            } catch (SQLException e) {
+                new Log(e, event, name).sendLogSqlCommandEvent(true);
+            }
+            return;
+        }
+
         String[] args = event.getArgs().split(" ");
         if (args.length < 2) {
             event.reply("2 arguments are needed.\n" +
@@ -57,7 +63,7 @@ public class AddGifCommand extends Command {
         URLConnection c;
         try {
             url = new URL(gifUrl);
-             c = url.openConnection();
+            c = url.openConnection();
         } catch (IOException e) {
             new Log(e, event, name).sendLogHttpCommandEvent();
             return;

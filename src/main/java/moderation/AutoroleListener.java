@@ -14,7 +14,20 @@ public class AutoroleListener extends ListenerAdapter {
         User eventUser = event.getUser();
         if (eventUser.isBot()) return;
 
-        Guild internalGuild = new Guild(event.getGuild().getIdLong());
+        // Enabled?
+        try {
+            if (!new servant.Guild(event.getGuild().getIdLong()).getToggleStatus("autorole")) return;
+        } catch (SQLException e) {
+            new Log(e, event, name).sendLogSqlMemberJoinEvent();
+        }
+
+        Guild internalGuild;
+        try {
+            internalGuild = new Guild(event.getGuild().getIdLong());
+        } catch (SQLException e) {
+            new Log(e, event, name).sendLogSqlMemberJoinEvent();
+            return;
+        }
         try {
             if (internalGuild.hasAutorole()) {
                 event.getGuild().getController().addSingleRoleToMember(event.getMember(), internalGuild.getAutorole()).queue();

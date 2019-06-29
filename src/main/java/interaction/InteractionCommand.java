@@ -6,7 +6,9 @@ import net.dv8tion.jda.core.entities.Emote;
 import net.dv8tion.jda.core.entities.User;
 import servant.Guild;
 import servant.Log;
+import servant.Servant;
 import utilities.Parser;
+import utilities.UsageEmbed;
 
 import java.sql.SQLException;
 
@@ -15,6 +17,28 @@ public abstract class InteractionCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
+        // Enabled?
+        try {
+            if (!new servant.Guild(event.getGuild().getIdLong()).getToggleStatus("interaction")) return;
+        } catch (SQLException e) {
+            new Log(e, event, name).sendLogSqlCommandEvent(false);
+        }
+
+        String prefix = Servant.config.getDefaultPrefix();
+        // Usage
+        if (event.getArgs().isEmpty()) {
+            try {
+                String usage = "**" + name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase() + (name.toLowerCase().equals("dab") ? " on" : "") +  " someone**\n" +
+                        "Command: `" + prefix + name + " [@user]`\n" +
+                        "Example: `" + prefix + name + " @Servant`";
+
+                event.reply(new UsageEmbed(name, event.getAuthor(), ownerCommand, userPermissions, aliases, usage, null).getEmbed());
+            } catch (SQLException e) {
+                new Log(e, event, name).sendLogSqlCommandEvent(true);
+            }
+            return;
+        }
+
         // Check mentioned user.
         if (!Parser.hasMentionedUser(event.getMessage())) {
             event.reply("Invalid mention.");
