@@ -1,7 +1,7 @@
 2019-06-29 (v4.5.0):
 - Updated README.
 - Renamed FileOnlyChannel to MediaOnlyChannel.
-- MediaOnlyChannels now allow images, videos, audio files, youtube videos and soundcloud urls.
+- MediaOnlyChannels now allow images, videos, audio files, youtube videos, soundcloud urls and links to images or videos (direct link only).
 - On setting up MediaOnlyChannels, the channel description will no longer be changed.
 - Any feature except bot owners and JDA utilties standard ones can be toggled.
 - Default toggle values are in the toggle.ini file.
