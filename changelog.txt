@@ -1,9 +1,9 @@
 2019-06-29 (v4.5.1):
-- Sorted help message
-- Sorted features in about message
-- Renamed StealAvatarCommand to AvatarCommand
-- Renamed GuildSettingsCommand to GuildCommand
-- Renamed UserSettingsCommand to UserCommand
+- Sorted help message.
+- Sorted features in about message.
+- Renamed StealAvatarCommand to AvatarCommand.
+- Renamed GuildSettingsCommand to GuildCommand.
+- Renamed UserSettingsCommand to UserCommand.
 
 2019-06-29 (v4.5.0):
 - Updated README.
