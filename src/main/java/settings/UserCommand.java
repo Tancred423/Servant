@@ -9,22 +9,20 @@ import servant.Servant;
 import servant.User;
 import utilities.MessageHandler;
 import utilities.MyEntry;
-import utilities.Parser;
 import utilities.UsageEmbed;
 
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GuildSettingsCommand extends Command {
-    public GuildSettingsCommand() {
-        this.name = "guild";
-        this.aliases = new String[]{"server"};
-        this.help = "personalize the bot to your desire (guild) | **ADMINISTRATOR**";
-        this.category = new Category("Moderation");
+public class UserCommand extends Command {
+    public UserCommand() {
+        this.name = "user";
+        this.aliases = new String[]{"member"};
+        this.help = "personalize the bot to your desire (user)";
+        this.category = new Category("Free to all");
         this.arguments = "[set|unset] [setting] [value]";
         this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
-        this.userPermissions = new Permission[]{Permission.ADMINISTRATOR};
         this.guildOnly = false;
     }
 
@@ -32,36 +30,28 @@ public class GuildSettingsCommand extends Command {
     protected void execute(CommandEvent event) {
         // Enabled?
         try {
-            if (!new servant.Guild(event.getGuild().getIdLong()).getToggleStatus("guild")) return;
+            if (event.getGuild() != null) if (!new servant.Guild(event.getGuild().getIdLong()).getToggleStatus("user")) return;
         } catch (SQLException e) {
             new Log(e, event, name).sendLogSqlCommandEvent(false);
-        }
-
-        net.dv8tion.jda.core.entities.Guild guild = event.getGuild();
-        Guild internalGuild;
-        try {
-            internalGuild = new Guild(guild.getIdLong());
-        } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(true);
-            return;
         }
 
         String prefix = Servant.config.getDefaultPrefix();
         // Usage
         if (event.getArgs().isEmpty()) {
             try {
-                String usage = "**Setting an offset**\n" +
-                        "Command: `" + prefix + name + " set offset [offset]`\n" +
-                        "Example: `" + prefix + name + " set offset +01:00`\n" +
+                String usage = "**Setting an embed color**\n" +
+                        "Command: `" + prefix + name + " set color [color code]`\n" +
+                        "Example 1: `" + prefix + name + " set color 0xFFFFFF`\n" +
+                        "Example 2: `" + prefix + name + " set color #FFFFFF`\n" +
+                        "Example 3: `" + prefix + name + " set color FFFFFF`\n" +
                         "\n" +
-                        "**Unsetting the offset**\n" +
-                        "Command: `" + prefix + name + " unset offset`\n" +
+                        "**Unsetting the embed color**\n" +
+                        "Command: `" + prefix + name + " unset color`\n" +
                         "\n" +
                         "**Show your current settings**\n" +
                         "Command: `" + prefix + name + " show`";
 
-                String hint = "Unsetting an offset will just remove your custom offset and you will use the default offset (" + Servant.config.getDefaultOffset() + ") again.\n" +
-                        "Offset always adds on UTC.\n" +
+                String hint = "An embed color is the color you can see right know on the left of this text field thingy.\n" +
                         "More settings will be added in future updates.";
 
                 event.reply(new UsageEmbed(name, event.getAuthor(), ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
@@ -74,6 +64,7 @@ public class GuildSettingsCommand extends Command {
         String[] args = event.getArgs().split(" ");
         String type = args[0].toLowerCase();
         String setting;
+        long userId = event.getAuthor().getIdLong();
         User internalUser;
 
         switch (type) {
@@ -88,16 +79,23 @@ public class GuildSettingsCommand extends Command {
                 setting = args[1].toLowerCase();
                 String value = args[2];
 
+                try {
+                    internalUser = new User(userId);
+                } catch (SQLException e) {
+                    new Log(e, event, name).sendLogSqlCommandEvent(true);
+                    return;
+                }
+
                 switch (setting) {
-                    case "offset":
-                    case "timezone":
-                        if (!Parser.isValidOffset(value)) {
-                            event.reply("Invalid offset");
+                    case "color":
+                    case "colour":
+                        value = utilities.Parser.parseColor(value);
+                        if (value == null) {
+                            event.reply("The given color code is invalid.");
                             return;
                         }
-
                         try {
-                            internalGuild.setOffset(value);
+                            internalUser.setColor(value);
                         } catch (SQLException e) {
                             new Log(e, event, name).sendLogSqlCommandEvent(true);
                             return;
@@ -122,12 +120,19 @@ public class GuildSettingsCommand extends Command {
 
                 setting = args[1].toLowerCase();
 
+                try {
+                    internalUser = new User(userId);
+                } catch (SQLException e) {
+                    new Log(e, event, name).sendLogSqlCommandEvent(true);
+                    return;
+                }
+
                 switch (setting) {
-                    case "offset":
-                    case "timezone":
+                    case "color":
+                    case "colour":
                         boolean wasUnset;
                         try {
-                            wasUnset = internalGuild.unsetOffset();
+                            wasUnset = internalUser.unsetColor();
                         } catch (SQLException e) {
                             new Log(e, event, name).sendLogSqlCommandEvent(true);
                             return;
@@ -146,23 +151,23 @@ public class GuildSettingsCommand extends Command {
             case "show":
             case "sh":
                 net.dv8tion.jda.core.entities.User author = event.getAuthor();
-                String offset;
+                String colorCode;
                 try {
                     internalUser = new User(author.getIdLong());
-                    offset = internalGuild.getOffset();
+                    colorCode = internalUser.getColorCode();
                 } catch (SQLException e) {
                     new Log(e, event, name).sendLogSqlCommandEvent(true);
                     return;
                 }
 
                 Map<String, Map.Entry<String, Boolean>> fields = new HashMap<>();
-                fields.put("Offset", new MyEntry<>(offset, true));
+                fields.put("Color", new MyEntry<>(colorCode, true));
 
                 new MessageHandler().sendEmbed(event.getChannel(),
                         internalUser.getColor(),
-                        "Guild Settings",
+                        "User Settings",
                         null,
-                        guild.getIconUrl(),
+                        author.getAvatarUrl(),
                         null,
                         null,
                         null,

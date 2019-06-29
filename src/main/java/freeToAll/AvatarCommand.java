@@ -16,8 +16,8 @@ import utilities.UsageEmbed;
 import java.awt.*;
 import java.sql.SQLException;
 
-public class StealAvatarCommand extends Command {
-    public StealAvatarCommand() {
+public class AvatarCommand extends Command {
+    public AvatarCommand() {
         this.name = "avatar";
         this.aliases = new String[]{"ava", "stealavatar", "stealava"};
         this.help = "returns mentioned user's avatar.";

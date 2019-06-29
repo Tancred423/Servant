@@ -4,7 +4,7 @@ import config.ToggleFile;
 import moderation.JoinListener;
 import moderation.*;
 import freeToAll.CoinflipCommand;
-import freeToAll.StealAvatarCommand;
+import freeToAll.AvatarCommand;
 import level.LevelCommand;
 import level.LevelListener;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
@@ -17,8 +17,8 @@ import config.ConfigFile;
 import interaction.*;
 import net.dv8tion.jda.core.*;
 import net.dv8tion.jda.core.entities.Game;
-import settings.GuildSettingsCommand;
-import settings.UserSettingsCommand;
+import settings.GuildCommand;
+import settings.UserCommand;
 import toggle.ToggleCommand;
 
 import javax.security.auth.login.LoginException;
@@ -50,7 +50,7 @@ public class Servant {
         client.addCommands(
                 // Default JDA utilities commands.
                 new AboutCommand(Color.decode(config.getDefaultColorCode()), "your multifuntional bot",
-                        new String[]{"Moderation Tools", "Informative Commands", "Shit-post Features", "Interactive Features"},
+                        new String[]{"Moderation Tools", "Informative Commands", "Interactive Features", "Shit-post Features"},
                         Permission.ADMINISTRATOR),
                 new GuildlistCommand(waiter), // BOT OWNER
                 new PingCommand(),
@@ -59,27 +59,27 @@ public class Servant {
                 // Moderation
                 new AutoroleCommand(), // MANAGE ROLES
                 new ClearCommand(), // MANAGE MESSAGES
-                new GuildSettingsCommand(), // ADMINISTRATOR
+                new GuildCommand(), // ADMINISTRATOR
                 new JoinCommand(), // MANAGE CHANNEL
                 new MediaOnlyChannelCommand(), // MANAGE CHANNEL
                 new ToggleCommand(), // ADMINISTRATOR
 
                 // Free to all
+                new AvatarCommand(),
                 new CoinflipCommand(),
                 new LevelCommand(),
-                new StealAvatarCommand(),
-                new UserSettingsCommand(),
+                new UserCommand(),
 
                 // Interaction commands.
                 new AddGifCommand(), // BOT OWNER
-                new HugCommand(),
-                new SlapCommand(),
                 new BegCommand(),
                 new CookieCommand(),
+                new DabCommand(),
+                new HighfiveCommand(),
+                new HugCommand(),
                 new KissCommand(),
                 new PatCommand(),
-                new HighfiveCommand(),
-                new DabCommand()
+                new SlapCommand()
         );
 
         new JDABuilder(AccountType.BOT)
