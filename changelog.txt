@@ -2,6 +2,7 @@
 - Updated README.
 - Renamed FileOnlyChannel to MediaOnlyChannel.
 - MediaOnlyChannels now allow images, videos, audio files, youtube videos and soundcloud urls.
+- On setting up MediaOnlyChannels, the channel description will no longer be changed.
 - Any feature except bot owners and JDA utilties standard ones can be toggled.
 - Default toggle values are in the toggle.ini file.
 - Guilds can now set a custom timezone offset. (from UTC)
