@@ -1,12 +1,13 @@
 package servant;
 
 import config.ToggleFile;
+import freeToAll.BaguetteCommand;
 import moderation.JoinListener;
 import moderation.*;
 import freeToAll.CoinflipCommand;
 import freeToAll.AvatarCommand;
-import level.LevelCommand;
-import level.LevelListener;
+import freeToAll.LevelCommand;
+import freeToAll.LevelListener;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.jagrosh.jdautilities.examples.command.AboutCommand;
@@ -17,8 +18,8 @@ import config.ConfigFile;
 import interaction.*;
 import net.dv8tion.jda.core.*;
 import net.dv8tion.jda.core.entities.Game;
-import settings.GuildCommand;
-import settings.UserCommand;
+import moderation.GuildCommand;
+import freeToAll.UserCommand;
 import toggle.ToggleCommand;
 
 import javax.security.auth.login.LoginException;
@@ -66,6 +67,7 @@ public class Servant {
 
                 // Free to all
                 new AvatarCommand(),
+                new BaguetteCommand(),
                 new CoinflipCommand(),
                 new LevelCommand(),
                 new UserCommand(),

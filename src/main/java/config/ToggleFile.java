@@ -19,6 +19,7 @@ public class ToggleFile {
     private boolean avatar;
     private boolean user;
     private boolean interaction;
+    private boolean baguette;
 
     // Constructor.
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -53,6 +54,7 @@ public class ToggleFile {
         config.setProperty("avatar", "on");
         config.setProperty("user", "on");
         config.setProperty("interaction", "on");
+        config.getProperty("baguette", "on");
 
         config.store(os,
                 "Project: Servant\n" +
@@ -77,6 +79,7 @@ public class ToggleFile {
         this.avatar = config.getProperty("avatar").equals("on");
         this.user = config.getProperty("user").equals("on");
         this.interaction = config.getProperty("interaction").equals("on");
+        this.baguette = config.getProperty("baguette").equals("on");
     }
 
     // Setter.
@@ -90,6 +93,7 @@ public class ToggleFile {
     public void setAvatar (String avatar) { this.avatar = avatar.equals("on"); }
     public void setUser (String user) { this.user = user.equals("on"); }
     public void setInteraction (String interaction) { this.interaction = interaction.equals("on"); }
+    public void setBaguette (String baguette) { this.baguette = baguette.equals("on"); }
 
     // Getter.
     public boolean get(String feature) {
@@ -114,6 +118,8 @@ public class ToggleFile {
                 return user;
             case "interaction":
                 return interaction;
+            case "baguette":
+                return baguette;
             default:
                 return true;
         }
@@ -129,4 +135,5 @@ public class ToggleFile {
     public boolean getAvatar() { return avatar; }
     public boolean getUser() { return user; }
     public boolean getInteraction() { return interaction; }
+    public boolean getBaguette() { return baguette; }
 }
