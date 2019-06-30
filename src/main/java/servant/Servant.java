@@ -1,5 +1,6 @@
 package servant;
 
+import zChatLib.Bot;
 import config.ToggleFile;
 import freeToAll.BaguetteCommand;
 import moderation.JoinListener;
@@ -20,7 +21,8 @@ import net.dv8tion.jda.core.*;
 import net.dv8tion.jda.core.entities.Game;
 import moderation.GuildCommand;
 import freeToAll.UserCommand;
-import toggle.ToggleCommand;
+import patreon.ChatbotListener;
+import moderation.ToggleCommand;
 
 import javax.security.auth.login.LoginException;
 import java.awt.*;
@@ -30,6 +32,7 @@ public class Servant {
     public static JDA jda;
     public static ConfigFile config;
     public static ToggleFile toggle;
+    public static Bot chatBot;
 
     public static void main(String[] args) throws IOException, LoginException {
         config = new ConfigFile();
@@ -99,6 +102,7 @@ public class Servant {
                 .addEventListener(new AutoroleListener())
                 .addEventListener(new MediaOnlyChannelListener())
                 .addEventListener(new JoinListener())
+                .addEventListener(new ChatbotListener())
 
                 // Start.
                 .build();

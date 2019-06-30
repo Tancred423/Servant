@@ -62,5 +62,20 @@
             <artifactId>java-ordered-properties</artifactId>
             <version>LATEST</version>
         </dependency>
+        <!-- Chatbot AIML -->
+        <dependency>
+            <artifactId>com.google</artifactId>
+            <groupId>Ab</groupId>
+            <version>0.0.4.3</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/resources/lib/Ab.jar</systemPath>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/joda-time/joda-time -->
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>2.10.2</version>
+        </dependency>
+
     </dependencies>
 </project>

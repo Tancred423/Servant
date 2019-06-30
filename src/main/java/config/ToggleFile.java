@@ -20,6 +20,7 @@ public class ToggleFile {
     private boolean user;
     private boolean interaction;
     private boolean baguette;
+    private boolean chatbot;
 
     // Constructor.
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -54,7 +55,8 @@ public class ToggleFile {
         config.setProperty("avatar", "on");
         config.setProperty("user", "on");
         config.setProperty("interaction", "on");
-        config.getProperty("baguette", "on");
+        config.setProperty("baguette", "on");
+        config.setProperty("chatbot", "on");
 
         config.store(os,
                 "Project: Servant\n" +
@@ -80,6 +82,7 @@ public class ToggleFile {
         this.user = config.getProperty("user").equals("on");
         this.interaction = config.getProperty("interaction").equals("on");
         this.baguette = config.getProperty("baguette").equals("on");
+        this.chatbot = config.getProperty("chatbot").equals("on");
     }
 
     // Setter.
@@ -94,6 +97,7 @@ public class ToggleFile {
     public void setUser (String user) { this.user = user.equals("on"); }
     public void setInteraction (String interaction) { this.interaction = interaction.equals("on"); }
     public void setBaguette (String baguette) { this.baguette = baguette.equals("on"); }
+    public void setChatbot (String chatbot) { this.chatbot = chatbot.equals("on"); }
 
     // Getter.
     public boolean get(String feature) {
@@ -120,6 +124,8 @@ public class ToggleFile {
                 return interaction;
             case "baguette":
                 return baguette;
+            case "chatbot":
+                return chatbot;
             default:
                 return true;
         }
@@ -136,4 +142,5 @@ public class ToggleFile {
     public boolean getUser() { return user; }
     public boolean getInteraction() { return interaction; }
     public boolean getBaguette() { return baguette; }
+    public boolean getChatbot() { return chatbot; }
 }

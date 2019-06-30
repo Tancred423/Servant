@@ -1,4 +1,4 @@
-package toggle;
+package moderation;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -62,6 +62,8 @@ public class ToggleCommand extends Command {
             add("avatar");
             add("user");
             add("interaction");
+            add("baguette");
+            add("chatbot");
         }};
 
         String[] args = event.getArgs().split(" ");
