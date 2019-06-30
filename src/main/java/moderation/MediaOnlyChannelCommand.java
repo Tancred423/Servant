@@ -127,7 +127,7 @@ public class MediaOnlyChannelCommand extends Command {
                     new Log(e, event, name).sendLogSqlCommandEvent(true);
                     return;
                 }
-                if (channels == null) event.reply("There are not media only channels.");
+                if (channels == null) event.reply("There are no media only channels.");
                 else {
                     StringBuilder sb = new StringBuilder();
                     for (MessageChannel chan : channels)

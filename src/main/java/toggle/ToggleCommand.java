@@ -52,7 +52,6 @@ public class ToggleCommand extends Command {
         }
 
         List<String> validFeatures = new ArrayList<>(){{
-            add("all");
             add("autorole");
             add("clear");
             add("guild");
@@ -74,36 +73,77 @@ public class ToggleCommand extends Command {
         }
 
         String feature = getAlias(args[0]);
-        if (!validFeatures.contains(feature)) {
+        // Has to be improved. Redundant text.
+        if (feature == null) {
+            event.reply("Invalid feature.\n" +
+                    "Currently only 'level' is toggleable.");
+            return;
+        } else if (!validFeatures.contains(feature) && !feature.equals("all")) {
             event.reply("Invalid feature.\n" +
                     "Currently only 'level' is toggleable.");
             return;
         }
 
-        String status = args[1].toLowerCase();
-        if (!status.equals("on") && !status.equals("off") && !status.equals("status")) {
+        String arg1 = args[1].toLowerCase();
+        if (!arg1.equals("on") && !arg1.equals("off") && !arg1.equals("status")) {
             event.reply("Status has to be `on`, `off` or `status`.");
             return;
         }
 
-        if (status.equals("status")) {
-            try {
-                boolean statusB = new Guild(event.getGuild().getIdLong()).getToggleStatus(feature);
-                event.reply(feature + "'s status: " + (statusB ? "on" : "off"));
-            } catch (SQLException e) {
-                new Log(e, event, name).sendLogSqlCommandEvent(true);
+        Guild internalGuild;
+        try {
+            internalGuild = new Guild(event.getGuild().getIdLong());
+        } catch (SQLException e) {
+            new Log(e, event, name).sendLogSqlCommandEvent(true);
+            return;
+        }
+
+        if (arg1.equals("status")) {
+            if (feature.equals("all")) {
+                // Toggle Status All Features
+                StringBuilder stringBuilder = new StringBuilder();
+                for (String validFeature : validFeatures) {
+                    try {
+                        boolean toggleStatus = internalGuild.getToggleStatus(validFeature);
+                        stringBuilder.append(validFeature).append(": ").append(toggleStatus ? "on" : "off").append("\n");
+                    } catch (SQLException e) {
+                        new Log(e, event, name).sendLogSqlCommandEvent(false);
+                    }
+                }
+                event.reply(stringBuilder.toString());
+            } else {
+                // Toggle Status Single Feature
+                try {
+                    boolean toggleStatus = internalGuild.getToggleStatus(feature);
+                    event.reply(feature + "'s status: " + (toggleStatus ? "on" : "off"));
+                } catch (SQLException e) {
+                    new Log(e, event, name).sendLogSqlCommandEvent(true);
+                }
             }
             return;
         }
 
         boolean statusBool;
-        statusBool = status.equals("on");
+        statusBool = arg1.equals("on");
 
-        try {
-            new Guild(event.getGuild().getIdLong()).setToggleStatus(feature, statusBool);
-        } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(true);
-            return;
+        if (feature.equals("all")) {
+            // Toggle all features.
+            for (String validFeature : validFeatures) {
+                try {
+                    internalGuild.setToggleStatus(validFeature, statusBool);
+                } catch (SQLException e) {
+                    new Log(e, event, name).sendLogSqlCommandEvent(false);
+                    return;
+                }
+            }
+        } else {
+            // Toggle single feature.
+            try {
+                internalGuild.setToggleStatus(feature, statusBool);
+            } catch (SQLException e) {
+                new Log(e, event, name).sendLogSqlCommandEvent(true);
+                return;
+            }
         }
         event.reactSuccess();
     }

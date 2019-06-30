@@ -1,3 +1,9 @@
+2019-06-30 (v4.6.1):
+- Updated .gitignore to save old Servant versions.
+- Fixed typo in README.
+- Fixed typo in MediaOnlyChannel class.
+- Toggle all is now available.
+
 2019-06-29 (v4.6.0):
 - Added BaguetteCommand.
 

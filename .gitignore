@@ -34,3 +34,6 @@ hs_err_pid*
 
 # Database Backups
 /database/*
+
+# Old Versions
+/old_versions/*
