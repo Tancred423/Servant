@@ -1,0 +1,8 @@
+url:https://github.com/Tancred423/Servant
+name:Servant
+email:servant.discord@gmail.com
+gender:female
+botmaster:Tancred
+organization:Mistlock Sanctuary
+version:1.0.0
+

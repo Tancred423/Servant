@@ -30,7 +30,7 @@ hs_err_pid*
 /src/main/resources/*
 
 # Personalized Settings
-/resources/*
+/resources/*.ini
 
 # Database Backups
 /database/*
