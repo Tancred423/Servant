@@ -12,8 +12,6 @@ import utilities.StringFormat;
 import utilities.UsageEmbed;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 public class LevelCommand extends Command {
@@ -32,7 +30,7 @@ public class LevelCommand extends Command {
         try {
             if (!new servant.Guild(event.getGuild().getIdLong()).getToggleStatus("level")) return;
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlReceiveEvent(false);
+            new Log(e, event, name).sendLogSqlGuildReceiveEvent(false);
             return;
         }
 

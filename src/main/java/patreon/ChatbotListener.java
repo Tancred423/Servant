@@ -4,19 +4,29 @@ import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import servant.Log;
 import servant.Servant;
 import zChatLib.Chat;
 import zChatLib.MagicBooleans;
 
+import java.sql.SQLException;
+
 public class ChatbotListener extends ListenerAdapter {
     public void onMessageReceived(MessageReceivedEvent event) {
+        // Enabled?
+        try {
+            if (event.getGuild() != null) if (!new servant.Guild(event.getGuild().getIdLong()).getToggleStatus("baguette")) return;
+        } catch (SQLException e) {
+            new Log(e, event, "chatbot").sendLogSqlReceiveEvent(false);
+        }
+
+        // Do not react to other bots or yourself.
         User author = event.getAuthor();
+        if (author.isBot()) return;
+
         Message message = event.getMessage();
         String contentDisplay = message.getContentDisplay();
         contentDisplay = contentDisplay.replaceFirst("@" + event.getJDA().getSelfUser().getName(), "").trim();
-
-        // Do not react to other bots or yourself.
-        if (author.isBot()) return;
 
         // Chatbot is handles differently in DM.
         boolean isDM = event.getGuild() == null;

@@ -26,7 +26,7 @@ public class MediaOnlyChannelListener extends ListenerAdapter {
         try {
             if (!new servant.Guild(event.getGuild().getIdLong()).getToggleStatus("mediaonlychannel")) return;
         } catch (SQLException e) {
-            new Log(e, event, "mediaonlychannel").sendLogSqlReceiveEvent(false);
+            new Log(e, event, "mediaonlychannel").sendLogSqlGuildReceiveEvent(false);
         }
 
         // Is message in mo-channel?
@@ -73,7 +73,7 @@ public class MediaOnlyChannelListener extends ListenerAdapter {
                 }
             }
         } catch (SQLException e) {
-            new Log(e, event, "mediaonlychannellistener").sendLogSqlReceiveEvent(false);
+            new Log(e, event, "mediaonlychannellistener").sendLogSqlGuildReceiveEvent(false);
         }
     }
 

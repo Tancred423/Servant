@@ -33,7 +33,7 @@ public class LevelListener extends ListenerAdapter {
         try {
             if (!new servant.Guild(guild.getIdLong()).getToggleStatus("level")) return;
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlReceiveEvent(false);
+            new Log(e, event, name).sendLogSqlGuildReceiveEvent(false);
             return;
         }
 
@@ -61,21 +61,21 @@ public class LevelListener extends ListenerAdapter {
         try {
             currentLevel = getLevel(authorId, guildId);
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlReceiveEvent(true);
+            new Log(e, event, name).sendLogSqlGuildReceiveEvent(true);
             return;
         }
         int randomExp = ThreadLocalRandom.current().nextInt(15, 26); // Between 15 and 25 inclusively.
         try {
             new servant.User(authorId).addExp(guildId, randomExp);
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlReceiveEvent(true);
+            new Log(e, event, name).sendLogSqlGuildReceiveEvent(true);
             return;
         }
         int updatedLevel;
         try {
             updatedLevel = getLevel(authorId, guildId);
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlReceiveEvent(true);
+            new Log(e, event, name).sendLogSqlGuildReceiveEvent(true);
             return;
         }
 

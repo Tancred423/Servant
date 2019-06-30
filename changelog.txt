@@ -1,3 +1,7 @@
+2019-06-30 (v4.7.1):
+- Added toggle option to chatbot.
+- Bug fix: Chatbot didn't work on RPi.
+
 2019-06-30 (v4.7.0):
 - Added chatbot v1.0.0.
 - Added chatbot library.
