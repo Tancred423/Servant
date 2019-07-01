@@ -41,19 +41,14 @@ public class MediaOnlyChannelListener extends ListenerAdapter {
         }
         try {
             if (internalGuild.mediaOnlyChannelHasEntry(channel)) {
-                // Is is an url link or a file?
+                // Has to have an attachment or a valid url.
                 boolean validMessage = true;
                 Message message = event.getMessage();
 
                 List<Message.Attachment> attachments = message.getAttachments();
-                if (!attachments.isEmpty()) {
-                    for (Message.Attachment attachment : attachments) {
-                        String[] splitName = attachment.getFileName().split("\\.");
-                        if (!isValidExtension(splitName[splitName.length - 1])) validMessage = false;
-                    }
-                } else {
+                if (attachments.isEmpty()) {
                     String url = null;
-                    String args[] = event.getMessage().getContentDisplay().split(" ");
+                    String[] args = event.getMessage().getContentDisplay().split(" ");
                     for (String arg : args) if (arg.startsWith("http")) url = arg;
 
                     if (url == null) validMessage = false;
@@ -61,13 +56,13 @@ public class MediaOnlyChannelListener extends ListenerAdapter {
                 }
 
                 if (!validMessage) {
-                    // No files nor valid url. -> Delete and inform about fo-channel.
+                    // No files nor valid url. -> Delete and inform about mo-channel.
                     event.getMessage().delete().queue();
                     MessageBuilder mb = new MessageBuilder();
                     mb.setContent(author.getAsMention() + ", this is a media only channel!\n" +
                             "You are allowed to:\n" +
-                            "- Send images or videos with any description.\n" +
-                            "- Post a valid image or video url link with any description.\n" +
+                            "- Send upload files with an optional description.\n" +
+                            "- Post a valid url with an optional description.\n" +
                             "*This message will be deleted in 30 seconds.*");
                     new MessageHandler().sendAndExpire(channel, mb.build(), 30 * 1000); // 30 seconds.
                 }
@@ -79,52 +74,11 @@ public class MediaOnlyChannelListener extends ListenerAdapter {
 
     private static boolean isValidUrl(String urlString) {
         // Check for valid url.
-        URL url;
-        URLConnection c;
         try {
-            url = new URL(urlString);
-            c = url.openConnection();
+            new URL(urlString).openConnection();
         } catch (IOException e) {
             return false;
         }
-
-        // Check for content type
-        String contentType = c.getContentType();
-        return contentType.startsWith("image/")
-                || contentType.startsWith("video/")
-                || contentType.startsWith("audio/")
-                || urlString.contains("youtube.com/watch")
-                || urlString.contains("soundcloud.com");
-    }
-
-    private static boolean isValidExtension(String extension) {
-        List<String> extensionList = new ArrayList<>();
-        // Image
-        extensionList.add("jpg");
-        extensionList.add("jpeg");
-        extensionList.add("png");
-        extensionList.add("gif");
-        extensionList.add("webp");
-        extensionList.add("tiff");
-        extensionList.add("bmp");
-        extensionList.add("svg");
-        // Video
-        extensionList.add("mp4");
-        extensionList.add("3gp");
-        extensionList.add("ogg");
-        extensionList.add("wmv");
-        extensionList.add("webm");
-        extensionList.add("flv");
-        extensionList.add("avi");
-        extensionList.add("mov");
-        // Audio
-        extensionList.add("wav");
-        extensionList.add("mp3");
-        extensionList.add("flac");
-        extensionList.add("aiff");
-        extensionList.add("pcm");
-        extensionList.add("aac");
-
-        return extensionList.contains(extension.toLowerCase());
+        return true;
     }
 }

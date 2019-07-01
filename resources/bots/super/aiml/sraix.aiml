@@ -169,13 +169,6 @@
 <li>I'm unable to find the answer from web services.</li>
 <li>None of the other robots can tell me the answer.</li>
 </random>
-<random>
-<li>Let's try Google.</li>
-<li>I'm going to try a search</li>
-<li>Perhaps we should try a web search.</li>
-<li>I'll try asking Google.</li>
-</random>
-<oob><search><input/></search></oob></template>
 </category>
 <category><pattern>APPOINTMENT *</pattern>
 <template><srai>SCHEDULEDESCRIPTION <star/> SCHEDULEREQUEST APPOINTMENT <star/></srai></template>

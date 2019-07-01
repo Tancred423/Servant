@@ -1,3 +1,7 @@
+2019-07-01 (v4.7.2):
+- MediaOnlyChannels now allow any uploaded file or valid url with an optional description.
+- Updated sraix.aiml to exclude <oob> formatting.
+
 2019-06-30 (v4.7.1):
 - Added toggle option to chatbot.
 - Bug fix: Chatbot didn't work on RPi.
