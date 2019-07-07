@@ -1,4 +1,4 @@
-package moderation;
+package moderation.joinLeaveNotify;
 
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.MessageChannel;
@@ -10,13 +10,13 @@ import servant.Log;
 
 import java.sql.SQLException;
 
-public class JoinListener extends ListenerAdapter {
+public class JoinLeaveNotifyListener extends ListenerAdapter {
     public void onGuildMemberJoin(GuildMemberJoinEvent event) {
         // Enabled?
         try {
             if (!new servant.Guild(event.getGuild().getIdLong()).getToggleStatus("join")) return;
         } catch (SQLException e) {
-            new Log(e, event, "join").sendLogSqlMemberJoinEvent();
+            new Log(e, event, "join").sendLogSqlGuildMemberJoinEvent();
         }
 
         User joinedUser = event.getUser();
@@ -25,7 +25,7 @@ public class JoinListener extends ListenerAdapter {
         try {
             internalGuild = new servant.Guild(guild.getIdLong());
         } catch (SQLException e) {
-            new Log(e, event, "join").sendLogSqlMemberJoinEvent();
+            new Log(e, event, "join").sendLogSqlGuildMemberJoinEvent();
             return;
         }
 
@@ -33,7 +33,7 @@ public class JoinListener extends ListenerAdapter {
         try {
             channel = internalGuild.getJoinNotifierChannel();
         } catch (SQLException e) {
-            new Log(e, event, "join").sendLogSqlMemberJoinEvent();
+            new Log(e, event, "join").sendLogSqlGuildMemberJoinEvent();
             return;
         }
 
@@ -47,7 +47,7 @@ public class JoinListener extends ListenerAdapter {
         try {
             if (!new servant.Guild(event.getGuild().getIdLong()).getToggleStatus("join")) return;
         } catch (SQLException e) {
-            new Log(e, event, "join").sendLogSqlMemberJoinEvent();
+            new Log(e, event, "join").sendLogSqlGuildMemberJoinEvent();
         }
 
         User leftUser = event.getUser();
@@ -56,7 +56,7 @@ public class JoinListener extends ListenerAdapter {
         try {
             internalGuild = new servant.Guild(guild.getIdLong());
         } catch (SQLException e) {
-            new Log(e, event, "join").sendLogSqlMemberLeaveEvent();
+            new Log(e, event, "join").sendLogSqlGuildMemberLeaveEvent();
             return;
         }
 
@@ -64,7 +64,7 @@ public class JoinListener extends ListenerAdapter {
         try {
             channel = internalGuild.getJoinNotifierChannel();
         } catch (SQLException e) {
-            new Log(e, event, "join").sendLogSqlMemberLeaveEvent();
+            new Log(e, event, "join").sendLogSqlGuildMemberLeaveEvent();
             return;
         }
 

@@ -1,4 +1,4 @@
-package moderation;
+package moderation.mediaOnlyChannel;
 
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.Guild;
@@ -12,9 +12,7 @@ import utilities.MessageHandler;
 
 import java.io.IOException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class MediaOnlyChannelListener extends ListenerAdapter {
@@ -26,7 +24,7 @@ public class MediaOnlyChannelListener extends ListenerAdapter {
         try {
             if (!new servant.Guild(event.getGuild().getIdLong()).getToggleStatus("mediaonlychannel")) return;
         } catch (SQLException e) {
-            new Log(e, event, "mediaonlychannel").sendLogSqlGuildReceiveEvent(false);
+            new Log(e, event, "mediaonlychannel").sendLogSqlGuildMessageReceivedEvent(false);
         }
 
         // Is message in mo-channel?
@@ -68,7 +66,7 @@ public class MediaOnlyChannelListener extends ListenerAdapter {
                 }
             }
         } catch (SQLException e) {
-            new Log(e, event, "mediaonlychannellistener").sendLogSqlGuildReceiveEvent(false);
+            new Log(e, event, "mediaonlychannellistener").sendLogSqlGuildMessageReceivedEvent(false);
         }
     }
 

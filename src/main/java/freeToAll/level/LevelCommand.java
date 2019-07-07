@@ -1,4 +1,4 @@
-package freeToAll;
+package freeToAll.level;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -30,7 +30,7 @@ public class LevelCommand extends Command {
         try {
             if (!new servant.Guild(event.getGuild().getIdLong()).getToggleStatus("level")) return;
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlGuildReceiveEvent(false);
+            new Log(e, event, name).sendLogSqlGuildMessageReceivedEvent(false);
             return;
         }
 

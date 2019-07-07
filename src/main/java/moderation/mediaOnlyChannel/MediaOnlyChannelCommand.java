@@ -1,4 +1,4 @@
-package moderation;
+package moderation.mediaOnlyChannel;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;

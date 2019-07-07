@@ -1,4 +1,4 @@
-package moderation;
+package moderation.joinLeaveNotify;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -11,8 +11,8 @@ import utilities.UsageEmbed;
 
 import java.sql.SQLException;
 
-public class JoinCommand extends Command {
-    public JoinCommand() {
+public class JoinLeaveNotifyCommand extends Command {
+    public JoinLeaveNotifyCommand() {
         this.name = "join";
         this.aliases = new String[]{"leave"};
         this.help = "set up a channel for join and leave messages | **MANAGE CHANNELS**";

@@ -2,7 +2,7 @@
 0,CLEAR LOG,*,*,Done. <oob><clear>log</clear></oob>,oob.aiml
 0,*,WHAT WOULD YOU LIKE TO WRITE ON TWITTER,*,<srai>TWEET <star/></srai>,oob.aiml
 0,SEND MAIL,*,*,<srai>SEND EMAIL</srai>,oob.aiml
-0,SEND FEATURE REQUEST *,*,*,<think><set name="featurerequest"><star/></set></think> Click send to mail your feature request.  #Newline<oob><email><to>callmom-info@pandorabots.com</to><subject>Feature request <get name="featurerequest"/></subject><body>Dear CallMom developers#Comma I'd like to request that you add this feature to the next version of CallMom: <get name="featurerequest"/>.  Sincerely#Comma <get name="name"/></body></email></oob>,oob.aiml
+0,SEND FEATURE REQUEST *,*,*,<think><set name="featurerequest"><star/></set></think> Click send to mail your feature request.  #Newline<oob><email><to>servant.discord@gmail.com</to><subject>Feature request <get name="featurerequest"/></subject><body>Dear Tancred#Comma I'd like to request that you add this feature to the next version of Servant: <get name="featurerequest"/>.  Sincerely#Comma <get name="name"/></body></email></oob>,oob.aiml
 0,SHOW ME A VIDEO *,*,*,I'm looking up videos for you.  <oob><search>VIDEO <star/></search></oob>,oob.aiml
 0,SHOW ME A WEBSITE ABOUT *,*,*,Let's try a google search.  <oob><search><star/></search></oob>,oob.aiml
 0,I WANT TO BUY *,*,*,Let's try to find a store on the map.  <oob><map><star/></map></oob>,oob.aiml

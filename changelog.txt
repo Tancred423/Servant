@@ -1,3 +1,8 @@
+2019-07-07 (v4.8.0):
+- Added DM's to guild owner upon inviting or kicking the bot.
+- Some packages to sort classes.
+- Improved Log class a bit.
+
 2019-07-01 (v4.7.2):
 - MediaOnlyChannels now allow any uploaded file or valid url with an optional description.
 - Updated sraix.aiml to exclude <oob> formatting.

@@ -2,6 +2,8 @@ package servant;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
 import config.ConfigFile;
+import net.dv8tion.jda.core.events.guild.GuildJoinEvent;
+import net.dv8tion.jda.core.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberLeaveEvent;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -10,10 +12,12 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 public class Log {
     private Exception e;
     private CommandEvent commandEvent;
-    private GuildMessageReceivedEvent receivedEvent;
-    private MessageReceivedEvent msgReceiveEvent;
-    private GuildMemberJoinEvent memberJoinEvent;
-    private GuildMemberLeaveEvent memberLeaveEvent;
+    private GuildMessageReceivedEvent guildMessageReceivedEvent;
+    private MessageReceivedEvent messageReceivedEvent;
+    private GuildMemberJoinEvent guildMemberJoinEvent;
+    private GuildMemberLeaveEvent guildMemberLeaveEvent;
+    private GuildJoinEvent guildJoinEvent;
+    private GuildLeaveEvent guildLeaveEvent;
     private ConfigFile config;
     private String name;
 
@@ -24,30 +28,44 @@ public class Log {
         this.name = commandName;
     }
 
-    public Log(Exception e, GuildMessageReceivedEvent receiveEvent, String commandName) {
+    public Log(Exception e, GuildMessageReceivedEvent guildMessageReceivedEvent, String commandName) {
         this.e = e;
-        this.receivedEvent = receiveEvent;
+        this.guildMessageReceivedEvent = guildMessageReceivedEvent;
         this.config = Servant.config;
         this.name = commandName;
     }
 
-    public Log(Exception e, MessageReceivedEvent msgReceiveEvent, String commandName) {
+    public Log(Exception e, MessageReceivedEvent messageReceivedEvent, String commandName) {
         this.e = e;
-        this.msgReceiveEvent = msgReceiveEvent;
+        this.messageReceivedEvent = messageReceivedEvent;
         this.config = Servant.config;
         this.name = commandName;
     }
 
-    public Log(Exception e, GuildMemberJoinEvent memberJoinEvent, String commandName) {
+    public Log(Exception e, GuildMemberJoinEvent guildMemberJoinEvent, String commandName) {
         this.e = e;
-        this.memberJoinEvent = memberJoinEvent;
+        this.guildMemberJoinEvent = guildMemberJoinEvent;
         this.config = Servant.config;
         this.name = commandName;
     }
 
-    public Log(Exception e, GuildMemberLeaveEvent memberLeaveEvent, String commandName) {
+    public Log(Exception e, GuildMemberLeaveEvent guildMemberLeaveEvent, String commandName) {
         this.e = e;
-        this.memberLeaveEvent = memberLeaveEvent;
+        this.guildMemberLeaveEvent = guildMemberLeaveEvent;
+        this.config = Servant.config;
+        this.name = commandName;
+    }
+
+    public Log(Exception e, GuildJoinEvent guildJoinEvent, String commandName) {
+        this.e = e;
+        this.guildJoinEvent = guildJoinEvent;
+        this.config = Servant.config;
+        this.name = commandName;
+    }
+
+    public Log(Exception e, GuildLeaveEvent guildLeaveEvent, String commandName) {
+        this.e = e;
+        this.guildLeaveEvent = guildLeaveEvent;
         this.config = Servant.config;
         this.name = commandName;
     }
@@ -82,59 +100,87 @@ public class Log {
                         "```").queue());
     }
 
-    // guildReceiveEvent
-    public void sendLogSqlGuildReceiveEvent(boolean notifyUser) {
+    // guildMessageReceivedEvent
+    public void sendLogSqlGuildMessageReceivedEvent(boolean notifyUser) {
         e.printStackTrace();
-        if (notifyUser) receivedEvent.getChannel().sendMessage("Something went wrong connecting to the database.\n" + "A report was sent to the bot owner.").queue();
-        receivedEvent.getJDA().getUserById(config.getBotOwnerId()).openPrivateChannel().queue(privateChannel ->
+        if (notifyUser) guildMessageReceivedEvent.getChannel().sendMessage("Something went wrong connecting to the database.\n" + "A report was sent to the bot owner.").queue();
+        guildMessageReceivedEvent.getJDA().getUserById(config.getBotOwnerId()).openPrivateChannel().queue(privateChannel ->
                 privateChannel.sendMessage("```c\n" +
                         "Error\n" +
                         "-----\n" +
-                        "Guild: " + receivedEvent.getGuild().getName() + " (" + receivedEvent.getGuild().getIdLong() + ")\n" +
-                        "User: " + receivedEvent.getAuthor().getName() + " (" + receivedEvent.getAuthor().getIdLong() + ")\n" +
+                        "Guild: " + guildMessageReceivedEvent.getGuild().getName() + " (" + guildMessageReceivedEvent.getGuild().getIdLong() + ")\n" +
+                        "User: " + guildMessageReceivedEvent.getAuthor().getName() + " (" + guildMessageReceivedEvent.getAuthor().getIdLong() + ")\n" +
                         "Command: " + name + "\n" +
                         "Error: " + e.getMessage() + "\n" +
                         "```").queue());
     }
 
-    // receiveEvent
-    public void sendLogSqlReceiveEvent(boolean notifyUser) {
+    // messageReceivedEvent
+    public void sendLogSqlMessageReceivedEvent(boolean notifyUser) {
         e.printStackTrace();
-        if (notifyUser) msgReceiveEvent.getChannel().sendMessage("Something went wrong connecting to the database.\n" + "A report was sent to the bot owner.").queue();
-        msgReceiveEvent.getJDA().getUserById(config.getBotOwnerId()).openPrivateChannel().queue(privateChannel ->
+        if (notifyUser) messageReceivedEvent.getChannel().sendMessage("Something went wrong connecting to the database.\n" + "A report was sent to the bot owner.").queue();
+        messageReceivedEvent.getJDA().getUserById(config.getBotOwnerId()).openPrivateChannel().queue(privateChannel ->
                 privateChannel.sendMessage("```c\n" +
                         "Error\n" +
                         "-----\n" +
-                        (msgReceiveEvent.getGuild() == null ? "" : "Guild: " + msgReceiveEvent.getGuild().getName() + " (" + msgReceiveEvent.getGuild().getIdLong() + ")\n") +
-                        "User: " + msgReceiveEvent.getAuthor().getName() + " (" + msgReceiveEvent.getAuthor().getIdLong() + ")\n" +
+                        (messageReceivedEvent.getGuild() == null ? "" : "Guild: " + messageReceivedEvent.getGuild().getName() + " (" + messageReceivedEvent.getGuild().getIdLong() + ")\n") +
+                        "User: " + messageReceivedEvent.getAuthor().getName() + " (" + messageReceivedEvent.getAuthor().getIdLong() + ")\n" +
                         "Command: " + name + "\n" +
                         "Error: " + e.getMessage() + "\n" +
                         "```").queue());
     }
 
-    // memberJoinEvent
-    public void sendLogSqlMemberJoinEvent() {
+    // guildMemberJoinEvent
+    public void sendLogSqlGuildMemberJoinEvent() {
         e.printStackTrace();
-        memberJoinEvent.getJDA().getUserById(config.getBotOwnerId()).openPrivateChannel().queue(privateChannel ->
+        guildMemberJoinEvent.getJDA().getUserById(config.getBotOwnerId()).openPrivateChannel().queue(privateChannel ->
                 privateChannel.sendMessage("```c\n" +
                         "Error\n" +
                         "-----\n" +
-                        "Guild: " + memberJoinEvent.getGuild().getName() + " (" + memberJoinEvent.getGuild().getIdLong() + ")\n" +
-                        "User: " + memberJoinEvent.getUser().getName() + " (" + memberJoinEvent.getUser().getIdLong() + ")\n" +
+                        "Guild: " + guildMemberJoinEvent.getGuild().getName() + " (" + guildMemberJoinEvent.getGuild().getIdLong() + ")\n" +
+                        "User: " + guildMemberJoinEvent.getUser().getName() + " (" + guildMemberJoinEvent.getUser().getIdLong() + ")\n" +
                         "Command: " + name + "\n" +
                         "Error: " + e.getMessage() + "\n" +
                         "```").queue());
     }
 
-    // memberLeaveEvent
-    public void sendLogSqlMemberLeaveEvent() {
+    // guildMemberLeaveEvent
+    public void sendLogSqlGuildMemberLeaveEvent() {
         e.printStackTrace();
-        memberLeaveEvent.getJDA().getUserById(config.getBotOwnerId()).openPrivateChannel().queue(privateChannel ->
+        guildMemberLeaveEvent.getJDA().getUserById(config.getBotOwnerId()).openPrivateChannel().queue(privateChannel ->
                 privateChannel.sendMessage("```c\n" +
                         "Error\n" +
                         "-----\n" +
-                        "Guild: " + memberLeaveEvent.getGuild().getName() + " (" + memberLeaveEvent.getGuild().getIdLong() + ")\n" +
-                        "User: " + memberLeaveEvent.getUser().getName() + " (" + memberLeaveEvent.getUser().getIdLong() + ")\n" +
+                        "Guild: " + guildMemberLeaveEvent.getGuild().getName() + " (" + guildMemberLeaveEvent.getGuild().getIdLong() + ")\n" +
+                        "User: " + guildMemberLeaveEvent.getUser().getName() + " (" + guildMemberLeaveEvent.getUser().getIdLong() + ")\n" +
+                        "Command: " + name + "\n" +
+                        "Error: " + e.getMessage() + "\n" +
+                        "```").queue());
+    }
+
+    // guildJoinEvent
+    public void sendLogSqlGuildJoinEvent() {
+        e.printStackTrace();
+        guildJoinEvent.getJDA().getUserById(config.getBotOwnerId()).openPrivateChannel().queue(privateChannel ->
+                privateChannel.sendMessage("```c\n" +
+                        "Error\n" +
+                        "-----\n" +
+                        "Guild: " + guildJoinEvent.getGuild().getName() + " (" + guildJoinEvent.getGuild().getIdLong() + ")\n" +
+                        "User: " + guildJoinEvent.getGuild().getOwner().getUser().getName() + " (" + guildJoinEvent.getGuild().getOwner().getUser().getIdLong() + ")\n" +
+                        "Command: " + name + "\n" +
+                        "Error: " + e.getMessage() + "\n" +
+                        "```").queue());
+    }
+
+    // guildJoinEvent
+    public void sendLogSqlGuildLeaveEvent() {
+        e.printStackTrace();
+        guildLeaveEvent.getJDA().getUserById(config.getBotOwnerId()).openPrivateChannel().queue(privateChannel ->
+                privateChannel.sendMessage("```c\n" +
+                        "Error\n" +
+                        "-----\n" +
+                        "Guild: " + guildLeaveEvent.getGuild().getName() + " (" + guildLeaveEvent.getGuild().getIdLong() + ")\n" +
+                        "User: " + guildLeaveEvent.getGuild().getOwner().getUser().getName() + " (" + guildLeaveEvent.getGuild().getOwner().getUser().getIdLong() + ")\n" +
                         "Command: " + name + "\n" +
                         "Error: " + e.getMessage() + "\n" +
                         "```").queue());

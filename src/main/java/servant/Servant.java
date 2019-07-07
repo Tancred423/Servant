@@ -1,14 +1,20 @@
 package servant;
 
+import moderation.autorole.AutoroleCommand;
+import moderation.autorole.AutoroleListener;
+import moderation.ClearCommand;
+import moderation.InviteKickListener;
+import moderation.joinLeaveNotify.JoinLeaveNotifyCommand;
+import moderation.mediaOnlyChannel.MediaOnlyChannelCommand;
+import moderation.mediaOnlyChannel.MediaOnlyChannelListener;
 import zChatLib.Bot;
 import config.ToggleFile;
 import freeToAll.BaguetteCommand;
-import moderation.JoinListener;
-import moderation.*;
+import moderation.joinLeaveNotify.JoinLeaveNotifyListener;
 import freeToAll.CoinflipCommand;
 import freeToAll.AvatarCommand;
-import freeToAll.LevelCommand;
-import freeToAll.LevelListener;
+import freeToAll.level.LevelCommand;
+import freeToAll.level.LevelListener;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.jagrosh.jdautilities.examples.command.AboutCommand;
@@ -31,7 +37,7 @@ import java.io.IOException;
 public class Servant {
     public static JDA jda;
     public static ConfigFile config;
-    public static ToggleFile toggle;
+    static ToggleFile toggle;
     public static Bot chatBot;
 
     public static void main(String[] args) throws IOException, LoginException {
@@ -53,7 +59,7 @@ public class Servant {
 
         client.addCommands(
                 // Default JDA utilities commands.
-                new AboutCommand(Color.decode(config.getDefaultColorCode()), "your multifuntional bot",
+                new AboutCommand(Color.decode(config.getDefaultColorCode()), "your multifuntional bot.",
                         new String[]{"Moderation Tools", "Informative Commands", "Interactive Features", "Shit-post Features"},
                         Permission.ADMINISTRATOR),
                 new GuildlistCommand(waiter), // BOT OWNER
@@ -64,7 +70,7 @@ public class Servant {
                 new AutoroleCommand(), // MANAGE ROLES
                 new ClearCommand(), // MANAGE MESSAGES
                 new GuildCommand(), // ADMINISTRATOR
-                new JoinCommand(), // MANAGE CHANNEL
+                new JoinLeaveNotifyCommand(), // MANAGE CHANNEL
                 new MediaOnlyChannelCommand(), // MANAGE CHANNEL
                 new ToggleCommand(), // ADMINISTRATOR
 
@@ -97,12 +103,13 @@ public class Servant {
                 // Add event listeners.
                 .addEventListener(waiter)
                 .addEventListener(client.build())
-                .addEventListener(new ReadyListener())
-                .addEventListener(new LevelListener())
                 .addEventListener(new AutoroleListener())
-                .addEventListener(new MediaOnlyChannelListener())
-                .addEventListener(new JoinListener())
                 .addEventListener(new ChatbotListener())
+                .addEventListener(new InviteKickListener())
+                .addEventListener(new JoinLeaveNotifyListener())
+                .addEventListener(new LevelListener())
+                .addEventListener(new MediaOnlyChannelListener())
+                .addEventListener(new ReadyListener())
 
                 // Start.
                 .build();

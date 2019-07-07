@@ -1,4 +1,4 @@
-package moderation;
+package moderation.autorole;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;

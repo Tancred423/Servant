@@ -43,7 +43,7 @@
 0,GENDERNAME *,*,*,unknown,sraix.aiml
 0,WAS *,*,*,<sraix>WAS <star/></sraix>,sraix.aiml
 0,SHOULD I BUY *,*,*,<sraix>SHOULD I BUY <star/></sraix>,sraix.aiml
-0,SRAIXFAILED,*,*,<random>#Newline<li>I don't know the answer.</li>#Newline<li>I used my lifeline to ask another robot#Comma but he didn't know.</li>#Newline<li>I asked another robot#Comma but he didn't know.</li>#Newline<li>Sorry#Comma nothing found in web services.</li>#Newline<li>I'm unable to find the answer from web services.</li>#Newline<li>None of the other robots can tell me the answer.</li>#Newline</random>#Newline<random>#Newline<li>Let's try Google.</li>#Newline<li>I'm going to try a search</li>#Newline<li>Perhaps we should try a web search.</li>#Newline<li>I'll try asking Google.</li>#Newline</random>#Newline<oob><search><input/></search></oob>,sraix.aiml
+0,SRAIXFAILED,*,*,<random>#Newline<li>I don't know the answer.</li>#Newline<li>I used my lifeline to ask another robot#Comma but he didn't know.</li>#Newline<li>I asked another robot#Comma but he didn't know.</li>#Newline<li>Sorry#Comma nothing found in web services.</li>#Newline<li>I'm unable to find the answer from web services.</li>#Newline<li>None of the other robots can tell me the answer.</li>#Newline</random>,sraix.aiml
 0,APPOINTMENT *,*,*,<srai>SCHEDULEDESCRIPTION <star/> SCHEDULEREQUEST APPOINTMENT <star/></srai>,sraix.aiml
 0,HISTORY *,*,*,<sraix>HISTORY <star/></sraix>,sraix.aiml
 0,WHERE ARE *,*,*,<sraix>WHERE ARE <star/></sraix>,sraix.aiml

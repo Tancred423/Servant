@@ -1,4 +1,4 @@
-package moderation;
+package moderation.autorole;
 
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
@@ -18,14 +18,14 @@ public class AutoroleListener extends ListenerAdapter {
         try {
             if (!new servant.Guild(event.getGuild().getIdLong()).getToggleStatus("autorole")) return;
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlMemberJoinEvent();
+            new Log(e, event, name).sendLogSqlGuildMemberJoinEvent();
         }
 
         Guild internalGuild;
         try {
             internalGuild = new Guild(event.getGuild().getIdLong());
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlMemberJoinEvent();
+            new Log(e, event, name).sendLogSqlGuildMemberJoinEvent();
             return;
         }
         try {
@@ -33,7 +33,7 @@ public class AutoroleListener extends ListenerAdapter {
                 event.getGuild().getController().addSingleRoleToMember(event.getMember(), internalGuild.getAutorole()).queue();
             }
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlMemberJoinEvent();
+            new Log(e, event, name).sendLogSqlGuildMemberJoinEvent();
         }
     }
 }

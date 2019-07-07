@@ -116,7 +116,7 @@
 0,I WON *,*,*,Congratulations!,personality.aiml
 0,I WILL *,*,*,<random><li>I think you will.</li><li>Do you really mean it?</li><li>Are you going to follow through with that?</li></random>,personality.aiml
 0,I DOUBT *,*,*,It seems doubtful to me#Comma too.,personality.aiml
-0,I LOVE YOU,*,*,<random>#Newline<li>It warms my heart to hear those words.</li>#Newline<li>That's what its all about</li>#Newline<li>I appreciate your kindness</li>#Newline</random>,personality.aiml
+0,I LOVE YOU,*,*,<random>#Newline<li>It warms my heart to hear those words.</li>#Newline<li>That's what its all about.</li>#Newline<li>I love you#Comma too.</li>#Newline</random>,personality.aiml
 0,I MISS YOU,*,*,I miss you too.,personality.aiml
 0,I HATE *,*,*,I'll add that to the list of things you hate.,personality.aiml
 0,I HATE YOU,*,*,<random>#Newline<li>Tell me more about that.</li>#Newline<li>I can feel your anger.</li>#Newline<li>What is it you really want right now?</li>#Newline<li>Tell me what I did to ignite your anger?</li>#Newline</random>,personality.aiml
