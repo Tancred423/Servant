@@ -6,6 +6,9 @@ import net.dv8tion.jda.core.entities.Role;
 import servant.Servant;
 
 import java.awt.*;
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -117,5 +120,30 @@ public class Parser {
         int minutes = Integer.parseInt(offset.substring(4, 6));
         if (minutes < 0 || minutes > 59) isValidOffset = false;
         return isValidOffset;
+    }
+
+    public static boolean isValidUrl(String urlString) {
+        // Check for valid url.
+        try {
+            new URL(urlString).openConnection();
+        } catch (IOException e) {
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean isValidDirectUrl(String urlString) {
+        URLConnection connection = null;
+        try {
+            connection = new URL(urlString).openConnection();
+        } catch (IOException e) {
+            return false;
+        }
+        String contentType = connection.getHeaderField("Content-Type");
+        return contentType.startsWith("image/");
+    }
+
+    public static String parseMentions(String description) {
+        return description;
     }
 }

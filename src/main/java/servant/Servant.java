@@ -1,12 +1,12 @@
 package servant;
 
+import moderation.*;
 import moderation.autorole.AutoroleCommand;
 import moderation.autorole.AutoroleListener;
-import moderation.ClearCommand;
-import moderation.InviteKickListener;
 import moderation.joinLeaveNotify.JoinLeaveNotifyCommand;
 import moderation.mediaOnlyChannel.MediaOnlyChannelCommand;
 import moderation.mediaOnlyChannel.MediaOnlyChannelListener;
+import moderation.welcome.WelcomeCommand;
 import zChatLib.Bot;
 import config.ToggleFile;
 import freeToAll.BaguetteCommand;
@@ -25,10 +25,8 @@ import config.ConfigFile;
 import interaction.*;
 import net.dv8tion.jda.core.*;
 import net.dv8tion.jda.core.entities.Game;
-import moderation.GuildCommand;
 import freeToAll.UserCommand;
 import patreon.ChatbotListener;
-import moderation.ToggleCommand;
 
 import javax.security.auth.login.LoginException;
 import java.awt.*;
@@ -73,6 +71,7 @@ public class Servant {
                 new JoinLeaveNotifyCommand(), // MANAGE CHANNEL
                 new MediaOnlyChannelCommand(), // MANAGE CHANNEL
                 new ToggleCommand(), // ADMINISTRATOR
+                new WelcomeCommand(waiter), // MANAGE CHANNEL, MANAGE ROLES
 
                 // Free to all
                 new AvatarCommand(),

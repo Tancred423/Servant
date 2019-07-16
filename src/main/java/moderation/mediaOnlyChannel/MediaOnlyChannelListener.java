@@ -9,6 +9,7 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import servant.Log;
 import utilities.MessageHandler;
+import utilities.Parser;
 
 import java.io.IOException;
 import java.net.URL;
@@ -50,7 +51,7 @@ public class MediaOnlyChannelListener extends ListenerAdapter {
                     for (String arg : args) if (arg.startsWith("http")) url = arg;
 
                     if (url == null) validMessage = false;
-                    else if (!isValidUrl(url)) validMessage = false;
+                    else if (!Parser.isValidUrl(url)) validMessage = false;
                 }
 
                 if (!validMessage) {
@@ -68,15 +69,5 @@ public class MediaOnlyChannelListener extends ListenerAdapter {
         } catch (SQLException e) {
             new Log(e, event, "mediaonlychannellistener").sendLogSqlGuildMessageReceivedEvent(false);
         }
-    }
-
-    private static boolean isValidUrl(String urlString) {
-        // Check for valid url.
-        try {
-            new URL(urlString).openConnection();
-        } catch (IOException e) {
-            return false;
-        }
-        return true;
     }
 }

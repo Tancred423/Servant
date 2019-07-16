@@ -32,9 +32,9 @@ public class BaguetteCommand extends Command {
         if (coinflip == 10) random += ThreadLocalRandom.current().nextInt(0, 30) + 1; // Rarely a huge schlong
         if (coinflip ==  1) random = 0; // Rarely a veri smol one
 
-        Emote baguette1 = event.getJDA().getGuildById(436925371577925642L).getEmoteById(594643668535607306L);
-        Emote baguette2 = event.getJDA().getGuildById(436925371577925642L).getEmoteById(594643668405583886L);
-        Emote baguette3 = event.getJDA().getGuildById(436925371577925642L).getEmoteById(594643666723667988L);
+        Emote baguette1 = event.getJDA().getGuildById(599222484134264852L).getEmoteById(600597900568952835L);
+        Emote baguette2 = event.getJDA().getGuildById(599222484134264852L).getEmoteById(600597898668802048L);
+        Emote baguette3 = event.getJDA().getGuildById(599222484134264852L).getEmoteById(600597897804775436L);
 
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(baguette1.getAsMention());
