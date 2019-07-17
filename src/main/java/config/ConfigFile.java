@@ -56,7 +56,7 @@ public class ConfigFile {
         config.setProperty("databaseUsername", "root"    );
         config.setProperty("databasePassword", ""        );
         config.setProperty("supportGuildInv" , ""        );
-        config.setProperty("botVersion"      , "4.10.0"   );
+        config.setProperty("botVersion"      , "4.10.5"   );
 
         config.store(os,
                 "Project: Servant\n" +

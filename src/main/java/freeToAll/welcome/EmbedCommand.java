@@ -4,10 +4,10 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import servant.Log;
+import servant.Servant;
 import utilities.Parser;
 
 import java.sql.SQLException;
@@ -25,7 +25,6 @@ public class EmbedCommand extends Command {
         this.help = "creates embed message";
         this.category = new Category("Free to all");
         this.arguments = "";
-        this.userPermissions = new Permission[]{Permission.MANAGE_CHANNEL, Permission.MANAGE_ROLES};
         this.guildOnly = true;
         this.waiter = waiter;
     }
@@ -90,7 +89,7 @@ public class EmbedCommand extends Command {
                                 "--- There has to be a context. Just the description or just one or more fields are enough.\n" +
                                 "--- Stuff that is marked with \"(optional)\" are completely optional without any condition.\n" +
                                 "\n" +
-                                "**To start the configuration, you have to type `!embed` again and deny the initial question.**\n" +
+                                "**To start the configuration, you have to type `" + Servant.config.getDefaultPrefix() + "embed` again and deny the initial question.**\n" +
                                 "https://i.stack.imgur.com/HRWHk.png");
                     } else if (answer.toLowerCase().equals("no") || answer.toLowerCase().equals("n")) {
                         // Author Name
@@ -294,7 +293,6 @@ public class EmbedCommand extends Command {
                                                                                                                                                                                                                 if (!channelMessage.getMentionedChannels().isEmpty()) {
                                                                                                                                                                                                                     embed.setMessageChannel(channelMessage.getMentionedChannels().get(0));
                                                                                                                                                                                                                     sendWelcomeMessage(embed, event, wizardMessageIds);
-                                                                                                                                                                                                                    event.reactSuccess();
                                                                                                                                                                                                                 } else
                                                                                                                                                                                                                     endWithError(wizardMessageIds, event, "[Error] Invalid channel mention.");
                                                                                                                                                                                                             }, 1, TimeUnit.HOURS, () -> endWithError(wizardMessageIds, event, "[Timeout] You didn't provide a channel mention."));
@@ -358,6 +356,12 @@ public class EmbedCommand extends Command {
         eb.setFooter(embed.getFooterText(), embed.getFooterIconUrl());
         eb.setTimestamp(embed.getTimestamp());
 
-        embed.getMessageChannel().sendMessage(eb.build()).queue();
+        try {
+            embed.getMessageChannel().sendMessage(eb.build()).queue();
+            event.reactSuccess();
+        } catch (Exception e) {
+            event.reply("[ERROR] I told you, you cannot leave everything empty...");
+            event.reactError();
+        }
     }
 }
