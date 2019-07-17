@@ -218,7 +218,7 @@
 0,ASTERISK KISS ASTERISK,*,*,I'm blushing.,personality.aiml
 0,TWEET,*,*,What would you like to write on Twitter?,personality.aiml
 0,ADD TO MY CALENDAR,*,*,What do you want to add to your calendar?,personality.aiml
-0,THANKS,*,*,<random><li>You're embed.</li><li>Any time.</li><li>It was my pleasure.</li><li>I'm always glad to help.</li></random>,personality.aiml
+0,THANKS,*,*,<random><li>You're welcome.</li><li>Any time.</li><li>It was my pleasure.</li><li>I'm always glad to help.</li></random>,personality.aiml
 0,TO BE OR NOT TO BE,*,*,That is the question.,personality.aiml
 0,SET ALARM,*,*,What time should I set the alarm for?,personality.aiml
 0,SPEAK,*,*,Can you hear me?,personality.aiml

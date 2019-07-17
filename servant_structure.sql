@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jul 17, 2019 at 01:11 PM
+-- Generation Time: Jul 17, 2019 at 02:06 PM
 -- Server version: 5.6.34-log
 -- PHP Version: 7.2.1
 
@@ -19,7 +19,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `servant_dev`
+-- Database: `servant_structure`
 --
 
 -- --------------------------------------------------------
@@ -130,15 +130,6 @@ CREATE TABLE `reaction_role` (
   `emote_id` bigint(18) NOT NULL,
   `role_id` bigint(18) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `reaction_role`
---
-
-INSERT INTO `reaction_role` (`guild_id`, `channel_id`, `message_id`, `emoji`, `emote_guild_id`, `emote_id`, `role_id`) VALUES
-(436925371577925642, 599316558720008198, 601003457947893760, '', 436925371577925642, 582852645375574019, 599317368488853527),
-(436925371577925642, 599316558720008198, 601003457947893760, '', 436925371577925642, 582852645556060170, 468472630379282452),
-(436925371577925642, 599316558720008198, 601003457947893760, '👋', 0, 0, 599317368488853527);
 
 -- --------------------------------------------------------
 
