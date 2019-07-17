@@ -3,6 +3,7 @@ package freeToAll;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.core.Permission;
+import patreon.PatreonHandler;
 import servant.Guild;
 import servant.Log;
 import servant.Servant;
@@ -78,17 +79,17 @@ public class UserCommand extends Command {
 
                 setting = args[1].toLowerCase();
                 String value = args[2];
-
-                try {
-                    internalUser = new User(userId);
-                } catch (SQLException e) {
-                    new Log(e, event, name).sendLogSqlCommandEvent(true);
-                    return;
-                }
+                internalUser = new User(userId);
 
                 switch (setting) {
                     case "color":
                     case "colour":
+                        // Has to be $10 Patron.
+                        if (!PatreonHandler.is$10Patron(event.getAuthor())) {
+                            PatreonHandler.sendWarning(event.getChannel(), "$10");
+                            return;
+                        }
+
                         value = utilities.Parser.parseColor(value);
                         if (value == null) {
                             event.reply("The given color code is invalid.");
@@ -119,17 +120,17 @@ public class UserCommand extends Command {
                 }
 
                 setting = args[1].toLowerCase();
-
-                try {
-                    internalUser = new User(userId);
-                } catch (SQLException e) {
-                    new Log(e, event, name).sendLogSqlCommandEvent(true);
-                    return;
-                }
+                internalUser = new User(userId);
 
                 switch (setting) {
                     case "color":
                     case "colour":
+                        // Has to be $10 Patron.
+                        if (!PatreonHandler.is$10Patron(event.getAuthor())) {
+                            PatreonHandler.sendWarning(event.getChannel(), "$10");
+                            return;
+                        }
+
                         boolean wasUnset;
                         try {
                             wasUnset = internalUser.unsetColor();
@@ -163,18 +164,22 @@ public class UserCommand extends Command {
                 Map<String, Map.Entry<String, Boolean>> fields = new HashMap<>();
                 fields.put("Color", new MyEntry<>(colorCode, true));
 
-                new MessageHandler().sendEmbed(event.getChannel(),
-                        internalUser.getColor(),
-                        "User Settings",
-                        null,
-                        author.getAvatarUrl(),
-                        null,
-                        null,
-                        null,
-                        fields,
-                        null,
-                        null,
-                        null);
+                try {
+                    new MessageHandler().sendEmbed(event.getChannel(),
+                            internalUser.getColor(),
+                            "User Settings",
+                            null,
+                            author.getAvatarUrl(),
+                            null,
+                            null,
+                            null,
+                            fields,
+                            null,
+                            null,
+                            null);
+                } catch (SQLException e) {
+                    new Log(e, event, name).sendLogSqlCommandEvent(true);
+                }
                 break;
 
             default:

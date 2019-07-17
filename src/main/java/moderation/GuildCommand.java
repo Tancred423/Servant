@@ -146,30 +146,28 @@ public class GuildCommand extends Command {
             case "show":
             case "sh":
                 net.dv8tion.jda.core.entities.User author = event.getAuthor();
-                String offset;
-                try {
-                    internalUser = new User(author.getIdLong());
-                    offset = internalGuild.getOffset();
-                } catch (SQLException e) {
-                    new Log(e, event, name).sendLogSqlCommandEvent(true);
-                    return;
-                }
+                String offset = internalGuild.getOffset();
+                internalUser = new User(author.getIdLong());
 
                 Map<String, Map.Entry<String, Boolean>> fields = new HashMap<>();
                 fields.put("Offset", new MyEntry<>(offset, true));
 
-                new MessageHandler().sendEmbed(event.getChannel(),
-                        internalUser.getColor(),
-                        "Guild Settings",
-                        null,
-                        guild.getIconUrl(),
-                        null,
-                        null,
-                        null,
-                        fields,
-                        null,
-                        null,
-                        null);
+                try {
+                    new MessageHandler().sendEmbed(event.getChannel(),
+                            internalUser.getColor(),
+                            "Guild Settings",
+                            null,
+                            guild.getIconUrl(),
+                            null,
+                            null,
+                            null,
+                            fields,
+                            null,
+                            null,
+                            null);
+                } catch (SQLException e) {
+                    new Log(e, event, name).sendLogSqlCommandEvent(true);
+                }
                 break;
 
             default:

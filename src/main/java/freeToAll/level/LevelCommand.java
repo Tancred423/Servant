@@ -67,13 +67,7 @@ public class LevelCommand extends Command {
         }
 
         User author = event.getAuthor();
-        servant.User internalAuthor;
-        try {
-            internalAuthor = new servant.User(author.getIdLong());
-        } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(true);
-            return;
-        }
+        servant.User internalAuthor = new servant.User(author.getIdLong());
 
         String arg = event.getArgs();
         int currentExp;
@@ -145,13 +139,7 @@ public class LevelCommand extends Command {
                         return;
                     }
 
-                    servant.User internalMentioned;
-                    try {
-                        internalMentioned = new servant.User(mentioned.getIdLong());
-                    } catch (SQLException e) {
-                        new Log(e, event, name).sendLogSqlCommandEvent(true);
-                        return;
-                    }
+                    servant.User internalMentioned = new servant.User(mentioned.getIdLong());
                     try {
                         currentExp = internalMentioned.getExp(event.getGuild().getIdLong());
                     } catch (SQLException e) {

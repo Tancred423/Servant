@@ -1,5 +1,8 @@
 package servant;
 
+import net.dv8tion.jda.core.entities.Guild;
+import patreon.PatreonHandler;
+
 import java.awt.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -8,45 +11,57 @@ import java.sql.SQLException;
 
 public class User {
     private long userId;
-    private Color color;
 
-    public User(long userId) throws SQLException {
+    public User(long userId) {
         this.userId = userId;
-        thisColor();
     }
 
     // Color.
-    public Color getColor() { return color; }
-
     public String getColorCode() throws SQLException {
         Connection connection = Database.getConnection();
         PreparedStatement select = connection.prepareStatement("SELECT value FROM user_settings WHERE user_id=? AND setting=?");
         select.setLong(1, userId);
         select.setString(2, "color");
         ResultSet resultSet = select.executeQuery();
-        String colorCode = null;
+        String colorCode;
         if (resultSet.first()) colorCode = resultSet.getString("value");
-        if (colorCode == null) colorCode = Servant.config.getDefaultColorCode();
+        else {
+            net.dv8tion.jda.core.entities.User user = Servant.jda.getUserById(userId);
+            if (PatreonHandler.is$10Patron(user)) colorCode = "#29b6f6";
+            else if (PatreonHandler.is$5Patron(user)) colorCode = "#01ca9e";
+            else if (PatreonHandler.is$3Patron(user)) colorCode = "#ffca28";
+            else if (PatreonHandler.is$1Patron(user)) colorCode = "#bebebe";
+            else if (PatreonHandler.isDonator(user)) colorCode = "#cd7f32";
+            else colorCode = Servant.config.getDefaultColorCode();
+        }
         connection.close();
         return colorCode;
     }
 
-    private void thisColor() throws SQLException {
+    // Color.
+    public Color getColor() throws SQLException {
         Connection connection = Database.getConnection();
         PreparedStatement select = connection.prepareStatement("SELECT value FROM user_settings WHERE user_id=? AND setting=?");
         select.setLong(1, userId);
         select.setString(2, "color");
         ResultSet resultSet = select.executeQuery();
-        String colorCode = null;
-        if (resultSet.first()) colorCode = resultSet.getString("value");
-        if (colorCode == null) color = Color.decode(Servant.config.getDefaultColorCode());
-        else color = Color.decode(colorCode);
+        Color color;
+        if (resultSet.first()) color = Color.decode(resultSet.getString("value"));
+        else {
+            net.dv8tion.jda.core.entities.User user = Servant.jda.getUserById(userId);
+            Guild guild = Servant.jda.getGuildById(436925371577925642L);
+            if (PatreonHandler.is$10Patron(user)) color = guild.getRoleById(502472869234868224L).getColor();
+            else if (PatreonHandler.is$5Patron(user)) color = guild.getRoleById(502472823638458380L).getColor();
+            else if (PatreonHandler.is$3Patron(user)) color = guild.getRoleById(502472546600353796L).getColor();
+            else if (PatreonHandler.is$1Patron(user)) color = guild.getRoleById(502472440455233547L).getColor();
+            else if (PatreonHandler.isDonator(user)) color = guild.getRoleById(489738762838867969L).getColor();
+            else color = Color.decode(Servant.config.getDefaultColorCode());
+        }
         connection.close();
+        return color;
     }
 
     public void setColor(String colorCode) throws SQLException {
-        this.color = Color.decode(colorCode);
-
         Connection connection = Database.getConnection();
         if (hasEntry("user_settings", "setting", "color", false)) {
             //  Update.
@@ -67,8 +82,6 @@ public class User {
     }
 
     public boolean unsetColor() throws SQLException {
-        this.color = Color.decode(Servant.config.getDefaultColorCode());
-
         Connection connection = Database.getConnection();
         if (hasEntry("user_settings", "setting", "color", false)) {
             //  Delete.
@@ -136,7 +149,7 @@ public class User {
     }
 
     // Feature counter.
-    public int getFeatureCount(String feature) throws SQLException {
+    private int getFeatureCount(String feature) throws SQLException {
         Connection connection = Database.getConnection();
         PreparedStatement select = connection.prepareStatement("SELECT count FROM feature_count WHERE id=? AND feature=?");
         select.setLong(1, userId);

@@ -1,9 +1,10 @@
-package patreon;
+package chatbot;
 
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import patreon.PatreonHandler;
 import servant.Log;
 import servant.Servant;
 import zChatLib.Chat;
@@ -53,6 +54,12 @@ public class ChatbotListener extends ListenerAdapter {
     }
 
     private static void interact(MessageReceivedEvent event, String content) {
+        // Has to be $3 Patron.
+        if (!PatreonHandler.is$10Patron(event.getAuthor())) {
+            PatreonHandler.sendWarning(event.getChannel(), "$3");
+            return;
+        }
+
         MagicBooleans.trace_mode = false;
 
         zChatLib.Chat chatSession = new Chat(Servant.chatBot);

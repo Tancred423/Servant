@@ -9,6 +9,7 @@ import moderation.mediaOnlyChannel.MediaOnlyChannelListener;
 import freeToAll.welcome.EmbedCommand;
 import moderation.reactionRoles.ReactionRoleCommand;
 import moderation.reactionRoles.ReactionRoleListener;
+import patreon.PatreonListener;
 import zChatLib.Bot;
 import config.ToggleFile;
 import freeToAll.BaguetteCommand;
@@ -28,7 +29,7 @@ import interaction.*;
 import net.dv8tion.jda.core.*;
 import net.dv8tion.jda.core.entities.Game;
 import freeToAll.UserCommand;
-import patreon.ChatbotListener;
+import chatbot.ChatbotListener;
 
 import javax.security.auth.login.LoginException;
 import java.awt.*;
@@ -111,6 +112,7 @@ public class Servant {
                 .addEventListener(new JoinLeaveNotifyListener())
                 .addEventListener(new LevelListener())
                 .addEventListener(new MediaOnlyChannelListener())
+                .addEventListener(new PatreonListener())
                 .addEventListener(new ReactionRoleListener())
                 .addEventListener(new ReadyListener())
 

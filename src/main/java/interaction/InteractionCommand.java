@@ -50,13 +50,8 @@ public abstract class InteractionCommand extends Command {
         User author = event.getAuthor();
         servant.User internalAuthor;
         servant.User internalMentioned;
-        try {
-            internalAuthor = new servant.User(author.getIdLong());
-            internalMentioned = new servant.User(mentioned.getIdLong());
-        } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(true);
-            return;
-        }
+        internalAuthor = new servant.User(author.getIdLong());
+        internalMentioned = new servant.User(mentioned.getIdLong());
 
         // Get random gif.
         String gif;

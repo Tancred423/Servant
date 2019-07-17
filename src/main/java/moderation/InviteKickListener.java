@@ -6,7 +6,6 @@ import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.core.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
-import servant.Log;
 import servant.Servant;
 
 import java.awt.*;
@@ -18,18 +17,17 @@ public class InviteKickListener extends ListenerAdapter {
         User guildOwner = guild.getOwner().getUser();
 
         guildOwner.openPrivateChannel().queue(privateChannel -> {
-            servant.User internalGuildOwner = null;
-            try {
-                internalGuildOwner = new servant.User(guildOwner.getIdLong());
-            } catch (SQLException e) {
-                new Log(e, event, "InviteKickListener").sendLogSqlGuildJoinEvent();
-            }
+            servant.User internalGuildOwner = new servant.User(guildOwner.getIdLong());
             String p = Servant.config.getDefaultPrefix();
             User botOwner = Servant.jda.getUserById(Servant.config.getBotOwnerId());
             User bot = event.getJDA().getSelfUser();
             EmbedBuilder eb = new EmbedBuilder();
 
-            eb.setColor(internalGuildOwner == null ? Color.decode(Servant.config.getDefaultColorCode()) : internalGuildOwner.getColor());
+            try {
+                eb.setColor(internalGuildOwner.getColor());
+            } catch (SQLException e) {
+                eb.setColor(Color.decode(Servant.config.getDefaultColorCode()));
+            }
             eb.setAuthor(bot.getName() + " at your service!", null, guild.getIconUrl());
             eb.setDescription("Thank you for choosing me to assist you and your server.\n" +
                     "I have a lot of features. Most of them are enabled by default but some of them are not.\n" +
@@ -56,16 +54,15 @@ public class InviteKickListener extends ListenerAdapter {
         User guildOwner = guild.getOwner().getUser();
 
         guildOwner.openPrivateChannel().queue(privateChannel -> {
-            servant.User internalGuildOwner = null;
-            try {
-                internalGuildOwner = new servant.User(guildOwner.getIdLong());
-            } catch (SQLException e) {
-                new Log(e, event, "InviteKickListener").sendLogSqlGuildJoinEvent();
-            }
+            servant.User internalGuildOwner = new servant.User(guildOwner.getIdLong());
             User botOwner = Servant.jda.getUserById(Servant.config.getBotOwnerId());
             EmbedBuilder eb = new EmbedBuilder();
 
-            eb.setColor(internalGuildOwner == null ? Color.decode(Servant.config.getDefaultColorCode()) : internalGuildOwner.getColor());
+            try {
+                eb.setColor(internalGuildOwner.getColor());
+            } catch (SQLException e) {
+                eb.setColor(Color.decode(Servant.config.getDefaultColorCode()));
+            }
             eb.setAuthor("Farewell!", null, guild.getIconUrl());
             eb.setDescription("It's very sad to hear, that you don't need me anymore.\n" +
                     "If there is anything to improve, I am always open for feedback.\n" +
