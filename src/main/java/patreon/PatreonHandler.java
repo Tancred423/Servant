@@ -1,36 +1,59 @@
 package patreon;
 
 import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.User;
 import servant.Servant;
+
+import java.util.List;
 
 public class PatreonHandler {
     private static Guild g = Servant.jda.getGuildById(436925371577925642L);
 
     public static boolean isDonator(User user) {
         if (is$1Patron(user)) return true;
-        return g.getMemberById(user.getIdLong()).getRoles().contains(g.getRoleById(489738762838867969L));
+        List<Member> members = g.getMembers();
+        for (Member member : members)
+            if (member.getUser().equals(user))
+                return g.getMemberById(user.getIdLong()).getRoles().contains(g.getRoleById(489738762838867969L));
+        return false;
     }
 
     // Example: $10 Patron is also a $1 Patron!
     public static boolean is$1Patron(User user) {
         if (is$3Patron(user)) return true;
-        return g.getMemberById(user.getIdLong()).getRoles().contains(g.getRoleById(502472440455233547L));
+        List<Member> members = g.getMembers();
+        for (Member member : members)
+            if (member.getUser().equals(user))
+                return g.getMemberById(user.getIdLong()).getRoles().contains(g.getRoleById(502472440455233547L));
+        return false;
     }
 
     public static boolean is$3Patron(User user) {
         if (is$5Patron(user)) return true;
-        return g.getMemberById(user.getIdLong()).getRoles().contains(g.getRoleById(502472546600353796L));
+        List<Member> members = g.getMembers();
+        for (Member member : members)
+            if (member.getUser().equals(user))
+                return g.getMemberById(user.getIdLong()).getRoles().contains(g.getRoleById(502472546600353796L));
+        return false;
     }
 
     public static boolean is$5Patron(User user) {
         if (is$10Patron(user)) return true;
-        return g.getMemberById(user.getIdLong()).getRoles().contains(g.getRoleById(502472823638458380L));
+        List<Member> members = g.getMembers();
+        for (Member member : members)
+            if (member.getUser().equals(user))
+                return g.getMemberById(user.getIdLong()).getRoles().contains(g.getRoleById(502472823638458380L));
+        return false;
     }
 
     public static boolean is$10Patron(User user) {
-        return g.getMemberById(user.getIdLong()).getRoles().contains(g.getRoleById(502472869234868224L));
+        List<Member> members = g.getMembers();
+        for (Member member : members)
+            if (member.getUser().equals(user))
+                return g.getMemberById(user.getIdLong()).getRoles().contains(g.getRoleById(502472869234868224L));
+        return false;
     }
 
     public static void sendWarning(MessageChannel channel, String rank) {

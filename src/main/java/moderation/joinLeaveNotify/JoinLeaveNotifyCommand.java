@@ -45,7 +45,7 @@ public class JoinLeaveNotifyCommand extends Command {
             try {
                 String usage = "**Setting up a join and leave notification channel**\n" +
                         "Command: `" + prefix + name + " set [#channel]`\n" +
-                        "Example: `" + prefix + name + " set #welcome`\n" +
+                        "Example: `" + prefix + name + " set #embed`\n" +
                         "\n" +
                         "**Unsetting this channel**\n" +
                         "Command: `" + prefix + name + " unset`\n" +

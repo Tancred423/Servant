@@ -1,4 +1,4 @@
-package freeToAll.welcome;
+package freeToAll.embed;
 
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.MessageEmbed;

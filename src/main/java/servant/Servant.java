@@ -6,7 +6,7 @@ import moderation.autorole.AutoroleListener;
 import moderation.joinLeaveNotify.JoinLeaveNotifyCommand;
 import moderation.mediaOnlyChannel.MediaOnlyChannelCommand;
 import moderation.mediaOnlyChannel.MediaOnlyChannelListener;
-import freeToAll.welcome.EmbedCommand;
+import freeToAll.embed.EmbedCommand;
 import moderation.reactionRoles.ReactionRoleCommand;
 import moderation.reactionRoles.ReactionRoleListener;
 import patreon.PatreonListener;
