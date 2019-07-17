@@ -8,6 +8,8 @@ import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberLeaveEvent;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
+import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionRemoveEvent;
 
 public class Log {
     private Exception e;
@@ -18,8 +20,24 @@ public class Log {
     private GuildMemberLeaveEvent guildMemberLeaveEvent;
     private GuildJoinEvent guildJoinEvent;
     private GuildLeaveEvent guildLeaveEvent;
+    private GuildMessageReactionAddEvent guildMessageReactionAddEvent;
+    private GuildMessageReactionRemoveEvent guildMessageReactionRemoveEvent;
     private ConfigFile config;
     private String name;
+
+    public Log(Exception e, GuildMessageReactionAddEvent guildMessageReactionAddEvent, String commandName) {
+        this.e = e;
+        this.guildMessageReactionAddEvent = guildMessageReactionAddEvent;
+        this.config = Servant.config;
+        this.name = commandName;
+    }
+
+    public Log(Exception e, GuildMessageReactionRemoveEvent guildMessageReactionRemoveEvent, String commandName) {
+        this.e = e;
+        this.guildMessageReactionRemoveEvent = guildMessageReactionRemoveEvent;
+        this.config = Servant.config;
+        this.name = commandName;
+    }
 
     public Log(Exception e, CommandEvent commandEvent, String commandName) {
         this.e = e;
@@ -181,6 +199,34 @@ public class Log {
                         "-----\n" +
                         "Guild: " + guildLeaveEvent.getGuild().getName() + " (" + guildLeaveEvent.getGuild().getIdLong() + ")\n" +
                         "User: " + guildLeaveEvent.getGuild().getOwner().getUser().getName() + " (" + guildLeaveEvent.getGuild().getOwner().getUser().getIdLong() + ")\n" +
+                        "Command: " + name + "\n" +
+                        "Error: " + e.getMessage() + "\n" +
+                        "```").queue());
+    }
+
+    // guildMessageReactionAddEvent
+    public void sendLogSqlGuildMessageReactionAddEvent() {
+        e.printStackTrace();
+        guildMessageReactionAddEvent.getJDA().getUserById(config.getBotOwnerId()).openPrivateChannel().queue(privateChannel ->
+                privateChannel.sendMessage("```c\n" +
+                        "Error\n" +
+                        "-----\n" +
+                        "Guild: " + guildMessageReactionAddEvent.getGuild().getName() + " (" + guildMessageReactionAddEvent.getGuild().getIdLong() + ")\n" +
+                        "User: " + guildMessageReactionAddEvent.getGuild().getOwner().getUser().getName() + " (" + guildMessageReactionAddEvent.getGuild().getOwner().getUser().getIdLong() + ")\n" +
+                        "Command: " + name + "\n" +
+                        "Error: " + e.getMessage() + "\n" +
+                        "```").queue());
+    }
+
+    // guildMessageReactionRemoveEvent
+    public void sendLogSqlGuildMessageReactionRemoveEvent() {
+        e.printStackTrace();
+        guildMessageReactionRemoveEvent.getJDA().getUserById(config.getBotOwnerId()).openPrivateChannel().queue(privateChannel ->
+                privateChannel.sendMessage("```c\n" +
+                        "Error\n" +
+                        "-----\n" +
+                        "Guild: " + guildMessageReactionRemoveEvent.getGuild().getName() + " (" + guildMessageReactionRemoveEvent.getGuild().getIdLong() + ")\n" +
+                        "User: " + guildMessageReactionRemoveEvent.getGuild().getOwner().getUser().getName() + " (" + guildMessageReactionRemoveEvent.getGuild().getOwner().getUser().getIdLong() + ")\n" +
                         "Command: " + name + "\n" +
                         "Error: " + e.getMessage() + "\n" +
                         "```").queue());

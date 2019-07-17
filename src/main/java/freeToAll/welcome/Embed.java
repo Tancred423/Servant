@@ -1,6 +1,5 @@
-package moderation.welcome;
+package freeToAll.welcome;
 
-import net.dv8tion.jda.core.entities.Emote;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.Role;
@@ -8,7 +7,7 @@ import net.dv8tion.jda.core.entities.Role;
 import java.time.OffsetDateTime;
 import java.util.List;
 
-public class Welcome {
+public class Embed {
     private String authorName;
     private String authorUrl;
     private String authorIconUrl;
@@ -22,12 +21,8 @@ public class Welcome {
     private String footerIconUrl;
     private OffsetDateTime timestamp;
 
-    private String reactEmoji;
-    private Emote reactEmote;
-
     private Role role;
     private MessageChannel messageChannel;
-    private boolean emoteOrEmojiWasSet;
     private int amountFields;
 
     public void setAuthorName(String authorName) {
@@ -57,20 +52,11 @@ public class Welcome {
     public void setFooterIconUrl(String footerIconUrl) {
         this.footerIconUrl = footerIconUrl;
     }
-    public void setReactEmoji(String reactEmoji) {
-        this.reactEmoji = reactEmoji;
-    }
-    public void setReactEmote(Emote reactEmote) {
-        this.reactEmote = reactEmote;
-    }
     public void setRole(Role role) {
         this.role = role;
     }
     public void setMessageChannel(MessageChannel messageChannel) {
         this.messageChannel = messageChannel;
-    }
-    public void setEmoteOrEmojiWasSet(boolean emoteOrEmojiWasSet) {
-        this.emoteOrEmojiWasSet = emoteOrEmojiWasSet;
     }
     public void setAmountFields(int amountFields) {
         this.amountFields = amountFields;
@@ -112,12 +98,6 @@ public class Welcome {
     public String getFooterIconUrl() {
         return footerIconUrl;
     }
-    public String getReactEmoji() {
-        return reactEmoji;
-    }
-    public Emote getReactEmote() {
-        return reactEmote;
-    }
     public Role getRole() {
         return role;
     }
@@ -126,9 +106,6 @@ public class Welcome {
     }
     public int getAmountFields() {
         return amountFields;
-    }
-    public boolean emoteOrEmojiWasSet() {
-        return emoteOrEmojiWasSet;
     }
     public String getTitle() {
         return title;

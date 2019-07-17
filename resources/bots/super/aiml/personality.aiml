@@ -1033,7 +1033,7 @@ By "we" do you mean you and me?</li>
 <template>What do you want to add to your calendar?</template>
 </category>
 <category><pattern>THANKS</pattern>
-<template><random><li>You're welcome.</li><li>Any time.</li><li>It was my pleasure.</li><li>I'm always glad to help.</li></random></template>
+<template><random><li>You're embed.</li><li>Any time.</li><li>It was my pleasure.</li><li>I'm always glad to help.</li></random></template>
 </category>
 <category><pattern>TO BE OR NOT TO BE</pattern>
 <template>That is the question.</template>

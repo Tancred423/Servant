@@ -25,8 +25,8 @@ public abstract class InteractionCommand extends Command {
         }
 
         String prefix = Servant.config.getDefaultPrefix();
-        // Usage
         if (event.getArgs().isEmpty()) {
+            // Usage
             try {
                 String usage = "**" + name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase() + (name.toLowerCase().equals("dab") ? " on" : "") +  " someone**\n" +
                         "Command: `" + prefix + name + " [@user]`\n" +

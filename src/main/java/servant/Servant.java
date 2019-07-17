@@ -6,7 +6,9 @@ import moderation.autorole.AutoroleListener;
 import moderation.joinLeaveNotify.JoinLeaveNotifyCommand;
 import moderation.mediaOnlyChannel.MediaOnlyChannelCommand;
 import moderation.mediaOnlyChannel.MediaOnlyChannelListener;
-import moderation.welcome.WelcomeCommand;
+import freeToAll.welcome.EmbedCommand;
+import moderation.reactionRoles.ReactionRoleCommand;
+import moderation.reactionRoles.ReactionRoleListener;
 import zChatLib.Bot;
 import config.ToggleFile;
 import freeToAll.BaguetteCommand;
@@ -70,13 +72,14 @@ public class Servant {
                 new GuildCommand(), // ADMINISTRATOR
                 new JoinLeaveNotifyCommand(), // MANAGE CHANNEL
                 new MediaOnlyChannelCommand(), // MANAGE CHANNEL
+                new ReactionRoleCommand(), // MANAGE CHANNEL, MANAGE ROLES
                 new ToggleCommand(), // ADMINISTRATOR
-                new WelcomeCommand(waiter), // MANAGE CHANNEL, MANAGE ROLES
 
                 // Free to all
                 new AvatarCommand(),
                 new BaguetteCommand(),
                 new CoinflipCommand(),
+                new EmbedCommand(waiter),
                 new LevelCommand(),
                 new UserCommand(),
 
@@ -108,6 +111,7 @@ public class Servant {
                 .addEventListener(new JoinLeaveNotifyListener())
                 .addEventListener(new LevelListener())
                 .addEventListener(new MediaOnlyChannelListener())
+                .addEventListener(new ReactionRoleListener())
                 .addEventListener(new ReadyListener())
 
                 // Start.

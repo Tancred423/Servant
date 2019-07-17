@@ -1,8 +1,7 @@
 package utilities;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.Role;
+import net.dv8tion.jda.core.entities.*;
 import servant.Servant;
 
 import java.awt.*;
@@ -12,6 +11,8 @@ import java.net.URLConnection;
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.List;
 
 public class Parser {
     public static String parseColor(String colorCode) {
@@ -133,7 +134,7 @@ public class Parser {
     }
 
     public static boolean isValidDirectUrl(String urlString) {
-        URLConnection connection = null;
+        URLConnection connection;
         try {
             connection = new URL(urlString).openConnection();
         } catch (IOException e) {
@@ -141,9 +142,5 @@ public class Parser {
         }
         String contentType = connection.getHeaderField("Content-Type");
         return contentType.startsWith("image/");
-    }
-
-    public static String parseMentions(String description) {
-        return description;
     }
 }

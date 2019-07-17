@@ -9,6 +9,6 @@ import java.sql.SQLException;
 public class Database {
     public static Connection getConnection() throws SQLException {
         ConfigFile config = Servant.config;
-        return DriverManager.getConnection("jdbc:mysql://" + config.getDatabaseUrl() + "?useUnicode=true&serverTimezone=UTC", config.getDatabaseUsername(), config.getDatabasePassword());
+        return DriverManager.getConnection("jdbc:mysql://" + config.getDatabaseUrl() + "?useUnicode=true&serverTimezone=UTC&characterEncoding=UTF-8", config.getDatabaseUsername(), config.getDatabasePassword());
     }
 }

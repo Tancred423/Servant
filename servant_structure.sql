@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Erstellungszeit: 29. Jun 2019 um 15:22
--- Server-Version: 5.6.34-log
--- PHP-Version: 7.1.5
+-- Generation Time: Jul 17, 2019 at 01:11 PM
+-- Server version: 5.6.34-log
+-- PHP Version: 7.2.1
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
@@ -19,13 +19,13 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Datenbank: `servant_structure`
+-- Database: `servant_dev`
 --
 
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `autorole`
+-- Table structure for table `autorole`
 --
 
 CREATE TABLE `autorole` (
@@ -36,7 +36,7 @@ CREATE TABLE `autorole` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `emote`
+-- Table structure for table `emote`
 --
 
 CREATE TABLE `emote` (
@@ -48,7 +48,7 @@ CREATE TABLE `emote` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `feature_count`
+-- Table structure for table `feature_count`
 --
 
 CREATE TABLE `feature_count` (
@@ -60,7 +60,7 @@ CREATE TABLE `feature_count` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `guild_settings`
+-- Table structure for table `guild_settings`
 --
 
 CREATE TABLE `guild_settings` (
@@ -72,7 +72,7 @@ CREATE TABLE `guild_settings` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `interaction`
+-- Table structure for table `interaction`
 --
 
 CREATE TABLE `interaction` (
@@ -83,7 +83,7 @@ CREATE TABLE `interaction` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `interaction_count`
+-- Table structure for table `interaction_count`
 --
 
 CREATE TABLE `interaction_count` (
@@ -96,7 +96,7 @@ CREATE TABLE `interaction_count` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `join_notifier`
+-- Table structure for table `join_notifier`
 --
 
 CREATE TABLE `join_notifier` (
@@ -107,7 +107,7 @@ CREATE TABLE `join_notifier` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `mediaonlychannel`
+-- Table structure for table `mediaonlychannel`
 --
 
 CREATE TABLE `mediaonlychannel` (
@@ -118,7 +118,32 @@ CREATE TABLE `mediaonlychannel` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `toggle`
+-- Table structure for table `reaction_role`
+--
+
+CREATE TABLE `reaction_role` (
+  `guild_id` bigint(18) NOT NULL,
+  `channel_id` bigint(18) NOT NULL,
+  `message_id` bigint(18) NOT NULL,
+  `emoji` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `emote_guild_id` bigint(18) NOT NULL,
+  `emote_id` bigint(18) NOT NULL,
+  `role_id` bigint(18) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `reaction_role`
+--
+
+INSERT INTO `reaction_role` (`guild_id`, `channel_id`, `message_id`, `emoji`, `emote_guild_id`, `emote_id`, `role_id`) VALUES
+(436925371577925642, 599316558720008198, 601003457947893760, '', 436925371577925642, 582852645375574019, 599317368488853527),
+(436925371577925642, 599316558720008198, 601003457947893760, '', 436925371577925642, 582852645556060170, 468472630379282452),
+(436925371577925642, 599316558720008198, 601003457947893760, '👋', 0, 0, 599317368488853527);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `toggle`
 --
 
 CREATE TABLE `toggle` (
@@ -130,7 +155,7 @@ CREATE TABLE `toggle` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `user_exp`
+-- Table structure for table `user_exp`
 --
 
 CREATE TABLE `user_exp` (
@@ -142,7 +167,7 @@ CREATE TABLE `user_exp` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `user_settings`
+-- Table structure for table `user_settings`
 --
 
 CREATE TABLE `user_settings` (
@@ -152,65 +177,71 @@ CREATE TABLE `user_settings` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Indizes der exportierten Tabellen
+-- Indexes for dumped tables
 --
 
 --
--- Indizes für die Tabelle `autorole`
+-- Indexes for table `autorole`
 --
 ALTER TABLE `autorole`
   ADD PRIMARY KEY (`guild_id`,`role_id`);
 
 --
--- Indizes für die Tabelle `emote`
+-- Indexes for table `emote`
 --
 ALTER TABLE `emote`
   ADD PRIMARY KEY (`emote_name`);
 
 --
--- Indizes für die Tabelle `feature_count`
+-- Indexes for table `feature_count`
 --
 ALTER TABLE `feature_count`
   ADD PRIMARY KEY (`id`,`feature`);
 
 --
--- Indizes für die Tabelle `guild_settings`
+-- Indexes for table `guild_settings`
 --
 ALTER TABLE `guild_settings`
   ADD PRIMARY KEY (`guild_id`,`setting`);
 
 --
--- Indizes für die Tabelle `interaction_count`
+-- Indexes for table `interaction_count`
 --
 ALTER TABLE `interaction_count`
   ADD PRIMARY KEY (`user_id`,`interaction`);
 
 --
--- Indizes für die Tabelle `join_notifier`
+-- Indexes for table `join_notifier`
 --
 ALTER TABLE `join_notifier`
   ADD PRIMARY KEY (`guild_id`);
 
 --
--- Indizes für die Tabelle `mediaonlychannel`
+-- Indexes for table `mediaonlychannel`
 --
 ALTER TABLE `mediaonlychannel`
   ADD PRIMARY KEY (`guild_id`,`channel_id`);
 
 --
--- Indizes für die Tabelle `toggle`
+-- Indexes for table `reaction_role`
+--
+ALTER TABLE `reaction_role`
+  ADD PRIMARY KEY (`guild_id`,`channel_id`,`message_id`,`emoji`,`emote_guild_id`,`emote_id`);
+
+--
+-- Indexes for table `toggle`
 --
 ALTER TABLE `toggle`
   ADD PRIMARY KEY (`guild_id`,`feature`);
 
 --
--- Indizes für die Tabelle `user_exp`
+-- Indexes for table `user_exp`
 --
 ALTER TABLE `user_exp`
   ADD PRIMARY KEY (`user_id`,`guild_id`);
 
 --
--- Indizes für die Tabelle `user_settings`
+-- Indexes for table `user_settings`
 --
 ALTER TABLE `user_settings`
   ADD PRIMARY KEY (`user_id`,`setting`);
