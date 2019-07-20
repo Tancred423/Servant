@@ -15,10 +15,84 @@ import java.util.Map;
 public class Guild {
     private long guildId;
     private String offset;
+    private String prefix;
 
     public Guild(long guildId) throws SQLException {
         this.guildId = guildId;
         thisOffset();
+        thisPrefix();
+    }
+
+    // Prefix.
+    public String getPrefix() { return prefix; }
+
+    private boolean prefixHasEntry() throws SQLException {
+        Connection connection = Database.getConnection();
+        PreparedStatement select = connection.prepareStatement("SELECT * FROM guild_settings WHERE guild_id=? AND setting=?");
+        select.setLong(1, guildId);
+        select.setString(2, "prefix");
+        ResultSet resultSet = select.executeQuery();
+        if (resultSet.first()) {
+            connection.close();
+            return true;
+        } else {
+            connection.close();
+            return false;
+        }
+    }
+
+    private void thisPrefix() throws SQLException {
+        Connection connection = Database.getConnection();
+        PreparedStatement select = connection.prepareStatement("SELECT value FROM guild_settings WHERE guild_id=? AND setting=?");
+        select.setLong(1, guildId);
+        select.setString(2, "prefix");
+        ResultSet resultSet = select.executeQuery();
+        String prefix = null;
+        if (resultSet.first()) prefix = resultSet.getString("value");
+        if (prefix == null) this.prefix = Servant.config.getDefaultPrefix();
+        else this.prefix = prefix;
+        connection.close();
+    }
+
+    public void setPrefix(String prefix) throws SQLException {
+        this.prefix = prefix;
+
+        Connection connection = Database.getConnection();
+        if (prefixHasEntry()) {
+            //  Update.
+            PreparedStatement update = connection.prepareStatement("UPDATE guild_settings SET value=? WHERE guild_id=? AND setting=?");
+            update.setString(1, prefix);
+            update.setLong(2, guildId);
+            update.setString(3, "prefix");
+            update.executeUpdate();
+        } else {
+            // Insert.
+            PreparedStatement insert = connection.prepareStatement("INSERT INTO guild_settings (guild_id,setting,value) VALUES (?,?,?)");
+            insert.setLong(1, guildId);
+            insert.setString(2, "prefix");
+            insert.setString(3, prefix);
+            insert.executeUpdate();
+        }
+        connection.close();
+    }
+
+    public boolean unsetPRefix() throws SQLException {
+        this.prefix = Servant.config.getDefaultPrefix();
+
+        Connection connection = Database.getConnection();
+        if (prefixHasEntry()) {
+            //  Delete.
+            PreparedStatement delete = connection.prepareStatement("DELETE FROM guild_settings WHERE guild_id=? AND setting=?");
+            delete.setLong(1, guildId);
+            delete.setString(2, "prefix");
+            delete.executeUpdate();
+            connection.close();
+            return true;
+        } else {
+            // Nothing to delete.
+            connection.close();
+            return false;
+        }
     }
 
     // Color.
@@ -45,10 +119,10 @@ public class Guild {
         select.setLong(1, guildId);
         select.setString(2, "offset");
         ResultSet resultSet = select.executeQuery();
-        String prefix = null;
-        if (resultSet.first()) prefix = resultSet.getString("value");
-        if (prefix == null) this.offset = Servant.config.getDefaultOffset();
-        else this.offset = prefix;
+        String offset = null;
+        if (resultSet.first()) offset = resultSet.getString("value");
+        if (offset == null) this.offset = Servant.config.getDefaultOffset();
+        else this.offset = offset;
         connection.close();
     }
 

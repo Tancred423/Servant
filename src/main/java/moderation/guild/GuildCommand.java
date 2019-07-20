@@ -1,7 +1,9 @@
-package moderation;
+package moderation.guild;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.jagrosh.jdautilities.command.GuildSettingsManager;
+import com.jagrosh.jdautilities.command.GuildSettingsProvider;
 import net.dv8tion.jda.core.Permission;
 import servant.Guild;
 import servant.Log;
@@ -104,6 +106,9 @@ public class GuildCommand extends Command {
                         }
 
                         event.reactSuccess();
+                        break;
+
+                    case "prefix":
                         break;
 
                     default:

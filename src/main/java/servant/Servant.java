@@ -3,6 +3,8 @@ package servant;
 import moderation.*;
 import moderation.autorole.AutoroleCommand;
 import moderation.autorole.AutoroleListener;
+import moderation.guild.GuildCommand;
+import moderation.guild.GuildManager;
 import moderation.joinLeaveNotify.JoinLeaveNotifyCommand;
 import moderation.mediaOnlyChannel.MediaOnlyChannelCommand;
 import moderation.mediaOnlyChannel.MediaOnlyChannelListener;
@@ -57,7 +59,7 @@ public class Servant {
         client.setOwnerId(config.getBotOwnerId());
         client.setEmojis("✅", "⚠", "❌"); // ✅, ⚠, ❌.
         client.setPrefix(config.getDefaultPrefix());
-
+        client.setGuildSettingsManager(new GuildManager());
         client.addCommands(
                 // Default JDA utilities commands.
                 new AboutCommand(Color.decode(config.getDefaultColorCode()), "your multifuntional bot.",

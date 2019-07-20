@@ -28,6 +28,7 @@ public class ReactionRoleListener extends ListenerAdapter {
 
         MessageReaction.ReactionEmote reactionEmote = event.getReactionEmote();
         if (reactionEmote.isEmote()) {
+            if (reactionEmote.getEmote().getGuild() == null) return;
             emoteGuildId = reactionEmote.getEmote().getGuild().getIdLong();
             emoteId = reactionEmote.getEmote().getIdLong();
         } else {
