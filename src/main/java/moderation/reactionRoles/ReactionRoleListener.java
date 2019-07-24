@@ -3,6 +3,7 @@ package moderation.reactionRoles;
 import net.dv8tion.jda.core.entities.MessageReaction;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionRemoveEvent;
+import net.dv8tion.jda.core.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import servant.Log;
 
@@ -38,7 +39,11 @@ public class ReactionRoleListener extends ListenerAdapter {
         try {
             if (ReactionRoleDatabase.hasEntry(guildId, channelId, messageId, emoji, emoteGuildId, emoteId)) {
                 long roleId = ReactionRoleDatabase.getRoleId(guildId, channelId, messageId, emoji, emoteGuildId, emoteId);
-                event.getGuild().getController().addSingleRoleToMember(event.getMember(), event.getGuild().getRoleById(roleId)).queue();
+                try {
+                    event.getGuild().getController().addSingleRoleToMember(event.getMember(), event.getGuild().getRoleById(roleId)).queue();
+                } catch (InsufficientPermissionException e) {
+                    event.getChannel().sendMessage("Insufficient Permissions.").queue();
+                }
             }
         } catch (SQLException e) {
             new Log(e, event, "reactionrole").sendLogSqlGuildMessageReactionAddEvent();
@@ -64,6 +69,7 @@ public class ReactionRoleListener extends ListenerAdapter {
 
         MessageReaction.ReactionEmote reactionEmote = event.getReactionEmote();
         if (reactionEmote.isEmote()) {
+            if (reactionEmote.getEmote().getGuild() == null) return;
             emoteGuildId = reactionEmote.getEmote().getGuild().getIdLong();
             emoteId = reactionEmote.getEmote().getIdLong();
         } else {
@@ -73,7 +79,11 @@ public class ReactionRoleListener extends ListenerAdapter {
         try {
             if (ReactionRoleDatabase.hasEntry(guildId, channelId, messageId, emoji, emoteGuildId, emoteId)) {
                 long roleId = ReactionRoleDatabase.getRoleId(guildId, channelId, messageId, emoji, emoteGuildId, emoteId);
-                event.getGuild().getController().removeSingleRoleFromMember(event.getMember(), event.getGuild().getRoleById(roleId)).queue();
+                try {
+                    event.getGuild().getController().removeSingleRoleFromMember(event.getMember(), event.getGuild().getRoleById(roleId)).queue();
+                } catch (InsufficientPermissionException e) {
+                    event.getChannel().sendMessage("Insufficient Permissions.").queue();
+                }
             }
         } catch (SQLException e) {
             new Log(e, event, "reactionrole").sendLogSqlGuildMessageReactionRemoveEvent();

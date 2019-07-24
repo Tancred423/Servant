@@ -20,10 +20,7 @@ public class Embed {
     private String footerText;
     private String footerIconUrl;
     private OffsetDateTime timestamp;
-
-    private Role role;
     private MessageChannel messageChannel;
-    private int amountFields;
 
     public void setAuthorName(String authorName) {
         this.authorName = authorName;
@@ -52,14 +49,8 @@ public class Embed {
     public void setFooterIconUrl(String footerIconUrl) {
         this.footerIconUrl = footerIconUrl;
     }
-    public void setRole(Role role) {
-        this.role = role;
-    }
     public void setMessageChannel(MessageChannel messageChannel) {
         this.messageChannel = messageChannel;
-    }
-    public void setAmountFields(int amountFields) {
-        this.amountFields = amountFields;
     }
     public void setTitle(String title) {
         this.title = title;
@@ -98,14 +89,8 @@ public class Embed {
     public String getFooterIconUrl() {
         return footerIconUrl;
     }
-    public Role getRole() {
-        return role;
-    }
     public MessageChannel getMessageChannel() {
         return messageChannel;
-    }
-    public int getAmountFields() {
-        return amountFields;
     }
     public String getTitle() {
         return title;

@@ -2,10 +2,11 @@ package servant;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
 import config.ConfigFile;
-import net.dv8tion.jda.core.events.guild.GuildJoinEvent;
-import net.dv8tion.jda.core.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberLeaveEvent;
+import net.dv8tion.jda.core.events.guild.voice.GuildVoiceJoinEvent;
+import net.dv8tion.jda.core.events.guild.voice.GuildVoiceLeaveEvent;
+import net.dv8tion.jda.core.events.guild.voice.GuildVoiceMoveEvent;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
@@ -18,12 +19,34 @@ public class Log {
     private MessageReceivedEvent messageReceivedEvent;
     private GuildMemberJoinEvent guildMemberJoinEvent;
     private GuildMemberLeaveEvent guildMemberLeaveEvent;
-    private GuildJoinEvent guildJoinEvent;
-    private GuildLeaveEvent guildLeaveEvent;
     private GuildMessageReactionAddEvent guildMessageReactionAddEvent;
     private GuildMessageReactionRemoveEvent guildMessageReactionRemoveEvent;
+    private GuildVoiceJoinEvent guildVoiceJoinEvent;
+    private GuildVoiceMoveEvent guildVoiceMoveEvent;
+    private GuildVoiceLeaveEvent guildVoiceLeaveEvent;
     private ConfigFile config;
     private String name;
+
+    public Log(Exception e, GuildVoiceJoinEvent guildVoiceJoinEvent, String commandName) {
+        this.e = e;
+        this.guildVoiceJoinEvent = guildVoiceJoinEvent;
+        this.config = Servant.config;
+        this.name = commandName;
+    }
+
+    public Log(Exception e, GuildVoiceMoveEvent guildVoiceMoveEvent, String commandName) {
+        this.e = e;
+        this.guildVoiceMoveEvent = guildVoiceMoveEvent;
+        this.config = Servant.config;
+        this.name = commandName;
+    }
+
+    public Log(Exception e, GuildVoiceLeaveEvent guildVoiceLeaveEvent, String commandName) {
+        this.e = e;
+        this.guildVoiceLeaveEvent = guildVoiceLeaveEvent;
+        this.config = Servant.config;
+        this.name = commandName;
+    }
 
     public Log(Exception e, GuildMessageReactionAddEvent guildMessageReactionAddEvent, String commandName) {
         this.e = e;
@@ -74,22 +97,9 @@ public class Log {
         this.name = commandName;
     }
 
-    public Log(Exception e, GuildJoinEvent guildJoinEvent, String commandName) {
-        this.e = e;
-        this.guildJoinEvent = guildJoinEvent;
-        this.config = Servant.config;
-        this.name = commandName;
-    }
-
-    public Log(Exception e, GuildLeaveEvent guildLeaveEvent, String commandName) {
-        this.e = e;
-        this.guildLeaveEvent = guildLeaveEvent;
-        this.config = Servant.config;
-        this.name = commandName;
-    }
-
     // commandEvent
     public void sendLogSqlCommandEvent(boolean notifyUser) {
+        commandEvent.reactWarning();
         e.printStackTrace();
         if (notifyUser) commandEvent.reply("Something went wrong connecting to the database.\n" + "A report was sent to the bot owner.");
         commandEvent.getJDA().getUserById(config.getBotOwnerId()).openPrivateChannel().queue(privateChannel ->
@@ -104,6 +114,7 @@ public class Log {
     }
 
     public void sendLogHttpCommandEvent() {
+        commandEvent.reactWarning();
         e.printStackTrace();
         commandEvent.reply("Something went wrong connecting to HTTP.\n" +
                 "A report was sent to the bot owner.");
@@ -176,34 +187,6 @@ public class Log {
                         "```").queue());
     }
 
-    // guildJoinEvent
-    public void sendLogSqlGuildJoinEvent() {
-        e.printStackTrace();
-        guildJoinEvent.getJDA().getUserById(config.getBotOwnerId()).openPrivateChannel().queue(privateChannel ->
-                privateChannel.sendMessage("```c\n" +
-                        "Error\n" +
-                        "-----\n" +
-                        "Guild: " + guildJoinEvent.getGuild().getName() + " (" + guildJoinEvent.getGuild().getIdLong() + ")\n" +
-                        "User: " + guildJoinEvent.getGuild().getOwner().getUser().getName() + " (" + guildJoinEvent.getGuild().getOwner().getUser().getIdLong() + ")\n" +
-                        "Command: " + name + "\n" +
-                        "Error: " + e.getMessage() + "\n" +
-                        "```").queue());
-    }
-
-    // guildJoinEvent
-    public void sendLogSqlGuildLeaveEvent() {
-        e.printStackTrace();
-        guildLeaveEvent.getJDA().getUserById(config.getBotOwnerId()).openPrivateChannel().queue(privateChannel ->
-                privateChannel.sendMessage("```c\n" +
-                        "Error\n" +
-                        "-----\n" +
-                        "Guild: " + guildLeaveEvent.getGuild().getName() + " (" + guildLeaveEvent.getGuild().getIdLong() + ")\n" +
-                        "User: " + guildLeaveEvent.getGuild().getOwner().getUser().getName() + " (" + guildLeaveEvent.getGuild().getOwner().getUser().getIdLong() + ")\n" +
-                        "Command: " + name + "\n" +
-                        "Error: " + e.getMessage() + "\n" +
-                        "```").queue());
-    }
-
     // guildMessageReactionAddEvent
     public void sendLogSqlGuildMessageReactionAddEvent() {
         e.printStackTrace();
@@ -227,6 +210,48 @@ public class Log {
                         "-----\n" +
                         "Guild: " + guildMessageReactionRemoveEvent.getGuild().getName() + " (" + guildMessageReactionRemoveEvent.getGuild().getIdLong() + ")\n" +
                         "User: " + guildMessageReactionRemoveEvent.getGuild().getOwner().getUser().getName() + " (" + guildMessageReactionRemoveEvent.getGuild().getOwner().getUser().getIdLong() + ")\n" +
+                        "Command: " + name + "\n" +
+                        "Error: " + e.getMessage() + "\n" +
+                        "```").queue());
+    }
+
+    // guildVoiceJoinEvent
+    public void sendLogSqlGuildVoiceJoinEvent() {
+        e.printStackTrace();
+        guildVoiceJoinEvent.getJDA().getUserById(config.getBotOwnerId()).openPrivateChannel().queue(privateChannel ->
+                privateChannel.sendMessage("```c\n" +
+                        "Error\n" +
+                        "-----\n" +
+                        "Guild: " + guildVoiceJoinEvent.getGuild().getName() + " (" + guildVoiceJoinEvent.getGuild().getIdLong() + ")\n" +
+                        "User: " + guildVoiceJoinEvent.getGuild().getOwner().getUser().getName() + " (" + guildVoiceJoinEvent.getGuild().getOwner().getUser().getIdLong() + ")\n" +
+                        "Command: " + name + "\n" +
+                        "Error: " + e.getMessage() + "\n" +
+                        "```").queue());
+    }
+
+    // guildVoiceMoveEvent
+    public void sendLogSqlGuildVoiceMoveEvent() {
+        e.printStackTrace();
+        guildVoiceMoveEvent.getJDA().getUserById(config.getBotOwnerId()).openPrivateChannel().queue(privateChannel ->
+                privateChannel.sendMessage("```c\n" +
+                        "Error\n" +
+                        "-----\n" +
+                        "Guild: " + guildVoiceMoveEvent.getGuild().getName() + " (" + guildVoiceMoveEvent.getGuild().getIdLong() + ")\n" +
+                        "User: " + guildVoiceMoveEvent.getGuild().getOwner().getUser().getName() + " (" + guildVoiceMoveEvent.getGuild().getOwner().getUser().getIdLong() + ")\n" +
+                        "Command: " + name + "\n" +
+                        "Error: " + e.getMessage() + "\n" +
+                        "```").queue());
+    }
+
+    // guildVoiceLeaveEvent
+    public void sendLogSqlGuildVoiceLeaveEvent() {
+        e.printStackTrace();
+        guildVoiceLeaveEvent.getJDA().getUserById(config.getBotOwnerId()).openPrivateChannel().queue(privateChannel ->
+                privateChannel.sendMessage("```c\n" +
+                        "Error\n" +
+                        "-----\n" +
+                        "Guild: " + guildVoiceLeaveEvent.getGuild().getName() + " (" + guildVoiceLeaveEvent.getGuild().getIdLong() + ")\n" +
+                        "User: " + guildVoiceLeaveEvent.getGuild().getOwner().getUser().getName() + " (" + guildVoiceLeaveEvent.getGuild().getOwner().getUser().getIdLong() + ")\n" +
                         "Command: " + name + "\n" +
                         "Error: " + e.getMessage() + "\n" +
                         "```").queue());

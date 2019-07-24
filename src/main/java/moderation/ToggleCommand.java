@@ -53,17 +53,21 @@ public class ToggleCommand extends Command {
 
         List<String> validFeatures = new ArrayList<>(){{
             add("autorole");
-            add("clear");
-            add("guild");
-            add("join");
-            add("mediaonlychannel");
-            add("coinflip");
-            add("level");
             add("avatar");
-            add("user");
-            add("interaction");
             add("baguette");
             add("chatbot");
+            add("clear");
+            add("coinflip");
+            add("embed");
+            add("guild");
+            add("interaction");
+            add("join");
+            add("level");
+            add("lobby");
+            add("love");
+            add("mediaonlychannel");
+            add("reactionrole");
+            add("user");
         }};
 
         String[] args = event.getArgs().split(" ");

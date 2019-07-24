@@ -1,11 +1,14 @@
 package servant;
 
+import freeToAll.*;
 import moderation.*;
 import moderation.autorole.AutoroleCommand;
 import moderation.autorole.AutoroleListener;
 import moderation.guild.GuildCommand;
 import moderation.guild.GuildManager;
 import moderation.joinLeaveNotify.JoinLeaveNotifyCommand;
+import moderation.lobby.LobbyCommand;
+import moderation.lobby.LobbyListener;
 import moderation.mediaOnlyChannel.MediaOnlyChannelCommand;
 import moderation.mediaOnlyChannel.MediaOnlyChannelListener;
 import freeToAll.embed.EmbedCommand;
@@ -14,10 +17,7 @@ import moderation.reactionRoles.ReactionRoleListener;
 import patreon.PatreonListener;
 import zChatLib.Bot;
 import config.ToggleFile;
-import freeToAll.BaguetteCommand;
 import moderation.joinLeaveNotify.JoinLeaveNotifyListener;
-import freeToAll.CoinflipCommand;
-import freeToAll.AvatarCommand;
 import freeToAll.level.LevelCommand;
 import freeToAll.level.LevelListener;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
@@ -30,7 +30,6 @@ import config.ConfigFile;
 import interaction.*;
 import net.dv8tion.jda.core.*;
 import net.dv8tion.jda.core.entities.Game;
-import freeToAll.UserCommand;
 import chatbot.ChatbotListener;
 
 import javax.security.auth.login.LoginException;
@@ -74,6 +73,7 @@ public class Servant {
                 new ClearCommand(), // MANAGE MESSAGES
                 new GuildCommand(), // ADMINISTRATOR
                 new JoinLeaveNotifyCommand(), // MANAGE CHANNEL
+                new LobbyCommand(), // MANAGE CHANNEL
                 new MediaOnlyChannelCommand(), // MANAGE CHANNEL
                 new ReactionRoleCommand(), // MANAGE CHANNEL, MANAGE ROLES
                 new ToggleCommand(), // ADMINISTRATOR
@@ -84,6 +84,7 @@ public class Servant {
                 new CoinflipCommand(),
                 new EmbedCommand(waiter),
                 new LevelCommand(),
+                new LoveCommand(),
                 new UserCommand(),
 
                 // Interaction commands.
@@ -113,6 +114,7 @@ public class Servant {
                 .addEventListener(new InviteKickListener())
                 .addEventListener(new JoinLeaveNotifyListener())
                 .addEventListener(new LevelListener())
+                .addEventListener(new LobbyListener())
                 .addEventListener(new MediaOnlyChannelListener())
                 .addEventListener(new PatreonListener())
                 .addEventListener(new ReactionRoleListener())

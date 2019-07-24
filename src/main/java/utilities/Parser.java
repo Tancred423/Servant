@@ -11,6 +11,7 @@ import java.net.URLConnection;
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -142,5 +143,27 @@ public class Parser {
         }
         String contentType = connection.getHeaderField("Content-Type");
         return contentType.startsWith("image/");
+    }
+
+    public static boolean isValidPrefix(String prefix) {
+        boolean isValidPrefix = true;
+        if (prefix.length() > 32) isValidPrefix = false;
+
+        // I will handle this properly in the future.
+        List<String> someHardcodedStuff = new ArrayList<>();
+        someHardcodedStuff.add("select");
+        someHardcodedStuff.add("drop");
+        someHardcodedStuff.add("delete");
+        someHardcodedStuff.add("insert");
+        someHardcodedStuff.add("update");
+        if (someHardcodedStuff.contains(prefix)) isValidPrefix = false;
+
+        return isValidPrefix;
+    }
+
+    public static boolean isValidVoiceChannelId(Guild guild, String id) {
+        if (!id.matches("[0-9]+") || id.length() != 18) return false;
+        guild.getVoiceChannelById(id);
+        return true;
     }
 }

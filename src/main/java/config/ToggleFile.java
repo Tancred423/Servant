@@ -20,6 +20,8 @@ public class ToggleFile {
     private boolean interaction;
     private boolean join;
     private boolean level;
+    private boolean lobby;
+    private boolean love;
     private boolean mediaonlychannel;
     private boolean reactionrole;
     private boolean user;
@@ -64,6 +66,8 @@ public class ToggleFile {
         toggle.setProperty("interaction", "on");
         toggle.setProperty("join", "on");
         toggle.setProperty("level", "off");
+        toggle.setProperty("lobby", "on");
+        toggle.setProperty("love", "on");
         toggle.setProperty("mediaonlychannel", "on");
         toggle.setProperty("reactionrole", "on");
         toggle.setProperty("user", "on");
@@ -92,6 +96,8 @@ public class ToggleFile {
         this.interaction = toggle.getProperty("interaction").equals("on");
         this.join = toggle.getProperty("join").equals("on");
         this.level = toggle.getProperty("level").equals("on");
+        this.lobby = toggle.getProperty("lobby").equals("on");
+        this.love = toggle.getProperty("love").equals("on");
         this.mediaonlychannel = toggle.getProperty("mediaonlychannel").equals("on");
         this.reactionrole = toggle.getProperty("reactionrole").equals("on");
         this.user = toggle.getProperty("user").equals("on");
@@ -109,6 +115,8 @@ public class ToggleFile {
     public void setInteraction (String interaction) { this.interaction = interaction.equals("on"); }
     public void setJoin (String join) { this.join = join.equals("on"); }
     public void setLevel (String level) { this.level = level.equals("on"); }
+    public void setLobby (String lobby) { this.lobby = lobby.equals("on"); }
+    public void setLove (String love) { this.love = love.equals("on"); }
     public void setMediaonlychannel (String mediaonlychannel) { this.mediaonlychannel = mediaonlychannel.equals("on"); }
     public void setReactionrole (String reactionrole) { this.reactionrole = reactionrole.equals("on"); }
     public void setUser (String user) { this.user = user.equals("on"); }
@@ -127,6 +135,8 @@ public class ToggleFile {
             case "interaction": return interaction;
             case "join": return join;
             case "level": return level;
+            case "lobby": return lobby;
+            case "love": return love;
             case "mediaonlychannel": return mediaonlychannel;
             case "reactionrole": return reactionrole;
             case "user": return user;
@@ -145,6 +155,8 @@ public class ToggleFile {
     public boolean getInteraction() { return interaction; }
     public boolean getJoin() { return join; }
     public boolean getLevel() { return level; }
+    public boolean getLobby() { return lobby; }
+    public boolean getLove() { return love; }
     public boolean getMediaOnlyChannel() { return mediaonlychannel; }
     public boolean getReactionRole() { return reactionrole; }
     public boolean getUser() { return user; }

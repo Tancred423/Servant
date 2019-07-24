@@ -59,6 +59,13 @@ public class GuildCommand extends Command {
                         "**Unsetting the offset**\n" +
                         "Command: `" + prefix + name + " unset offset`\n" +
                         "\n" +
+                        "**Setting an server specific prefix**\n" +
+                        "Command: `" + prefix + name + " set prefix [prefix]`\n" +
+                        "Example: `" + prefix + name + " set prefix !`\n" +
+                        "\n" +
+                        "**Unsettings the prefix**\n" +
+                        "Command: `" + prefix + name + " unset prefix`\n" +
+                        "\n" +
                         "**Show your current settings**\n" +
                         "Command: `" + prefix + name + " show`";
 
@@ -94,7 +101,8 @@ public class GuildCommand extends Command {
                     case "offset":
                     case "timezone":
                         if (!Parser.isValidOffset(value)) {
-                            event.reply("Invalid offset");
+                            event.reply("Invalid offset.");
+                            event.reactError();
                             return;
                         }
 
@@ -109,6 +117,20 @@ public class GuildCommand extends Command {
                         break;
 
                     case "prefix":
+                        if (!Parser.isValidPrefix(value)) {
+                            event.reply("Invalid prefix.");
+                            event.reactError();
+                            return;
+                        }
+
+                        try {
+                            internalGuild.setPrefix(value);
+                        } catch (SQLException e) {
+                            new Log(e, event, name).sendLogSqlCommandEvent(true);
+                            return;
+                        }
+
+                        event.reactSuccess();
                         break;
 
                     default:
@@ -126,13 +148,25 @@ public class GuildCommand extends Command {
                 }
 
                 setting = args[1].toLowerCase();
+                boolean wasUnset;
 
                 switch (setting) {
                     case "offset":
                     case "timezone":
-                        boolean wasUnset;
                         try {
                             wasUnset = internalGuild.unsetOffset();
+                        } catch (SQLException e) {
+                            new Log(e, event, name).sendLogSqlCommandEvent(true);
+                            return;
+                        }
+
+                        if (wasUnset) event.reactSuccess();
+                        else event.reply("Nothing to unset.");
+                        break;
+
+                    case "prefix":
+                        try {
+                            wasUnset = internalGuild.unsetPRefix();
                         } catch (SQLException e) {
                             new Log(e, event, name).sendLogSqlCommandEvent(true);
                             return;
@@ -151,11 +185,14 @@ public class GuildCommand extends Command {
             case "show":
             case "sh":
                 net.dv8tion.jda.core.entities.User author = event.getAuthor();
-                String offset = internalGuild.getOffset();
                 internalUser = new User(author.getIdLong());
 
+                String showOffset = internalGuild.getOffset();
+                String showPrefix = internalGuild.getPrefix();
+
                 Map<String, Map.Entry<String, Boolean>> fields = new HashMap<>();
-                fields.put("Offset", new MyEntry<>(offset, true));
+                fields.put("Offset", new MyEntry<>(showOffset, true));
+                fields.put("Prefix", new MyEntry<>(showPrefix, true));
 
                 try {
                     new MessageHandler().sendEmbed(event.getChannel(),

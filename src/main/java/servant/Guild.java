@@ -23,6 +23,73 @@ public class Guild {
         thisPrefix();
     }
 
+    // Lobby.
+    public List<Long> getLobbies() throws SQLException {
+        Connection connection = Database.getConnection();
+        PreparedStatement select = connection.prepareStatement("SELECT * FROM lobby WHERE guild_id=?");
+        select.setLong(1, guildId);
+        ResultSet resultSet = select.executeQuery();
+        List<Long> lobbies = new ArrayList<>();
+        if (resultSet.first()) do lobbies.add(resultSet.getLong("channel_id")); while (resultSet.next());
+        connection.close();
+        return lobbies;
+    }
+
+    public boolean isLobby(long channelId) throws SQLException {
+        Connection connection = Database.getConnection();
+        PreparedStatement select = connection.prepareStatement("SELECT * FROM lobby WHERE guild_id=? and channel_id=?");
+        select.setLong(1, guildId);
+        select.setLong(2, channelId);
+        ResultSet resultSet = select.executeQuery();
+        if (resultSet.first()) {
+            connection.close();
+            return true;
+        } else {
+            connection.close();
+            return false;
+        }
+    }
+
+    private boolean lobbiesHasEntry() throws SQLException {
+        Connection connection = Database.getConnection();
+        PreparedStatement select = connection.prepareStatement("SELECT * FROM lobby WHERE guild_id=?");
+        select.setLong(1, guildId);
+        ResultSet resultSet = select.executeQuery();
+        if (resultSet.first()) {
+            connection.close();
+            return true;
+        } else {
+            connection.close();
+            return false;
+        }
+    }
+
+    public void setLobby(long channelId) throws SQLException {
+        Connection connection = Database.getConnection();
+        PreparedStatement insert = connection.prepareStatement("INSERT INTO lobby (guild_id,channel_id) VALUES (?,?)");
+        insert.setLong(1, guildId);
+        insert.setLong(2, channelId);
+        insert.executeUpdate();
+        connection.close();
+    }
+
+    public boolean unsetLobby(long channelId) throws SQLException {
+        Connection connection = Database.getConnection();
+        if (prefixHasEntry()) {
+            //  Delete.
+            PreparedStatement delete = connection.prepareStatement("DELETE FROM lobby WHERE guild_id=? and channel_id=?");
+            delete.setLong(1, guildId);
+            delete.setLong(2, channelId);
+            delete.executeUpdate();
+            connection.close();
+            return true;
+        } else {
+            // Nothing to delete.
+            connection.close();
+            return false;
+        }
+    }
+
     // Prefix.
     public String getPrefix() { return prefix; }
 
@@ -167,10 +234,10 @@ public class Guild {
         }
     }
 
-    // DB
-    private boolean hasEntry(String tableName, String column, String key, boolean isFeatureCount) throws SQLException {
+    // Feature counter.
+    private boolean featureCountHasEntry(String key) throws SQLException {
         Connection connection = Database.getConnection();
-        PreparedStatement select = connection.prepareStatement("SELECT * FROM "  + tableName + " WHERE " + (isFeatureCount ? "id" : "user_id") + "=? AND " + column + "=?");
+        PreparedStatement select = connection.prepareStatement("SELECT * FROM feature_count WHERE id=? AND feature=?");
         select.setLong(1, guildId);
         select.setString(2, key);
         ResultSet resultSet = select.executeQuery();
@@ -183,8 +250,7 @@ public class Guild {
         }
     }
 
-    // Feature counter.
-    public int getFeatureCount(String feature) throws SQLException {
+    private int getFeatureCount(String feature) throws SQLException {
         Connection connection = Database.getConnection();
         PreparedStatement select = connection.prepareStatement("SELECT count FROM feature_count WHERE id=? AND feature=?");
         select.setLong(1, guildId);
@@ -199,7 +265,7 @@ public class Guild {
     public void incrementFeatureCount(String feature) throws SQLException {
         int count = getFeatureCount(feature);
         Connection connection = Database.getConnection();
-        if (hasEntry("feature_count", "feature", feature, true)) {
+        if (featureCountHasEntry(feature)) {
             // Update.
             PreparedStatement update = connection.prepareStatement("UPDATE feature_count SET count=? WHERE id=? AND feature=?");
             update.setInt(1, count + 1);
