@@ -35,14 +35,14 @@ public class LoveCommand extends Command {
         Message message = event.getMessage();
         List<Member> mentioned = message.getMentionedMembers();
 
-        if (mentioned.size() < 2) {
+        if (mentioned.size() < 1) {
             event.reactError();
             event.reply("You didn't mention enough people");
             return;
         }
 
         Member first = mentioned.get(0);
-        Member second = mentioned.get(1);
+        Member second = mentioned.size() == 1 ? mentioned.get(0) : mentioned.get(1);
 
         User author = event.getAuthor();
         servant.User internalAuthor = new servant.User(author.getIdLong());

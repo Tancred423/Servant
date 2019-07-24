@@ -41,7 +41,7 @@ public class LobbyListener extends ListenerAdapter {
         if (channels.contains(channel.getIdLong())) {
             // Create copy.
             VoiceChannel newChannel = (VoiceChannel) guild.getController().createVoiceChannel(getLobbyName(member))
-                    .setBitrate(channel.getBitrate())
+                    .setBitrate(channel.getBitrate() > 96000 ? 96000 : channel.getBitrate())
                     .setUserlimit(channel.getUserLimit())
                     .complete();
 
@@ -77,7 +77,7 @@ public class LobbyListener extends ListenerAdapter {
         if (channels.contains(joinedChannel.getIdLong())) {
             // Create copy.
             VoiceChannel newChannel = (VoiceChannel) guild.getController().createVoiceChannel(getLobbyName(member))
-                    .setBitrate(joinedChannel.getBitrate())
+                    .setBitrate(joinedChannel.getBitrate() > 96000 ? 96000 : joinedChannel.getBitrate())
                     .setUserlimit(joinedChannel.getUserLimit())
                     .complete();
 
