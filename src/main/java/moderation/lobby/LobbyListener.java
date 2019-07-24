@@ -12,6 +12,7 @@ import servant.Log;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class LobbyListener extends ListenerAdapter {
     private List<VoiceChannel> active = new ArrayList<>();
@@ -50,6 +51,23 @@ public class LobbyListener extends ListenerAdapter {
             guild.getController().moveVoiceMember(member, newChannel).complete();
             active.add(newChannel);
         }
+
+        Thread thread = new Thread(() -> {
+            try {
+                TimeUnit.MILLISECONDS.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            for (int i=0; i<active.size(); i++) {
+                if (active.get(i).getMembers().size() == 0) {
+                    event.getJDA().getVoiceChannelById(active.get(i).getIdLong()).delete().complete();
+                    active.remove(active.get(i));
+                }
+            }
+        });
+
+        thread.start();
     }
 
     public void onGuildVoiceMove(GuildVoiceMoveEvent event) {
@@ -86,6 +104,23 @@ public class LobbyListener extends ListenerAdapter {
             guild.getController().moveVoiceMember(member, newChannel).complete();
             active.add(newChannel);
         }
+
+        Thread thread = new Thread(() -> {
+            try {
+                TimeUnit.MILLISECONDS.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            for (int i=0; i<active.size(); i++) {
+                if (active.get(i).getMembers().size() == 0) {
+                    event.getJDA().getVoiceChannelById(active.get(i).getIdLong()).delete().complete();
+                    active.remove(active.get(i));
+                }
+            }
+        });
+
+        thread.start();
 
         // Leave
         VoiceChannel leftChannel = event.getChannelLeft();
