@@ -1,8 +1,6 @@
 package moderation.lobby;
 
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.VoiceChannel;
+import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceMoveEvent;
@@ -40,21 +38,47 @@ public class LobbyListener extends ListenerAdapter {
         VoiceChannel channel = event.getChannelJoined();
 
         if (channels.contains(channel.getIdLong())) {
-            // Create copy.
-            VoiceChannel newChannel = (VoiceChannel) guild.getController().createVoiceChannel(getLobbyName(member))
-                    .setBitrate(channel.getBitrate() > 96000 ? 96000 : channel.getBitrate())
-                    .setUserlimit(channel.getUserLimit())
-                    .complete();
+//            try {
+//                if (internalGuild.isVoiceText()) {
+//                    // Create copy.
+//                    VoiceChannel newChannel = (VoiceChannel) guild.getController().createVoiceChannel(getLobbyName(member))
+//                            .setBitrate(channel.getBitrate() > 96000 ? 96000 : channel.getBitrate())
+//                            .setUserlimit(channel.getUserLimit())
+//                            .complete();
+//                    if (channel.getParent() != null) newChannel.getManager().setParent(channel.getParent()).complete();
+//
+//                    // Create Text Channel
+//                    TextChannel newText = (TextChannel) guild.getController().createTextChannel(member.getNickname())
+//                            .setTopic("Only people in your voice channel can see this channel.")
+//                            .complete();
+//                    if (channel.getParent() != null) newText.getManager().setParent(channel.getParent()).complete();
+//
+//                    // Create category
+//                    Category newCategory = (Category) guild.getController().createCategory(member.getNickname()).complete();
+//                    if (channel.getParent() != null) newCategory.getManager().setParent(channel.getParent()).complete();
+//
+//                    guild.getController()
+//                } else {
+                    // Create copy.
+                    VoiceChannel newChannel = (VoiceChannel) guild.getController().createVoiceChannel(getLobbyName(member))
+                            .setBitrate(channel.getBitrate() > 96000 ? 96000 : channel.getBitrate())
+                            .setUserlimit(channel.getUserLimit())
+                            .complete();
+                    if (channel.getParent() != null) newChannel.getManager().setParent(channel.getParent()).complete();
 
-            if (channel.getParent() != null) newChannel.getManager().setParent(channel.getParent()).complete();
-            guild.getController().modifyVoiceChannelPositions().selectPosition(newChannel).moveTo(channel.getPosition() + 1).complete();
-            guild.getController().moveVoiceMember(member, newChannel).complete();
-            active.add(newChannel);
+                    guild.getController().modifyVoiceChannelPositions().selectPosition(newChannel).moveTo(channel.getPosition() + 1).complete();
+                    guild.getController().moveVoiceMember(member, newChannel).complete();
+                    active.add(newChannel);
+//                }
+//            } catch (SQLException e) {
+//                new Log(e, event, "lobby").sendLogSqlGuildVoiceJoinEvent();
+//                return;
+//            }
         }
 
         Thread thread = new Thread(() -> {
             try {
-                TimeUnit.MILLISECONDS.sleep(500);
+                TimeUnit.MILLISECONDS.sleep(2500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -107,7 +131,7 @@ public class LobbyListener extends ListenerAdapter {
 
         Thread thread = new Thread(() -> {
             try {
-                TimeUnit.MILLISECONDS.sleep(500);
+                TimeUnit.MILLISECONDS.sleep(2500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

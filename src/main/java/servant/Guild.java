@@ -24,6 +24,65 @@ public class Guild {
     }
 
     // Lobby.
+    public boolean toggleVoiceText() throws SQLException {
+        Connection connection = Database.getConnection();
+        PreparedStatement select = connection.prepareStatement("SELECT * FROM guild_settings WHERE guild_id=? AND setting=?");
+        select.setLong(1, guildId);
+        select.setString(2, "voicetext");
+        ResultSet resultSet = select.executeQuery();
+        boolean wasEnabled;
+        if (resultSet.first()) {
+            if (resultSet.getString("value").equals("on")) wasEnabled = setVoiceText(false);
+            else wasEnabled = setVoiceText(true);
+        } else wasEnabled = setVoiceText(true);
+        return wasEnabled;
+    }
+
+    private boolean setVoiceText(boolean enable) throws SQLException {
+        Connection connection = Database.getConnection();
+        if (voiceTextHasEntry()) {
+            //  Update.
+            PreparedStatement update = connection.prepareStatement("UPDATE guild_settings SET value=? WHERE guild_id=? AND setting=?");
+            update.setString(1, enable ? "on" : "off");
+            update.setLong(2, guildId);
+            update.setString(3, "voicetext");
+            update.executeUpdate();
+        } else {
+            // Insert.
+            PreparedStatement insert = connection.prepareStatement("INSERT INTO guild_settings (guild_id,setting,value) VALUES (?,?,?)");
+            insert.setLong(1, guildId);
+            insert.setString(2, "voicetext");
+            insert.setString(3, enable ? "on" : "off");
+            insert.executeUpdate();
+        }
+        connection.close();
+        return enable;
+    }
+
+    private boolean voiceTextHasEntry() throws SQLException {
+        Connection connection = Database.getConnection();
+        PreparedStatement select = connection.prepareStatement("SELECT * FROM guild_settings WHERE guild_id=? AND setting=?");
+        select.setLong(1, guildId);
+        select.setString(2, "voicetext");
+        ResultSet resultSet = select.executeQuery();
+        boolean voiceTextHasEntry = false;
+        if (resultSet.first()) voiceTextHasEntry = true;
+        connection.close();
+        return voiceTextHasEntry;
+    }
+
+    public boolean isVoiceText() throws SQLException {
+        Connection connection = Database.getConnection();
+        PreparedStatement select = connection.prepareStatement("SELECT * FROM guild_settings WHERE guild_id=? AND setting=?");
+        select.setLong(1, guildId);
+        select.setString(2, "voicetext");
+        ResultSet resultSet = select.executeQuery();
+        boolean isVoiceText = false;
+        if (resultSet.first()) isVoiceText = resultSet.getString("value").equals("on");
+        connection.close();
+        return isVoiceText;
+    }
+
     public List<Long> getLobbies() throws SQLException {
         Connection connection = Database.getConnection();
         PreparedStatement select = connection.prepareStatement("SELECT * FROM lobby WHERE guild_id=?");

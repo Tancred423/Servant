@@ -7,10 +7,14 @@ import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.User;
 import servant.Log;
 import utilities.MessageHandler;
+import utilities.MyEntry;
 import utilities.Parser;
+import utilities.UsageEmbed;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class LobbyCommand extends Command {
     public LobbyCommand() {
@@ -31,20 +35,42 @@ public class LobbyCommand extends Command {
             new Log(e, event, name).sendLogSqlCommandEvent(false);
         }
 
-        String[] args = event.getArgs().split(" ");
-        if (args.length < 1) {
-            // Usage
-            return;
-        }
-
         Guild guild = event.getGuild();
         servant.Guild internalGuild;
+
         try {
             internalGuild = new servant.Guild(guild.getIdLong());
         } catch (SQLException e) {
             new Log(e, event, name).sendLogSqlCommandEvent(true);
             return;
         }
+
+        String[] args = event.getArgs().split(" ");
+        if (args.length < 1) {
+            String prefix = internalGuild.getPrefix();
+            // Usage
+            try {
+                String usage = "**Set a voice channel lobby**\n" +
+                        "Command: `" + prefix + name + " set <Voice Channel ID>`\n" +
+                        "Example: `" + prefix + name + " set 999999999999999999`\n" +
+                        "\n" +
+                        "**Unset a voice channel lobby**\n" +
+                        "Command: `" + prefix + name + " unset <Voice Channel ID>`\n" +
+                        "Example: `" + prefix + name + " unset 999999999999999999`\n" +
+                        "\n" +
+                        "**Show current voice channel lobbies**\n" +
+                        "Command: `" + prefix + name + " show`\n" +
+                        "\n" +
+                        "**Toggle voice-text-channel mode**\n" +
+                        "Command: `" + prefix + name + " toggletext`";
+
+                event.reply(new UsageEmbed(name, event.getAuthor(), ownerCommand, userPermissions, aliases, usage, null).getEmbed());
+            } catch (SQLException e) {
+                new Log(e, event, name).sendLogSqlCommandEvent(true);
+            }
+            return;
+        }
+
         User author = event.getAuthor();
         servant.User internalAuthor = new servant.User(author.getIdLong());
 
@@ -87,14 +113,20 @@ public class LobbyCommand extends Command {
                     return;
                 }
 
+                boolean wasUnset;
+
                 try {
-                    internalGuild.unsetLobby(Long.parseLong(args[1]));
+                    wasUnset = internalGuild.unsetLobby(Long.parseLong(args[1]));
                 } catch (SQLException e) {
                     new Log(e, event, name).sendLogSqlCommandEvent(true);
                     return;
                 }
 
-                event.reactSuccess();
+                if (wasUnset) event.reactSuccess();
+                else {
+                    event.reactError();
+                    event.reply("Nothing to unset.");
+                }
                 break;
 
             case "show":
@@ -118,16 +150,25 @@ public class LobbyCommand extends Command {
                     builder.append(guild.getVoiceChannelById(lobby).getName()).append(" (").append(lobby).append(")\n");
                 builder.append("```");
 
+                Map<String, Map.Entry<String, Boolean>> fields = new HashMap<>();
+                fields.put("Current Lobbies", new MyEntry<>(builder.toString(), false));
+                try {
+                    fields.put("Voice Text", new MyEntry<>(internalGuild.isVoiceText() ? "Enabled" : "Disabled", false));
+                } catch (SQLException e) {
+                    new Log(e, event, name).sendLogSqlCommandEvent(true);
+                    return;
+                }
+
                 try {
                     new MessageHandler().sendEmbed(event.getChannel(),
                             internalAuthor.getColor(),
                             guild.getName(),
                             null,
                             guild.getIconUrl(),
-                            "Current Lobbies",
-                            guild.getSplashUrl(),
-                            builder.toString(),
                             null,
+                            guild.getSplashUrl(),
+                            null,
+                            fields,
                             null,
                             "Type `" + internalGuild.getPrefix() + "lobby` to get help.",
                             null);
@@ -137,9 +178,22 @@ public class LobbyCommand extends Command {
                 }
                 break;
 
+            case "toggletext":
+            case "tt":
+                try {
+                    boolean wasEnabled = internalGuild.toggleVoiceText();
+                    event.reactSuccess();
+                    if (wasEnabled) event.reply("Voice text enabled.");
+                    else event.reply("Voice text disabled.");
+                } catch (SQLException e) {
+                    new Log(e, event, name).sendLogSqlCommandEvent(true);
+                    event.reactWarning();
+                }
+                break;
+
             default:
                 event.reactError();
-                event.reply("Invalid argument. Either `set`, `unset` or `show`.");
+                event.reply("Invalid argument. Either `set`, `unset`, `show` or `toggletext`.");
                 break;
         }
     }
