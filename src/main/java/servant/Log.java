@@ -69,6 +69,12 @@ public class Log {
         this.name = commandName;
     }
 
+    public Log(CommandEvent commandEvent, String commandName) {
+        this.commandEvent = commandEvent;
+        this.config = Servant.config;
+        this.name = commandName;
+    }
+
     public Log(Exception e, GuildMessageReceivedEvent guildMessageReceivedEvent, String commandName) {
         this.e = e;
         this.guildMessageReceivedEvent = guildMessageReceivedEvent;
@@ -126,6 +132,33 @@ public class Log {
                         "User: " + commandEvent.getAuthor().getName() + " (" + commandEvent.getAuthor().getIdLong() + ")\n" +
                         "Command: " + name + "\n" +
                         "Error: " + e.getMessage() + "\n" +
+                        "```").queue());
+    }
+
+    public void sendLogIOCommandEvent(boolean notifyUser) {
+        commandEvent.reactWarning();
+        e.printStackTrace();
+        if (notifyUser) commandEvent.reply("Something went wrong with saving data.\n" + "A report was sent to the bot owner.");
+        commandEvent.getJDA().getUserById(config.getBotOwnerId()).openPrivateChannel().queue(privateChannel ->
+                privateChannel.sendMessage("```c\n" +
+                        "Error\n" +
+                        "-----\n" +
+                        "Guild: " + commandEvent.getGuild().getName() + " (" + commandEvent.getGuild().getIdLong() + ")\n" +
+                        "User: " + commandEvent.getAuthor().getName() + " (" + commandEvent.getAuthor().getIdLong() + ")\n" +
+                        "Command: " + name + "\n" +
+                        "Error: " + e.getMessage() + "\n" +
+                        "```").queue());
+    }
+
+    public void sendLogProfileDelete() {
+        commandEvent.getJDA().getUserById(config.getBotOwnerId()).openPrivateChannel().queue(privateChannel ->
+                privateChannel.sendMessage("```c\n" +
+                        "Error\n" +
+                        "-----\n" +
+                        "Guild: " + commandEvent.getGuild().getName() + " (" + commandEvent.getGuild().getIdLong() + ")\n" +
+                        "User: " + commandEvent.getAuthor().getName() + " (" + commandEvent.getAuthor().getIdLong() + ")\n" +
+                        "Command: " + name + "\n" +
+                        "Error: Image was not deleted.\n" +
                         "```").queue());
     }
 

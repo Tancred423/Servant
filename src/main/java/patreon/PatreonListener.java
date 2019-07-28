@@ -51,9 +51,9 @@ public class PatreonListener extends ListenerAdapter {
             eb.setThumbnail("https://i.imgur.com/rCnhGKA.jpg"); // Patreon Logo
         }
 
-        servant.Guild internalGuild;
+        moderation.guild.Guild internalGuild;
         try {
-            internalGuild = new servant.Guild(event.getGuild().getIdLong());
+            internalGuild = new moderation.guild.Guild(event.getGuild().getIdLong());
             eb.setTimestamp(ZonedDateTime.now(ZoneId.of(internalGuild.getOffset())));
         } catch (SQLException ignored) { }
 

@@ -37,3 +37,6 @@ hs_err_pid*
 
 # Old Versions
 /old_versions/*
+
+# Temporary Profile Files
+/profile_tmp/*

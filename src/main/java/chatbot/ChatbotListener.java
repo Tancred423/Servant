@@ -1,5 +1,6 @@
 package chatbot;
 
+import moderation.guild.Guild;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -16,7 +17,7 @@ public class ChatbotListener extends ListenerAdapter {
     public void onMessageReceived(MessageReceivedEvent event) {
         // Enabled?
         try {
-            if (event.getGuild() != null) if (!new servant.Guild(event.getGuild().getIdLong()).getToggleStatus("baguette")) return;
+            if (event.getGuild() != null) if (!new Guild(event.getGuild().getIdLong()).getToggleStatus("baguette")) return;
         } catch (SQLException e) {
             new Log(e, event, "chatbot").sendLogSqlMessageReceivedEvent(false);
         }

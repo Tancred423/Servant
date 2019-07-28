@@ -2,6 +2,7 @@ package interaction;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import moderation.guild.Guild;
 import servant.*;
 import utilities.UsageEmbed;
 

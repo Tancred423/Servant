@@ -1,6 +1,7 @@
 package servant;
 
 import freeToAll.*;
+import freeToAll.profile.ProfileCommand;
 import moderation.*;
 import moderation.autorole.AutoroleCommand;
 import moderation.autorole.AutoroleListener;
@@ -39,7 +40,7 @@ import java.io.IOException;
 public class Servant {
     public static JDA jda;
     public static ConfigFile config;
-    static ToggleFile toggle;
+    public static ToggleFile toggle;
     public static Bot chatBot;
 
     public static void main(String[] args) throws IOException, LoginException {
@@ -54,7 +55,6 @@ public class Servant {
         EventWaiter waiter = new EventWaiter(); // Has to be added to JDABuilder.
         CommandClientBuilder client = new CommandClientBuilder(); // Command management by JDA utilities.
 
-        client.setGame(Game.playing(config.getDefaultPrefix() + "help | v" + config.getBotVersion()));
         client.setOwnerId(config.getBotOwnerId());
         client.setEmojis("✅", "⚠", "❌"); // ✅, ⚠, ❌.
         client.setPrefix(config.getDefaultPrefix());
@@ -85,6 +85,7 @@ public class Servant {
                 new EmbedCommand(waiter),
                 new LevelCommand(),
                 new LoveCommand(),
+                new ProfileCommand(),
                 new UserCommand(),
 
                 // Interaction commands.

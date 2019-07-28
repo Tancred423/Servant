@@ -28,15 +28,15 @@ public class AutoroleCommand extends Command {
     protected void execute(CommandEvent event) {
         // Enabled?
         try {
-            if (!new servant.Guild(event.getGuild().getIdLong()).getToggleStatus("autorole")) return;
+            if (!new moderation.guild.Guild(event.getGuild().getIdLong()).getToggleStatus("autorole")) return;
         } catch (SQLException e) {
             new Log(e, event, name).sendLogSqlCommandEvent(false);
         }
 
         Guild guild = event.getGuild();
-        servant.Guild internalGuild;
+        moderation.guild.Guild internalGuild;
         try {
-            internalGuild = new servant.Guild(guild.getIdLong());
+            internalGuild = new moderation.guild.Guild(guild.getIdLong());
         } catch (SQLException e) {
             new Log(e, event, name).sendLogSqlCommandEvent(true);
             return;
@@ -128,7 +128,7 @@ public class AutoroleCommand extends Command {
         // Statistics.
         try {
             new servant.User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            new servant.Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
+            new moderation.guild.Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
         } catch (SQLException e) {
             new Log(e, event, name).sendLogSqlCommandEvent(false);
         }

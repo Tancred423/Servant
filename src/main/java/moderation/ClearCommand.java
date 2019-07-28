@@ -7,7 +7,7 @@ import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.MessageHistory;
-import servant.Guild;
+import moderation.guild.Guild;
 import servant.Log;
 import servant.Servant;
 import servant.User;
@@ -21,7 +21,7 @@ import java.util.List;
 public class ClearCommand extends Command {
     public ClearCommand() {
         this.name = "clear";
-        this.aliases = new String[]{"clean", "delete"};
+        this.aliases = new String[]{"clean", "delete", "purge"};
         this.help = "delete messages | **MANAGE MESSAGES**";
         this.category = new Category("Moderation");
         this.arguments = "[1 - 100]";
@@ -34,7 +34,7 @@ public class ClearCommand extends Command {
     protected void execute(CommandEvent event) {
         // Enabled?
         try {
-            if (!new servant.Guild(event.getGuild().getIdLong()).getToggleStatus("clear")) return;
+            if (!new Guild(event.getGuild().getIdLong()).getToggleStatus("clear")) return;
         } catch (SQLException e) {
             new Log(e, event, name).sendLogSqlCommandEvent(false);
         }

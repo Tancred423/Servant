@@ -1,5 +1,6 @@
 package moderation.reactionRoles;
 
+import moderation.guild.Guild;
 import net.dv8tion.jda.core.entities.MessageReaction;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionRemoveEvent;
@@ -13,7 +14,7 @@ public class ReactionRoleListener extends ListenerAdapter {
     public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {
         // Enabled?
         try {
-            if (!new servant.Guild(event.getGuild().getIdLong()).getToggleStatus("reactionrole")) return;
+            if (!new Guild(event.getGuild().getIdLong()).getToggleStatus("reactionrole")) return;
         } catch (SQLException e) {
             new Log(e, event, "reactionrole").sendLogSqlGuildMessageReactionAddEvent();
         }
@@ -53,7 +54,7 @@ public class ReactionRoleListener extends ListenerAdapter {
     public void onGuildMessageReactionRemove(GuildMessageReactionRemoveEvent event) {
         // Enabled?
         try {
-            if (!new servant.Guild(event.getGuild().getIdLong()).getToggleStatus("reactionrole")) return;
+            if (!new Guild(event.getGuild().getIdLong()).getToggleStatus("reactionrole")) return;
         } catch (SQLException e) {
             new Log(e, event, "reactionrole").sendLogSqlGuildMessageReactionRemoveEvent();
         }

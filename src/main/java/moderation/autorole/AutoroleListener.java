@@ -3,7 +3,7 @@ package moderation.autorole;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
-import servant.Guild;
+import moderation.guild.Guild;
 import servant.Log;
 
 import java.sql.SQLException;
@@ -16,7 +16,7 @@ public class AutoroleListener extends ListenerAdapter {
 
         // Enabled?
         try {
-            if (!new servant.Guild(event.getGuild().getIdLong()).getToggleStatus("autorole")) return;
+            if (!new Guild(event.getGuild().getIdLong()).getToggleStatus("autorole")) return;
         } catch (SQLException e) {
             new Log(e, event, name).sendLogSqlGuildMemberJoinEvent();
         }

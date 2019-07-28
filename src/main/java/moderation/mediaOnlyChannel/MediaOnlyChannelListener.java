@@ -11,8 +11,6 @@ import servant.Log;
 import utilities.MessageHandler;
 import utilities.Parser;
 
-import java.io.IOException;
-import java.net.URL;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -23,7 +21,7 @@ public class MediaOnlyChannelListener extends ListenerAdapter {
 
         // Enabled?
         try {
-            if (!new servant.Guild(event.getGuild().getIdLong()).getToggleStatus("mediaonlychannel")) return;
+            if (!new moderation.guild.Guild(event.getGuild().getIdLong()).getToggleStatus("mediaonlychannel")) return;
         } catch (SQLException e) {
             new Log(e, event, "mediaonlychannel").sendLogSqlGuildMessageReceivedEvent(false);
         }
@@ -31,9 +29,9 @@ public class MediaOnlyChannelListener extends ListenerAdapter {
         // Is message in mo-channel?
         MessageChannel channel = event.getChannel();
         Guild guild = event.getGuild();
-        servant.Guild internalGuild;
+        moderation.guild.Guild internalGuild;
         try {
-            internalGuild = new servant.Guild(guild.getIdLong());
+            internalGuild = new moderation.guild.Guild(guild.getIdLong());
         } catch (SQLException e) {
             new Log(e, event, "mediaonlychannel").sendLogSqlCommandEvent(true);
             return;

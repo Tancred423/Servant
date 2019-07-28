@@ -2,6 +2,7 @@ package freeToAll;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import moderation.guild.Guild;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
@@ -27,7 +28,7 @@ public class LoveCommand extends Command {
     protected void execute(CommandEvent event) {
         // Enabled?
         try {
-            if (!new servant.Guild(event.getGuild().getIdLong()).getToggleStatus("love")) return;
+            if (!new Guild(event.getGuild().getIdLong()).getToggleStatus("love")) return;
         } catch (SQLException e) {
             new Log(e, event, name).sendLogSqlCommandEvent(false);
         }
@@ -70,6 +71,14 @@ public class LoveCommand extends Command {
             );
         } catch (SQLException e) {
             new Log(e, event, name).sendLogSqlCommandEvent(true);
+        }
+
+        // Statistics.
+        try {
+            new servant.User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
+            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
+        } catch (SQLException e) {
+            new Log(e, event, name).sendLogSqlCommandEvent(false);
         }
     }
 

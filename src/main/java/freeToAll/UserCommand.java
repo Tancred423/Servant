@@ -4,7 +4,7 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.core.Permission;
 import patreon.PatreonHandler;
-import servant.Guild;
+import moderation.guild.Guild;
 import servant.Log;
 import servant.Servant;
 import servant.User;
@@ -31,7 +31,7 @@ public class UserCommand extends Command {
     protected void execute(CommandEvent event) {
         // Enabled?
         try {
-            if (event.getGuild() != null) if (!new servant.Guild(event.getGuild().getIdLong()).getToggleStatus("user")) return;
+            if (event.getGuild() != null) if (!new Guild(event.getGuild().getIdLong()).getToggleStatus("user")) return;
         } catch (SQLException e) {
             new Log(e, event, name).sendLogSqlCommandEvent(false);
         }

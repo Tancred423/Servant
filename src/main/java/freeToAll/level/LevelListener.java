@@ -31,7 +31,7 @@ public class LevelListener extends ListenerAdapter {
 
         // Enabled?
         try {
-            if (!new servant.Guild(guild.getIdLong()).getToggleStatus("level")) return;
+            if (!new moderation.guild.Guild(guild.getIdLong()).getToggleStatus("level")) return;
         } catch (SQLException e) {
             new Log(e, event, name).sendLogSqlGuildMessageReceivedEvent(false);
             return;

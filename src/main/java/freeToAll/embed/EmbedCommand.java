@@ -3,6 +3,7 @@ package freeToAll.embed;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import moderation.guild.Guild;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
@@ -33,7 +34,7 @@ public class EmbedCommand extends Command {
     protected void execute(CommandEvent event) {
         // Enabled?
         try {
-            if (!new servant.Guild(event.getGuild().getIdLong()).getToggleStatus("embed")) return;
+            if (!new Guild(event.getGuild().getIdLong()).getToggleStatus("embed")) return;
         } catch (SQLException e) {
             new Log(e, event, name).sendLogSqlCommandEvent(false);
         }
@@ -45,9 +46,9 @@ public class EmbedCommand extends Command {
         channel.sendMessage("Embed to the embed message configuration wizard. In the following I will ask you to enter stuff. On every question you have 1 hour to answer, otherwise the configuration will be stopped and you will loose all the progress.\n" +
                 "To do this, you should know a bit about embeds. If you don't have any experience with embeds, I recommend you to type \"yes\" on the following question.\n" +
                 "**Do you want help with the embed layout? Yes/No:**").queue(sentMessage -> wizardMessageIds.add(sentMessage.getIdLong()));
-        final servant.Guild internalGuild;
+        final Guild internalGuild;
         try {
-            internalGuild = new servant.Guild(event.getGuild().getIdLong());
+            internalGuild = new Guild(event.getGuild().getIdLong());
         } catch (SQLException e) {
             e.printStackTrace();
             return;
@@ -329,6 +330,14 @@ public class EmbedCommand extends Command {
                                 }, 1, TimeUnit.HOURS, () -> endWithError(wizardMessageIds, event, "[Timeout] You didn't provide an Author Name."));
                     } else event.reply("You had one job.");
                 }, 1, TimeUnit.HOURS, () -> endWithError(wizardMessageIds, event, "[Timeout] You didn't answer me."));
+
+        // Statistics.
+        try {
+            new servant.User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
+            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
+        } catch (SQLException e) {
+            new Log(e, event, name).sendLogSqlCommandEvent(false);
+        }
     }
 
     private void endWithError(List<Long> wizardMessageIds, CommandEvent event, String errorMessage) {

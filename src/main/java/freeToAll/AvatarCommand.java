@@ -6,7 +6,7 @@ import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.User;
-import servant.Guild;
+import moderation.guild.Guild;
 import servant.Log;
 import servant.Servant;
 import utilities.MessageHandler;
@@ -31,7 +31,7 @@ public class AvatarCommand extends Command {
     protected void execute(CommandEvent event) {
         // Enabled?
         try {
-            if (event.getGuild() != null) if (!new servant.Guild(event.getGuild().getIdLong()).getToggleStatus("avatar")) return;
+            if (event.getGuild() != null) if (!new Guild(event.getGuild().getIdLong()).getToggleStatus("avatar")) return;
         } catch (SQLException e) {
             new Log(e, event, name).sendLogSqlCommandEvent(false);
         }

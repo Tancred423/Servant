@@ -23,6 +23,7 @@ public class ToggleFile {
     private boolean lobby;
     private boolean love;
     private boolean mediaonlychannel;
+    private boolean profile;
     private boolean reactionrole;
     private boolean user;
 
@@ -69,6 +70,7 @@ public class ToggleFile {
         toggle.setProperty("lobby", "on");
         toggle.setProperty("love", "on");
         toggle.setProperty("mediaonlychannel", "on");
+        toggle.setProperty("profile", "on");
         toggle.setProperty("reactionrole", "on");
         toggle.setProperty("user", "on");
 
@@ -99,6 +101,7 @@ public class ToggleFile {
         this.lobby = toggle.getProperty("lobby").equals("on");
         this.love = toggle.getProperty("love").equals("on");
         this.mediaonlychannel = toggle.getProperty("mediaonlychannel").equals("on");
+        this.profile = toggle.getProperty("profile").equals("on");
         this.reactionrole = toggle.getProperty("reactionrole").equals("on");
         this.user = toggle.getProperty("user").equals("on");
     }
@@ -118,6 +121,7 @@ public class ToggleFile {
     public void setLobby (String lobby) { this.lobby = lobby.equals("on"); }
     public void setLove (String love) { this.love = love.equals("on"); }
     public void setMediaonlychannel (String mediaonlychannel) { this.mediaonlychannel = mediaonlychannel.equals("on"); }
+    public void setProfile (String profile) { this.profile = profile.equals("on"); }
     public void setReactionrole (String reactionrole) { this.reactionrole = reactionrole.equals("on"); }
     public void setUser (String user) { this.user = user.equals("on"); }
 
@@ -138,6 +142,7 @@ public class ToggleFile {
             case "lobby": return lobby;
             case "love": return love;
             case "mediaonlychannel": return mediaonlychannel;
+            case "profile": return profile;
             case "reactionrole": return reactionrole;
             case "user": return user;
             default: return true;
@@ -158,6 +163,7 @@ public class ToggleFile {
     public boolean getLobby() { return lobby; }
     public boolean getLove() { return love; }
     public boolean getMediaOnlyChannel() { return mediaonlychannel; }
+    public boolean getProfile() { return profile; }
     public boolean getReactionRole() { return reactionrole; }
     public boolean getUser() { return user; }
 }

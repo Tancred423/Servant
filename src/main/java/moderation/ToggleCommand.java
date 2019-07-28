@@ -3,7 +3,7 @@ package moderation;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.core.Permission;
-import servant.Guild;
+import moderation.guild.Guild;
 import servant.Log;
 import servant.Servant;
 import utilities.UsageEmbed;
@@ -66,6 +66,7 @@ public class ToggleCommand extends Command {
             add("lobby");
             add("love");
             add("mediaonlychannel");
+            add("profile");
             add("reactionrole");
             add("user");
         }};
@@ -81,12 +82,10 @@ public class ToggleCommand extends Command {
         String feature = getAlias(args[0]);
         // Has to be improved. Redundant text.
         if (feature == null) {
-            event.reply("Invalid feature.\n" +
-                    "Currently only 'level' is toggleable.");
+            event.reply("Invalid feature.");
             return;
         } else if (!validFeatures.contains(feature) && !feature.equals("all")) {
-            event.reply("Invalid feature.\n" +
-                    "Currently only 'level' is toggleable.");
+            event.reply("Invalid feature.");
             return;
         }
 
@@ -152,44 +151,26 @@ public class ToggleCommand extends Command {
             }
         }
         event.reactSuccess();
+
+        // Statistics.
+        try {
+            new servant.User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
+            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
+        } catch (SQLException e) {
+            new Log(e, event, name).sendLogSqlCommandEvent(false);
+        }
     }
 
     private String getAlias(String arg) {
         switch (arg.toLowerCase()) {
             case "all":
             case "everything":
+            case "anything":
                 return "all";
 
             case "autorole":
             case "ar":
                 return "autorole";
-
-            case "clear":
-            case "clean":
-            case "delete":
-                return "clear";
-
-            case "guild":
-            case "server":
-                return "guild";
-
-            case "join":
-            case "leave":
-                return "join";
-
-            case "mediaonlychannel":
-            case "mediaonly":
-            case "mo":
-            case "moc":
-                return "mediaonlychannel";
-
-            case "coinflip":
-            case "cf":
-                return "coinflip";
-
-            case "level":
-            case "lvl":
-                return "level";
 
             case "avatar":
             case "ava":
@@ -197,12 +178,73 @@ public class ToggleCommand extends Command {
             case "stealava":
                 return "avatar";
 
-            case "user":
-            case "member":
-                return "user";
+            case "baguette":
+                return "baguette";
+
+            case "chatbot":
+            case "cleverbot":
+                return "chatbot";
+
+            case "clear":
+            case "clean":
+            case "delete":
+            case "purge":
+                return "clear";
+
+            case "coinflip":
+            case "cf":
+            case "cointoss":
+            case "ct":
+                return "coinflip";
+
+            case "embed":
+                return "embed";
+
+            case "guild":
+            case "server":
+                return "guild";
 
             case "interaction":
                 return "interaction";
+
+            case "join":
+            case "leave":
+                return "join";
+
+            case "level":
+            case "lvl":
+            case "experience":
+            case "exp":
+                return "level";
+
+            case "lobby":
+            case "autochannel":
+            case "ac":
+                return "lobby";
+
+            case "love":
+            case "ship":
+            case "uwu":
+                return "love";
+
+            case "mediaonlychannel":
+            case "mediaonly":
+            case "moc":
+            case "mo":
+                return "mediaonlychannel";
+
+            case "profile":
+            case "profil":
+                return "profile";
+
+            case "reactionrole":
+            case "reactrole":
+            case "rr":
+                return "reactionrole";
+
+            case "user":
+            case "member":
+                return "user";
 
             default:
                 return null;

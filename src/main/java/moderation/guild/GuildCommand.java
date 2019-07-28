@@ -2,10 +2,7 @@ package moderation.guild;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.command.GuildSettingsManager;
-import com.jagrosh.jdautilities.command.GuildSettingsProvider;
 import net.dv8tion.jda.core.Permission;
-import servant.Guild;
 import servant.Log;
 import servant.Servant;
 import servant.User;
@@ -34,7 +31,7 @@ public class GuildCommand extends Command {
     protected void execute(CommandEvent event) {
         // Enabled?
         try {
-            if (!new servant.Guild(event.getGuild().getIdLong()).getToggleStatus("guild")) return;
+            if (!new Guild(event.getGuild().getIdLong()).getToggleStatus("guild")) return;
         } catch (SQLException e) {
             new Log(e, event, name).sendLogSqlCommandEvent(false);
         }
@@ -166,7 +163,7 @@ public class GuildCommand extends Command {
 
                     case "prefix":
                         try {
-                            wasUnset = internalGuild.unsetPRefix();
+                            wasUnset = internalGuild.unsetPrefix();
                         } catch (SQLException e) {
                             new Log(e, event, name).sendLogSqlCommandEvent(true);
                             return;
@@ -178,6 +175,7 @@ public class GuildCommand extends Command {
 
                     default:
                         event.reply("This setting does not exist.");
+                        event.reactWarning();
                         break;
                 }
                 break;

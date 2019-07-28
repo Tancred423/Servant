@@ -4,7 +4,7 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.User;
-import servant.Guild;
+import moderation.guild.Guild;
 import servant.Log;
 import servant.Servant;
 import utilities.Parser;
@@ -28,14 +28,14 @@ public class LevelCommand extends Command {
     protected void execute(CommandEvent event) {
         // Enabled?
         try {
-            if (!new servant.Guild(event.getGuild().getIdLong()).getToggleStatus("level")) return;
+            if (!new Guild(event.getGuild().getIdLong()).getToggleStatus("level")) return;
         } catch (SQLException e) {
             new Log(e, event, name).sendLogSqlGuildMessageReceivedEvent(false);
             return;
         }
 
         net.dv8tion.jda.core.entities.Guild guild = event.getGuild();
-        servant.Guild internalGuild;
+        Guild internalGuild;
         try {
             internalGuild = new Guild(guild.getIdLong());
         } catch (SQLException e) {

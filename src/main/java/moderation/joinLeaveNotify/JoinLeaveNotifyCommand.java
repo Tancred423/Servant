@@ -26,15 +26,15 @@ public class JoinLeaveNotifyCommand extends Command {
     protected void execute(CommandEvent event) {
         // Enabled?
         try {
-            if (!new servant.Guild(event.getGuild().getIdLong()).getToggleStatus("join")) return;
+            if (!new moderation.guild.Guild(event.getGuild().getIdLong()).getToggleStatus("join")) return;
         } catch (SQLException e) {
             new Log(e, event, name).sendLogSqlCommandEvent(false);
         }
 
         Guild guild = event.getGuild();
-        servant.Guild internalGuild;
+        moderation.guild.Guild internalGuild;
         try {
-            internalGuild = new servant.Guild(guild.getIdLong());
+            internalGuild = new moderation.guild.Guild(guild.getIdLong());
         } catch (SQLException e) {
             new Log(e, event, name).sendLogSqlCommandEvent(true);
             return;
@@ -108,6 +108,14 @@ public class JoinLeaveNotifyCommand extends Command {
                 if (channel == null) event.reply("No channel is set.");
                 else event.reply("Current channel: " + channel.getName());
                 break;
+        }
+
+        // Statistics.
+        try {
+            new servant.User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
+            if (event.getGuild() != null) new moderation.guild.Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
+        } catch (SQLException e) {
+            new Log(e, event, name).sendLogSqlCommandEvent(false);
         }
     }
 }

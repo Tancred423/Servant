@@ -1,7 +1,10 @@
-package servant;
+package moderation.guild;
 
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.Role;
+import net.dv8tion.jda.core.entities.User;
+import servant.Database;
+import servant.Servant;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -202,7 +205,7 @@ public class Guild {
         connection.close();
     }
 
-    public boolean unsetPRefix() throws SQLException {
+    boolean unsetPrefix() throws SQLException {
         this.prefix = Servant.config.getDefaultPrefix();
 
         Connection connection = Database.getConnection();
@@ -252,7 +255,7 @@ public class Guild {
         connection.close();
     }
 
-    public void setOffset(String offset) throws SQLException {
+    void setOffset(String offset) throws SQLException {
         this.offset = offset;
 
         Connection connection = Database.getConnection();
@@ -274,7 +277,7 @@ public class Guild {
         connection.close();
     }
 
-    public boolean unsetOffset() throws SQLException {
+    boolean unsetOffset() throws SQLException {
         this.offset = Servant.config.getDefaultOffset();
 
         Connection connection = Database.getConnection();
@@ -600,5 +603,26 @@ public class Guild {
         } else {
             return false;
         }
+    }
+
+    // Exp
+    public int getUserRank(long userId) throws SQLException {
+        Connection connection = Database.getConnection();
+        PreparedStatement select = connection.prepareStatement("SELECT * FROM user_exp WHERE guild_id=? ORDER BY exp DESC");
+        select.setLong(1, guildId);
+        ResultSet resultSet = select.executeQuery();
+        int rank = 0;
+        if (resultSet.first()) {
+            rank = 1;
+            do {
+                if (resultSet.getLong("user_id") == userId) {
+                    connection.close();
+                    return rank;
+                } else rank++;
+            } while (resultSet.next());
+        }
+
+        connection.close();
+        return rank;
     }
 }

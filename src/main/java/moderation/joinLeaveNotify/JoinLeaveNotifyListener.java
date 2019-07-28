@@ -14,16 +14,16 @@ public class JoinLeaveNotifyListener extends ListenerAdapter {
     public void onGuildMemberJoin(GuildMemberJoinEvent event) {
         // Enabled?
         try {
-            if (!new servant.Guild(event.getGuild().getIdLong()).getToggleStatus("join")) return;
+            if (!new moderation.guild.Guild(event.getGuild().getIdLong()).getToggleStatus("join")) return;
         } catch (SQLException e) {
             new Log(e, event, "join").sendLogSqlGuildMemberJoinEvent();
         }
 
         User joinedUser = event.getUser();
         Guild guild = event.getGuild();
-        servant.Guild internalGuild;
+        moderation.guild.Guild internalGuild;
         try {
-            internalGuild = new servant.Guild(guild.getIdLong());
+            internalGuild = new moderation.guild.Guild(guild.getIdLong());
         } catch (SQLException e) {
             new Log(e, event, "join").sendLogSqlGuildMemberJoinEvent();
             return;
@@ -45,16 +45,16 @@ public class JoinLeaveNotifyListener extends ListenerAdapter {
     public void onGuildMemberLeave(GuildMemberLeaveEvent event) {
         // Enabled?
         try {
-            if (!new servant.Guild(event.getGuild().getIdLong()).getToggleStatus("join")) return;
+            if (!new moderation.guild.Guild(event.getGuild().getIdLong()).getToggleStatus("join")) return;
         } catch (SQLException e) {
             new Log(e, event, "join").sendLogSqlGuildMemberJoinEvent();
         }
 
         User leftUser = event.getUser();
         Guild guild = event.getGuild();
-        servant.Guild internalGuild;
+        moderation.guild.Guild internalGuild;
         try {
-            internalGuild = new servant.Guild(guild.getIdLong());
+            internalGuild = new moderation.guild.Guild(guild.getIdLong());
         } catch (SQLException e) {
             new Log(e, event, "join").sendLogSqlGuildMemberLeaveEvent();
             return;

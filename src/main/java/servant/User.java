@@ -8,6 +8,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class User {
     private long userId;
@@ -215,5 +217,17 @@ public class User {
             update.executeUpdate();
         }
         connection.close();
+    }
+
+    public Map<String, Integer> getMostUsedFeature() throws SQLException {
+        Connection connection = Database.getConnection();
+        PreparedStatement select = connection.prepareStatement("SELECT * FROM feature_count WHERE id=? ORDER BY count DESC");
+        select.setLong(1, userId);
+        ResultSet resultSet = select.executeQuery();
+        Map<String, Integer> feature = new HashMap<>();
+        if (resultSet.first()) feature.put(resultSet.getString("feature"), resultSet.getInt("count"));
+        else feature.put("Not found.", 0);
+        connection.close();
+        return feature;
     }
 }

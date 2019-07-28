@@ -7,13 +7,12 @@ import javax.annotation.Nullable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 
 public class GuildSettings implements GuildSettingsProvider {
     private Collection<String> prefixes = new ArrayList<>();
 
     GuildSettings(Guild guild) throws SQLException {
-        String prefix = new servant.Guild(guild.getIdLong()).getPrefix();
+        String prefix = new moderation.guild.Guild(guild.getIdLong()).getPrefix();
         if (prefix != null) addPrefixes(prefix);
     }
 

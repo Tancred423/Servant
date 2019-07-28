@@ -19,16 +19,16 @@ public class LobbyListener extends ListenerAdapter {
     public void onGuildVoiceJoin(GuildVoiceJoinEvent event) {
         // Enabled?
         try {
-            if (!new servant.Guild(event.getGuild().getIdLong()).getToggleStatus("lobby")) return;
+            if (!new moderation.guild.Guild(event.getGuild().getIdLong()).getToggleStatus("lobby")) return;
         } catch (SQLException e) {
             return;
         }
 
         Guild guild = event.getGuild();
-        servant.Guild internalGuild;
+        moderation.guild.Guild internalGuild;
         List<Long> channels;
         try {
-            internalGuild = new servant.Guild(guild.getIdLong());
+            internalGuild = new moderation.guild.Guild(guild.getIdLong());
             channels = internalGuild.getLobbies();
         } catch (SQLException e) {
             new Log(e, event, "lobby").sendLogSqlGuildVoiceJoinEvent();
@@ -97,17 +97,17 @@ public class LobbyListener extends ListenerAdapter {
     public void onGuildVoiceMove(GuildVoiceMoveEvent event) {
         // Enabled?
         try {
-            if (!new servant.Guild(event.getGuild().getIdLong()).getToggleStatus("lobby")) return;
+            if (!new moderation.guild.Guild(event.getGuild().getIdLong()).getToggleStatus("lobby")) return;
         } catch (SQLException e) {
             return;
         }
 
         // Join
         Guild guild = event.getGuild();
-        servant.Guild internalGuild;
+        moderation.guild.Guild internalGuild;
         List<Long> channels;
         try {
-            internalGuild = new servant.Guild(guild.getIdLong());
+            internalGuild = new moderation.guild.Guild(guild.getIdLong());
             channels = internalGuild.getLobbies();
         } catch (SQLException e) {
             new Log(e, event, "lobby").sendLogSqlGuildVoiceJoinEvent();
@@ -158,7 +158,7 @@ public class LobbyListener extends ListenerAdapter {
     public void onGuildVoiceLeave(GuildVoiceLeaveEvent event) {
         // Enabled?
         try {
-            if (!new servant.Guild(event.getGuild().getIdLong()).getToggleStatus("lobby")) return;
+            if (!new moderation.guild.Guild(event.getGuild().getIdLong()).getToggleStatus("lobby")) return;
         } catch (SQLException e) {
             return;
         }

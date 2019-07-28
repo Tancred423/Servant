@@ -2,6 +2,7 @@ package moderation.reactionRoles;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import moderation.guild.Guild;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Emote;
 import net.dv8tion.jda.core.entities.Message;
@@ -28,7 +29,7 @@ public class ReactionRoleCommand extends Command {
     protected void execute(CommandEvent event) {
         // Enabled?
         try {
-            if (!new servant.Guild(event.getGuild().getIdLong()).getToggleStatus("reactionrole")) return;
+            if (!new Guild(event.getGuild().getIdLong()).getToggleStatus("reactionrole")) return;
         } catch (SQLException e) {
             new Log(e, event, name).sendLogSqlCommandEvent(false);
         }
@@ -190,6 +191,14 @@ public class ReactionRoleCommand extends Command {
                 event.reactError();
                 event.reply("Either `set` or `unset` a reaction.");
                 break;
+        }
+
+        // Statistics.
+        try {
+            new servant.User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
+            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
+        } catch (SQLException e) {
+            new Log(e, event, name).sendLogSqlCommandEvent(false);
         }
     }
 }
