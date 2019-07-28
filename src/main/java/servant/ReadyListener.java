@@ -24,24 +24,24 @@ public class ReadyListener extends ListenerAdapter {
             return;
         }
 
-        setPresence(Servant.jda);
+        setPresence();
 
         System.out.println(event.getJDA().getSelfUser().getName() + " ready.");
     }
 
     public void onResume(ResumedEvent event) {
-        setPresence(Servant.jda);
+        setPresence();
     }
 
     public void onReconnect(ReconnectedEvent event) {
-        setPresence(Servant.jda);
+        setPresence();
     }
 
     private String getResourcesPath() {
         return System.getProperty("user.dir") + File.separator + "resources";
     }
 
-    private void setPresence(JDA jda) {
-        jda.getPresence().setPresence(OnlineStatus.ONLINE, Game.playing(Servant.config.getDefaultPrefix() + "help | v" + Servant.config.getBotVersion()));
+    private void setPresence() {
+        Servant.jda.getPresence().setPresence(OnlineStatus.ONLINE, Game.playing(Servant.config.getDefaultPrefix() + "help | v" + Servant.config.getBotVersion()));
     }
 }
