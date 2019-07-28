@@ -2,6 +2,9 @@ package servant;
 
 import freeToAll.*;
 import freeToAll.profile.ProfileCommand;
+import freeToAll.vote.QuickvoteCommand;
+import freeToAll.vote.QuickvoteEndListener;
+import freeToAll.vote.QuickvoteMultipleVoteListener;
 import moderation.*;
 import moderation.autorole.AutoroleCommand;
 import moderation.autorole.AutoroleListener;
@@ -88,7 +91,10 @@ public class Servant {
                 new ProfileCommand(),
                 new UserCommand(),
 
-                // Interaction commands.
+                // Vote
+                new QuickvoteCommand(), // Bot: MESSAGE_ADD_REACTION, MESSAGE_EXT_EMOJI
+
+                // Interaction
                 new AddGifCommand(), // BOT OWNER
                 new BegCommand(),
                 new CookieCommand(),
@@ -120,6 +126,8 @@ public class Servant {
                 .addEventListener(new PatreonListener())
                 .addEventListener(new ReactionRoleListener())
                 .addEventListener(new ReadyListener())
+                .addEventListener(new QuickvoteEndListener())
+                .addEventListener(new QuickvoteMultipleVoteListener())
 
                 // Start.
                 .build();

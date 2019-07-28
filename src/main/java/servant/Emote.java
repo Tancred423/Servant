@@ -18,4 +18,28 @@ public class Emote {
                     .getEmoteById(resultSet.getLong("emote_id"));
         return emote;
     }
+
+    public static String getEmoji(String emojiName) {
+        switch (emojiName) {
+            case "baguette1":
+            case "baguette2":
+            case "baguette3":
+                return "\uD83E\uDD56"; // 🥖
+
+            case "upvote":
+                return "\uD83D\uDC4D"; // 👍
+
+            case "shrug":
+                return "\uD83E\uDD37"; // 🤷
+
+            case "downvote":
+                return "\uD83D\uDC4E"; // 👎
+
+            case "end":
+                return "❌"; // ❌
+
+            default:
+                return null;
+        }
+    }
 }
