@@ -1,4 +1,4 @@
-package freeToAll.vote;
+package vote;
 
 import moderation.guild.Guild;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -94,7 +94,8 @@ public class QuickvoteEndListener extends ListenerAdapter {
             message.editMessage(eb.build()).queue();
             message.clearReactions().queue();
             try {
-                VoteDatabase.unsetQuickvote(messageId);
+                VoteDatabase.unsetQuickvote(message.getIdLong());
+                VoteDatabase.unsetUserVotes(message.getIdLong());
             } catch (SQLException e) {
                 event.getJDA().getUserById(Servant.config.getBotOwnerId()).openPrivateChannel().queue(privateChannel ->
                         privateChannel.sendMessage("Greetings master! I couldn't remove a succesful quickvote ending from the database."

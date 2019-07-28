@@ -1,4 +1,4 @@
-package freeToAll.vote;
+package vote;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
@@ -8,6 +8,7 @@ import net.dv8tion.jda.core.Permission;
 import servant.Emote;
 import servant.Log;
 import servant.Servant;
+import servant.User;
 
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
@@ -17,13 +18,13 @@ public class QuickvoteCommand extends Command {
     public QuickvoteCommand() {
         this.name = "quickvote";
         this.aliases = new String[]{"qv"};
-        this.help = "reacts with an upvote, shrug and downvote";
+        this.help = "vote with \"upvote\", \"shrug\" and \"downvote\"";
         this.category = new Category("Vote");
-        this.arguments = null;
+        this.arguments = "[optional text]";
         this.hidden = false;
-        this.guildOnly = false;
+        this.guildOnly = true;
         this.ownerCommand = false;
-        this.cooldown = 0;
+        this.cooldown = 5; // 5 seconds
         this.cooldownScope = CooldownScope.USER;
         this.userPermissions = new Permission[0];
         this.botPermissions = new Permission[]{Permission.MESSAGE_ADD_REACTION, Permission.MESSAGE_EXT_EMOJI};
@@ -31,6 +32,13 @@ public class QuickvoteCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
+        // Enabled?
+        try {
+            if (!new Guild(event.getGuild().getIdLong()).getToggleStatus("guild")) return;
+        } catch (SQLException e) {
+            new Log(e, event, name).sendLogSqlCommandEvent(false);
+        }
+
         var message = event.getMessage();
         var author = message.getAuthor();
         var internalAuthor = new servant.User(author.getIdLong());
@@ -95,5 +103,13 @@ public class QuickvoteCommand extends Command {
         });
 
         message.delete().queue();
+
+        // Statistics.
+        try {
+            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
+            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
+        } catch (SQLException e) {
+            new Log(e, event, name).sendLogSqlCommandEvent(false);
+        }
     }
 }

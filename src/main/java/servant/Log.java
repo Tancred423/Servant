@@ -2,10 +2,10 @@ package servant;
 
 import com.jagrosh.jdautilities.command.CommandEvent;
 import config.ConfigFile;
+import net.dv8tion.jda.core.events.channel.voice.VoiceChannelDeleteEvent;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberLeaveEvent;
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceJoinEvent;
-import net.dv8tion.jda.core.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceMoveEvent;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
@@ -23,7 +23,7 @@ public class Log {
     private GuildMessageReactionRemoveEvent guildMessageReactionRemoveEvent;
     private GuildVoiceJoinEvent guildVoiceJoinEvent;
     private GuildVoiceMoveEvent guildVoiceMoveEvent;
-    private GuildVoiceLeaveEvent guildVoiceLeaveEvent;
+    private VoiceChannelDeleteEvent voiceChannelDeleteEvent;
     private ConfigFile config;
     private String name;
 
@@ -41,9 +41,9 @@ public class Log {
         this.name = commandName;
     }
 
-    public Log(Exception e, GuildVoiceLeaveEvent guildVoiceLeaveEvent, String commandName) {
+    public Log(Exception e, VoiceChannelDeleteEvent voiceChannelDeleteEvent, String commandName) {
         this.e = e;
-        this.guildVoiceLeaveEvent = guildVoiceLeaveEvent;
+        this.voiceChannelDeleteEvent = voiceChannelDeleteEvent;
         this.config = Servant.config;
         this.name = commandName;
     }
@@ -276,15 +276,15 @@ public class Log {
                         "```").queue());
     }
 
-    // guildVoiceLeaveEvent
-    public void sendLogSqlGuildVoiceLeaveEvent() {
+    // voiceChannelDeleteEvent
+    public void sendLogSqlVoiceChannelDeleteEvent() {
         e.printStackTrace();
-        guildVoiceLeaveEvent.getJDA().getUserById(config.getBotOwnerId()).openPrivateChannel().queue(privateChannel ->
+        voiceChannelDeleteEvent.getJDA().getUserById(config.getBotOwnerId()).openPrivateChannel().queue(privateChannel ->
                 privateChannel.sendMessage("```c\n" +
                         "Error\n" +
                         "-----\n" +
-                        "Guild: " + guildVoiceLeaveEvent.getGuild().getName() + " (" + guildVoiceLeaveEvent.getGuild().getIdLong() + ")\n" +
-                        "User: " + guildVoiceLeaveEvent.getGuild().getOwner().getUser().getName() + " (" + guildVoiceLeaveEvent.getGuild().getOwner().getUser().getIdLong() + ")\n" +
+                        "Guild: " + voiceChannelDeleteEvent.getGuild().getName() + " (" + voiceChannelDeleteEvent.getGuild().getIdLong() + ")\n" +
+                        "User: " + voiceChannelDeleteEvent.getGuild().getOwner().getUser().getName() + " (" + voiceChannelDeleteEvent.getGuild().getOwner().getUser().getIdLong() + ")\n" +
                         "Command: " + name + "\n" +
                         "Error: " + e.getMessage() + "\n" +
                         "```").queue());

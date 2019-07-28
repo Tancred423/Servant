@@ -15,20 +15,26 @@ import java.util.List;
 public class ToggleCommand extends Command {
     public ToggleCommand() {
         this.name = "toggle";
-        this.help = "toggles feature on or off | **ADMINISTRATOR**";
+        this.aliases = new String[0];
+        this.help = "toggles feature on or off | Administrator";
         this.category = new Command.Category("Moderation");
-        this.arguments = "[feature] [on|off|status]";
+        this.arguments = "<feature> [on|off|status]";
+        this.hidden = false;
         this.guildOnly = true;
+        this.ownerCommand = false;
+        this.cooldown = 5;
+        this.cooldownScope = CooldownScope.USER;
         this.userPermissions = new Permission[]{Permission.ADMINISTRATOR};
+        this.botPermissions = new Permission[0];
     }
 
     @Override
     protected void execute(CommandEvent event) {
-        String prefix = Servant.config.getDefaultPrefix();
+        var prefix = Servant.config.getDefaultPrefix();
         // Usage
         if (event.getArgs().isEmpty()) {
             try {
-                String usage = "**Manage one feautre**\n" +
+                var usage = "**Manage one feautre**\n" +
                         "Command: `" + prefix + name + " [feature] [on|off|status]`\n" +
                         "Example 1: `" + prefix + name + " level on`\n" +
                         "Example 2: `" + prefix + name + " level off`\n" +
@@ -40,7 +46,7 @@ public class ToggleCommand extends Command {
                         "Example 2: `" + prefix + name + " all off`\n" +
                         "Examepl 3: `" + prefix + name + " all status`\n";
 
-                String hint = "Be careful with toggling all features on or off, as you may delete your perfect set-up.\n" +
+                var hint = "Be careful with toggling all features on or off, as you may delete your perfect set-up.\n" +
                         "You may write `everything` instead of `all`.\n" +
                         "Status will only show the current status without changing any values.";
 
@@ -67,11 +73,12 @@ public class ToggleCommand extends Command {
             add("love");
             add("mediaonlychannel");
             add("profile");
+            add("quickvote");
             add("reactionrole");
             add("user");
         }};
 
-        String[] args = event.getArgs().split(" ");
+        var args = event.getArgs().split(" ");
         if (args.length < 2) {
             event.reply("Too few arguments.\n" +
                     "toggle [feature] <on|off|status>\n" +
@@ -79,7 +86,7 @@ public class ToggleCommand extends Command {
             return;
         }
 
-        String feature = getAlias(args[0]);
+        var feature = getAlias(args[0]);
         // Has to be improved. Redundant text.
         if (feature == null) {
             event.reply("Invalid feature.");
@@ -89,7 +96,7 @@ public class ToggleCommand extends Command {
             return;
         }
 
-        String arg1 = args[1].toLowerCase();
+        var arg1 = args[1].toLowerCase();
         if (!arg1.equals("on") && !arg1.equals("off") && !arg1.equals("status")) {
             event.reply("Status has to be `on`, `off` or `status`.");
             return;
@@ -106,10 +113,10 @@ public class ToggleCommand extends Command {
         if (arg1.equals("status")) {
             if (feature.equals("all")) {
                 // Toggle Status All Features
-                StringBuilder stringBuilder = new StringBuilder();
-                for (String validFeature : validFeatures) {
+                var stringBuilder = new StringBuilder();
+                for (var validFeature : validFeatures) {
                     try {
-                        boolean toggleStatus = internalGuild.getToggleStatus(validFeature);
+                        var toggleStatus = internalGuild.getToggleStatus(validFeature);
                         stringBuilder.append(validFeature).append(": ").append(toggleStatus ? "on" : "off").append("\n");
                     } catch (SQLException e) {
                         new Log(e, event, name).sendLogSqlCommandEvent(false);
@@ -119,7 +126,7 @@ public class ToggleCommand extends Command {
             } else {
                 // Toggle Status Single Feature
                 try {
-                    boolean toggleStatus = internalGuild.getToggleStatus(feature);
+                    var toggleStatus = internalGuild.getToggleStatus(feature);
                     event.reply(feature + "'s status: " + (toggleStatus ? "on" : "off"));
                 } catch (SQLException e) {
                     new Log(e, event, name).sendLogSqlCommandEvent(true);
@@ -128,12 +135,11 @@ public class ToggleCommand extends Command {
             return;
         }
 
-        boolean statusBool;
-        statusBool = arg1.equals("on");
+        var statusBool = arg1.equals("on");
 
         if (feature.equals("all")) {
             // Toggle all features.
-            for (String validFeature : validFeatures) {
+            for (var validFeature : validFeatures) {
                 try {
                     internalGuild.setToggleStatus(validFeature, statusBool);
                 } catch (SQLException e) {
@@ -236,6 +242,10 @@ public class ToggleCommand extends Command {
             case "profile":
             case "profil":
                 return "profile";
+
+            case "quickvote":
+            case "qr":
+                return "quickvote";
 
             case "reactionrole":
             case "reactrole":

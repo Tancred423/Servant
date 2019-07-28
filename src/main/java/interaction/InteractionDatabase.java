@@ -2,9 +2,6 @@ package interaction;
 
 import servant.Database;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,10 +9,10 @@ import java.util.concurrent.ThreadLocalRandom;
 
 class InteractionDatabase {
     static String getGifUrl(String commandName) throws SQLException {
-        Connection connection = Database.getConnection();
-        PreparedStatement select = connection.prepareStatement("SELECT gif FROM interaction WHERE interaction=?");
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT gif FROM interaction WHERE interaction=?");
         select.setString(1, commandName);
-        ResultSet resultSet = select.executeQuery();
+        var resultSet = select.executeQuery();
         String gif = null;
         if (resultSet.first()) {
             List<String> gifs = new ArrayList<>();

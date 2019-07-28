@@ -5,8 +5,6 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import moderation.guild.Guild;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.User;
 import servant.Log;
 import utilities.MessageHandler;
 
@@ -18,10 +16,16 @@ public class LoveCommand extends Command {
     public LoveCommand() {
         this.name = "love";
         this.aliases = new String[]{"ship", "uwu"};
-        this.help = "detects love percentage between two persons.";
+        this.help = "detects love percentage between two persons";
         this.category = new Command.Category("Free to all");
+        this.arguments = "@user1 @user2";
+        this.hidden = false;
+        this.guildOnly = false;
+        this.ownerCommand = false;
+        this.cooldown = 5;
+        this.cooldownScope = CooldownScope.USER;
+        this.userPermissions = new Permission[0];
         this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
-        this.guildOnly = true;
     }
 
     @Override
@@ -33,7 +37,7 @@ public class LoveCommand extends Command {
             new Log(e, event, name).sendLogSqlCommandEvent(false);
         }
 
-        Message message = event.getMessage();
+        var message = event.getMessage();
         List<Member> mentioned = message.getMentionedMembers();
 
         if (mentioned.size() < 1) {
@@ -42,16 +46,16 @@ public class LoveCommand extends Command {
             return;
         }
 
-        Member first = mentioned.get(0);
-        Member second = mentioned.size() == 1 ? mentioned.get(0) : mentioned.get(1);
+        var first = mentioned.get(0);
+        var second = mentioned.size() == 1 ? mentioned.get(0) : mentioned.get(1);
 
-        User author = event.getAuthor();
-        servant.User internalAuthor = new servant.User(author.getIdLong());
+        var author = event.getAuthor();
+        var internalAuthor = new servant.User(author.getIdLong());
 
-        int love = ThreadLocalRandom.current().nextInt(0, 101);
-        String bar = getBar(love);
-        String quote = getQuote(love, mentioned.size() == 1);
-        String shippingName = getShippingName(first, second);
+        var love = ThreadLocalRandom.current().nextInt(0, 101);
+        var bar = getBar(love);
+        var quote = getQuote(love, mentioned.size() == 1);
+        var shippingName = getShippingName(first, second);
 
         try {
             new MessageHandler().sendEmbed(event.getChannel(),

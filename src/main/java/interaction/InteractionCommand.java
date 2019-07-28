@@ -3,7 +3,6 @@ package interaction;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.core.entities.Emote;
-import net.dv8tion.jda.core.entities.User;
 import moderation.guild.Guild;
 import servant.Log;
 import servant.Servant;
@@ -24,11 +23,11 @@ public abstract class InteractionCommand extends Command {
             new Log(e, event, name).sendLogSqlCommandEvent(false);
         }
 
-        String prefix = Servant.config.getDefaultPrefix();
+        var prefix = Servant.config.getDefaultPrefix();
         if (event.getArgs().isEmpty()) {
             // Usage
             try {
-                String usage = "**" + name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase() + (name.toLowerCase().equals("dab") ? " on" : "") +  " someone**\n" +
+                var usage = "**" + name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase() + (name.toLowerCase().equals("dab") ? " on" : "") +  " someone**\n" +
                         "Command: `" + prefix + name + " [@user]`\n" +
                         "Example: `" + prefix + name + " @Servant`";
 
@@ -46,12 +45,10 @@ public abstract class InteractionCommand extends Command {
         }
 
         // Get users.
-        User mentioned = event.getMessage().getMentionedMembers().get(0).getUser();
-        User author = event.getAuthor();
-        servant.User internalAuthor;
-        servant.User internalMentioned;
-        internalAuthor = new servant.User(author.getIdLong());
-        internalMentioned = new servant.User(mentioned.getIdLong());
+        var mentioned = event.getMessage().getMentionedMembers().get(0).getUser();
+        var author = event.getAuthor();
+        var internalAuthor = new servant.User(author.getIdLong());
+        var internalMentioned = new servant.User(mentioned.getIdLong());
 
         // Get random gif.
         String gif;

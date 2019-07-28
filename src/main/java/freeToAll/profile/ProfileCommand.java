@@ -19,16 +19,22 @@ public class ProfileCommand extends Command {
     public ProfileCommand() {
         this.name = "profile";
         this.aliases = new String[]{"profil"};
-        this.help = "shows your profile.";
+        this.help = "shows your profile";
         this.category = new Category("Free to all");
-        this.botPermissions = new Permission[]{Permission.MESSAGE_ATTACH_FILES};
+        this.arguments = null;
+        this.hidden = false;
         this.guildOnly = true;
+        this.ownerCommand = false;
+        this.cooldown = 5;
+        this.cooldownScope = CooldownScope.USER;
+        this.userPermissions = new Permission[0];
+        this.botPermissions = new Permission[]{Permission.MESSAGE_ATTACH_FILES};
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     protected void execute(CommandEvent event) {
-        event.getChannel().sendTyping();
+        event.getChannel().sendTyping().queue();
 
         // Enabled?
         try {
@@ -38,17 +44,17 @@ public class ProfileCommand extends Command {
         }
 
         // Create File.
-        String currentDir   = System.getProperty("user.dir");
-        String profileTmpDir = currentDir   + "/profile_tmp" ;
-        String imageDir     = profileTmpDir + "/" + OffsetDateTime.now(ZoneOffset.UTC).toEpochSecond() + ".png";
+        var currentDir   = System.getProperty("user.dir");
+        var profileTmpDir = currentDir   + "/profile_tmp" ;
+        var imageDir     = profileTmpDir + "/" + OffsetDateTime.now(ZoneOffset.UTC).toEpochSecond() + ".png";
 
-        File profileTmp = new File(profileTmpDir);
+        var profileTmp = new File(profileTmpDir);
         if (!profileTmp.exists()) profileTmp.mkdir();
-        File image = new File(imageDir);
+        var image = new File(imageDir);
 
         // Create Image.
         try {
-            Profile profile = new Profile(event.getAuthor(), event.getGuild());
+            var profile = new Profile(event.getAuthor(), event.getGuild());
             ImageIO.write(profile.getImage(), "png", image);
         } catch (IOException IOE) {
             new Log(IOE, event, name).sendLogIOCommandEvent(true);
@@ -64,7 +70,7 @@ public class ProfileCommand extends Command {
         event.getChannel().sendFile(image).queue();
 
         // Delete File.
-        Thread thread = new Thread(() -> {
+        var thread = new Thread(() -> {
             try {
                 TimeUnit.MILLISECONDS.sleep(10000); // 10 seconds.
             } catch (InterruptedException e) {

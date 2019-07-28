@@ -4,21 +4,17 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import servant.Database;
 import servant.Log;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 class ReactionRoleDatabase {
     static int setReactionRole(CommandEvent event, long guildId, long channelId, long messageId, String emoji, long emoteGuildId, long emoteId, long roleId) {
         try {
-            Connection connection = Database.getConnection();
-
+            var connection = Database.getConnection();
             if (hasEntry(guildId, channelId, messageId, emoji, emoteGuildId, emoteId)) {
                 return 1;
             } else {
                 // Insert
-                PreparedStatement insert = connection.prepareStatement("INSERT INTO reaction_role (guild_id, channel_id, message_id, emoji, emote_guild_id, emote_id, role_id) VALUES (?,?,?,?,?,?,?)");
+                var insert = connection.prepareStatement("INSERT INTO reaction_role (guild_id, channel_id, message_id, emoji, emote_guild_id, emote_id, role_id) VALUES (?,?,?,?,?,?,?)");
                 insert.setLong(1, guildId);
                 insert.setLong(2, channelId);
                 insert.setLong(3, messageId);
@@ -38,13 +34,12 @@ class ReactionRoleDatabase {
 
     static int unsetReactionRole(CommandEvent event, long guildId, long channelId, long messageId, String emoji, long emoteGuildId, long emoteId) {
         try {
-            Connection connection = Database.getConnection();
-
+            var connection = Database.getConnection();
             if (!hasEntry(guildId, channelId, messageId, emoji, emoteGuildId, emoteId)) {
                 return 1;
             } else {
                 // Delete
-                PreparedStatement delete = connection.prepareStatement("DELETE FROM reaction_role WHERE guild_id=? AND channel_id=? AND message_id=? AND emoji=? AND emote_guild_id=? AND emote_id=?");
+                var delete = connection.prepareStatement("DELETE FROM reaction_role WHERE guild_id=? AND channel_id=? AND message_id=? AND emoji=? AND emote_guild_id=? AND emote_id=?");
                 delete.setLong(1, guildId);
                 delete.setLong(2, channelId);
                 delete.setLong(3, messageId);
@@ -62,32 +57,32 @@ class ReactionRoleDatabase {
     }
 
     static long getRoleId(long guildId, long channelId, long messageId, String emoji, long emoteGuildId, long emoteId) throws SQLException {
-        Connection connection = Database.getConnection();
-        PreparedStatement select = connection.prepareStatement("SELECT role_id FROM reaction_role WHERE guild_id=? AND channel_id=? AND message_id=? AND emoji=? AND emote_guild_id=? AND emote_id=?");
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT role_id FROM reaction_role WHERE guild_id=? AND channel_id=? AND message_id=? AND emoji=? AND emote_guild_id=? AND emote_id=?");
         select.setLong(1, guildId);
         select.setLong(2, channelId);
         select.setLong(3, messageId);
         select.setString(4, (emoji == null ? "" : emoji));
         select.setLong(5, emoteGuildId);
         select.setLong(6, emoteId);
-        ResultSet resultSet = select.executeQuery();
-        long roleId = 0;
+        var resultSet = select.executeQuery();
+        var roleId = 0L;
         if (resultSet.first()) roleId = resultSet.getLong("role_id");
         connection.close();
         return roleId;
     }
 
     static boolean hasEntry(long guildId, long channelId, long messageId, String emoji, long emoteGuildId, long emoteId) throws SQLException {
-        Connection connection = Database.getConnection();
-        PreparedStatement select = connection.prepareStatement("SELECT role_id FROM reaction_role WHERE guild_id=? AND channel_id=? AND message_id=? AND emoji=? AND emote_guild_id=? AND emote_id=?");
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT role_id FROM reaction_role WHERE guild_id=? AND channel_id=? AND message_id=? AND emoji=? AND emote_guild_id=? AND emote_id=?");
         select.setLong(1, guildId);
         select.setLong(2, channelId);
         select.setLong(3, messageId);
         select.setString(4, (emoji == null ? "" : emoji));
         select.setLong(5, emoteGuildId);
         select.setLong(6, emoteId);
-        ResultSet resultSet = select.executeQuery();
-        boolean hasEntry = false;
+        var resultSet = select.executeQuery();
+        var hasEntry = false;
         if (resultSet.first()) hasEntry = true;
         connection.close();
         return hasEntry;

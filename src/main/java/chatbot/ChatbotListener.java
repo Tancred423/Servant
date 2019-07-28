@@ -1,8 +1,6 @@
 package chatbot;
 
 import moderation.guild.Guild;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import patreon.PatreonHandler;
@@ -23,15 +21,15 @@ public class ChatbotListener extends ListenerAdapter {
         }
 
         // Do not react to other bots or yourself.
-        User author = event.getAuthor();
+        var author = event.getAuthor();
         if (author.isBot()) return;
 
-        Message message = event.getMessage();
-        String contentDisplay = message.getContentDisplay();
+        var message = event.getMessage();
+        var contentDisplay = message.getContentDisplay();
         contentDisplay = contentDisplay.replaceFirst("@" + event.getJDA().getSelfUser().getName(), "").trim();
 
         // Chatbot is handles differently in DM.
-        boolean isDM = event.getGuild() == null;
+        var isDM = event.getGuild() == null;
 
         // Do not interact with commands.
         if (contentDisplay.startsWith(Servant.config.getDefaultPrefix())) return;
@@ -48,7 +46,7 @@ public class ChatbotListener extends ListenerAdapter {
 
             // Or if bot got mentioned.
             if (message.getMentionedMembers().isEmpty()) return;
-            User mentioned = message.getMentionedMembers().get(0).getUser();
+            var mentioned = message.getMentionedMembers().get(0).getUser();
             if (mentioned.getIdLong() != event.getJDA().getSelfUser().getIdLong()) return;
             interact(event, contentDisplay);
         }
@@ -63,10 +61,10 @@ public class ChatbotListener extends ListenerAdapter {
 
         MagicBooleans.trace_mode = false;
 
-        zChatLib.Chat chatSession = new Chat(Servant.chatBot);
+        var chatSession = new Chat(Servant.chatBot);
         Servant.chatBot.brain.nodeStats();
 
-        String response = chatSession.multisentenceRespond(content);
+        var response = chatSession.multisentenceRespond(content);
         response = response.replaceAll("&lt;", "<");
         response = response.replaceAll("&gt;", ">");
 

@@ -14,7 +14,7 @@ public class PatreonHandler {
     public static boolean isDonator(User user) {
         if (is$1Patron(user)) return true;
         List<Member> members = g.getMembers();
-        for (Member member : members)
+        for (var member : members)
             if (member.getUser().equals(user))
                 return g.getMemberById(user.getIdLong()).getRoles().contains(g.getRoleById(489738762838867969L));
         return false;
@@ -24,7 +24,7 @@ public class PatreonHandler {
     public static boolean is$1Patron(User user) {
         if (is$3Patron(user)) return true;
         List<Member> members = g.getMembers();
-        for (Member member : members)
+        for (var member : members)
             if (member.getUser().equals(user))
                 return g.getMemberById(user.getIdLong()).getRoles().contains(g.getRoleById(502472440455233547L));
         return false;
@@ -33,7 +33,7 @@ public class PatreonHandler {
     public static boolean is$3Patron(User user) {
         if (is$5Patron(user)) return true;
         List<Member> members = g.getMembers();
-        for (Member member : members)
+        for (var member : members)
             if (member.getUser().equals(user))
                 return g.getMemberById(user.getIdLong()).getRoles().contains(g.getRoleById(502472546600353796L));
         return false;
@@ -42,7 +42,7 @@ public class PatreonHandler {
     public static boolean is$5Patron(User user) {
         if (is$10Patron(user)) return true;
         List<Member> members = g.getMembers();
-        for (Member member : members)
+        for (var member : members)
             if (member.getUser().equals(user))
                 return g.getMemberById(user.getIdLong()).getRoles().contains(g.getRoleById(502472823638458380L));
         return false;
@@ -50,14 +50,14 @@ public class PatreonHandler {
 
     public static boolean is$10Patron(User user) {
         List<Member> members = g.getMembers();
-        for (Member member : members)
+        for (var member : members)
             if (member.getUser().equals(user))
                 return g.getMemberById(user.getIdLong()).getRoles().contains(g.getRoleById(502472869234868224L));
         return false;
     }
 
     public static void sendWarning(MessageChannel channel, String rank) {
-        String message = "You have to be a %s to use this feature!";
+        var message = "You have to be a %s to use this feature!";
         switch (rank) {
             case "donator":
                 channel.sendMessage(String.format(message, "donator")).queue();

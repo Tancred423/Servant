@@ -12,7 +12,6 @@ import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Parser {
@@ -53,7 +52,7 @@ public class Parser {
     }
 
     public static boolean isOlderThanTwoWeeks(OffsetDateTime creationTime) {
-        long twoWeeksAgo = System.currentTimeMillis() - 1000 * 3600 * 24 * 14; // 2 weeks
+        var twoWeeksAgo = System.currentTimeMillis() - 1000 * 3600 * 24 * 14; // 2 weeks
         return creationTime.toEpochSecond() * 1000 < twoWeeksAgo;
     }
 
@@ -67,12 +66,8 @@ public class Parser {
     }
 
     public static int getTotalLevelExp(int level) {
-        int totalExp = 0;
-
-        for (int i = level; i >= 0; i--) {
-            totalExp += getLevelExp(i);
-        }
-
+        var totalExp = 0;
+        for (var i = level; i >= 0; i--) totalExp += getLevelExp(i);
         return totalExp;
     }
 
@@ -81,8 +76,8 @@ public class Parser {
     }
 
     public static int getLevelFromExp(int exp) {
-        int remaining_exp = exp;
-        int level = 0;
+        var remaining_exp = exp;
+        var level = 0;
         while (remaining_exp >= getLevelExp(level)) {
             remaining_exp -= getLevelExp(level);
             level++;
@@ -96,13 +91,11 @@ public class Parser {
         try {
             role = event.getMessage().getMentionedRoles().get(0);
         } catch (IndexOutOfBoundsException e) {
-            String[] args = event.getArgs().split(" ");
+            var args = event.getArgs().split(" ");
             if (args.length < 2) return null;
-            String id = args[1];
-            if (!id.matches("[0-9]+") || id.length() != 18) {
-                return null;
-            }
-            long roleId = Long.parseLong(id);
+            var id = args[1];
+            if (!id.matches("[0-9]+") || id.length() != 18) return null;
+            var roleId = Long.parseLong(id);
             role = Servant.jda.getGuildById(event.getGuild().getIdLong()).getRoleById(roleId);
         }
 
@@ -111,15 +104,15 @@ public class Parser {
 
     // Guild
     public static boolean isValidOffset(String offset) {
-        boolean isValidOffset = true;
+        var isValidOffset = true;
         if (offset.length() != 6) isValidOffset = false;
         if (!offset.startsWith("+") && !offset.startsWith("-")) isValidOffset = false;
         if (!offset.substring(1, 3).matches("[0-9]+")) isValidOffset = false;
-        int hours = Integer.parseInt(offset.substring(1, 3));
+        var hours = Integer.parseInt(offset.substring(1, 3));
         if (hours < 0 || hours > 14) isValidOffset = false;
         if (!offset.substring(3, 4).equals(":")) isValidOffset = false;
         if (!offset.substring(4, 6).matches("[0-9]+")) isValidOffset = false;
-        int minutes = Integer.parseInt(offset.substring(4, 6));
+        var minutes = Integer.parseInt(offset.substring(4, 6));
         if (minutes < 0 || minutes > 59) isValidOffset = false;
         return isValidOffset;
     }
@@ -141,12 +134,12 @@ public class Parser {
         } catch (IOException e) {
             return false;
         }
-        String contentType = connection.getHeaderField("Content-Type");
+        var contentType = connection.getHeaderField("Content-Type");
         return contentType.startsWith("image/");
     }
 
     public static boolean isValidPrefix(String prefix) {
-        boolean isValidPrefix = true;
+        var isValidPrefix = true;
         if (prefix.length() > 32) isValidPrefix = false;
 
         // I will handle this properly in the future.
@@ -161,6 +154,7 @@ public class Parser {
         return isValidPrefix;
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean isValidVoiceChannelId(Guild guild, String id) {
         if (!id.matches("[0-9]+") || id.length() != 18) return false;
         guild.getVoiceChannelById(id);

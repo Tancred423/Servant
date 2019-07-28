@@ -2,13 +2,9 @@ package moderation.guild;
 
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.Role;
-import net.dv8tion.jda.core.entities.User;
 import servant.Database;
 import servant.Servant;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -28,11 +24,11 @@ public class Guild {
 
     // Lobby.
     public boolean toggleVoiceText() throws SQLException {
-        Connection connection = Database.getConnection();
-        PreparedStatement select = connection.prepareStatement("SELECT * FROM guild_settings WHERE guild_id=? AND setting=?");
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT * FROM guild_settings WHERE guild_id=? AND setting=?");
         select.setLong(1, guildId);
         select.setString(2, "voicetext");
-        ResultSet resultSet = select.executeQuery();
+        var resultSet = select.executeQuery();
         boolean wasEnabled;
         if (resultSet.first()) {
             if (resultSet.getString("value").equals("on")) wasEnabled = setVoiceText(false);
@@ -42,17 +38,17 @@ public class Guild {
     }
 
     private boolean setVoiceText(boolean enable) throws SQLException {
-        Connection connection = Database.getConnection();
+        var connection = Database.getConnection();
         if (voiceTextHasEntry()) {
             //  Update.
-            PreparedStatement update = connection.prepareStatement("UPDATE guild_settings SET value=? WHERE guild_id=? AND setting=?");
+            var update = connection.prepareStatement("UPDATE guild_settings SET value=? WHERE guild_id=? AND setting=?");
             update.setString(1, enable ? "on" : "off");
             update.setLong(2, guildId);
             update.setString(3, "voicetext");
             update.executeUpdate();
         } else {
             // Insert.
-            PreparedStatement insert = connection.prepareStatement("INSERT INTO guild_settings (guild_id,setting,value) VALUES (?,?,?)");
+            var insert = connection.prepareStatement("INSERT INTO guild_settings (guild_id,setting,value) VALUES (?,?,?)");
             insert.setLong(1, guildId);
             insert.setString(2, "voicetext");
             insert.setString(3, enable ? "on" : "off");
@@ -63,72 +59,43 @@ public class Guild {
     }
 
     private boolean voiceTextHasEntry() throws SQLException {
-        Connection connection = Database.getConnection();
-        PreparedStatement select = connection.prepareStatement("SELECT * FROM guild_settings WHERE guild_id=? AND setting=?");
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT * FROM guild_settings WHERE guild_id=? AND setting=?");
         select.setLong(1, guildId);
         select.setString(2, "voicetext");
-        ResultSet resultSet = select.executeQuery();
-        boolean voiceTextHasEntry = false;
+        var resultSet = select.executeQuery();
+        var voiceTextHasEntry = false;
         if (resultSet.first()) voiceTextHasEntry = true;
         connection.close();
         return voiceTextHasEntry;
     }
 
     public boolean isVoiceText() throws SQLException {
-        Connection connection = Database.getConnection();
-        PreparedStatement select = connection.prepareStatement("SELECT * FROM guild_settings WHERE guild_id=? AND setting=?");
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT * FROM guild_settings WHERE guild_id=? AND setting=?");
         select.setLong(1, guildId);
         select.setString(2, "voicetext");
-        ResultSet resultSet = select.executeQuery();
-        boolean isVoiceText = false;
+        var resultSet = select.executeQuery();
+        var isVoiceText = false;
         if (resultSet.first()) isVoiceText = resultSet.getString("value").equals("on");
         connection.close();
         return isVoiceText;
     }
 
     public List<Long> getLobbies() throws SQLException {
-        Connection connection = Database.getConnection();
-        PreparedStatement select = connection.prepareStatement("SELECT * FROM lobby WHERE guild_id=?");
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT * FROM lobby WHERE guild_id=?");
         select.setLong(1, guildId);
-        ResultSet resultSet = select.executeQuery();
+        var resultSet = select.executeQuery();
         List<Long> lobbies = new ArrayList<>();
         if (resultSet.first()) do lobbies.add(resultSet.getLong("channel_id")); while (resultSet.next());
         connection.close();
         return lobbies;
     }
 
-    public boolean isLobby(long channelId) throws SQLException {
-        Connection connection = Database.getConnection();
-        PreparedStatement select = connection.prepareStatement("SELECT * FROM lobby WHERE guild_id=? and channel_id=?");
-        select.setLong(1, guildId);
-        select.setLong(2, channelId);
-        ResultSet resultSet = select.executeQuery();
-        if (resultSet.first()) {
-            connection.close();
-            return true;
-        } else {
-            connection.close();
-            return false;
-        }
-    }
-
-    private boolean lobbiesHasEntry() throws SQLException {
-        Connection connection = Database.getConnection();
-        PreparedStatement select = connection.prepareStatement("SELECT * FROM lobby WHERE guild_id=?");
-        select.setLong(1, guildId);
-        ResultSet resultSet = select.executeQuery();
-        if (resultSet.first()) {
-            connection.close();
-            return true;
-        } else {
-            connection.close();
-            return false;
-        }
-    }
-
     public void setLobby(long channelId) throws SQLException {
-        Connection connection = Database.getConnection();
-        PreparedStatement insert = connection.prepareStatement("INSERT INTO lobby (guild_id,channel_id) VALUES (?,?)");
+        var connection = Database.getConnection();
+        var insert = connection.prepareStatement("INSERT INTO lobby (guild_id,channel_id) VALUES (?,?)");
         insert.setLong(1, guildId);
         insert.setLong(2, channelId);
         insert.executeUpdate();
@@ -136,10 +103,10 @@ public class Guild {
     }
 
     public boolean unsetLobby(long channelId) throws SQLException {
-        Connection connection = Database.getConnection();
+        var connection = Database.getConnection();
         if (prefixHasEntry()) {
             //  Delete.
-            PreparedStatement delete = connection.prepareStatement("DELETE FROM lobby WHERE guild_id=? and channel_id=?");
+            var delete = connection.prepareStatement("DELETE FROM lobby WHERE guild_id=? and channel_id=?");
             delete.setLong(1, guildId);
             delete.setLong(2, channelId);
             delete.executeUpdate();
@@ -156,11 +123,11 @@ public class Guild {
     public String getPrefix() { return prefix; }
 
     private boolean prefixHasEntry() throws SQLException {
-        Connection connection = Database.getConnection();
-        PreparedStatement select = connection.prepareStatement("SELECT * FROM guild_settings WHERE guild_id=? AND setting=?");
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT * FROM guild_settings WHERE guild_id=? AND setting=?");
         select.setLong(1, guildId);
         select.setString(2, "prefix");
-        ResultSet resultSet = select.executeQuery();
+        var resultSet = select.executeQuery();
         if (resultSet.first()) {
             connection.close();
             return true;
@@ -171,11 +138,11 @@ public class Guild {
     }
 
     private void thisPrefix() throws SQLException {
-        Connection connection = Database.getConnection();
-        PreparedStatement select = connection.prepareStatement("SELECT value FROM guild_settings WHERE guild_id=? AND setting=?");
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT value FROM guild_settings WHERE guild_id=? AND setting=?");
         select.setLong(1, guildId);
         select.setString(2, "prefix");
-        ResultSet resultSet = select.executeQuery();
+        var resultSet = select.executeQuery();
         String prefix = null;
         if (resultSet.first()) prefix = resultSet.getString("value");
         if (prefix == null) this.prefix = Servant.config.getDefaultPrefix();
@@ -186,17 +153,17 @@ public class Guild {
     public void setPrefix(String prefix) throws SQLException {
         this.prefix = prefix;
 
-        Connection connection = Database.getConnection();
+        var connection = Database.getConnection();
         if (prefixHasEntry()) {
             //  Update.
-            PreparedStatement update = connection.prepareStatement("UPDATE guild_settings SET value=? WHERE guild_id=? AND setting=?");
+            var update = connection.prepareStatement("UPDATE guild_settings SET value=? WHERE guild_id=? AND setting=?");
             update.setString(1, prefix);
             update.setLong(2, guildId);
             update.setString(3, "prefix");
             update.executeUpdate();
         } else {
             // Insert.
-            PreparedStatement insert = connection.prepareStatement("INSERT INTO guild_settings (guild_id,setting,value) VALUES (?,?,?)");
+            var insert = connection.prepareStatement("INSERT INTO guild_settings (guild_id,setting,value) VALUES (?,?,?)");
             insert.setLong(1, guildId);
             insert.setString(2, "prefix");
             insert.setString(3, prefix);
@@ -208,10 +175,10 @@ public class Guild {
     boolean unsetPrefix() throws SQLException {
         this.prefix = Servant.config.getDefaultPrefix();
 
-        Connection connection = Database.getConnection();
+        var connection = Database.getConnection();
         if (prefixHasEntry()) {
             //  Delete.
-            PreparedStatement delete = connection.prepareStatement("DELETE FROM guild_settings WHERE guild_id=? AND setting=?");
+            var delete = connection.prepareStatement("DELETE FROM guild_settings WHERE guild_id=? AND setting=?");
             delete.setLong(1, guildId);
             delete.setString(2, "prefix");
             delete.executeUpdate();
@@ -228,11 +195,11 @@ public class Guild {
     public String getOffset() { return offset; }
 
     private boolean offsetHasEntry() throws SQLException {
-        Connection connection = Database.getConnection();
-        PreparedStatement select = connection.prepareStatement("SELECT * FROM guild_settings WHERE guild_id=? AND setting=?");
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT * FROM guild_settings WHERE guild_id=? AND setting=?");
         select.setLong(1, guildId);
         select.setString(2, "offset");
-        ResultSet resultSet = select.executeQuery();
+        var resultSet = select.executeQuery();
         if (resultSet.first()) {
             connection.close();
             return true;
@@ -243,11 +210,11 @@ public class Guild {
     }
 
     private void thisOffset() throws SQLException {
-        Connection connection = Database.getConnection();
-        PreparedStatement select = connection.prepareStatement("SELECT value FROM guild_settings WHERE guild_id=? AND setting=?");
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT value FROM guild_settings WHERE guild_id=? AND setting=?");
         select.setLong(1, guildId);
         select.setString(2, "offset");
-        ResultSet resultSet = select.executeQuery();
+        var resultSet = select.executeQuery();
         String offset = null;
         if (resultSet.first()) offset = resultSet.getString("value");
         if (offset == null) this.offset = Servant.config.getDefaultOffset();
@@ -258,17 +225,17 @@ public class Guild {
     void setOffset(String offset) throws SQLException {
         this.offset = offset;
 
-        Connection connection = Database.getConnection();
+        var connection = Database.getConnection();
         if (offsetHasEntry()) {
             //  Update.
-            PreparedStatement update = connection.prepareStatement("UPDATE guild_settings SET value=? WHERE guild_id=? AND setting=?");
+            var update = connection.prepareStatement("UPDATE guild_settings SET value=? WHERE guild_id=? AND setting=?");
             update.setString(1, offset);
             update.setLong(2, guildId);
             update.setString(3, "offset");
             update.executeUpdate();
         } else {
             // Insert.
-            PreparedStatement insert = connection.prepareStatement("INSERT INTO guild_settings (guild_id,setting,value) VALUES (?,?,?)");
+            var insert = connection.prepareStatement("INSERT INTO guild_settings (guild_id,setting,value) VALUES (?,?,?)");
             insert.setLong(1, guildId);
             insert.setString(2, "offset");
             insert.setString(3, offset);
@@ -280,10 +247,10 @@ public class Guild {
     boolean unsetOffset() throws SQLException {
         this.offset = Servant.config.getDefaultOffset();
 
-        Connection connection = Database.getConnection();
+        var connection = Database.getConnection();
         if (offsetHasEntry()) {
             //  Delete.
-            PreparedStatement delete = connection.prepareStatement("DELETE FROM guild_settings WHERE guild_id=? AND setting=?");
+            var delete = connection.prepareStatement("DELETE FROM guild_settings WHERE guild_id=? AND setting=?");
             delete.setLong(1, guildId);
             delete.setString(2, "offset");
             delete.executeUpdate();
@@ -298,11 +265,11 @@ public class Guild {
 
     // Feature counter.
     private boolean featureCountHasEntry(String key) throws SQLException {
-        Connection connection = Database.getConnection();
-        PreparedStatement select = connection.prepareStatement("SELECT * FROM feature_count WHERE id=? AND feature=?");
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT * FROM feature_count WHERE id=? AND feature=?");
         select.setLong(1, guildId);
         select.setString(2, key);
-        ResultSet resultSet = select.executeQuery();
+        var resultSet = select.executeQuery();
         if (resultSet.first()) {
             connection.close();
             return true;
@@ -313,11 +280,11 @@ public class Guild {
     }
 
     private int getFeatureCount(String feature) throws SQLException {
-        Connection connection = Database.getConnection();
-        PreparedStatement select = connection.prepareStatement("SELECT count FROM feature_count WHERE id=? AND feature=?");
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT count FROM feature_count WHERE id=? AND feature=?");
         select.setLong(1, guildId);
         select.setString(2, feature.toLowerCase());
-        ResultSet resultSet = select.executeQuery();
+        var resultSet = select.executeQuery();
         int featureCount = 0;
         if (resultSet.first()) featureCount = resultSet.getInt("count");
         connection.close();
@@ -325,18 +292,18 @@ public class Guild {
     }
 
     public void incrementFeatureCount(String feature) throws SQLException {
-        int count = getFeatureCount(feature);
-        Connection connection = Database.getConnection();
+        var count = getFeatureCount(feature);
+        var connection = Database.getConnection();
         if (featureCountHasEntry(feature)) {
             // Update.
-            PreparedStatement update = connection.prepareStatement("UPDATE feature_count SET count=? WHERE id=? AND feature=?");
+            var update = connection.prepareStatement("UPDATE feature_count SET count=? WHERE id=? AND feature=?");
             update.setInt(1, count + 1);
             update.setLong(2, guildId);
             update.setString(3, feature.toLowerCase());
             update.executeUpdate();
         } else {
             // Insert.
-            PreparedStatement insert = connection.prepareStatement("INSERT INTO feature_count (id,feature,count) VALUES (?,?,?)");
+            var insert = connection.prepareStatement("INSERT INTO feature_count (id,feature,count) VALUES (?,?,?)");
             insert.setLong(1, guildId);
             insert.setString(2, feature.toLowerCase());
             insert.setInt(3, 1);
@@ -347,14 +314,14 @@ public class Guild {
 
     // Level
     public Map<Long, Integer> getLeaderboard() throws SQLException  {
-        Connection connection = Database.getConnection();
-        PreparedStatement select = connection.prepareStatement("SELECT * FROM user_exp WHERE guild_id=? ORDER BY exp DESC");
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT * FROM user_exp WHERE guild_id=? ORDER BY exp DESC");
         select.setLong(1, guildId);
-        ResultSet resultSet = select.executeQuery();
+        var resultSet = select.executeQuery();
 
         Map<Long, Integer> userExp = new LinkedHashMap<>();
         if (resultSet.first()) {
-            int counter = 0;
+            var counter = 0;
             do {
                 if (counter >= 10) break;
                 userExp.put(resultSet.getLong("user_id"), resultSet.getInt("exp"));
@@ -368,12 +335,12 @@ public class Guild {
 
     // Autorole
     public boolean hasAutorole() throws SQLException {
-        Connection connection = Database.getConnection();
-        PreparedStatement select = connection.prepareStatement("SELECT * FROM autorole WHERE guild_id=?");
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT * FROM autorole WHERE guild_id=?");
         select.setLong(1, guildId);
-        ResultSet resultSet = select.executeQuery();
+        var resultSet = select.executeQuery();
 
-        boolean hasAutorole = false;
+        var hasAutorole = false;
         if (resultSet.first()) hasAutorole = true;
 
         connection.close();
@@ -381,14 +348,14 @@ public class Guild {
     }
 
     public Role getAutorole() throws SQLException {
-        Connection connection = Database.getConnection();
-        PreparedStatement select = connection.prepareStatement("SELECT role_id FROM autorole WHERE guild_id=?");
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT role_id FROM autorole WHERE guild_id=?");
         select.setLong(1, guildId);
-        ResultSet resultSet = select.executeQuery();
+        var resultSet = select.executeQuery();
 
         Role role = null;
         if (resultSet.first()) {
-            long roleId = resultSet.getLong("role_id");
+            var roleId = resultSet.getLong("role_id");
             role = Servant.jda.getGuildById(guildId).getRoleById(roleId);
         }
 
@@ -397,10 +364,10 @@ public class Guild {
     }
 
     private boolean autoroleHasEntry() throws SQLException {
-        Connection connection = Database.getConnection();
-        PreparedStatement select = connection.prepareStatement("SELECT * FROM autorole WHERE guild_id=?");
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT * FROM autorole WHERE guild_id=?");
         select.setLong(1, guildId);
-        ResultSet resultSet = select.executeQuery();
+        var resultSet = select.executeQuery();
         if (resultSet.first()) {
             connection.close();
             return true;
@@ -411,16 +378,16 @@ public class Guild {
     }
 
     public void setAutorole(Role role) throws SQLException {
-        Connection connection = Database.getConnection();
+        var connection = Database.getConnection();
         if (autoroleHasEntry()) {
             // Update.
-            PreparedStatement update = connection.prepareStatement("UPDATE autorole SET role_id=? WHERE guild_id=?");
+            var update = connection.prepareStatement("UPDATE autorole SET role_id=? WHERE guild_id=?");
             update.setLong(1, role.getIdLong());
             update.setLong(2, guildId);
             update.executeUpdate();
         } else {
             // Insert.
-            PreparedStatement insert = connection.prepareStatement("INSERT INTO autorole (guild_id,role_id) VALUES (?,?)");
+            var insert = connection.prepareStatement("INSERT INTO autorole (guild_id,role_id) VALUES (?,?)");
             insert.setLong(1, guildId);
             insert.setLong(2, role.getIdLong());
             insert.executeUpdate();
@@ -431,8 +398,8 @@ public class Guild {
     public boolean unsetAutorole() throws SQLException {
         if (autoroleHasEntry()) {
             // Delete.
-            Connection connection = Database.getConnection();
-            PreparedStatement delete = connection.prepareStatement("DELETE FROM autorole WHERE guild_id=?");
+            var connection = Database.getConnection();
+            var delete = connection.prepareStatement("DELETE FROM autorole WHERE guild_id=?");
             delete.setLong(1, guildId);
             delete.executeUpdate();
             connection.close();
@@ -442,11 +409,11 @@ public class Guild {
 
     // MeidaOnlyChannel
     public boolean mediaOnlyChannelHasEntry(MessageChannel channel) throws SQLException {
-        Connection connection = Database.getConnection();
-        PreparedStatement select = connection.prepareStatement("SELECT * FROM mediaonlychannel WHERE guild_id=? AND channel_id=?");
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT * FROM mediaonlychannel WHERE guild_id=? AND channel_id=?");
         select.setLong(1, guildId);
         select.setLong(2, channel.getIdLong());
-        ResultSet resultSet = select.executeQuery();
+        var resultSet = select.executeQuery();
         if (resultSet.first()) {
             connection.close();
             return true;
@@ -457,8 +424,8 @@ public class Guild {
     }
 
     public void addMediaOnlyChannel(MessageChannel channel) throws SQLException {
-        Connection connection = Database.getConnection();
-        PreparedStatement insert = connection.prepareStatement("INSERT INTO mediaonlychannel (guild_id,channel_id) VALUES (?,?)");
+        var connection = Database.getConnection();
+        var insert = connection.prepareStatement("INSERT INTO mediaonlychannel (guild_id,channel_id) VALUES (?,?)");
         insert.setLong(1, guildId);
         insert.setLong(2, channel.getIdLong());
         insert.executeUpdate();
@@ -467,8 +434,8 @@ public class Guild {
 
     public boolean unsetMediaOnlyChannel(MessageChannel channel) throws SQLException {
         if (mediaOnlyChannelHasEntry(channel)) {
-            Connection connection = Database.getConnection();
-            PreparedStatement delete = connection.prepareStatement("DELETE FROM mediaonlychannel WHERE guild_id=? AND channel_id=?");
+            var connection = Database.getConnection();
+            var delete = connection.prepareStatement("DELETE FROM mediaonlychannel WHERE guild_id=? AND channel_id=?");
             delete.setLong(1, guildId);
             delete.setLong(2, channel.getIdLong());
             delete.executeUpdate();
@@ -480,10 +447,10 @@ public class Guild {
     }
 
     public List<MessageChannel> getMediaOnlyChannels() throws SQLException {
-        Connection connection = Database.getConnection();
-        PreparedStatement select = connection.prepareStatement("SELECT * FROM mediaonlychannel WHERE guild_id=?");
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT * FROM mediaonlychannel WHERE guild_id=?");
         select.setLong(1, guildId);
-        ResultSet resultSet = select.executeQuery();
+        var resultSet = select.executeQuery();
         List<MessageChannel> channels = new ArrayList<>();
 
         if (resultSet.first()) {
@@ -499,11 +466,11 @@ public class Guild {
 
     // Toggle
     private boolean toggleHasEntry(String feature) throws SQLException {
-        Connection connection = Database.getConnection();
-        PreparedStatement select = connection.prepareStatement("SELECT * FROM toggle WHERE guild_id=? AND feature=?");
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT * FROM toggle WHERE guild_id=? AND feature=?");
         select.setLong(1, guildId);
         select.setString(2, feature);
-        ResultSet resultSet = select.executeQuery();
+        var resultSet = select.executeQuery();
         if (resultSet.first()) {
             connection.close();
             return true;
@@ -514,11 +481,11 @@ public class Guild {
     }
 
     public boolean getToggleStatus(String feature) throws SQLException {
-        Connection connection = Database.getConnection();
-        PreparedStatement select = connection.prepareStatement("SELECT is_enabled FROM toggle WHERE guild_id=? AND feature=?");
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT is_enabled FROM toggle WHERE guild_id=? AND feature=?");
         select.setLong(1, guildId);
         select.setString(2, feature);
-        ResultSet resultSet = select.executeQuery();
+        var resultSet = select.executeQuery();
         boolean isEnabled;
         if (resultSet.first()) isEnabled = resultSet.getBoolean("is_enabled");
         else isEnabled = Servant.toggle.get(feature);
@@ -528,17 +495,17 @@ public class Guild {
     }
 
     public void setToggleStatus(String feature, boolean status) throws SQLException {
-        Connection connection = Database.getConnection();
+        var connection = Database.getConnection();
         if (toggleHasEntry(feature)) {
             // Update.
-            PreparedStatement update = connection.prepareStatement("UPDATE toggle SET is_enabled=? WHERE guild_id=? AND feature=?");
+            var update = connection.prepareStatement("UPDATE toggle SET is_enabled=? WHERE guild_id=? AND feature=?");
             update.setBoolean(1, status);
             update.setLong(2, guildId);
             update.setString(3, feature);
             update.executeUpdate();
         } else {
             // Insert.
-            PreparedStatement insert = connection.prepareStatement("INSERT INTO toggle (guild_id,feature,is_enabled) VALUES (?,?,?)");
+            var insert = connection.prepareStatement("INSERT INTO toggle (guild_id,feature,is_enabled) VALUES (?,?,?)");
             insert.setLong(1, guildId);
             insert.setString(2, feature);
             insert.setBoolean(3, status);
@@ -549,10 +516,10 @@ public class Guild {
 
     // JoinNotifier
     private boolean joinNotifierHasEntry() throws SQLException {
-        Connection connection = Database.getConnection();
-        PreparedStatement select = connection.prepareStatement("SELECT * FROM join_notifier WHERE guild_id=?");
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT * FROM join_notifier WHERE guild_id=?");
         select.setLong(1, guildId);
-        ResultSet resultSet = select.executeQuery();
+        var resultSet = select.executeQuery();
         if (resultSet.first()) {
             connection.close();
             return true;
@@ -563,10 +530,10 @@ public class Guild {
     }
 
     public MessageChannel getJoinNotifierChannel() throws SQLException {
-        Connection connection = Database.getConnection();
-        PreparedStatement select = connection.prepareStatement("SELECT channel_id FROM join_notifier WHERE guild_id=?");
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT channel_id FROM join_notifier WHERE guild_id=?");
         select.setLong(1, guildId);
-        ResultSet resultSet = select.executeQuery();
+        var resultSet = select.executeQuery();
         MessageChannel channel = null;
         if (resultSet.first()) channel = Servant.jda.getGuildById(guildId).getTextChannelById(resultSet.getLong("channel_id"));
 
@@ -575,16 +542,16 @@ public class Guild {
     }
 
     public void setJoinNotifierChannel(MessageChannel channel) throws SQLException {
-        Connection connection = Database.getConnection();
+        var connection = Database.getConnection();
         if (joinNotifierHasEntry()) {
             // Update.
-            PreparedStatement update = connection.prepareStatement("UPDATE join_notifier SET channel_id=? WHERE guild_id=?");
+            var update = connection.prepareStatement("UPDATE join_notifier SET channel_id=? WHERE guild_id=?");
             update.setLong(1, channel.getIdLong());
             update.setLong(2, guildId);
             update.executeUpdate();
         } else {
             // Insert.
-            PreparedStatement insert = connection.prepareStatement("INSERT INTO join_notifier (guild_id,channel_id) VALUES (?,?)");
+            var insert = connection.prepareStatement("INSERT INTO join_notifier (guild_id,channel_id) VALUES (?,?)");
             insert.setLong(1, guildId);
             insert.setLong(2, channel.getIdLong());
             insert.executeUpdate();
@@ -594,8 +561,8 @@ public class Guild {
 
     public boolean unsetJoinNotifierChannel() throws SQLException {
         if (joinNotifierHasEntry()) {
-            Connection connection = Database.getConnection();
-            PreparedStatement delete = connection.prepareStatement("DELETE FROM join_notifier WHERE guild_id=?");
+            var connection = Database.getConnection();
+            var delete = connection.prepareStatement("DELETE FROM join_notifier WHERE guild_id=?");
             delete.setLong(1, guildId);
             delete.executeUpdate();
             connection.close();
@@ -607,10 +574,10 @@ public class Guild {
 
     // Exp
     public int getUserRank(long userId) throws SQLException {
-        Connection connection = Database.getConnection();
-        PreparedStatement select = connection.prepareStatement("SELECT * FROM user_exp WHERE guild_id=? ORDER BY exp DESC");
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT * FROM user_exp WHERE guild_id=? ORDER BY exp DESC");
         select.setLong(1, guildId);
-        ResultSet resultSet = select.executeQuery();
+        var resultSet = select.executeQuery();
         int rank = 0;
         if (resultSet.first()) {
             rank = 1;

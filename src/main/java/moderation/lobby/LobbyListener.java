@@ -1,6 +1,7 @@
 package moderation.lobby;
 
 import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.core.events.channel.voice.VoiceChannelDeleteEvent;
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceMoveEvent;
@@ -24,7 +25,7 @@ public class LobbyListener extends ListenerAdapter {
             return;
         }
 
-        Guild guild = event.getGuild();
+        var guild = event.getGuild();
         moderation.guild.Guild internalGuild;
         List<Long> channels;
         try {
@@ -34,49 +35,22 @@ public class LobbyListener extends ListenerAdapter {
             new Log(e, event, "lobby").sendLogSqlGuildVoiceJoinEvent();
             return;
         }
-        Member member = event.getMember();
-        VoiceChannel channel = event.getChannelJoined();
+        var member = event.getMember();
+        var channel = event.getChannelJoined();
 
         if (channels.contains(channel.getIdLong())) {
-//            try {
-//                if (internalGuild.isVoiceText()) {
-//                    // Create copy.
-//                    VoiceChannel newChannel = (VoiceChannel) guild.getController().createVoiceChannel(getLobbyName(member))
-//                            .setBitrate(channel.getBitrate() > 96000 ? 96000 : channel.getBitrate())
-//                            .setUserlimit(channel.getUserLimit())
-//                            .complete();
-//                    if (channel.getParent() != null) newChannel.getManager().setParent(channel.getParent()).complete();
-//
-//                    // Create Text Channel
-//                    TextChannel newText = (TextChannel) guild.getController().createTextChannel(member.getNickname())
-//                            .setTopic("Only people in your voice channel can see this channel.")
-//                            .complete();
-//                    if (channel.getParent() != null) newText.getManager().setParent(channel.getParent()).complete();
-//
-//                    // Create category
-//                    Category newCategory = (Category) guild.getController().createCategory(member.getNickname()).complete();
-//                    if (channel.getParent() != null) newCategory.getManager().setParent(channel.getParent()).complete();
-//
-//                    guild.getController()
-//                } else {
-                    // Create copy.
-                    VoiceChannel newChannel = (VoiceChannel) guild.getController().createVoiceChannel(getLobbyName(member))
-                            .setBitrate(channel.getBitrate() > 96000 ? 96000 : channel.getBitrate())
-                            .setUserlimit(channel.getUserLimit())
-                            .complete();
-                    if (channel.getParent() != null) newChannel.getManager().setParent(channel.getParent()).complete();
+            var newChannel = (VoiceChannel) guild.getController().createVoiceChannel(getLobbyName(member))
+                    .setBitrate(Math.min(channel.getBitrate(), 96000))
+                    .setUserlimit(channel.getUserLimit())
+                    .complete();
+            if (channel.getParent() != null) newChannel.getManager().setParent(channel.getParent()).complete();
 
-                    guild.getController().modifyVoiceChannelPositions().selectPosition(newChannel).moveTo(channel.getPosition() + 1).complete();
-                    guild.getController().moveVoiceMember(member, newChannel).complete();
-                    active.add(newChannel);
-//                }
-//            } catch (SQLException e) {
-//                new Log(e, event, "lobby").sendLogSqlGuildVoiceJoinEvent();
-//                return;
-//            }
+            guild.getController().modifyVoiceChannelPositions().selectPosition(newChannel).moveTo(channel.getPosition() + 1).complete();
+            guild.getController().moveVoiceMember(member, newChannel).complete();
+            active.add(newChannel);
         }
 
-        Thread thread = new Thread(() -> {
+        var thread = new Thread(() -> {
             try {
                 TimeUnit.MILLISECONDS.sleep(2500);
             } catch (InterruptedException e) {
@@ -103,23 +77,22 @@ public class LobbyListener extends ListenerAdapter {
         }
 
         // Join
-        Guild guild = event.getGuild();
+        var guild = event.getGuild();
         moderation.guild.Guild internalGuild;
         List<Long> channels;
         try {
             internalGuild = new moderation.guild.Guild(guild.getIdLong());
             channels = internalGuild.getLobbies();
         } catch (SQLException e) {
-            new Log(e, event, "lobby").sendLogSqlGuildVoiceJoinEvent();
+            new Log(e, event, "lobby").sendLogSqlGuildVoiceMoveEvent();
             return;
         }
-        Member member = event.getMember();
-        VoiceChannel joinedChannel = event.getChannelJoined();
+        var member = event.getMember();
+        var joinedChannel = event.getChannelJoined();
 
         if (channels.contains(joinedChannel.getIdLong())) {
-            // Create copy.
-            VoiceChannel newChannel = (VoiceChannel) guild.getController().createVoiceChannel(getLobbyName(member))
-                    .setBitrate(joinedChannel.getBitrate() > 96000 ? 96000 : joinedChannel.getBitrate())
+            var newChannel = (VoiceChannel) guild.getController().createVoiceChannel(getLobbyName(member))
+                    .setBitrate(Math.min(joinedChannel.getBitrate(), 96000))
                     .setUserlimit(joinedChannel.getUserLimit())
                     .complete();
 
@@ -129,7 +102,7 @@ public class LobbyListener extends ListenerAdapter {
             active.add(newChannel);
         }
 
-        Thread thread = new Thread(() -> {
+        var thread = new Thread(() -> {
             try {
                 TimeUnit.MILLISECONDS.sleep(2500);
             } catch (InterruptedException e) {
@@ -147,7 +120,7 @@ public class LobbyListener extends ListenerAdapter {
         thread.start();
 
         // Leave
-        VoiceChannel leftChannel = event.getChannelLeft();
+        var leftChannel = event.getChannelLeft();
 
         if (active.contains(leftChannel) && leftChannel.getMembers().size() == 0) {
             active.remove(leftChannel);
@@ -163,11 +136,22 @@ public class LobbyListener extends ListenerAdapter {
             return;
         }
 
-        VoiceChannel channel = event.getChannelLeft();
+        var channel = event.getChannelLeft();
 
         if (active.contains(channel) && channel.getMembers().size() == 0) {
             active.remove(channel);
             channel.delete().complete();
+        }
+    }
+
+    public void onVoiceChannelDelete(VoiceChannelDeleteEvent event) {
+        if (active.contains(event.getChannel())) {
+            active.remove(event.getChannel());
+            try {
+                new moderation.guild.Guild(event.getGuild().getIdLong()).unsetLobby(event.getChannel().getIdLong());
+            } catch (SQLException e) {
+                new Log(e, event, "lobby").sendLogSqlVoiceChannelDeleteEvent();
+            }
         }
     }
 }

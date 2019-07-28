@@ -12,7 +12,7 @@ public class GuildSettings implements GuildSettingsProvider {
     private Collection<String> prefixes = new ArrayList<>();
 
     GuildSettings(Guild guild) throws SQLException {
-        String prefix = new moderation.guild.Guild(guild.getIdLong()).getPrefix();
+        var prefix = new moderation.guild.Guild(guild.getIdLong()).getPrefix();
         if (prefix != null) addPrefixes(prefix);
     }
 

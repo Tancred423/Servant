@@ -2,8 +2,6 @@ package patreon;
 
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberRoleAddEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
@@ -35,9 +33,9 @@ public class PatreonListener extends ListenerAdapter {
         }
     }
 
-    public void sendPatreonNotification(GuildMemberRoleAddEvent event, String rank) {
-        EmbedBuilder eb = new EmbedBuilder();
-        User patron = event.getMember().getUser();
+    private void sendPatreonNotification(GuildMemberRoleAddEvent event, String rank) {
+        var eb = new EmbedBuilder();
+        var patron = event.getMember().getUser();
 
         eb.setColor(event.getRoles().get(0).getColor());
         eb.setAuthor(patron.getName() + "#" + patron.getDiscriminator(), null, patron.getAvatarUrl());
@@ -61,7 +59,7 @@ public class PatreonListener extends ListenerAdapter {
     }
 
     private String getPatreonRoleMention(String rank, JDA jda) {
-        Guild guild = jda.getGuildById(436925371577925642L);
+        var guild = jda.getGuildById(436925371577925642L);
         switch (rank) {
             case "donation":
                 return guild.getRoleById(489738762838867969L).getAsMention();

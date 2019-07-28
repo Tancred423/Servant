@@ -1,7 +1,6 @@
 package moderation.reactionRoles;
 
 import moderation.guild.Guild;
-import net.dv8tion.jda.core.entities.MessageReaction;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionRemoveEvent;
 import net.dv8tion.jda.core.exceptions.InsufficientPermissionException;
@@ -21,14 +20,14 @@ public class ReactionRoleListener extends ListenerAdapter {
 
         if (event.getUser().isBot()) return;
 
-        long guildId = event.getGuild().getIdLong();
-        long channelId = event.getChannel().getIdLong();
-        long messageId = event.getMessageIdLong();
+        var guildId = event.getGuild().getIdLong();
+        var channelId = event.getChannel().getIdLong();
+        var messageId = event.getMessageIdLong();
         String emoji = null;
-        long emoteGuildId = 0;
-        long emoteId = 0;
+        var emoteGuildId = 0L;
+        var emoteId = 0L;
 
-        MessageReaction.ReactionEmote reactionEmote = event.getReactionEmote();
+        var reactionEmote = event.getReactionEmote();
         if (reactionEmote.isEmote()) {
             if (reactionEmote.getEmote().getGuild() == null) return;
             emoteGuildId = reactionEmote.getEmote().getGuild().getIdLong();
@@ -61,14 +60,14 @@ public class ReactionRoleListener extends ListenerAdapter {
 
         if (event.getUser().isBot()) return;
 
-        long guildId = event.getGuild().getIdLong();
-        long channelId = event.getChannel().getIdLong();
-        long messageId = event.getMessageIdLong();
+        var guildId = event.getGuild().getIdLong();
+        var channelId = event.getChannel().getIdLong();
+        var messageId = event.getMessageIdLong();
         String emoji = null;
-        long emoteGuildId = 0;
-        long emoteId = 0;
+        var emoteGuildId = 0L;
+        var emoteId = 0L;
 
-        MessageReaction.ReactionEmote reactionEmote = event.getReactionEmote();
+        var reactionEmote = event.getReactionEmote();
         if (reactionEmote.isEmote()) {
             if (reactionEmote.getEmote().getGuild() == null) return;
             emoteGuildId = reactionEmote.getEmote().getGuild().getIdLong();

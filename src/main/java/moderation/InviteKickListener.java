@@ -1,8 +1,6 @@
 package moderation;
 
 import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.core.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
@@ -13,15 +11,15 @@ import java.sql.SQLException;
 
 public class InviteKickListener extends ListenerAdapter {
     public void onGuildJoin(GuildJoinEvent event) {
-        Guild guild = event.getGuild();
-        User guildOwner = guild.getOwner().getUser();
+        var guild = event.getGuild();
+        var guildOwner = guild.getOwner().getUser();
 
         guildOwner.openPrivateChannel().queue(privateChannel -> {
-            servant.User internalGuildOwner = new servant.User(guildOwner.getIdLong());
-            String p = Servant.config.getDefaultPrefix();
-            User botOwner = Servant.jda.getUserById(Servant.config.getBotOwnerId());
-            User bot = event.getJDA().getSelfUser();
-            EmbedBuilder eb = new EmbedBuilder();
+            var internalGuildOwner = new servant.User(guildOwner.getIdLong());
+            var p = Servant.config.getDefaultPrefix();
+            var botOwner = Servant.jda.getUserById(Servant.config.getBotOwnerId());
+            var bot = event.getJDA().getSelfUser();
+            var eb = new EmbedBuilder();
 
             try {
                 eb.setColor(internalGuildOwner.getColor());
@@ -50,13 +48,13 @@ public class InviteKickListener extends ListenerAdapter {
     }
 
     public void onGuildLeave(GuildLeaveEvent event) {
-        Guild guild = event.getGuild();
-        User guildOwner = guild.getOwner().getUser();
+        var guild = event.getGuild();
+        var guildOwner = guild.getOwner().getUser();
 
         guildOwner.openPrivateChannel().queue(privateChannel -> {
-            servant.User internalGuildOwner = new servant.User(guildOwner.getIdLong());
-            User botOwner = Servant.jda.getUserById(Servant.config.getBotOwnerId());
-            EmbedBuilder eb = new EmbedBuilder();
+            var internalGuildOwner = new servant.User(guildOwner.getIdLong());
+            var botOwner = Servant.jda.getUserById(Servant.config.getBotOwnerId());
+            var eb = new EmbedBuilder();
 
             try {
                 eb.setColor(internalGuildOwner.getColor());

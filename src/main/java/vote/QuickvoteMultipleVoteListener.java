@@ -1,4 +1,4 @@
-package freeToAll.vote;
+package vote;
 
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
@@ -7,14 +7,10 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import servant.Emote;
 
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class QuickvoteMultipleVoteListener extends ListenerAdapter {
-    private Map<User, Boolean> tmp = new HashMap<>();
-
     public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {
-        User user = event.getUser();
+        var user = event.getUser();
         if (user.isBot()) return;
 
         var messageId = event.getMessageIdLong();
@@ -42,13 +38,10 @@ public class QuickvoteMultipleVoteListener extends ListenerAdapter {
         }
 
         event.getChannel().getMessageById(messageId).queue(message -> {
-            long userId = user.getIdLong();
+            var userId = user.getIdLong();
             try {
-                if (VoteDatabase.hasVoted(messageId, userId)){
-                    tmp.put(user, true);
-                    event.getReaction().removeReaction(user).queue();
-                }
-                else VoteDatabase.setUserVote(messageId, userId);
+                if (VoteDatabase.hasVoted(messageId, userId)) event.getReaction().removeReaction(user).queue();
+                else VoteDatabase.setUserVote(messageId, userId, (reactionEmote.isEmote() ? reactionEmote.getEmote().getIdLong() : 0), (reactionEmote.isEmote() ? "" : reactionEmote.getName()));
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -56,13 +49,8 @@ public class QuickvoteMultipleVoteListener extends ListenerAdapter {
     }
 
     public void onGuildMessageReactionRemove(GuildMessageReactionRemoveEvent event) {
-        User user = event.getUser();
+        var user = event.getUser();
         if (user.isBot()) return;
-
-        if (tmp.get(user)) {
-            tmp.replace(user, false);
-            return;
-        }
 
         var messageId = event.getMessageIdLong();
         try {
@@ -89,12 +77,29 @@ public class QuickvoteMultipleVoteListener extends ListenerAdapter {
         }
 
         event.getChannel().getMessageById(messageId).queue(message -> {
-            long userId = user.getIdLong();
-            try {
-                VoteDatabase.unsetUserVote(messageId, userId);
-            } catch (SQLException e) {
-                e.printStackTrace();
+            if (reactionEmote.isEmote()) {
+                try {
+                    if (reactionEmote.getEmote().getIdLong() == VoteDatabase.getVoteEmoteId(messageId, user.getIdLong()))
+                        unsetVote(messageId, user);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                try {
+                    if (reactionEmote.getName().equals(VoteDatabase.getVoteEmoji(messageId, user.getIdLong())))
+                        unsetVote(messageId, user);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
         });
+    }
+
+    private void unsetVote(long messageId, User user) {
+        try {
+            VoteDatabase.unsetUserVote(messageId, user.getIdLong());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

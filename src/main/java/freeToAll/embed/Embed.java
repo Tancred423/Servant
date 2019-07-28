@@ -2,7 +2,6 @@ package freeToAll.embed;
 
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.MessageEmbed;
-import net.dv8tion.jda.core.entities.Role;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -22,83 +21,83 @@ public class Embed {
     private OffsetDateTime timestamp;
     private MessageChannel messageChannel;
 
-    public void setAuthorName(String authorName) {
+    void setAuthorName(String authorName) {
         this.authorName = authorName;
     }
-    public void setAuthorUrl(String authorUrl) {
+    void setAuthorUrl(String authorUrl) {
         this.authorUrl = authorUrl;
     }
-    public void setAuthorIconUrl(String authorIconUrl) {
+    void setAuthorIconUrl(String authorIconUrl) {
         this.authorIconUrl = authorIconUrl;
     }
-    public void setThumbnailUrl(String thumbnailUrl) {
+    void setThumbnailUrl(String thumbnailUrl) {
         this.thumbnailUrl = thumbnailUrl;
     }
-    public void setDescription(String description) {
+    void setDescription(String description) {
         this.description = description;
     }
     public void setFields(List<MessageEmbed.Field> fields) {
         this.fields = fields;
     }
-    public void setImageUrl(String imageUrl) {
+    void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
-    public void setFooterText(String footerText) {
+    void setFooterText(String footerText) {
         this.footerText = footerText;
     }
-    public void setFooterIconUrl(String footerIconUrl) {
+    void setFooterIconUrl(String footerIconUrl) {
         this.footerIconUrl = footerIconUrl;
     }
-    public void setMessageChannel(MessageChannel messageChannel) {
+    void setMessageChannel(MessageChannel messageChannel) {
         this.messageChannel = messageChannel;
     }
     public void setTitle(String title) {
         this.title = title;
     }
-    public void setTimestamp(OffsetDateTime timestamp) {
+    void setTimestamp(OffsetDateTime timestamp) {
         this.timestamp = timestamp;
     }
-    public void setTitleUrl(String titleUrl) {
+    void setTitleUrl(String titleUrl) {
         this.titleUrl = titleUrl;
     }
 
-    public String getAuthorName() {
+    String getAuthorName() {
         return authorName;
     }
-    public String getAuthorUrl() {
+    String getAuthorUrl() {
         return authorUrl;
     }
-    public String getAuthorIconUrl() {
+    String getAuthorIconUrl() {
         return authorIconUrl;
     }
-    public String getThumbnailUrl() {
+    String getThumbnailUrl() {
         return thumbnailUrl;
     }
-    public String getDescription() {
+    String getDescription() {
         return description;
     }
     public List<MessageEmbed.Field> getFields() {
         return fields;
     }
-    public String getImageUrl() {
+    String getImageUrl() {
         return imageUrl;
     }
-    public String getFooterText() {
+    String getFooterText() {
         return footerText;
     }
-    public String getFooterIconUrl() {
+    String getFooterIconUrl() {
         return footerIconUrl;
     }
-    public MessageChannel getMessageChannel() {
+    MessageChannel getMessageChannel() {
         return messageChannel;
     }
     public String getTitle() {
         return title;
     }
-    public OffsetDateTime getTimestamp() {
+    OffsetDateTime getTimestamp() {
         return timestamp;
     }
-    public String getTitleUrl() {
+    String getTitleUrl() {
         return titleUrl;
     }
 }

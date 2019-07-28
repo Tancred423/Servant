@@ -20,7 +20,7 @@ public class MessageHandler {
     }
 
     public void sendEmbed(MessageChannel channel, Color color, String authorName, String authorUrl, String authorIconUrl, String title, String thumbUrl, String description, Map<String, Map.Entry<String, Boolean>> fields, String imageUrl, String footerText, String footerIconUrl) {
-        EmbedBuilder eb  = new EmbedBuilder();
+        var eb  = new EmbedBuilder();
         if (color       != null) eb.setColor(color);
         if (authorName  != null) eb.setAuthor(authorName, authorUrl, authorIconUrl);
         if (title       != null) eb.setTitle(title);

@@ -3,7 +3,6 @@ package moderation.joinLeaveNotify;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import servant.Log;
 import servant.Servant;
@@ -15,11 +14,16 @@ public class JoinLeaveNotifyCommand extends Command {
     public JoinLeaveNotifyCommand() {
         this.name = "join";
         this.aliases = new String[]{"leave"};
-        this.help = "set up a channel for join and leave messages | **MANAGE CHANNELS**";
+        this.help = "set up a channel for join and leave messages | Manage Channels";
         this.category = new Category("Moderation");
-        this.arguments = "[set|unset|status] [on set: #channel]";
-        this.userPermissions = new Permission[]{Permission.MANAGE_CHANNEL};
+        this.arguments = "[set|unset|status] <on set: #channel>";
+        this.hidden = false;
         this.guildOnly = true;
+        this.ownerCommand = false;
+        this.cooldown = 5;
+        this.cooldownScope = CooldownScope.USER;
+        this.userPermissions = new Permission[]{Permission.MANAGE_CHANNEL};
+        this.botPermissions = new Permission[0];
     }
 
     @Override
@@ -31,7 +35,7 @@ public class JoinLeaveNotifyCommand extends Command {
             new Log(e, event, name).sendLogSqlCommandEvent(false);
         }
 
-        Guild guild = event.getGuild();
+        var guild = event.getGuild();
         moderation.guild.Guild internalGuild;
         try {
             internalGuild = new moderation.guild.Guild(guild.getIdLong());
@@ -39,11 +43,11 @@ public class JoinLeaveNotifyCommand extends Command {
             new Log(e, event, name).sendLogSqlCommandEvent(true);
             return;
         }
-        String prefix = Servant.config.getDefaultPrefix();
+        var prefix = Servant.config.getDefaultPrefix();
         // Usage
         if (event.getArgs().isEmpty()) {
             try {
-                String usage = "**Setting up a join and leave notification channel**\n" +
+                var usage = "**Setting up a join and leave notification channel**\n" +
                         "Command: `" + prefix + name + " set [#channel]`\n" +
                         "Example: `" + prefix + name + " set #welcome`\n" +
                         "\n" +
@@ -53,7 +57,7 @@ public class JoinLeaveNotifyCommand extends Command {
                         "**Showing current notification channel**\n" +
                         "Command: `" + prefix + name + " show`";
 
-                String hint = "Shows a message like \"Name#1234 just joined GuildName!\"\n" +
+                var hint = "Shows a message like \"Name#1234 just joined GuildName!\"\n" +
                         "or \"Name#1234 just left GuildName!\"";
 
                 event.reply(new UsageEmbed(name, event.getAuthor(), ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
@@ -63,7 +67,7 @@ public class JoinLeaveNotifyCommand extends Command {
             return;
         }
 
-        String[] args = event.getArgs().split(" ");
+        var args = event.getArgs().split(" ");
         MessageChannel channel;
 
         switch (args[0].toLowerCase()) {

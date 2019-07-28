@@ -5,7 +5,6 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import moderation.guild.Guild;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Emote;
-import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.MessageReaction;
 import servant.Log;
@@ -19,11 +18,16 @@ public class ReactionRoleCommand extends Command {
     public ReactionRoleCommand() {
         this.name = "reactionrole";
         this.aliases = new String[]{"reactrole", "rr"};
-        this.help = "set up automatic role management via reactions | **MANAGE ROLES**";
+        this.help = "set up automatic role management via reactions | Manage Roles";
         this.category = new Category("Moderation");
-        this.arguments = "[message ID] [emoji/emote] [@role | role ID]";
-        this.userPermissions = new Permission[]{Permission.MANAGE_ROLES};
+        this.arguments = "<message ID> <emoji/emote> [@role|role ID]";
+        this.hidden = false;
         this.guildOnly = true;
+        this.ownerCommand = false;
+        this.cooldown = 5;
+        this.cooldownScope = CooldownScope.USER;
+        this.userPermissions = new Permission[]{Permission.MANAGE_ROLES};
+        this.botPermissions = new Permission[0];
     }
     @Override
     protected void execute(CommandEvent event) {
@@ -34,12 +38,12 @@ public class ReactionRoleCommand extends Command {
             new Log(e, event, name).sendLogSqlCommandEvent(false);
         }
 
-        String prefix = Servant.config.getDefaultPrefix();
-        Emote tancWave = event.getJDA().getGuildById(436925371577925642L).getEmoteById(582852645765775360L);
+        var prefix = Servant.config.getDefaultPrefix();
+        var tancWave = event.getJDA().getGuildById(436925371577925642L).getEmoteById(582852645765775360L);
         if (event.getArgs().isEmpty()) {
             // Usage
             try {
-                String usage = "**Set up a reaction to manage user roles**\n" +
+                var usage = "**Set up a reaction to manage user roles**\n" +
                         "Command: `" + prefix + name + " set [#channel | channel ID] [message ID] [emoji/emote] [@role | role ID]`\n" +
                         "Example: " + prefix + name + " set #test-channel 999999999999999999 " + tancWave.getAsMention() + " @role\n" +
                         "\n" +
@@ -47,7 +51,7 @@ public class ReactionRoleCommand extends Command {
                         "Command: `" + prefix + name + " unset [#channel | channel ID] [message Id] [emoji/emote]`\n" +
                         "Example: " + prefix + name + " unset #test-channel 999999999999999999 " + tancWave.getAsMention();
 
-                String hint = "**How to get ID's:**\n" +
+                var hint = "**How to get ID's:**\n" +
                         "Role: `\\@role` - THIS ALSO PINGS. Maybe do this is a non public channel.\n" +
                         "Channels: \n" +
                         "1. Activate Discord Developer Mode: User Settings → Appearance → ADVANCED → Developer Mode\n" +
@@ -60,8 +64,8 @@ public class ReactionRoleCommand extends Command {
             return;
         }
 
-        Message message = event.getMessage();
-        String[] args = event.getArgs().trim().replaceAll(" +", " ").split(" ");
+        var message = event.getMessage();
+        var args = event.getArgs().trim().replaceAll(" +", " ").split(" ");
         long channelId;
         MessageChannel reactionChannel;
         long messageId;
@@ -98,7 +102,7 @@ public class ReactionRoleCommand extends Command {
                     else roleId = message.getMentionedRoles().get(0).getIdLong();
                     event.getGuild().getRoleById(roleId);
 
-                    int success = ReactionRoleDatabase.setReactionRole(event,
+                    var success = ReactionRoleDatabase.setReactionRole(event,
                             event.getGuild().getIdLong(),
                             channelId,
                             messageId,
@@ -109,8 +113,8 @@ public class ReactionRoleCommand extends Command {
 
                     if (success == 0) {
                         event.reactSuccess();
-                        String finalEmoji = emoji;
-                        Emote finalEmote = emote;
+                        var finalEmoji = emoji;
+                        var finalEmote = emote;
                         event.getGuild().getTextChannelById(channelId).getMessageById(messageId).queue(msg -> {
                             if (finalEmoji == null) msg.addReaction(finalEmote).queue();
                             else msg.addReaction(finalEmoji).queue();
@@ -150,7 +154,7 @@ public class ReactionRoleCommand extends Command {
                     if (emoji == null) message.addReaction(emote).queue();
                     else message.addReaction(emoji).queue();
 
-                    int success = ReactionRoleDatabase.unsetReactionRole(event,
+                    var success = ReactionRoleDatabase.unsetReactionRole(event,
                             event.getGuild().getIdLong(),
                             channelId,
                             messageId,
@@ -160,8 +164,8 @@ public class ReactionRoleCommand extends Command {
 
                     if (success == 0) {
                         event.reactSuccess();
-                        String finalEmoji = emoji;
-                        Emote finalEmote = emote;
+                        var finalEmoji = emoji;
+                        var finalEmote = emote;
                         event.getGuild().getTextChannelById(channelId).getMessageById(messageId).queue(msg -> {
                             List<MessageReaction> reactions = msg.getReactions();
                             for (MessageReaction reaction : reactions)

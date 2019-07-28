@@ -2,8 +2,7 @@ package freeToAll.level;
 
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.Permission;
 import moderation.guild.Guild;
 import servant.Log;
 import servant.Servant;
@@ -18,10 +17,16 @@ public class LevelCommand extends Command {
     public LevelCommand() {
         this.name = "level";
         this.aliases = new String[]{"lvl", "experience", "exp"};
-        this.help = "check your level or the current guild's leaderboard";
+        this.help = "check your level or the guild's leaderboard";
         this.category = new Category("Free to all");
-        this.arguments = "[show, @user or \"leaderboard\"]";
+        this.arguments = "[show|@user|leaderboard]";
+        this.hidden = false;
         this.guildOnly = true;
+        this.ownerCommand = false;
+        this.cooldown = 5;
+        this.cooldownScope = CooldownScope.USER;
+        this.userPermissions = new Permission[0];
+        this.botPermissions = new Permission[0];
     }
 
     @Override
@@ -42,11 +47,11 @@ public class LevelCommand extends Command {
             new Log(e, event, name).sendLogSqlCommandEvent(true);
             return;
         }
-        String prefix = Servant.config.getDefaultPrefix();
+        var prefix = Servant.config.getDefaultPrefix();
         // Usage
         if (event.getArgs().isEmpty()) {
             try {
-                String usage = "**Show your own current level**\n" +
+                var usage = "**Show your own current level**\n" +
                         "Command: `" + prefix + name + " show`\n" +
                         "\n" +
                         "**Show someone else's current level**\n" +
@@ -56,7 +61,7 @@ public class LevelCommand extends Command {
                         "**Showing guild's current leaderboard**\n" +
                         "Command: `" + prefix + name + " leaderboard`";
 
-                String hint = "You will get 15 - 25 exp inclusively per message (" + Servant.config.getExpCdMillis() + "ms CD)\n" +
+                var hint = "You will get 15 - 25 exp inclusively per message (" + Servant.config.getExpCdMillis() + "ms CD)\n" +
                         "Aliases for `leaderboard`: `leaderboards`, `lb` and `lbs`.";
 
                 event.reply(new UsageEmbed(name, event.getAuthor(), ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
@@ -66,10 +71,10 @@ public class LevelCommand extends Command {
             return;
         }
 
-        User author = event.getAuthor();
-        servant.User internalAuthor = new servant.User(author.getIdLong());
+        var author = event.getAuthor();
+        var internalAuthor = new servant.User(author.getIdLong());
 
-        String arg = event.getArgs();
+        var arg = event.getArgs();
         int currentExp;
         int currentLevel;
         int neededExp;
@@ -78,7 +83,6 @@ public class LevelCommand extends Command {
         switch (arg.toLowerCase()) {
             case "show":
             case "sh":
-
                 try {
                     currentExp = internalAuthor.getExp(event.getGuild().getIdLong());
                 } catch (SQLException e) {
@@ -108,7 +112,7 @@ public class LevelCommand extends Command {
                     return;
                 }
 
-                StringBuilder leaderboard = new StringBuilder();
+                var leaderboard = new StringBuilder();
                 leaderboard
                         .append("```c\n")
                         .append("Name                             Level     EXP\n")
@@ -131,15 +135,15 @@ public class LevelCommand extends Command {
             default:
                 if (Parser.hasMentionedUser(event.getMessage())) {
                     // Show mentioned user's level.
-                    Message message = event.getMessage();
-                    User mentioned = message.getMentionedMembers().get(0).getUser();
+                    var message = event.getMessage();
+                    var mentioned = message.getMentionedMembers().get(0).getUser();
 
                     if (mentioned.isBot()) {
                         event.reply("Bots cannot collect experience.");
                         return;
                     }
 
-                    servant.User internalMentioned = new servant.User(mentioned.getIdLong());
+                    var internalMentioned = new servant.User(mentioned.getIdLong());
                     try {
                         currentExp = internalMentioned.getExp(event.getGuild().getIdLong());
                     } catch (SQLException e) {

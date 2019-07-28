@@ -9,8 +9,14 @@ public class SlapCommand extends InteractionCommand {
         this.help = "mentions someone for a slap";
         this.category = new Category("Interaction");
         this.arguments = "@user";
-        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.hidden = false;
         this.guildOnly = true;
+        this.ownerCommand = false;
+        this.cooldown = 5;
+        this.cooldownScope = CooldownScope.USER;
+        this.userPermissions = new Permission[0];
+        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+
         this.emoji = "✋"; // ✋.
     }
 }

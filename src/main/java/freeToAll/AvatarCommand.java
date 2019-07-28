@@ -3,9 +3,6 @@ package freeToAll;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.MessageChannel;
-import net.dv8tion.jda.core.entities.User;
 import moderation.guild.Guild;
 import servant.Log;
 import servant.Servant;
@@ -20,11 +17,16 @@ public class AvatarCommand extends Command {
     public AvatarCommand() {
         this.name = "avatar";
         this.aliases = new String[]{"ava", "stealavatar", "stealava"};
-        this.help = "returns mentioned user's avatar.";
+        this.help = "returns mentioned user's avatar";
         this.category = new Category("Free to all");
         this.arguments = "@user";
-        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.hidden = false;
         this.guildOnly = false;
+        this.ownerCommand = false;
+        this.cooldown = 5;
+        this.cooldownScope = CooldownScope.USER;
+        this.userPermissions = new Permission[0];
+        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
     }
 
     @Override
@@ -36,11 +38,11 @@ public class AvatarCommand extends Command {
             new Log(e, event, name).sendLogSqlCommandEvent(false);
         }
 
-        String prefix = Servant.config.getDefaultPrefix();
+        var prefix = Servant.config.getDefaultPrefix();
         // Usage
         if (event.getArgs().isEmpty()) {
             try {
-                String usage = "**Stealing someones avatar**\n" +
+                var usage = "**Stealing someones avatar**\n" +
                         "Command: `" + prefix + name + " [@user]`\n" +
                         "Example: `" + prefix + name + " @Servant`\n";
 
@@ -57,16 +59,17 @@ public class AvatarCommand extends Command {
             return;
         }
 
-        Message message = event.getMessage();
-        MessageChannel channel = message.getChannel();
-        User author = message.getAuthor();
-        User mentioned = message.getMentionedMembers().get(0).getUser();
-        String avatarUrl = mentioned.getAvatarUrl();
-        Color color = null;
+        var message = event.getMessage();
+        var channel = message.getChannel();
+        var author = message.getAuthor();
+        var mentioned = message.getMentionedMembers().get(0).getUser();
+        var avatarUrl = mentioned.getAvatarUrl();
+        Color color;
         try {
             color = new servant.User(author.getIdLong()).getColor();
         } catch (SQLException e) {
             new Log(e, event, name).sendLogSqlCommandEvent(true);
+            return;
         }
 
         new MessageHandler().sendEmbed(

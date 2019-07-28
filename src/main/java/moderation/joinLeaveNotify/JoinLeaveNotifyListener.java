@@ -1,8 +1,6 @@
 package moderation.joinLeaveNotify;
 
-import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.MessageChannel;
-import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberLeaveEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
@@ -19,8 +17,8 @@ public class JoinLeaveNotifyListener extends ListenerAdapter {
             new Log(e, event, "join").sendLogSqlGuildMemberJoinEvent();
         }
 
-        User joinedUser = event.getUser();
-        Guild guild = event.getGuild();
+        var joinedUser = event.getUser();
+        var guild = event.getGuild();
         moderation.guild.Guild internalGuild;
         try {
             internalGuild = new moderation.guild.Guild(guild.getIdLong());
@@ -50,8 +48,8 @@ public class JoinLeaveNotifyListener extends ListenerAdapter {
             new Log(e, event, "join").sendLogSqlGuildMemberJoinEvent();
         }
 
-        User leftUser = event.getUser();
-        Guild guild = event.getGuild();
+        var leftUser = event.getUser();
+        var guild = event.getGuild();
         moderation.guild.Guild internalGuild;
         try {
             internalGuild = new moderation.guild.Guild(guild.getIdLong());

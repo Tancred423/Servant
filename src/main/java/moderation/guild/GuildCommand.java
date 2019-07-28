@@ -19,12 +19,16 @@ public class GuildCommand extends Command {
     public GuildCommand() {
         this.name = "guild";
         this.aliases = new String[]{"server"};
-        this.help = "personalize the bot to your desire (guild) | **ADMINISTRATOR**";
+        this.help = "personalize the bot to your desire (guild specific) | Administrator";
         this.category = new Category("Moderation");
-        this.arguments = "[set|unset] [setting] [value]";
-        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.arguments = "[set|unset] <setting> <value>";
+        this.hidden = false;
+        this.guildOnly = true;
+        this.ownerCommand = false;
+        this.cooldown = 5;
+        this.cooldownScope = CooldownScope.USER;
         this.userPermissions = new Permission[]{Permission.ADMINISTRATOR};
-        this.guildOnly = false;
+        this.botPermissions = new Permission[0];
     }
 
     @Override
@@ -36,7 +40,7 @@ public class GuildCommand extends Command {
             new Log(e, event, name).sendLogSqlCommandEvent(false);
         }
 
-        net.dv8tion.jda.core.entities.Guild guild = event.getGuild();
+        var guild = event.getGuild();
         Guild internalGuild;
         try {
             internalGuild = new Guild(guild.getIdLong());
@@ -45,11 +49,11 @@ public class GuildCommand extends Command {
             return;
         }
 
-        String prefix = Servant.config.getDefaultPrefix();
+        var prefix = Servant.config.getDefaultPrefix();
         // Usage
         if (event.getArgs().isEmpty()) {
             try {
-                String usage = "**Setting an offset**\n" +
+                var usage = "**Setting an offset**\n" +
                         "Command: `" + prefix + name + " set offset [offset]`\n" +
                         "Example: `" + prefix + name + " set offset +01:00`\n" +
                         "\n" +
@@ -66,7 +70,7 @@ public class GuildCommand extends Command {
                         "**Show your current settings**\n" +
                         "Command: `" + prefix + name + " show`";
 
-                String hint = "Unsetting an offset will just remove your custom offset and you will use the default offset (" + Servant.config.getDefaultOffset() + ") again.\n" +
+                var hint = "Unsetting an offset will just remove your custom offset and you will use the default offset (" + Servant.config.getDefaultOffset() + ") again.\n" +
                         "Offset always adds on UTC.\n" +
                         "More settings will be added in future updates.";
 
@@ -77,8 +81,8 @@ public class GuildCommand extends Command {
             return;
         }
 
-        String[] args = event.getArgs().split(" ");
-        String type = args[0].toLowerCase();
+        var args = event.getArgs().split(" ");
+        var type = args[0].toLowerCase();
         String setting;
         User internalUser;
 
@@ -92,7 +96,7 @@ public class GuildCommand extends Command {
                 }
 
                 setting = args[1].toLowerCase();
-                String value = args[2];
+                var value = args[2];
 
                 switch (setting) {
                     case "offset":
@@ -182,11 +186,11 @@ public class GuildCommand extends Command {
 
             case "show":
             case "sh":
-                net.dv8tion.jda.core.entities.User author = event.getAuthor();
+                var author = event.getAuthor();
                 internalUser = new User(author.getIdLong());
 
-                String showOffset = internalGuild.getOffset();
-                String showPrefix = internalGuild.getPrefix();
+                var showOffset = internalGuild.getOffset();
+                var showPrefix = internalGuild.getPrefix();
 
                 Map<String, Map.Entry<String, Boolean>> fields = new HashMap<>();
                 fields.put("Offset", new MyEntry<>(showOffset, true));

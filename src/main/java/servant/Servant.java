@@ -2,9 +2,9 @@ package servant;
 
 import freeToAll.*;
 import freeToAll.profile.ProfileCommand;
-import freeToAll.vote.QuickvoteCommand;
-import freeToAll.vote.QuickvoteEndListener;
-import freeToAll.vote.QuickvoteMultipleVoteListener;
+import vote.QuickvoteCommand;
+import vote.QuickvoteEndListener;
+import vote.QuickvoteMultipleVoteListener;
 import moderation.*;
 import moderation.autorole.AutoroleCommand;
 import moderation.autorole.AutoroleListener;
@@ -55,8 +55,8 @@ public class Servant {
 
         toggle = new ToggleFile();
 
-        EventWaiter waiter = new EventWaiter(); // Has to be added to JDABuilder.
-        CommandClientBuilder client = new CommandClientBuilder(); // Command management by JDA utilities.
+        var waiter = new EventWaiter(); // Has to be added to JDABuilder.
+        var client = new CommandClientBuilder(); // Command management by JDA utilities.
 
         client.setOwnerId(config.getBotOwnerId());
         client.setEmojis("✅", "⚠", "❌"); // ✅, ⚠, ❌.

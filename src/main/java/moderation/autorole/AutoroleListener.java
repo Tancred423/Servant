@@ -1,6 +1,5 @@
 package moderation.autorole;
 
-import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import moderation.guild.Guild;
@@ -10,8 +9,8 @@ import java.sql.SQLException;
 
 public class AutoroleListener extends ListenerAdapter {
     public void onGuildMemberJoin(GuildMemberJoinEvent event) {
-        String name = "autorole";
-        User eventUser = event.getUser();
+        var name = "autorole";
+        var eventUser = event.getUser();
         if (eventUser.isBot()) return;
 
         // Enabled?

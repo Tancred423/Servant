@@ -23,9 +23,9 @@ public class LevelListener extends ListenerAdapter {
     }
 
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
-        String name = "level listener";
-        User author = event.getAuthor();
-        Guild guild = event.getGuild();
+        var name = "level listener";
+        var author = event.getAuthor();
+        var guild = event.getGuild();
 
         if (author.isBot()) return;
 
@@ -40,7 +40,7 @@ public class LevelListener extends ListenerAdapter {
         Map<User, ZonedDateTime> userCd = guildCds.get(guild);
 
         if (userCd != null) {
-            ZonedDateTime lastMessage = userCd.get(author);
+            var lastMessage = userCd.get(author);
             if (lastMessage != null) {
                 // Check if last message is older than the exp cooldown.
                 long difference = Parser.getTimeDifferenceInMillis(lastMessage, ZonedDateTime.now(ZoneOffset.UTC));
@@ -54,8 +54,8 @@ public class LevelListener extends ListenerAdapter {
         userCd.put(author, ZonedDateTime.now(ZoneOffset.UTC));
         guildCds.put(guild, userCd);
 
-        long authorId = author.getIdLong();
-        long guildId = guild.getIdLong();
+        var authorId = author.getIdLong();
+        var guildId = guild.getIdLong();
 
         int currentLevel;
         try {
@@ -64,7 +64,7 @@ public class LevelListener extends ListenerAdapter {
             new Log(e, event, name).sendLogSqlGuildMessageReceivedEvent(true);
             return;
         }
-        int randomExp = ThreadLocalRandom.current().nextInt(15, 26); // Between 15 and 25 inclusively.
+        var randomExp = ThreadLocalRandom.current().nextInt(15, 26); // Between 15 and 25 inclusively.
         try {
             new servant.User(authorId).addExp(guildId, randomExp);
         } catch (SQLException e) {

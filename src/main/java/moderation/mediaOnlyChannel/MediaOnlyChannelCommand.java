@@ -15,12 +15,16 @@ public class MediaOnlyChannelCommand extends Command {
     public MediaOnlyChannelCommand() {
         this.name = "mediaonlychannel";
         this.aliases = new String[]{"mediaonly", "moc", "mo"};
-        this.help = "set up channels where only images, videos and links to images or videos can be posted | **MANAGE CHANNELS**";
+        this.help = "set up channels where only files and links can be posted | Manage Channels";
         this.category = new Category("Moderation");
-        this.arguments = "[set|unset|show] [on (un)set: #channel]";
-        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_MANAGE};
-        this.userPermissions = new Permission[]{Permission.MANAGE_CHANNEL};
+        this.arguments = "[set|unset|show] <on (un)set: #channel>";
+        this.hidden = false;
         this.guildOnly = true;
+        this.ownerCommand = false;
+        this.cooldown = 5;
+        this.cooldownScope = CooldownScope.USER;
+        this.userPermissions = new Permission[]{Permission.MANAGE_CHANNEL};
+        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_MANAGE};
     }
 
     @Override
@@ -32,7 +36,7 @@ public class MediaOnlyChannelCommand extends Command {
             new Log(e, event, name).sendLogSqlCommandEvent(false);
         }
 
-        Guild guild = event.getGuild();
+        var guild = event.getGuild();
         moderation.guild.Guild internalGuild;
         try {
             internalGuild = new moderation.guild.Guild(guild.getIdLong());
@@ -40,11 +44,11 @@ public class MediaOnlyChannelCommand extends Command {
             new Log(e, event, name).sendLogSqlCommandEvent(true);
             return;
         }
-        String prefix = Servant.config.getDefaultPrefix();
+        var prefix = Servant.config.getDefaultPrefix();
         // Usage
         if (event.getArgs().isEmpty()) {
             try {
-                String usage = "**Setting up an media only channel**\n" +
+                var usage = "**Setting up an media only channel**\n" +
                         "Command: `" + prefix + name + " set [#channel]`\n" +
                         "Example: `" + prefix + name + " set #images`\n" +
                         "\n" +
@@ -55,7 +59,7 @@ public class MediaOnlyChannelCommand extends Command {
                         "**Showing current media only channels**\n" +
                         "Command: `" + prefix + name + " show`";
 
-                String hint = "You can have multiple media only channels.";
+                var hint = "You can have multiple media only channels.";
 
                 event.reply(new UsageEmbed(name, event.getAuthor(), ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
             } catch (SQLException e) {
@@ -64,7 +68,7 @@ public class MediaOnlyChannelCommand extends Command {
             return;
         }
 
-        String[] args = event.getArgs().split(" ");
+        var args = event.getArgs().split(" ");
         MessageChannel channel;
 
         switch (args[0].toLowerCase()) {
@@ -129,7 +133,7 @@ public class MediaOnlyChannelCommand extends Command {
                 }
                 if (channels == null) event.reply("There are no media only channels.");
                 else {
-                    StringBuilder sb = new StringBuilder();
+                    var sb = new StringBuilder();
                     for (MessageChannel chan : channels)
                         sb.append(chan.getName()).append(" (").append(chan.getIdLong()).append(")\n");
                     event.reply(sb.toString());

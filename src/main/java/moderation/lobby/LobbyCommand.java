@@ -3,8 +3,6 @@ package moderation.lobby;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.User;
 import servant.Log;
 import utilities.MessageHandler;
 import utilities.MyEntry;
@@ -20,10 +18,16 @@ public class LobbyCommand extends Command {
     public LobbyCommand() {
         this.name = "lobby";
         this.aliases = new String[]{"autochannel", "ac"};
-        this.help = "set up lobbies for automated voice channels.";
-        this.category = new Command.Category("Moderation");
-        this.userPermissions = new Permission[]{Permission.MANAGE_CHANNEL};
+        this.help = "set up lobbies for automated voice channels | Manage Channels";
+        this.category = new Category("Moderation");
+        this.arguments = "[set|unset|show] <on (un)set: #channel>";
+        this.hidden = false;
         this.guildOnly = true;
+        this.ownerCommand = false;
+        this.cooldown = 5;
+        this.cooldownScope = CooldownScope.USER;
+        this.userPermissions = new Permission[]{Permission.MANAGE_CHANNEL};
+        this.botPermissions = new Permission[]{Permission.MANAGE_CHANNEL};
     }
 
     @Override
@@ -35,9 +39,8 @@ public class LobbyCommand extends Command {
             new Log(e, event, name).sendLogSqlCommandEvent(false);
         }
 
-        Guild guild = event.getGuild();
+        var guild = event.getGuild();
         moderation.guild.Guild internalGuild;
-
         try {
             internalGuild = new moderation.guild.Guild(guild.getIdLong());
         } catch (SQLException e) {
@@ -45,12 +48,12 @@ public class LobbyCommand extends Command {
             return;
         }
 
-        String[] args = event.getArgs().split(" ");
+        var args = event.getArgs().split(" ");
         if (args.length < 1) {
-            String prefix = internalGuild.getPrefix();
+            var prefix = internalGuild.getPrefix();
             // Usage
             try {
-                String usage = "**Set a voice channel lobby**\n" +
+                var usage = "**Set a voice channel lobby**\n" +
                         "Command: `" + prefix + name + " set <Voice Channel ID>`\n" +
                         "Example: `" + prefix + name + " set 999999999999999999`\n" +
                         "\n" +
@@ -71,8 +74,8 @@ public class LobbyCommand extends Command {
             return;
         }
 
-        User author = event.getAuthor();
-        servant.User internalAuthor = new servant.User(author.getIdLong());
+        var author = event.getAuthor();
+        var internalAuthor = new servant.User(author.getIdLong());
 
         switch (args[0].toLowerCase()) {
             case "set":
@@ -144,7 +147,7 @@ public class LobbyCommand extends Command {
                     return;
                 }
 
-                StringBuilder builder = new StringBuilder();
+                var builder = new StringBuilder();
                 builder.append("```c\n");
                 for (long lobby : lobbies)
                     builder.append(guild.getVoiceChannelById(lobby).getName()).append(" (").append(lobby).append(")\n");
@@ -181,7 +184,7 @@ public class LobbyCommand extends Command {
             case "toggletext":
             case "tt":
                 try {
-                    boolean wasEnabled = internalGuild.toggleVoiceText();
+                    var wasEnabled = internalGuild.toggleVoiceText();
                     event.reactSuccess();
                     if (wasEnabled) event.reply("Voice text enabled.");
                     else event.reply("Voice text disabled.");

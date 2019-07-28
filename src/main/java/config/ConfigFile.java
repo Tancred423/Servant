@@ -25,16 +25,16 @@ public class ConfigFile {
     // Constructor.
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public ConfigFile() throws IOException {
-        String currentDir   = System.getProperty("user.dir");
-        String resourcesDir = currentDir   + "/resources" ;
-        String configDir    = resourcesDir + "/config.ini";
+        var currentDir   = System.getProperty("user.dir");
+        var resourcesDir = currentDir   + "/resources" ;
+        var configDir    = resourcesDir + "/config.ini";
 
         // Create ./resources if it does not exist already.
-        File resources = new File(resourcesDir);
+        var resources = new File(resourcesDir);
         if (!resources.exists()) resources.mkdir();
 
         // Create ./resources/config.ini if it does not exist already.
-        File config = new File(configDir);
+        var config = new File(configDir);
         if (!config.exists()) createDefault(resourcesDir);
 
         readConfig(configDir);
@@ -42,8 +42,8 @@ public class ConfigFile {
 
     // Write default config file.
     private void createDefault(String resourcesDir) throws IOException {
-        OrderedProperties config = new OrderedProperties();
-        OutputStream os = new FileOutputStream(resourcesDir + "/config.ini");
+        var config = new OrderedProperties();
+        var os = new FileOutputStream(resourcesDir + "/config.ini");
 
         config.setProperty("botToken"        , ""        );
         config.setProperty("defaultLanguage" , "en"      ); // English.
@@ -56,7 +56,7 @@ public class ConfigFile {
         config.setProperty("databaseUsername", "root"    );
         config.setProperty("databasePassword", ""        );
         config.setProperty("supportGuildInv" , ""        );
-        config.setProperty("botVersion"      , "4.13.0"  );
+        config.setProperty("botVersion"      , "4.13.2"  );
 
         config.store(os,
                 "Project: Servant\n" +
@@ -67,8 +67,8 @@ public class ConfigFile {
 
     // Read config file.
     private void readConfig(String configDir) throws IOException {
-        OrderedProperties config = new OrderedProperties();
-        InputStream is = new FileInputStream(configDir);
+        var config = new OrderedProperties();
+        var is = new FileInputStream(configDir);
         config.load(is);
 
         this.botToken         = config.getProperty("botToken"        );
@@ -115,12 +115,12 @@ public class ConfigFile {
 
     // Checks.
     public boolean isMissing() {
-        boolean corrupted = false;
-        boolean missing = false;
-        boolean shutdown = false;
+        var corrupted = false;
+        var missing = false;
+        var shutdown = false;
 
-        String errorMessage = "Please add a %s to the ./resources/config.ini file.";
-        String corruptedMessage = "The config file is corrupted.\n" +
+        var errorMessage = "Please add a %s to the ./resources/config.ini file.";
+        var corruptedMessage = "The config file is corrupted.\n" +
                 "1. Backup your values.\n" +
                 "2. Delete the ./resources/config.ini file.\n" +
                 "3. Start the bot to generate a new config.ini file.\n" +

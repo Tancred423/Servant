@@ -5,7 +5,7 @@ import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import moderation.guild.Guild;
 import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import servant.Log;
 import servant.Servant;
@@ -23,10 +23,18 @@ public class EmbedCommand extends Command {
 
     public EmbedCommand(EventWaiter waiter) {
         this.name = "embed";
-        this.help = "creates embed message";
+        this.aliases = new String[0];
+        this.help = "creates customized embed message | Embed Links";
         this.category = new Category("Free to all");
-        this.arguments = "";
+        this.arguments = null;
+        this.hidden = false;
         this.guildOnly = true;
+        this.ownerCommand = false;
+        this.cooldown = 5;
+        this.cooldownScope = CooldownScope.USER;
+        this.userPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+
         this.waiter = waiter;
     }
 
@@ -40,8 +48,8 @@ public class EmbedCommand extends Command {
         }
 
         List<Long> wizardMessageIds = new ArrayList<>();
-        MessageChannel channel = event.getChannel();
-        Embed embed = new Embed();
+        var channel = event.getChannel();
+        var embed = new Embed();
 
         channel.sendMessage("Embed to the embed message configuration wizard. In the following I will ask you to enter stuff. On every question you have 1 hour to answer, otherwise the configuration will be stopped and you will loose all the progress.\n" +
                 "To do this, you should know a bit about embeds. If you don't have any experience with embeds, I recommend you to type \"yes\" on the following question.\n" +
@@ -56,9 +64,9 @@ public class EmbedCommand extends Command {
         waiter.waitForEvent(GuildMessageReceivedEvent.class,
                 helpEvent -> helpEvent.getAuthor().equals(event.getAuthor()) && helpEvent.getChannel().equals(event.getChannel()),
                 helpEvent -> {
-                    Message helpMessage = helpEvent.getMessage();
+                    var helpMessage = helpEvent.getMessage();
                     wizardMessageIds.add(helpMessage.getIdLong());
-                    String answer = helpMessage.getContentDisplay();
+                    var answer = helpMessage.getContentDisplay();
 
                     if (answer.toLowerCase().equals("yes") || answer.toLowerCase().equals("y")) {
                         event.reply("**Author Name:** The title of the embed.\n" +
@@ -100,9 +108,9 @@ public class EmbedCommand extends Command {
                         waiter.waitForEvent(GuildMessageReceivedEvent.class,
                                 authorNameEvent -> authorNameEvent.getAuthor().equals(event.getAuthor()) && authorNameEvent.getChannel().equals(event.getChannel()),
                                 authorNameEvent -> {
-                                    Message authorNameMessage = authorNameEvent.getMessage();
+                                    var authorNameMessage = authorNameEvent.getMessage();
                                     wizardMessageIds.add(authorNameMessage.getIdLong());
-                                    String authorName = authorNameMessage.getContentDisplay();
+                                    var authorName = authorNameMessage.getContentDisplay();
 
                                     if (authorName.length() <= 256) {
                                         if (authorName.toLowerCase().equals("none")) embed.setAuthorName(null);
@@ -115,9 +123,9 @@ public class EmbedCommand extends Command {
                                         waiter.waitForEvent(GuildMessageReceivedEvent.class,
                                                 authorUrlEvent -> authorUrlEvent.getAuthor().equals(event.getAuthor()) && authorUrlEvent.getChannel().equals(event.getChannel()),
                                                 authorUrlEvent -> {
-                                                    Message authorUrlMessage = authorUrlEvent.getMessage();
+                                                    var authorUrlMessage = authorUrlEvent.getMessage();
                                                     wizardMessageIds.add(authorUrlMessage.getIdLong());
-                                                    String authorUrl = authorUrlMessage.getContentDisplay();
+                                                    var authorUrl = authorUrlMessage.getContentDisplay();
 
                                                     if (Parser.isValidUrl(authorUrl) || authorUrl.toLowerCase().equals("none")) {
                                                         if (authorUrl.toLowerCase().equals("none"))
@@ -133,9 +141,9 @@ public class EmbedCommand extends Command {
                                                         waiter.waitForEvent(GuildMessageReceivedEvent.class,
                                                                 authorIconUrlEvent -> authorIconUrlEvent.getAuthor().equals(event.getAuthor()) && authorIconUrlEvent.getChannel().equals(event.getChannel()),
                                                                 authorIconUrlEvent -> {
-                                                                    Message authorIconUrlMessage = authorIconUrlEvent.getMessage();
+                                                                    var authorIconUrlMessage = authorIconUrlEvent.getMessage();
                                                                     wizardMessageIds.add(authorIconUrlMessage.getIdLong());
-                                                                    String authorIconUrl = authorIconUrlMessage.getContentDisplay();
+                                                                    var authorIconUrl = authorIconUrlMessage.getContentDisplay();
 
                                                                     if (Parser.isValidDirectUrl(authorIconUrl) || authorIconUrl.toLowerCase().equals("none")) {
                                                                         if (authorIconUrl.toLowerCase().equals("none"))
@@ -151,9 +159,9 @@ public class EmbedCommand extends Command {
                                                                         waiter.waitForEvent(GuildMessageReceivedEvent.class,
                                                                                 thumbnailUrlEvent -> thumbnailUrlEvent.getAuthor().equals(event.getAuthor()) && thumbnailUrlEvent.getChannel().equals(event.getChannel()),
                                                                                 thumbnailUrlEvent -> {
-                                                                                    Message thumnailUrlMessage = thumbnailUrlEvent.getMessage();
+                                                                                    var thumnailUrlMessage = thumbnailUrlEvent.getMessage();
                                                                                     wizardMessageIds.add(thumnailUrlMessage.getIdLong());
-                                                                                    String thumbnailUrl = thumnailUrlMessage.getContentDisplay();
+                                                                                    var thumbnailUrl = thumnailUrlMessage.getContentDisplay();
 
                                                                                     if (Parser.isValidDirectUrl(thumbnailUrl) || thumbnailUrl.toLowerCase().equals("none")) {
                                                                                         if (thumbnailUrl.toLowerCase().equals("none"))
@@ -168,9 +176,9 @@ public class EmbedCommand extends Command {
                                                                                         waiter.waitForEvent(GuildMessageReceivedEvent.class,
                                                                                                 titleEvent -> titleEvent.getAuthor().equals(event.getAuthor()) && titleEvent.getChannel().equals(event.getChannel()),
                                                                                                 titleEvent -> {
-                                                                                                    Message titleMessage = titleEvent.getMessage();
+                                                                                                    var titleMessage = titleEvent.getMessage();
                                                                                                     wizardMessageIds.add(titleMessage.getIdLong());
-                                                                                                    String title = titleMessage.getContentDisplay();
+                                                                                                    var title = titleMessage.getContentDisplay();
 
                                                                                                     if (title.length() <= 256) {
                                                                                                         if (title.toLowerCase().equals("none"))
@@ -185,9 +193,9 @@ public class EmbedCommand extends Command {
                                                                                                         waiter.waitForEvent(GuildMessageReceivedEvent.class,
                                                                                                                 titleUrlEvent -> titleUrlEvent.getAuthor().equals(event.getAuthor()) && titleUrlEvent.getChannel().equals(event.getChannel()),
                                                                                                                 titleUrlEvent -> {
-                                                                                                                    Message titleUrlMessage = titleUrlEvent.getMessage();
+                                                                                                                    var titleUrlMessage = titleUrlEvent.getMessage();
                                                                                                                     wizardMessageIds.add(titleUrlMessage.getIdLong());
-                                                                                                                    String titleUrl = titleUrlMessage.getContentDisplay();
+                                                                                                                    var titleUrl = titleUrlMessage.getContentDisplay();
 
                                                                                                                     if (Parser.isValidUrl(titleUrl) || titleUrl.toLowerCase().equals("none")) {
                                                                                                                         if (titleUrl.toLowerCase().equals("none"))
@@ -204,9 +212,9 @@ public class EmbedCommand extends Command {
                                                                                                                         waiter.waitForEvent(GuildMessageReceivedEvent.class,
                                                                                                                                 descriptionEvent -> descriptionEvent.getAuthor().equals(event.getAuthor()) && descriptionEvent.getChannel().equals(event.getChannel()),
                                                                                                                                 descriptionEvent -> {
-                                                                                                                                    Message descriptionMessage = descriptionEvent.getMessage();
+                                                                                                                                    var descriptionMessage = descriptionEvent.getMessage();
                                                                                                                                     wizardMessageIds.add(descriptionMessage.getIdLong());
-                                                                                                                                    String description = descriptionMessage.getContentDisplay();
+                                                                                                                                    var description = descriptionMessage.getContentDisplay();
 
                                                                                                                                     if (description.length() <= 2048) {
                                                                                                                                         if (description.toLowerCase().equals("none"))
@@ -223,9 +231,9 @@ public class EmbedCommand extends Command {
                                                                                                                                         waiter.waitForEvent(GuildMessageReceivedEvent.class,
                                                                                                                                                 imageUrlEvent -> imageUrlEvent.getAuthor().equals(event.getAuthor()) && imageUrlEvent.getChannel().equals(event.getChannel()),
                                                                                                                                                 imageUrlEvent -> {
-                                                                                                                                                    Message imageUrlMessage = imageUrlEvent.getMessage();
+                                                                                                                                                    var imageUrlMessage = imageUrlEvent.getMessage();
                                                                                                                                                     wizardMessageIds.add(imageUrlMessage.getIdLong());
-                                                                                                                                                    String imageUrl = imageUrlMessage.getContentDisplay();
+                                                                                                                                                    var imageUrl = imageUrlMessage.getContentDisplay();
                                                                                                                                                     if (Parser.isValidDirectUrl(imageUrl) || imageUrl.toLowerCase().equals("none")) {
                                                                                                                                                         if (imageUrl.toLowerCase().equals("none"))
                                                                                                                                                             embed.setImageUrl(null);
@@ -239,9 +247,9 @@ public class EmbedCommand extends Command {
                                                                                                                                                         waiter.waitForEvent(GuildMessageReceivedEvent.class,
                                                                                                                                                                 footerTextEvent -> footerTextEvent.getAuthor().equals(event.getAuthor()) && footerTextEvent.getChannel().equals(event.getChannel()),
                                                                                                                                                                 footerTextEvent -> {
-                                                                                                                                                                    Message footerTextMessage = footerTextEvent.getMessage();
+                                                                                                                                                                    var footerTextMessage = footerTextEvent.getMessage();
                                                                                                                                                                     wizardMessageIds.add(footerTextMessage.getIdLong());
-                                                                                                                                                                    String footerText = footerTextMessage.getContentDisplay();
+                                                                                                                                                                    var footerText = footerTextMessage.getContentDisplay();
 
                                                                                                                                                                     if (footerText.length() <= 2048) {
                                                                                                                                                                         if (footerText.toLowerCase().equals("none"))
@@ -256,9 +264,9 @@ public class EmbedCommand extends Command {
                                                                                                                                                                         waiter.waitForEvent(GuildMessageReceivedEvent.class,
                                                                                                                                                                                 footerIconUrlEvent -> footerIconUrlEvent.getAuthor().equals(event.getAuthor()) && footerIconUrlEvent.getChannel().equals(event.getChannel()),
                                                                                                                                                                                 footerIconUrlEvent -> {
-                                                                                                                                                                                    Message footerIconUrlMessage = footerIconUrlEvent.getMessage();
+                                                                                                                                                                                    var footerIconUrlMessage = footerIconUrlEvent.getMessage();
                                                                                                                                                                                     wizardMessageIds.add(footerIconUrlMessage.getIdLong());
-                                                                                                                                                                                    String footerIconUrl = footerIconUrlMessage.getContentDisplay();
+                                                                                                                                                                                    var footerIconUrl = footerIconUrlMessage.getContentDisplay();
                                                                                                                                                                                     if (Parser.isValidDirectUrl(footerIconUrl) || footerIconUrl.toLowerCase().equals("none")) {
                                                                                                                                                                                         if (footerIconUrl.equals("none"))
                                                                                                                                                                                             embed.setFooterIconUrl(null);
@@ -274,10 +282,10 @@ public class EmbedCommand extends Command {
                                                                                                                                                                                         waiter.waitForEvent(GuildMessageReceivedEvent.class,
                                                                                                                                                                                                 timestampEvent -> timestampEvent.getAuthor().equals(event.getAuthor()) && timestampEvent.getChannel().equals(event.getChannel()),
                                                                                                                                                                                                 timestampEvent -> {
-                                                                                                                                                                                                    Message timestampMessage = timestampEvent.getMessage();
+                                                                                                                                                                                                    var timestampMessage = timestampEvent.getMessage();
                                                                                                                                                                                                     wizardMessageIds.add(timestampMessage.getIdLong());
-                                                                                                                                                                                                    boolean hasTimestamp = timestampMessage.getContentDisplay().toLowerCase().equals("yes");
-                                                                                                                                                                                                    ZoneId zoneId = internalGuild.getOffset() == null ? ZoneId.of("UTC") : ZoneId.of(internalGuild.getOffset());
+                                                                                                                                                                                                    var hasTimestamp = timestampMessage.getContentDisplay().toLowerCase().equals("yes");
+                                                                                                                                                                                                    var zoneId = internalGuild.getOffset() == null ? ZoneId.of("UTC") : ZoneId.of(internalGuild.getOffset());
                                                                                                                                                                                                     if (hasTimestamp)
                                                                                                                                                                                                         embed.setTimestamp(OffsetDateTime.now(zoneId));
                                                                                                                                                                                                     else
@@ -289,7 +297,7 @@ public class EmbedCommand extends Command {
                                                                                                                                                                                                     waiter.waitForEvent(GuildMessageReceivedEvent.class,
                                                                                                                                                                                                             channelEvent -> channelEvent.getAuthor().equals(event.getAuthor()) && channelEvent.getChannel().equals(event.getChannel()),
                                                                                                                                                                                                             channelEvent -> {
-                                                                                                                                                                                                                Message channelMessage = channelEvent.getMessage();
+                                                                                                                                                                                                                var channelMessage = channelEvent.getMessage();
                                                                                                                                                                                                                 wizardMessageIds.add(channelMessage.getIdLong());
                                                                                                                                                                                                                 if (!channelMessage.getMentionedChannels().isEmpty()) {
                                                                                                                                                                                                                     embed.setMessageChannel(channelMessage.getMentionedChannels().get(0));

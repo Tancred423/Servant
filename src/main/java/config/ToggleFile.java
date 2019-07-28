@@ -24,22 +24,23 @@ public class ToggleFile {
     private boolean love;
     private boolean mediaonlychannel;
     private boolean profile;
+    private boolean quickvote;
     private boolean reactionrole;
     private boolean user;
 
     // Constructor.
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public ToggleFile() throws IOException {
-        String currentDir   = System.getProperty("user.dir");
-        String resourcesDir = currentDir   + "/resources" ;
-        String toggleDir    = resourcesDir + "/toggle.ini";
+        var currentDir   = System.getProperty("user.dir");
+        var resourcesDir = currentDir   + "/resources" ;
+        var toggleDir    = resourcesDir + "/toggle.ini";
 
         // Create ./resources if it does not exist already.
-        File resources = new File(resourcesDir);
+        var resources = new File(resourcesDir);
         if (!resources.exists()) resources.mkdir();
 
         // Create ./resources/config.ini if it does not exist already.
-        File toggle = new File(toggleDir);
+        var toggle = new File(toggleDir);
         if (!toggle.exists()) createDefault(resourcesDir);
 
         try {
@@ -53,8 +54,8 @@ public class ToggleFile {
 
     // Write default config file.
     private void createDefault(String resourcesDir) throws IOException {
-        OrderedProperties toggle = new OrderedProperties();
-        OutputStream os = new FileOutputStream(resourcesDir + "/toggle.ini");
+        var toggle = new OrderedProperties();
+        var os = new FileOutputStream(resourcesDir + "/toggle.ini");
 
         toggle.setProperty("autorole", "on");
         toggle.setProperty("avatar", "on");
@@ -71,6 +72,7 @@ public class ToggleFile {
         toggle.setProperty("love", "on");
         toggle.setProperty("mediaonlychannel", "on");
         toggle.setProperty("profile", "on");
+        toggle.setProperty("quickvote", "on");
         toggle.setProperty("reactionrole", "on");
         toggle.setProperty("user", "on");
 
@@ -83,8 +85,8 @@ public class ToggleFile {
 
     // Read config file.
     private void readToggle(String configDir) throws IOException, NullPointerException {
-        OrderedProperties toggle = new OrderedProperties();
-        InputStream is = new FileInputStream(configDir);
+        var toggle = new OrderedProperties();
+        var is = new FileInputStream(configDir);
         toggle.load(is);
 
         this.autorole = toggle.getProperty("autorole").equals("on");
@@ -102,6 +104,7 @@ public class ToggleFile {
         this.love = toggle.getProperty("love").equals("on");
         this.mediaonlychannel = toggle.getProperty("mediaonlychannel").equals("on");
         this.profile = toggle.getProperty("profile").equals("on");
+        this.quickvote = toggle.getProperty("quickvote").equals("on");
         this.reactionrole = toggle.getProperty("reactionrole").equals("on");
         this.user = toggle.getProperty("user").equals("on");
     }
@@ -122,6 +125,7 @@ public class ToggleFile {
     public void setLove (String love) { this.love = love.equals("on"); }
     public void setMediaonlychannel (String mediaonlychannel) { this.mediaonlychannel = mediaonlychannel.equals("on"); }
     public void setProfile (String profile) { this.profile = profile.equals("on"); }
+    public void setQuickvote (String quickvote) { this.quickvote = quickvote.equals("on"); }
     public void setReactionrole (String reactionrole) { this.reactionrole = reactionrole.equals("on"); }
     public void setUser (String user) { this.user = user.equals("on"); }
 
@@ -143,6 +147,7 @@ public class ToggleFile {
             case "love": return love;
             case "mediaonlychannel": return mediaonlychannel;
             case "profile": return profile;
+            case "quickvote": return quickvote;
             case "reactionrole": return reactionrole;
             case "user": return user;
             default: return true;
@@ -164,6 +169,7 @@ public class ToggleFile {
     public boolean getLove() { return love; }
     public boolean getMediaOnlyChannel() { return mediaonlychannel; }
     public boolean getProfile() { return profile; }
+    public boolean getQuickvote() { return quickvote; }
     public boolean getReactionRole() { return reactionrole; }
     public boolean getUser() { return user; }
 }

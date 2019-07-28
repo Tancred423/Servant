@@ -20,11 +20,16 @@ public class UserCommand extends Command {
     public UserCommand() {
         this.name = "user";
         this.aliases = new String[]{"member"};
-        this.help = "personalize the bot to your desire (user)";
+        this.help = "personalize the bot to your desire (user specific)";
         this.category = new Category("Free to all");
-        this.arguments = "[set|unset] [setting] [value]";
-        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.arguments = "[set|unset] <setting> <value>";
+        this.hidden = false;
         this.guildOnly = false;
+        this.ownerCommand = false;
+        this.cooldown = 5;
+        this.cooldownScope = CooldownScope.USER;
+        this.userPermissions = new Permission[0];
+        this.botPermissions = new Permission[0];
     }
 
     @Override
@@ -36,11 +41,11 @@ public class UserCommand extends Command {
             new Log(e, event, name).sendLogSqlCommandEvent(false);
         }
 
-        String prefix = Servant.config.getDefaultPrefix();
+        var prefix = Servant.config.getDefaultPrefix();
         // Usage
         if (event.getArgs().isEmpty()) {
             try {
-                String usage = "**Setting an embed color**\n" +
+                var usage = "**Setting an embed color**\n" +
                         "Command: `" + prefix + name + " set color [color code]`\n" +
                         "Example 1: `" + prefix + name + " set color 0xFFFFFF`\n" +
                         "Example 2: `" + prefix + name + " set color #FFFFFF`\n" +
@@ -52,7 +57,7 @@ public class UserCommand extends Command {
                         "**Show your current settings**\n" +
                         "Command: `" + prefix + name + " show`";
 
-                String hint = "An embed color is the color you can see right know on the left of this text field thingy.\n" +
+                var hint = "An embed color is the color you can see right know on the left of this text field thingy.\n" +
                         "More settings will be added in future updates.";
 
                 event.reply(new UsageEmbed(name, event.getAuthor(), ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
@@ -62,10 +67,10 @@ public class UserCommand extends Command {
             return;
         }
 
-        String[] args = event.getArgs().split(" ");
-        String type = args[0].toLowerCase();
+        var args = event.getArgs().split(" ");
+        var type = args[0].toLowerCase();
         String setting;
-        long userId = event.getAuthor().getIdLong();
+        var userId = event.getAuthor().getIdLong();
         User internalUser;
 
         switch (type) {
@@ -78,7 +83,7 @@ public class UserCommand extends Command {
                 }
 
                 setting = args[1].toLowerCase();
-                String value = args[2];
+                var value = args[2];
                 internalUser = new User(userId);
 
                 switch (setting) {
@@ -151,7 +156,7 @@ public class UserCommand extends Command {
 
             case "show":
             case "sh":
-                net.dv8tion.jda.core.entities.User author = event.getAuthor();
+                var author = event.getAuthor();
                 String colorCode;
                 try {
                     internalUser = new User(author.getIdLong());

@@ -3,7 +3,6 @@ package moderation.autorole;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Role;
 import servant.Log;
 import servant.Servant;
@@ -16,12 +15,16 @@ public class AutoroleCommand extends Command {
     public AutoroleCommand() {
         this.name = "autorole";
         this.aliases = new String[]{"ar"};
-        this.help = "set the role any new member will receive | **MANAGE ROLES**";
+        this.help = "set the role any new member will receive | Manage Roles";
         this.category = new Category("Moderation");
-        this.arguments = "[set|unset|show] [on set: @role or role ID]";
+        this.arguments = "[set|unset|show] <on set: @role or role ID>";
+        this.hidden = false;
         this.guildOnly = true;
-        this.botPermissions = new Permission[]{Permission.MANAGE_ROLES};
+        this.ownerCommand = false;
+        this.cooldown = 5;
+        this.cooldownScope = CooldownScope.USER;
         this.userPermissions = new Permission[]{Permission.MANAGE_ROLES};
+        this.botPermissions = new Permission[]{Permission.MANAGE_ROLES};
     }
 
     @Override
@@ -33,7 +36,7 @@ public class AutoroleCommand extends Command {
             new Log(e, event, name).sendLogSqlCommandEvent(false);
         }
 
-        Guild guild = event.getGuild();
+        var guild = event.getGuild();
         moderation.guild.Guild internalGuild;
         try {
             internalGuild = new moderation.guild.Guild(guild.getIdLong());
@@ -41,11 +44,11 @@ public class AutoroleCommand extends Command {
             new Log(e, event, name).sendLogSqlCommandEvent(true);
             return;
         }
-        String prefix = Servant.config.getDefaultPrefix();
+        var prefix = Servant.config.getDefaultPrefix();
         // Usage
         if (event.getArgs().isEmpty()) {
             try {
-                String usage = "**Setting up an autorole**\n" +
+                var usage = "**Setting up an autorole**\n" +
                         "Command: `" + prefix + name + " set [@role or role ID]`\n" +
                         "Example 1: `" + prefix + name + " set @Member`\n" +
                         "Example 2: `" + prefix + name + " set 999999999999999999`\n" +
@@ -56,7 +59,7 @@ public class AutoroleCommand extends Command {
                         "**Showing current autorole**\n" +
                         "Command: `" + prefix + name + " show`";
 
-                String hint = "You can get the role ID by writing `\\@role`.\n" +
+                var hint = "You can get the role ID by writing `\\@role`.\n" +
                         "This requires you to ping it. To avoid it, you can do it in a hidden channel.\n" +
                         "Using the role ID instead of just pinging it, is nice if you don't want to annoy a lot of people.";
 
@@ -67,7 +70,7 @@ public class AutoroleCommand extends Command {
             return;
         }
 
-        String[] args = event.getArgs().split(" ");
+        var args = event.getArgs().split(" ");
 
         Role role;
 

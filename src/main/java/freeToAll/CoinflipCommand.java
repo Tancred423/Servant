@@ -14,10 +14,16 @@ public class CoinflipCommand extends Command {
     public CoinflipCommand() {
         this.name = "coinflip";
         this.aliases = new String[]{"cf", "cointoss", "ct"};
-        this.help = "returns head or tail.";
+        this.help = "returns head or tail";
         this.category = new Category("Free to all");
-        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.arguments = null;
+        this.hidden = false;
         this.guildOnly = false;
+        this.ownerCommand = false;
+        this.cooldown = 5;
+        this.cooldownScope = CooldownScope.USER;
+        this.userPermissions = new Permission[0];
+        this.botPermissions = new Permission[0];
     }
 
     @Override
@@ -29,7 +35,7 @@ public class CoinflipCommand extends Command {
             new Log(e, event, name).sendLogSqlCommandEvent(false);
         }
 
-        int coinflip = ThreadLocalRandom.current().nextInt(0, 2); // 0 or 1.
+        var coinflip = ThreadLocalRandom.current().nextInt(0, 2); // 0 or 1.
         if (coinflip == 0) event.reply("Head!");
         else event.reply("Tail!");
 
