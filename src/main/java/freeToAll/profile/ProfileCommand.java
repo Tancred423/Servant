@@ -45,8 +45,8 @@ public class ProfileCommand extends Command {
             new Log(e, event.getGuild(), event.getAuthor(), name, null).sendLog(false);
         }
 
-        User author = event.getAuthor();
-        User mentioned = (event.getMessage().getMentionedMembers().isEmpty() ? null : event.getMessage().getMentionedMembers().get(0).getUser());
+        var author = event.getAuthor();
+        var mentioned = (event.getMessage().getMentionedMembers().isEmpty() ? null : event.getMessage().getMentionedMembers().get(0).getUser());
 
         // Create File.
         var currentDir   = System.getProperty("user.dir");

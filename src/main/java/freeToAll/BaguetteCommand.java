@@ -3,6 +3,7 @@ package freeToAll;
 
 import moderation.guild.Guild;
 import net.dv8tion.jda.core.Permission;
+import servant.Emote;
 import servant.Log;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
@@ -40,9 +41,18 @@ public class BaguetteCommand extends Command {
         if (coinflip == 10) random += ThreadLocalRandom.current().nextInt(0, 30) + 1; // Rarely a huge schlong
         if (coinflip ==  1) random = 0; // Rarely a veri smol one
 
-        var baguette1 = event.getJDA().getGuildById(599222484134264852L).getEmoteById(600597900568952835L);
-        var baguette2 = event.getJDA().getGuildById(599222484134264852L).getEmoteById(600597898668802048L);
-        var baguette3 = event.getJDA().getGuildById(599222484134264852L).getEmoteById(600597897804775436L);
+        net.dv8tion.jda.core.entities.Emote baguette1;
+        net.dv8tion.jda.core.entities.Emote baguette2;
+        net.dv8tion.jda.core.entities.Emote baguette3;
+
+        try {
+            baguette1 = Emote.getEmote("baguette1");
+            baguette2 = Emote.getEmote("baguette2");
+            baguette3 = Emote.getEmote("baguette3");
+        } catch (SQLException e) {
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
+            return;
+        }
 
         var stringBuilder = new StringBuilder();
         stringBuilder.append(baguette1.getAsMention());

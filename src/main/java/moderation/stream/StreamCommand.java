@@ -42,7 +42,7 @@ public class StreamCommand extends Command {
         // Usage
         if (arg.isEmpty()) {
             try {
-                String prefix = new Guild(event.getGuild().getIdLong()).getPrefix();
+                var prefix = new Guild(event.getGuild().getIdLong()).getPrefix();
 
                 var description = "You can set up streamers, one stream notification channel and one streamer role.\n" +
                         "Once a streamer goes online (Gets the \"Streaming...\" discord status), a notification will be posted and the streamer will receive the designated role.";

@@ -179,8 +179,8 @@ public class LoveCommand extends Command {
     }
 
     private String getShippingName(Member first, Member second) {
-        String firstName = first.getUser().getName();
-        String secondName = second.getUser().getName();
+        String firstName = first.getNickname();
+        String secondName = second.getNickname();
         return firstName.substring(0, 1).toUpperCase() + firstName.substring(1, firstName.length() / 2).toLowerCase()
                 + secondName.substring(secondName.length() / 2).toLowerCase();
     }

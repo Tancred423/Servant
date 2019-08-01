@@ -96,7 +96,7 @@ public class LevelCommand extends Command {
                 neededExp = Parser.getLevelExp(currentLevel);
                 currentExpOnThisLevel = currentExp - Parser.getTotalLevelExp(currentLevel - 1);
 
-                event.reply(author.getAsMention() + "'s current level: " + currentLevel + " (" + currentExpOnThisLevel + "/" + neededExp + " XP)");
+                event.reply(author.getAsMention() + (author.getName().endsWith("s") ? "" : "'s") + " current level: " + currentLevel + " (" + currentExpOnThisLevel + "/" + neededExp + " XP)");
                 break;
 
             case "leaderboard":
