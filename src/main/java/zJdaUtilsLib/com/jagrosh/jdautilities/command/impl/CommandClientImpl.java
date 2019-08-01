@@ -86,6 +86,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
     private final boolean useHelp;
     private final Consumer<CommandEvent> helpConsumer;
     private final String helpWord;
+    private final String helpWorldAlias;
     private final ScheduledExecutorService executor;
     private final AnnotatedModuleCompiler compiler;
     private final GuildSettingsManager manager;
@@ -130,6 +131,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
         this.linkMap = linkedCacheSize>0 ? new FixedSizeCache<>(linkedCacheSize) : null;
         this.useHelp = useHelp;
         this.helpWord = helpWord==null ? "help" : helpWord;
+        this.helpWorldAlias = "h";
         this.executor = executor==null ? Executors.newSingleThreadScheduledExecutor() : executor;
         this.compiler = compiler;
         this.manager = manager;
@@ -479,7 +481,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
         }
 
         if(parts != null) // Starts with valid prefix.
-            if(useHelp && parts[0].equalsIgnoreCase(helpWord)) {
+            if(useHelp && (parts[0].equalsIgnoreCase(helpWord) || parts[0].equalsIgnoreCase(helpWorldAlias))) {
                 CommandEvent cevent = new CommandEvent(event, parts[1]==null ? "" : parts[1], this);
                 if(listener!=null)
                     listener.onCommand(cevent, null);
