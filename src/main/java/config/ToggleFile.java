@@ -26,6 +26,7 @@ public class ToggleFile {
     private boolean profile;
     private boolean quickvote;
     private boolean reactionrole;
+    private boolean stream;
     private boolean user;
 
     // Constructor.
@@ -74,6 +75,7 @@ public class ToggleFile {
         toggle.setProperty("profile", "on");
         toggle.setProperty("quickvote", "on");
         toggle.setProperty("reactionrole", "on");
+        toggle.setProperty("stream", "on");
         toggle.setProperty("user", "on");
 
         toggle.store(os,
@@ -106,6 +108,7 @@ public class ToggleFile {
         this.profile = toggle.getProperty("profile").equals("on");
         this.quickvote = toggle.getProperty("quickvote").equals("on");
         this.reactionrole = toggle.getProperty("reactionrole").equals("on");
+        this.stream = toggle.getProperty("stream").equals("on");
         this.user = toggle.getProperty("user").equals("on");
     }
 
@@ -127,6 +130,7 @@ public class ToggleFile {
     public void setProfile (String profile) { this.profile = profile.equals("on"); }
     public void setQuickvote (String quickvote) { this.quickvote = quickvote.equals("on"); }
     public void setReactionrole (String reactionrole) { this.reactionrole = reactionrole.equals("on"); }
+    public void setStream (String stream) { this.stream = stream.equals("on"); }
     public void setUser (String user) { this.user = user.equals("on"); }
 
     // Getter.
@@ -149,6 +153,7 @@ public class ToggleFile {
             case "profile": return profile;
             case "quickvote": return quickvote;
             case "reactionrole": return reactionrole;
+            case "stream": return stream;
             case "user": return user;
             default: return true;
         }
@@ -171,5 +176,6 @@ public class ToggleFile {
     public boolean getProfile() { return profile; }
     public boolean getQuickvote() { return quickvote; }
     public boolean getReactionRole() { return reactionrole; }
+    public boolean getStream() { return stream; }
     public boolean getUser() { return user; }
 }

@@ -2,6 +2,7 @@ package moderation.guild;
 
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.Role;
+import net.dv8tion.jda.core.entities.User;
 import servant.Database;
 import servant.Servant;
 
@@ -591,5 +592,113 @@ public class Guild {
 
         connection.close();
         return rank;
+    }
+
+    // Stream
+    private boolean streamChannelHasEntry() throws SQLException {
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT * FROM stream_channel WHERE guild_id=?");
+        select.setLong(1, guildId);
+        var resultSet = select.executeQuery();
+        if (resultSet.first()) {
+            connection.close();
+            return true;
+        } else {
+            connection.close();
+            return false;
+        }
+    }
+
+    public long getStreamChannel() throws SQLException {
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT channel_id FROM stream_channel WHERE guild_id=?");
+        select.setLong(1, guildId);
+        var resultSet = select.executeQuery();
+        long channel = 0;
+        if (resultSet.first()) channel = resultSet.getLong("channel_id");
+
+        connection.close();
+        return channel;
+    }
+
+    public void setStreamChannel(MessageChannel channel) throws SQLException {
+        var connection = Database.getConnection();
+        if (streamChannelHasEntry()) {
+            // Update.
+            var update = connection.prepareStatement("UPDATE stream_channel SET channel_id=? WHERE guild_id=?");
+            update.setLong(1, channel.getIdLong());
+            update.setLong(2, guildId);
+            update.executeUpdate();
+        } else {
+            // Insert.
+            var insert = connection.prepareStatement("INSERT INTO stream_channel (guild_id,channel_id) VALUES (?,?)");
+            insert.setLong(1, guildId);
+            insert.setLong(2, channel.getIdLong());
+            insert.executeUpdate();
+        }
+        connection.close();
+    }
+
+    public boolean unsetStreamChannel() throws SQLException {
+        if (streamChannelHasEntry()) {
+            var connection = Database.getConnection();
+            var delete = connection.prepareStatement("DELETE FROM stream_channel WHERE guild_id=?");
+            delete.setLong(1, guildId);
+            delete.executeUpdate();
+            connection.close();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private boolean isStreamer(long userId) throws SQLException {
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT * FROM streamers WHERE guild_id=? AND user_id=?");
+        select.setLong(1, guildId);
+        select.setLong(2, userId);
+        var resultSet = select.executeQuery();
+        if (resultSet.first()) {
+            connection.close();
+            return true;
+        } else {
+            connection.close();
+            return false;
+        }
+    }
+
+    public List<Long> getStreamers() throws SQLException {
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT user_id FROM streamers WHERE guild_id=?");
+        select.setLong(1, guildId);
+        var resultSet = select.executeQuery();
+        List<Long> streamers = new ArrayList<>();
+        if (resultSet.first()) do streamers.add(resultSet.getLong("user_id")); while (resultSet.next());
+
+        connection.close();
+        return streamers;
+    }
+
+    public void setStreamer(long userId) throws SQLException {
+        var connection = Database.getConnection();
+        var insert = connection.prepareStatement("INSERT INTO streamers (guild_id,user_id) VALUES (?,?)");
+        insert.setLong(1, guildId);
+        insert.setLong(2, userId);
+        insert.executeUpdate();
+        connection.close();
+    }
+
+    public boolean unsetStreamer(long userId) throws SQLException {
+        if (isStreamer(userId)) {
+            var connection = Database.getConnection();
+            var delete = connection.prepareStatement("DELETE FROM streamers WHERE guild_id=? AND user_id=?");
+            delete.setLong(1, guildId);
+            delete.setLong(2, userId);
+            delete.executeUpdate();
+            connection.close();
+            return true;
+        } else {
+            return false;
+        }
     }
 }

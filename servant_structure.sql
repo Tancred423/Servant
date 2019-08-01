@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jul 17, 2019 at 02:06 PM
+-- Generation Time: Aug 01, 2019 at 09:10 AM
 -- Server version: 5.6.34-log
 -- PHP Version: 7.2.1
 
@@ -19,7 +19,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `servant_structure`
+-- Database: `servant_dev`
 --
 
 -- --------------------------------------------------------
@@ -107,6 +107,17 @@ CREATE TABLE `join_notifier` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `lobby`
+--
+
+CREATE TABLE `lobby` (
+  `guild_id` bigint(18) NOT NULL,
+  `channel_id` bigint(18) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `mediaonlychannel`
 --
 
@@ -129,6 +140,28 @@ CREATE TABLE `reaction_role` (
   `emote_guild_id` bigint(18) NOT NULL,
   `emote_id` bigint(18) NOT NULL,
   `role_id` bigint(18) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `streamers`
+--
+
+CREATE TABLE `streamers` (
+  `guild_id` bigint(18) NOT NULL,
+  `user_id` bigint(18) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `stream_channel`
+--
+
+CREATE TABLE `stream_channel` (
+  `guild_id` bigint(18) NOT NULL,
+  `channel_id` bigint(18) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -166,6 +199,31 @@ CREATE TABLE `user_settings` (
   `setting` varchar(32) NOT NULL,
   `value` varchar(200) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_votes`
+--
+
+CREATE TABLE `user_votes` (
+  `message_id` bigint(18) NOT NULL,
+  `user_id` bigint(18) NOT NULL,
+  `emote_id` bigint(18) NOT NULL,
+  `emoji` varchar(1) COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `votes`
+--
+
+CREATE TABLE `votes` (
+  `message_id` bigint(18) NOT NULL,
+  `author_id` bigint(18) NOT NULL,
+  `type` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Indexes for dumped tables
@@ -208,6 +266,12 @@ ALTER TABLE `join_notifier`
   ADD PRIMARY KEY (`guild_id`);
 
 --
+-- Indexes for table `lobby`
+--
+ALTER TABLE `lobby`
+  ADD PRIMARY KEY (`guild_id`,`channel_id`);
+
+--
 -- Indexes for table `mediaonlychannel`
 --
 ALTER TABLE `mediaonlychannel`
@@ -218,6 +282,18 @@ ALTER TABLE `mediaonlychannel`
 --
 ALTER TABLE `reaction_role`
   ADD PRIMARY KEY (`guild_id`,`channel_id`,`message_id`,`emoji`,`emote_guild_id`,`emote_id`);
+
+--
+-- Indexes for table `streamers`
+--
+ALTER TABLE `streamers`
+  ADD PRIMARY KEY (`guild_id`,`user_id`);
+
+--
+-- Indexes for table `stream_channel`
+--
+ALTER TABLE `stream_channel`
+  ADD PRIMARY KEY (`guild_id`);
 
 --
 -- Indexes for table `toggle`
@@ -236,6 +312,18 @@ ALTER TABLE `user_exp`
 --
 ALTER TABLE `user_settings`
   ADD PRIMARY KEY (`user_id`,`setting`);
+
+--
+-- Indexes for table `user_votes`
+--
+ALTER TABLE `user_votes`
+  ADD PRIMARY KEY (`message_id`,`user_id`);
+
+--
+-- Indexes for table `votes`
+--
+ALTER TABLE `votes`
+  ADD PRIMARY KEY (`message_id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

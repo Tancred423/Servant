@@ -2,6 +2,8 @@ package servant;
 
 import freeToAll.*;
 import freeToAll.profile.ProfileCommand;
+import moderation.stream.StreamCommand;
+import moderation.stream.StreamListener;
 import vote.QuickvoteCommand;
 import vote.QuickvoteEndListener;
 import vote.QuickvoteMultipleVoteListener;
@@ -67,19 +69,20 @@ public class Servant {
                 new AboutCommand(Color.decode(config.getDefaultColorCode()), "your multifuntional bot.",
                         new String[]{"Moderation Tools", "Informative Commands", "Interactive Features", "Shit-post Features"},
                         Permission.ADMINISTRATOR),
-                new GuildlistCommand(waiter), // BOT OWNER
+                new GuildlistCommand(waiter),
                 new PingCommand(),
-                new ShutdownCommand(), // BOT OWNER
+                new ShutdownCommand(),
 
                 // Moderation
-                new AutoroleCommand(), // MANAGE ROLES
-                new ClearCommand(), // MANAGE MESSAGES
-                new GuildCommand(), // ADMINISTRATOR
-                new JoinLeaveNotifyCommand(), // MANAGE CHANNEL
-                new LobbyCommand(), // MANAGE CHANNEL
-                new MediaOnlyChannelCommand(), // MANAGE CHANNEL
-                new ReactionRoleCommand(), // MANAGE CHANNEL, MANAGE ROLES
-                new ToggleCommand(), // ADMINISTRATOR
+                new AutoroleCommand(),
+                new ClearCommand(),
+                new GuildCommand(),
+                new JoinLeaveNotifyCommand(),
+                new LobbyCommand(),
+                new MediaOnlyChannelCommand(),
+                new ReactionRoleCommand(),
+                new StreamCommand(),
+                new ToggleCommand(),
 
                 // Free to all
                 new AvatarCommand(),
@@ -92,10 +95,10 @@ public class Servant {
                 new UserCommand(),
 
                 // Vote
-                new QuickvoteCommand(), // Bot: MESSAGE_ADD_REACTION, MESSAGE_EXT_EMOJI
+                new QuickvoteCommand(),
 
                 // Interaction
-                new AddGifCommand(), // BOT OWNER
+                new AddGifCommand(),
                 new BegCommand(),
                 new CookieCommand(),
                 new DabCommand(),
@@ -126,6 +129,7 @@ public class Servant {
                 .addEventListener(new PatreonListener())
                 .addEventListener(new ReactionRoleListener())
                 .addEventListener(new ReadyListener())
+                .addEventListener(new StreamListener())
                 .addEventListener(new QuickvoteEndListener())
                 .addEventListener(new QuickvoteMultipleVoteListener())
 

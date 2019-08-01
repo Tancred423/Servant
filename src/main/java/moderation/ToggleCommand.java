@@ -75,6 +75,7 @@ public class ToggleCommand extends Command {
             add("profile");
             add("quickvote");
             add("reactionrole");
+            add("stream");
             add("user");
         }};
 
@@ -251,6 +252,11 @@ public class ToggleCommand extends Command {
             case "reactrole":
             case "rr":
                 return "reactionrole";
+
+            case "stream":
+            case "streamer":
+            case "twitch":
+                return "stream";
 
             case "user":
             case "member":

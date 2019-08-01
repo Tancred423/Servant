@@ -11,6 +11,7 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionRemoveEvent;
+import net.dv8tion.jda.core.events.user.update.UserUpdateGameEvent;
 
 public class Log {
     private Exception e;
@@ -24,8 +25,16 @@ public class Log {
     private GuildVoiceJoinEvent guildVoiceJoinEvent;
     private GuildVoiceMoveEvent guildVoiceMoveEvent;
     private VoiceChannelDeleteEvent voiceChannelDeleteEvent;
+    private UserUpdateGameEvent userUpdateGameEvent;
     private ConfigFile config;
     private String name;
+
+    public Log(Exception e, UserUpdateGameEvent userUpdateGameEvent, String commandName) {
+        this.e = e;
+        this.userUpdateGameEvent = userUpdateGameEvent;
+        this.config = Servant.config;
+        this.name = commandName;
+    }
 
     public Log(Exception e, GuildVoiceJoinEvent guildVoiceJoinEvent, String commandName) {
         this.e = e;
@@ -101,6 +110,20 @@ public class Log {
         this.guildMemberLeaveEvent = guildMemberLeaveEvent;
         this.config = Servant.config;
         this.name = commandName;
+    }
+
+    // userUpdateGameEvent
+    public void sendLogSqlUserUpdateGameEvent() {
+        e.printStackTrace();
+        userUpdateGameEvent.getJDA().getUserById(config.getBotOwnerId()).openPrivateChannel().queue(privateChannel ->
+                privateChannel.sendMessage("```c\n" +
+                        "Error\n" +
+                        "-----\n" +
+                        "Guild: " + userUpdateGameEvent.getGuild().getName() + " (" + userUpdateGameEvent.getGuild().getIdLong() + ")\n" +
+                        "User: " + userUpdateGameEvent.getUser().getName() + " (" + userUpdateGameEvent.getUser().getIdLong() + ")\n" +
+                        "Command: " + name + "\n" +
+                        "Error: " + e.getMessage() + "\n" +
+                        "```").queue());
     }
 
     // commandEvent
