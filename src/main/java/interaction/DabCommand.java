@@ -1,3 +1,4 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package interaction;
 
 import net.dv8tion.jda.core.Permission;
@@ -6,7 +7,7 @@ public class DabCommand extends InteractionCommand {
     public DabCommand() {
         this.name = "dab";
         this.aliases = new String[]{"yeet"};
-        this.help = "mention someone you wanna dab on. YEET";
+        this.help = "Dab one someone. YEET";
         this.category = new Category("Interaction");
         this.arguments = "@user";
         this.hidden = false;

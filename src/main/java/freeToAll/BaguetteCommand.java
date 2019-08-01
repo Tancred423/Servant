@@ -1,10 +1,11 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package freeToAll;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import moderation.guild.Guild;
 import net.dv8tion.jda.core.Permission;
 import servant.Log;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.sql.SQLException;
 import java.util.concurrent.ThreadLocalRandom;
@@ -13,7 +14,7 @@ public class BaguetteCommand extends Command {
     public BaguetteCommand() {
         this.name = "baguette";
         this.aliases = new String[0];
-        this.help = "how big is your baguette?";
+        this.help = "How big is your baguette? \uD83D\uDE0F";
         this.category = new Category("Free to all");
         this.arguments = null;
         this.hidden = false;
@@ -31,7 +32,7 @@ public class BaguetteCommand extends Command {
         try {
             if (event.getGuild() != null) if (!new Guild(event.getGuild().getIdLong()).getToggleStatus("baguette")) return;
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
         }
 
         var random = ThreadLocalRandom.current().nextInt(0, 6) + 1; // 1, 2, 3, 4 or 5
@@ -55,7 +56,7 @@ public class BaguetteCommand extends Command {
             new servant.User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
             if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
         }
     }
 }

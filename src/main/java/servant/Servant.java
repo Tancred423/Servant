@@ -1,3 +1,4 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package servant;
 
 import freeToAll.*;
@@ -26,17 +27,17 @@ import config.ToggleFile;
 import moderation.joinLeaveNotify.JoinLeaveNotifyListener;
 import freeToAll.level.LevelCommand;
 import freeToAll.level.LevelListener;
-import com.jagrosh.jdautilities.command.CommandClientBuilder;
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.jagrosh.jdautilities.examples.command.AboutCommand;
-import com.jagrosh.jdautilities.examples.command.GuildlistCommand;
-import com.jagrosh.jdautilities.examples.command.PingCommand;
-import com.jagrosh.jdautilities.examples.command.ShutdownCommand;
 import config.ConfigFile;
 import interaction.*;
 import net.dv8tion.jda.core.*;
 import net.dv8tion.jda.core.entities.Game;
 import chatbot.ChatbotListener;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandClientBuilder;
+import zJdaUtilsLib.com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import zJdaUtilsLib.com.jagrosh.jdautilities.examples.command.AboutCommand;
+import zJdaUtilsLib.com.jagrosh.jdautilities.examples.command.GuildlistCommand;
+import zJdaUtilsLib.com.jagrosh.jdautilities.examples.command.PingCommand;
+import zJdaUtilsLib.com.jagrosh.jdautilities.examples.command.ShutdownCommand;
 
 import javax.security.auth.login.LoginException;
 import java.awt.*;
@@ -63,10 +64,11 @@ public class Servant {
         client.setOwnerId(config.getBotOwnerId());
         client.setEmojis("✅", "⚠", "❌"); // ✅, ⚠, ❌.
         client.setPrefix(config.getDefaultPrefix());
+        client.setServerInvite("discord.gg/4GpaH5V");
         client.setGuildSettingsManager(new GuildManager());
         client.addCommands(
                 // Default JDA utilities commands.
-                new AboutCommand(Color.decode(config.getDefaultColorCode()), "your multifuntional bot.",
+                new AboutCommand("your multifuntional bot.",
                         new String[]{"Moderation Tools", "Informative Commands", "Interactive Features", "Shit-post Features"},
                         Permission.ADMINISTRATOR),
                 new GuildlistCommand(waiter),

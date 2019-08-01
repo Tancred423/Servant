@@ -1,3 +1,4 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package freeToAll.level;
 
 import net.dv8tion.jda.core.entities.Guild;
@@ -23,7 +24,6 @@ public class LevelListener extends ListenerAdapter {
     }
 
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
-        var name = "level listener";
         var author = event.getAuthor();
         var guild = event.getGuild();
 
@@ -33,7 +33,7 @@ public class LevelListener extends ListenerAdapter {
         try {
             if (!new moderation.guild.Guild(guild.getIdLong()).getToggleStatus("level")) return;
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlGuildMessageReceivedEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), "level", null).sendLog(false);
             return;
         }
 
@@ -61,21 +61,21 @@ public class LevelListener extends ListenerAdapter {
         try {
             currentLevel = getLevel(authorId, guildId);
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlGuildMessageReceivedEvent(true);
+            new Log(e, event.getGuild(), event.getAuthor(), "level", null).sendLog(true);
             return;
         }
         var randomExp = ThreadLocalRandom.current().nextInt(15, 26); // Between 15 and 25 inclusively.
         try {
             new servant.User(authorId).addExp(guildId, randomExp);
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlGuildMessageReceivedEvent(true);
+            new Log(e, event.getGuild(), event.getAuthor(), "level", null).sendLog(true);
             return;
         }
         int updatedLevel;
         try {
             updatedLevel = getLevel(authorId, guildId);
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlGuildMessageReceivedEvent(true);
+            new Log(e, event.getGuild(), event.getAuthor(), "level", null).sendLog(true);
             return;
         }
 

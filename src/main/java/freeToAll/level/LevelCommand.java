@@ -1,7 +1,6 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package freeToAll.level;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.core.Permission;
 import moderation.guild.Guild;
 import servant.Log;
@@ -9,6 +8,8 @@ import servant.Servant;
 import utilities.Parser;
 import utilities.StringFormat;
 import utilities.UsageEmbed;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.sql.SQLException;
 import java.util.Map;
@@ -17,7 +18,7 @@ public class LevelCommand extends Command {
     public LevelCommand() {
         this.name = "level";
         this.aliases = new String[]{"lvl", "experience", "exp"};
-        this.help = "check your level or the guild's leaderboard";
+        this.help = "Check levels.";
         this.category = new Category("Free to all");
         this.arguments = "[show|@user|leaderboard]";
         this.hidden = false;
@@ -35,22 +36,27 @@ public class LevelCommand extends Command {
         try {
             if (!new Guild(event.getGuild().getIdLong()).getToggleStatus("level")) return;
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlGuildMessageReceivedEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
             return;
         }
 
-        net.dv8tion.jda.core.entities.Guild guild = event.getGuild();
+        var author = event.getAuthor();
+        var internalAuthor = new servant.User(author.getIdLong());
+        var guild = event.getGuild();
         Guild internalGuild;
         try {
             internalGuild = new Guild(guild.getIdLong());
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(true);
+            new Log(e, guild, author, name, event).sendLog(true);
             return;
         }
         var prefix = Servant.config.getDefaultPrefix();
         // Usage
         if (event.getArgs().isEmpty()) {
             try {
+                var description = "You are leveling up by being active in chat.\n" +
+                        "You can look up your or someone else's level or you can view the current guild's leaderboard.";
+
                 var usage = "**Show your own current level**\n" +
                         "Command: `" + prefix + name + " show`\n" +
                         "\n" +
@@ -64,15 +70,12 @@ public class LevelCommand extends Command {
                 var hint = "You will get 15 - 25 exp inclusively per message (" + Servant.config.getExpCdMillis() + "ms CD)\n" +
                         "Aliases for `leaderboard`: `leaderboards`, `lb` and `lbs`.";
 
-                event.reply(new UsageEmbed(name, event.getAuthor(), ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
             } catch (SQLException e) {
-                new Log(e, event, name).sendLogSqlCommandEvent(true);
+                new Log(e, guild, author, name, event).sendLog(true);
             }
             return;
         }
-
-        var author = event.getAuthor();
-        var internalAuthor = new servant.User(author.getIdLong());
 
         var arg = event.getArgs();
         int currentExp;
@@ -86,7 +89,7 @@ public class LevelCommand extends Command {
                 try {
                     currentExp = internalAuthor.getExp(event.getGuild().getIdLong());
                 } catch (SQLException e) {
-                    new Log(e, event, name).sendLogSqlCommandEvent(true);
+                    new Log(e, guild, author, name, event).sendLog(true);
                     return;
                 }
                 currentLevel = Parser.getLevelFromExp(currentExp);
@@ -104,7 +107,7 @@ public class LevelCommand extends Command {
                 try {
                     userExp = internalGuild.getLeaderboard();
                 } catch (SQLException e) {
-                    new Log(e, event, name).sendLogSqlCommandEvent(true);
+                    new Log(e, guild, author, name, event).sendLog(true);
                     return;
                 }
                 if (userExp == null) {
@@ -147,7 +150,7 @@ public class LevelCommand extends Command {
                     try {
                         currentExp = internalMentioned.getExp(event.getGuild().getIdLong());
                     } catch (SQLException e) {
-                        new Log(e, event, name).sendLogSqlCommandEvent(true);
+                        new Log(e, guild, author, name, event).sendLog(true);
                         return;
                     }
                     currentLevel = Parser.getLevelFromExp(currentExp);
@@ -167,7 +170,7 @@ public class LevelCommand extends Command {
             new servant.User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
             new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
         }
     }
 }

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Aug 01, 2019 at 09:10 AM
+-- Generation Time: Aug 01, 2019 at 03:22 PM
 -- Server version: 5.6.34-log
 -- PHP Version: 7.2.1
 
@@ -19,7 +19,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `servant_dev`
+-- Database: `servant_structure`
 --
 
 -- --------------------------------------------------------
@@ -151,6 +151,17 @@ CREATE TABLE `reaction_role` (
 CREATE TABLE `streamers` (
   `guild_id` bigint(18) NOT NULL,
   `user_id` bigint(18) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `streaming_role`
+--
+
+CREATE TABLE `streaming_role` (
+  `guild_id` bigint(18) NOT NULL,
+  `role_id` bigint(18) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -288,6 +299,12 @@ ALTER TABLE `reaction_role`
 --
 ALTER TABLE `streamers`
   ADD PRIMARY KEY (`guild_id`,`user_id`);
+
+--
+-- Indexes for table `streaming_role`
+--
+ALTER TABLE `streaming_role`
+  ADD PRIMARY KEY (`guild_id`);
 
 --
 -- Indexes for table `stream_channel`

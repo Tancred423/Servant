@@ -1,12 +1,13 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package moderation;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.core.Permission;
 import moderation.guild.Guild;
 import servant.Log;
 import servant.Servant;
 import utilities.UsageEmbed;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ public class ToggleCommand extends Command {
     public ToggleCommand() {
         this.name = "toggle";
         this.aliases = new String[0];
-        this.help = "toggles feature on or off | Administrator";
+        this.help = "Toggles bot's features.";
         this.category = new Command.Category("Moderation");
         this.arguments = "<feature> [on|off|status]";
         this.hidden = false;
@@ -34,6 +35,10 @@ public class ToggleCommand extends Command {
         // Usage
         if (event.getArgs().isEmpty()) {
             try {
+                var description = "You can toggle almost every feature on or off.\n" +
+                        "The level-feature is off by default in case you want to use it.\n" +
+                        "To check what features are toggleable, just use `" + prefix + name + " all status`";
+
                 var usage = "**Manage one feautre**\n" +
                         "Command: `" + prefix + name + " [feature] [on|off|status]`\n" +
                         "Example 1: `" + prefix + name + " level on`\n" +
@@ -44,15 +49,15 @@ public class ToggleCommand extends Command {
                         "Command: `" + prefix + name + " all [on|off|status]`\n" +
                         "Example 1: `" + prefix + name + " all on`\n" +
                         "Example 2: `" + prefix + name + " all off`\n" +
-                        "Examepl 3: `" + prefix + name + " all status`\n";
+                        "Example 3: `" + prefix + name + " all status`\n";
 
                 var hint = "Be careful with toggling all features on or off, as you may delete your perfect set-up.\n" +
                         "You may write `everything` instead of `all`.\n" +
                         "Status will only show the current status without changing any values.";
 
-                event.reply(new UsageEmbed(name, event.getAuthor(), ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
             } catch (SQLException e) {
-                new Log(e, event, name).sendLogSqlCommandEvent(true);
+                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
             }
             return;
         }
@@ -107,7 +112,7 @@ public class ToggleCommand extends Command {
         try {
             internalGuild = new Guild(event.getGuild().getIdLong());
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(true);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
             return;
         }
 
@@ -120,7 +125,7 @@ public class ToggleCommand extends Command {
                         var toggleStatus = internalGuild.getToggleStatus(validFeature);
                         stringBuilder.append(validFeature).append(": ").append(toggleStatus ? "on" : "off").append("\n");
                     } catch (SQLException e) {
-                        new Log(e, event, name).sendLogSqlCommandEvent(false);
+                        new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
                     }
                 }
                 event.reply(stringBuilder.toString());
@@ -130,7 +135,7 @@ public class ToggleCommand extends Command {
                     var toggleStatus = internalGuild.getToggleStatus(feature);
                     event.reply(feature + "'s status: " + (toggleStatus ? "on" : "off"));
                 } catch (SQLException e) {
-                    new Log(e, event, name).sendLogSqlCommandEvent(true);
+                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                 }
             }
             return;
@@ -144,7 +149,7 @@ public class ToggleCommand extends Command {
                 try {
                     internalGuild.setToggleStatus(validFeature, statusBool);
                 } catch (SQLException e) {
-                    new Log(e, event, name).sendLogSqlCommandEvent(false);
+                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
                     return;
                 }
             }
@@ -153,7 +158,7 @@ public class ToggleCommand extends Command {
             try {
                 internalGuild.setToggleStatus(feature, statusBool);
             } catch (SQLException e) {
-                new Log(e, event, name).sendLogSqlCommandEvent(true);
+                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                 return;
             }
         }
@@ -164,7 +169,7 @@ public class ToggleCommand extends Command {
             new servant.User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
             if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
         }
     }
 

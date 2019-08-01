@@ -1,3 +1,4 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package utilities;
 
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -10,7 +11,7 @@ import java.sql.SQLException;
 public class UsageEmbed {
     private MessageEmbed embed;
 
-    public UsageEmbed(String commandName, User author, boolean ownerCommand, Permission[] permissions, String[] aliases, String usage, String hint) throws SQLException {
+    public UsageEmbed(String commandName, User author, String description, boolean ownerCommand, Permission[] permissions, String[] aliases, String usage, String hint) throws SQLException {
         var internalUser = new servant.User(author.getIdLong());
 
         var stringBuilder = new StringBuilder();
@@ -24,8 +25,9 @@ public class UsageEmbed {
         var eb = new EmbedBuilder();
         eb.setColor(internalUser.getColor());
         eb.setAuthor(commandName.substring(0, 1).toUpperCase() + commandName.substring(1) + " Usage", null, null);
-        eb.addField(permissions.length > 1 ? "Permissions" : "Permission", ownerCommand ? "Bot Owner" : permission.isEmpty() ? "None" : permission, false);
-        eb.addField(aliases.length > 1 ? "Aliases" : "Alias", alias.isEmpty() ? "No aliases available" : alias, false);
+        eb.setDescription((description == null ? "No description available." : description));
+        eb.addField(permissions.length > 1 ? "Permissions" : "Permission", ownerCommand ? "Bot Owner" : permission.isEmpty() ? "None" : permission, true);
+        eb.addField(aliases.length > 1 ? "Aliases" : "Alias", alias.isEmpty() ? "No aliases available" : alias, true);
         eb.addField("Usage", usage == null ? "No usage available" : usage, false);
         eb.addField("Hint", hint == null ? "No hint available" : hint, false);
 

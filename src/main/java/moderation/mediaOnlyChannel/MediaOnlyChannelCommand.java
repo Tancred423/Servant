@@ -1,12 +1,13 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package moderation.mediaOnlyChannel;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.*;
 import servant.Log;
 import servant.Servant;
 import utilities.UsageEmbed;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -15,9 +16,9 @@ public class MediaOnlyChannelCommand extends Command {
     public MediaOnlyChannelCommand() {
         this.name = "mediaonlychannel";
         this.aliases = new String[]{"mediaonly", "moc", "mo"};
-        this.help = "set up channels where only files and links can be posted | Manage Channels";
+        this.help = "Files and links only channels.";
         this.category = new Category("Moderation");
-        this.arguments = "[set|unset|show] <on (un)set: #channel>";
+        this.arguments = null;
         this.hidden = false;
         this.guildOnly = true;
         this.ownerCommand = false;
@@ -33,7 +34,7 @@ public class MediaOnlyChannelCommand extends Command {
         try {
             if (!new moderation.guild.Guild(event.getGuild().getIdLong()).getToggleStatus("mediaonlychannel")) return;
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
         }
 
         var guild = event.getGuild();
@@ -41,13 +42,18 @@ public class MediaOnlyChannelCommand extends Command {
         try {
             internalGuild = new moderation.guild.Guild(guild.getIdLong());
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(true);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
             return;
         }
         var prefix = Servant.config.getDefaultPrefix();
         // Usage
         if (event.getArgs().isEmpty()) {
             try {
+                var description = "If a member writes a normal message into a text channel that is marked as mediaonlychannel, the message will be removed" +
+                        " and a warning will be posted.\n" +
+                        "Members only can post links or upload files.\n" +
+                        "This can be very handy for e.g. a memes channel.";
+
                 var usage = "**Setting up an media only channel**\n" +
                         "Command: `" + prefix + name + " set [#channel]`\n" +
                         "Example: `" + prefix + name + " set #images`\n" +
@@ -61,9 +67,9 @@ public class MediaOnlyChannelCommand extends Command {
 
                 var hint = "You can have multiple media only channels.";
 
-                event.reply(new UsageEmbed(name, event.getAuthor(), ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
             } catch (SQLException e) {
-                new Log(e, event, name).sendLogSqlCommandEvent(true);
+                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
             }
             return;
         }
@@ -89,7 +95,7 @@ public class MediaOnlyChannelCommand extends Command {
                 try {
                     internalGuild.addMediaOnlyChannel(channel);
                 } catch (SQLException e) {
-                    new Log(e, event, name).sendLogSqlCommandEvent(true);
+                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                     return;
                 }
 
@@ -114,7 +120,7 @@ public class MediaOnlyChannelCommand extends Command {
                 try {
                     wasUnset = internalGuild.unsetMediaOnlyChannel(channel);
                 } catch (SQLException e) {
-                    new Log(e, event, name).sendLogSqlCommandEvent(true);
+                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                     return;
                 }
 
@@ -128,7 +134,7 @@ public class MediaOnlyChannelCommand extends Command {
                 try {
                     channels = internalGuild.getMediaOnlyChannels();
                 } catch (SQLException e) {
-                    new Log(e, event, name).sendLogSqlCommandEvent(true);
+                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                     return;
                 }
                 if (channels == null) event.reply("There are no media only channels.");
@@ -150,7 +156,7 @@ public class MediaOnlyChannelCommand extends Command {
             new servant.User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
             new moderation.guild.Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
         }
     }
 }

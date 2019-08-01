@@ -1,3 +1,4 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package moderation.lobby;
 
 import net.dv8tion.jda.core.entities.*;
@@ -32,7 +33,7 @@ public class LobbyListener extends ListenerAdapter {
             internalGuild = new moderation.guild.Guild(guild.getIdLong());
             channels = internalGuild.getLobbies();
         } catch (SQLException e) {
-            new Log(e, event, "lobby").sendLogSqlGuildVoiceJoinEvent();
+            new Log(e, event.getGuild(), event.getMember().getUser(), "lobby", null).sendLog(false);
             return;
         }
         var member = event.getMember();
@@ -84,7 +85,7 @@ public class LobbyListener extends ListenerAdapter {
             internalGuild = new moderation.guild.Guild(guild.getIdLong());
             channels = internalGuild.getLobbies();
         } catch (SQLException e) {
-            new Log(e, event, "lobby").sendLogSqlGuildVoiceMoveEvent();
+            new Log(e, event.getGuild(), event.getMember().getUser(), "lobby", null).sendLog(false);
             return;
         }
         var member = event.getMember();
@@ -150,7 +151,7 @@ public class LobbyListener extends ListenerAdapter {
             try {
                 new moderation.guild.Guild(event.getGuild().getIdLong()).unsetLobby(event.getChannel().getIdLong());
             } catch (SQLException e) {
-                new Log(e, event, "lobby").sendLogSqlVoiceChannelDeleteEvent();
+                new Log(e, event.getGuild(), null, "lobby", null).sendLog(false);
             }
         }
     }

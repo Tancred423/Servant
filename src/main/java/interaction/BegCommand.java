@@ -1,3 +1,4 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package interaction;
 
 
@@ -7,7 +8,7 @@ public class BegCommand extends InteractionCommand {
     public BegCommand() {
         this.name = "beg";
         this.aliases = new String[0];
-        this.help = "mention someone to beg";
+        this.help = "Beg someone.";
         this.category = new Category("Interaction");
         this.arguments = "@user";
         this.hidden = false;

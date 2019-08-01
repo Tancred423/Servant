@@ -1,8 +1,9 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package utilities;
 
-import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.core.entities.*;
 import servant.Servant;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.awt.*;
 import java.io.IOException;

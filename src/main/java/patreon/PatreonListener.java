@@ -1,3 +1,4 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package patreon;
 
 import net.dv8tion.jda.core.EmbedBuilder;

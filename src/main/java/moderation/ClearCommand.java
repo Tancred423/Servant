@@ -1,7 +1,6 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package moderation;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Message;
@@ -13,6 +12,8 @@ import servant.User;
 import utilities.MessageHandler;
 import utilities.Parser;
 import utilities.UsageEmbed;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -21,7 +22,7 @@ public class ClearCommand extends Command {
     public ClearCommand() {
         this.name = "clear";
         this.aliases = new String[]{"clean", "delete", "purge"};
-        this.help = "delete messages | Manage Messages";
+        this.help = "Delete messages.";
         this.category = new Category("Moderation");
         this.arguments = "[1 - 100]";
         this.hidden = false;
@@ -39,7 +40,7 @@ public class ClearCommand extends Command {
         try {
             if (!new Guild(event.getGuild().getIdLong()).getToggleStatus("clear")) return;
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
         }
 
         var arg = event.getArgs();
@@ -47,15 +48,18 @@ public class ClearCommand extends Command {
         // Usage
         if (arg.isEmpty()) {
             try {
+                var description = "Deletes 1 - 100 messages.\n" +
+                        "Messages older than two weeks cannot be deleted because of Discord's restrictions.";
+
                 var usage = "**Delete some messages**\n" +
                         "Command: `" + prefix + name + " [1 - 100]`\n" +
                         "Example: `" + prefix + name + " 50`";
 
                 var hint = "The range is inclusively, so you can also delete just 1 or a total of 100 messages.";
 
-                event.reply(new UsageEmbed(name, event.getAuthor(), ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
             } catch (SQLException e) {
-                new Log(e, event, name).sendLogSqlCommandEvent(true);
+                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
             }
             return;
         }
@@ -96,7 +100,7 @@ public class ClearCommand extends Command {
             new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
             new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
         }
     }
 }

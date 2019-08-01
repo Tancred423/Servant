@@ -1,7 +1,6 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package moderation.guild;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.core.Permission;
 import servant.Log;
 import servant.Servant;
@@ -10,6 +9,8 @@ import utilities.MessageHandler;
 import utilities.MyEntry;
 import utilities.Parser;
 import utilities.UsageEmbed;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -19,9 +20,9 @@ public class GuildCommand extends Command {
     public GuildCommand() {
         this.name = "guild";
         this.aliases = new String[]{"server"};
-        this.help = "personalize the bot to your desire (guild specific) | Administrator";
+        this.help = "Bot personalization. (guild specific)";
         this.category = new Category("Moderation");
-        this.arguments = "[set|unset] <setting> <value>";
+        this.arguments = null;
         this.hidden = false;
         this.guildOnly = true;
         this.ownerCommand = false;
@@ -37,7 +38,7 @@ public class GuildCommand extends Command {
         try {
             if (!new Guild(event.getGuild().getIdLong()).getToggleStatus("guild")) return;
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
         }
 
         var guild = event.getGuild();
@@ -45,7 +46,7 @@ public class GuildCommand extends Command {
         try {
             internalGuild = new Guild(guild.getIdLong());
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(true);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
             return;
         }
 
@@ -53,6 +54,9 @@ public class GuildCommand extends Command {
         // Usage
         if (event.getArgs().isEmpty()) {
             try {
+                var description = "With this command you can personalize the bot to your guild's desire.\n" +
+                        "Currently you can set an offset and prefix.";
+
                 var usage = "**Setting an offset**\n" +
                         "Command: `" + prefix + name + " set offset [offset]`\n" +
                         "Example: `" + prefix + name + " set offset +01:00`\n" +
@@ -74,9 +78,9 @@ public class GuildCommand extends Command {
                         "Offset always adds on UTC.\n" +
                         "More settings will be added in future updates.";
 
-                event.reply(new UsageEmbed(name, event.getAuthor(), ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
             } catch (SQLException e) {
-                new Log(e, event, name).sendLogSqlCommandEvent(true);
+                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
             }
             return;
         }
@@ -110,7 +114,7 @@ public class GuildCommand extends Command {
                         try {
                             internalGuild.setOffset(value);
                         } catch (SQLException e) {
-                            new Log(e, event, name).sendLogSqlCommandEvent(true);
+                            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                             return;
                         }
 
@@ -127,7 +131,7 @@ public class GuildCommand extends Command {
                         try {
                             internalGuild.setPrefix(value);
                         } catch (SQLException e) {
-                            new Log(e, event, name).sendLogSqlCommandEvent(true);
+                            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                             return;
                         }
 
@@ -157,7 +161,7 @@ public class GuildCommand extends Command {
                         try {
                             wasUnset = internalGuild.unsetOffset();
                         } catch (SQLException e) {
-                            new Log(e, event, name).sendLogSqlCommandEvent(true);
+                            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                             return;
                         }
 
@@ -169,7 +173,7 @@ public class GuildCommand extends Command {
                         try {
                             wasUnset = internalGuild.unsetPrefix();
                         } catch (SQLException e) {
-                            new Log(e, event, name).sendLogSqlCommandEvent(true);
+                            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                             return;
                         }
 
@@ -210,7 +214,7 @@ public class GuildCommand extends Command {
                             null,
                             null);
                 } catch (SQLException e) {
-                    new Log(e, event, name).sendLogSqlCommandEvent(true);
+                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                 }
                 break;
 
@@ -223,7 +227,7 @@ public class GuildCommand extends Command {
             new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
             if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
         }
     }
 }

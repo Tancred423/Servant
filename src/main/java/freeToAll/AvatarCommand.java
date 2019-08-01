@@ -1,7 +1,6 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package freeToAll;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.core.Permission;
 import moderation.guild.Guild;
 import servant.Log;
@@ -9,6 +8,8 @@ import servant.Servant;
 import utilities.MessageHandler;
 import utilities.Parser;
 import utilities.UsageEmbed;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.awt.*;
 import java.sql.SQLException;
@@ -17,7 +18,7 @@ public class AvatarCommand extends Command {
     public AvatarCommand() {
         this.name = "avatar";
         this.aliases = new String[]{"ava", "stealavatar", "stealava"};
-        this.help = "returns mentioned user's avatar";
+        this.help = "Returns mentioned user's avatar.";
         this.category = new Category("Free to all");
         this.arguments = "@user";
         this.hidden = false;
@@ -35,20 +36,20 @@ public class AvatarCommand extends Command {
         try {
             if (event.getGuild() != null) if (!new Guild(event.getGuild().getIdLong()).getToggleStatus("avatar")) return;
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
         }
 
         var prefix = Servant.config.getDefaultPrefix();
         // Usage
         if (event.getArgs().isEmpty()) {
             try {
-                var usage = "**Stealing someones avatar**\n" +
-                        "Command: `" + prefix + name + " [@user]`\n" +
-                        "Example: `" + prefix + name + " @Servant`\n";
+                var description = "Steal someone's avatar.";
 
-                event.reply(new UsageEmbed(name, event.getAuthor(), ownerCommand, userPermissions, aliases, usage, null).getEmbed());
+                var usage = "Command: `" + prefix + name + " @user`\n";
+
+                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, null).getEmbed());
             } catch (SQLException e) {
-                new Log(e, event, name).sendLogSqlCommandEvent(true);
+                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
             }
             return;
         }
@@ -68,7 +69,7 @@ public class AvatarCommand extends Command {
         try {
             color = new servant.User(author.getIdLong()).getColor();
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(true);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
             return;
         }
 
@@ -90,7 +91,7 @@ public class AvatarCommand extends Command {
             new servant.User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
             if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
         }
     }
 }

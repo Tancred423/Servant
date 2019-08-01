@@ -1,13 +1,10 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package config;
 
 import nu.studer.java.util.OrderedProperties;
 
 import java.io.*;
 
-/*
- * You may ask how big my autism is.
- * My answer is yes.
- */
 public class ToggleFile {
     private boolean autorole;
     private boolean avatar;
@@ -112,27 +109,6 @@ public class ToggleFile {
         this.user = toggle.getProperty("user").equals("on");
     }
 
-    // Setter.
-    public void setAutorole (String autorole) { this.autorole = autorole.equals("on"); }
-    public void setAvatar (String avatar) { this.avatar = avatar.equals("on"); }
-    public void setBaguette (String baguette) { this.baguette = baguette.equals("on"); }
-    public void setChatbot (String chatbot) { this.chatbot = chatbot.equals("on"); }
-    public void setClear (String clear) { this.clear  = clear.equals("on"); }
-    public void setCoinflip (String coinflip) { this.coinflip = coinflip.equals("on"); }
-    public void setEmbed (String embed) { this.embed = embed.equals("on"); }
-    public void setGuild (String guild) { this.guild = guild.equals("on"); }
-    public void setInteraction (String interaction) { this.interaction = interaction.equals("on"); }
-    public void setJoin (String join) { this.join = join.equals("on"); }
-    public void setLevel (String level) { this.level = level.equals("on"); }
-    public void setLobby (String lobby) { this.lobby = lobby.equals("on"); }
-    public void setLove (String love) { this.love = love.equals("on"); }
-    public void setMediaonlychannel (String mediaonlychannel) { this.mediaonlychannel = mediaonlychannel.equals("on"); }
-    public void setProfile (String profile) { this.profile = profile.equals("on"); }
-    public void setQuickvote (String quickvote) { this.quickvote = quickvote.equals("on"); }
-    public void setReactionrole (String reactionrole) { this.reactionrole = reactionrole.equals("on"); }
-    public void setStream (String stream) { this.stream = stream.equals("on"); }
-    public void setUser (String user) { this.user = user.equals("on"); }
-
     // Getter.
     public boolean get(String feature) {
         switch (feature.toLowerCase()) {
@@ -158,24 +134,4 @@ public class ToggleFile {
             default: return true;
         }
     }
-
-    public boolean getAutorole() { return autorole; }
-    public boolean getAvatar() { return avatar; }
-    public boolean getBaguette() { return baguette; }
-    public boolean getChatbot() { return chatbot; }
-    public boolean getClear() { return clear; }
-    public boolean getCoinflip() { return coinflip; }
-    public boolean getEmbed() { return embed; }
-    public boolean getGuild() { return guild; }
-    public boolean getInteraction() { return interaction; }
-    public boolean getJoin() { return join; }
-    public boolean getLevel() { return level; }
-    public boolean getLobby() { return lobby; }
-    public boolean getLove() { return love; }
-    public boolean getMediaOnlyChannel() { return mediaonlychannel; }
-    public boolean getProfile() { return profile; }
-    public boolean getQuickvote() { return quickvote; }
-    public boolean getReactionRole() { return reactionrole; }
-    public boolean getStream() { return stream; }
-    public boolean getUser() { return user; }
 }

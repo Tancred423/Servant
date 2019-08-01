@@ -1,12 +1,13 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package moderation.joinLeaveNotify;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import servant.Log;
 import servant.Servant;
 import utilities.UsageEmbed;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.sql.SQLException;
 
@@ -14,9 +15,9 @@ public class JoinLeaveNotifyCommand extends Command {
     public JoinLeaveNotifyCommand() {
         this.name = "join";
         this.aliases = new String[]{"leave"};
-        this.help = "set up a channel for join and leave messages | Manage Channels";
+        this.help = "Join- and leave messages.";
         this.category = new Category("Moderation");
-        this.arguments = "[set|unset|status] <on set: #channel>";
+        this.arguments = null;
         this.hidden = false;
         this.guildOnly = true;
         this.ownerCommand = false;
@@ -32,7 +33,7 @@ public class JoinLeaveNotifyCommand extends Command {
         try {
             if (!new moderation.guild.Guild(event.getGuild().getIdLong()).getToggleStatus("join")) return;
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
         }
 
         var guild = event.getGuild();
@@ -40,13 +41,15 @@ public class JoinLeaveNotifyCommand extends Command {
         try {
             internalGuild = new moderation.guild.Guild(guild.getIdLong());
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(true);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
             return;
         }
         var prefix = Servant.config.getDefaultPrefix();
         // Usage
         if (event.getArgs().isEmpty()) {
             try {
+                var description = "The bot will post a notification once a new member joins or a member leaves the server.";
+
                 var usage = "**Setting up a join and leave notification channel**\n" +
                         "Command: `" + prefix + name + " set [#channel]`\n" +
                         "Example: `" + prefix + name + " set #welcome`\n" +
@@ -60,9 +63,9 @@ public class JoinLeaveNotifyCommand extends Command {
                 var hint = "Shows a message like \"Name#1234 just joined GuildName!\"\n" +
                         "or \"Name#1234 just left GuildName!\"";
 
-                event.reply(new UsageEmbed(name, event.getAuthor(), ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
             } catch (SQLException e) {
-                new Log(e, event, name).sendLogSqlCommandEvent(true);
+                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
             }
             return;
         }
@@ -83,7 +86,7 @@ public class JoinLeaveNotifyCommand extends Command {
                 try {
                     internalGuild.setJoinNotifierChannel(channel);
                 } catch (SQLException e) {
-                    new Log(e, event, name).sendLogSqlCommandEvent(true);
+                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                     return;
                 }
                 event.reactSuccess();
@@ -95,7 +98,7 @@ public class JoinLeaveNotifyCommand extends Command {
                 try {
                     wasUnset = internalGuild.unsetJoinNotifierChannel();
                 } catch (SQLException e) {
-                    new Log(e, event, name).sendLogSqlCommandEvent(true);
+                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                     return;
                 }
                 if (wasUnset) event.reactSuccess();
@@ -106,7 +109,7 @@ public class JoinLeaveNotifyCommand extends Command {
                 try {
                     channel = internalGuild.getJoinNotifierChannel();
                 } catch (SQLException e) {
-                    new Log(e, event, name).sendLogSqlCommandEvent(true);
+                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                     return;
                 }
                 if (channel == null) event.reply("No channel is set.");
@@ -119,7 +122,7 @@ public class JoinLeaveNotifyCommand extends Command {
             new servant.User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
             if (event.getGuild() != null) new moderation.guild.Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
         }
     }
 }

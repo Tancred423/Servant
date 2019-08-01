@@ -1,11 +1,12 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package freeToAll;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.core.Permission;
 import moderation.guild.Guild;
 import servant.Log;
 import servant.User;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.sql.SQLException;
 import java.util.concurrent.ThreadLocalRandom;
@@ -14,7 +15,7 @@ public class CoinflipCommand extends Command {
     public CoinflipCommand() {
         this.name = "coinflip";
         this.aliases = new String[]{"cf", "cointoss", "ct"};
-        this.help = "returns head or tail";
+        this.help = "Returns head or tail.";
         this.category = new Category("Free to all");
         this.arguments = null;
         this.hidden = false;
@@ -32,7 +33,7 @@ public class CoinflipCommand extends Command {
         try {
             if (event.getGuild() != null) if (!new Guild(event.getGuild().getIdLong()).getToggleStatus("coinflip")) return;
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
         }
 
         var coinflip = ThreadLocalRandom.current().nextInt(0, 2); // 0 or 1.
@@ -44,7 +45,7 @@ public class CoinflipCommand extends Command {
             new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
             if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
         }
     }
 }

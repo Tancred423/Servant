@@ -1,7 +1,6 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package moderation.reactionRoles;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import moderation.guild.Guild;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Emote;
@@ -10,6 +9,8 @@ import net.dv8tion.jda.core.entities.MessageReaction;
 import servant.Log;
 import servant.Servant;
 import utilities.UsageEmbed;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -18,9 +19,9 @@ public class ReactionRoleCommand extends Command {
     public ReactionRoleCommand() {
         this.name = "reactionrole";
         this.aliases = new String[]{"reactrole", "rr"};
-        this.help = "set up automatic role management via reactions | Manage Roles";
+        this.help = "Role management via reactions.";
         this.category = new Category("Moderation");
-        this.arguments = "<message ID> <emoji/emote> [@role|role ID]";
+        this.arguments = null;
         this.hidden = false;
         this.guildOnly = true;
         this.ownerCommand = false;
@@ -35,7 +36,7 @@ public class ReactionRoleCommand extends Command {
         try {
             if (!new Guild(event.getGuild().getIdLong()).getToggleStatus("reactionrole")) return;
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
         }
 
         var prefix = Servant.config.getDefaultPrefix();
@@ -43,6 +44,9 @@ public class ReactionRoleCommand extends Command {
         if (event.getArgs().isEmpty()) {
             // Usage
             try {
+                var description = "You can add reaction to a message via this command. Once a member clicks on the corresponding reaction, he will get the designated role\n" +
+                        "This allows you easy role management via reactions.";
+
                 var usage = "**Set up a reaction to manage user roles**\n" +
                         "Command: `" + prefix + name + " set [#channel | channel ID] [message ID] [emoji/emote] [@role | role ID]`\n" +
                         "Example: " + prefix + name + " set #test-channel 999999999999999999 " + tancWave.getAsMention() + " @role\n" +
@@ -57,9 +61,9 @@ public class ReactionRoleCommand extends Command {
                         "1. Activate Discord Developer Mode: User Settings → Appearance → ADVANCED → Developer Mode\n" +
                         "2. Rightclick a text channel → Copy ID";
 
-                event.reply(new UsageEmbed(name, event.getAuthor(), ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
             } catch (SQLException e) {
-                new Log(e, event, name).sendLogSqlCommandEvent(true);
+                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
             }
             return;
         }
@@ -69,6 +73,14 @@ public class ReactionRoleCommand extends Command {
         long channelId;
         MessageChannel reactionChannel;
         long messageId;
+        var guild = event.getGuild();
+        Guild internalGuild;
+        try {
+            internalGuild = new Guild(guild.getIdLong());
+        } catch (SQLException e) {
+            new Log(e, guild, event.getAuthor(), name, event).sendLog(true);
+            return;
+        }
 
         switch (args[0].toLowerCase()) {
             case "set":
@@ -102,14 +114,20 @@ public class ReactionRoleCommand extends Command {
                     else roleId = message.getMentionedRoles().get(0).getIdLong();
                     event.getGuild().getRoleById(roleId);
 
-                    var success = ReactionRoleDatabase.setReactionRole(event,
-                            event.getGuild().getIdLong(),
-                            channelId,
-                            messageId,
-                            emoji,
-                            (emote == null ? 0 : emote.getGuild().getIdLong()),
-                            (emote == null ? 0:  emote.getIdLong()),
-                            roleId);
+                    int success;
+                    try {
+                        success = internalGuild.setReactionRole(
+                                event.getGuild().getIdLong(),
+                                channelId,
+                                messageId,
+                                emoji,
+                                (emote == null ? 0 : emote.getGuild().getIdLong()),
+                                (emote == null ? 0:  emote.getIdLong()),
+                                roleId);
+                    } catch (SQLException e) {
+                        new Log(e, guild, event.getAuthor(), name, event).sendLog(true);
+                        return;
+                    }
 
                     if (success == 0) {
                         event.reactSuccess();
@@ -154,13 +172,19 @@ public class ReactionRoleCommand extends Command {
                     if (emoji == null) message.addReaction(emote).queue();
                     else message.addReaction(emoji).queue();
 
-                    var success = ReactionRoleDatabase.unsetReactionRole(event,
-                            event.getGuild().getIdLong(),
-                            channelId,
-                            messageId,
-                            emoji,
-                            (emote == null ? 0 : emote.getGuild().getIdLong()),
-                            (emote == null ? 0:  emote.getIdLong()));
+                    int success;
+                    try {
+                        success = internalGuild.unsetReactionRole(
+                                event.getGuild().getIdLong(),
+                                channelId,
+                                messageId,
+                                emoji,
+                                (emote == null ? 0 : emote.getGuild().getIdLong()),
+                                (emote == null ? 0:  emote.getIdLong()));
+                    } catch (SQLException e) {
+                        new Log(e, guild, event.getAuthor(), name, event).sendLog(true);
+                        return;
+                    }
 
                     if (success == 0) {
                         event.reactSuccess();
@@ -202,7 +226,7 @@ public class ReactionRoleCommand extends Command {
             new servant.User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
             if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
         }
     }
 }

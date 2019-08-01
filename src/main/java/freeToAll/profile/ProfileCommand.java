@@ -1,10 +1,12 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package freeToAll.profile;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import moderation.guild.Guild;
 import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.entities.User;
 import servant.Log;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import javax.imageio.ImageIO;
 import java.awt.geom.NoninvertibleTransformException;
@@ -19,9 +21,9 @@ public class ProfileCommand extends Command {
     public ProfileCommand() {
         this.name = "profile";
         this.aliases = new String[]{"profil"};
-        this.help = "shows your profile";
+        this.help = "Your or mentioned user's profile.";
         this.category = new Category("Free to all");
-        this.arguments = null;
+        this.arguments = "[optional @user]";
         this.hidden = false;
         this.guildOnly = true;
         this.ownerCommand = false;
@@ -40,8 +42,11 @@ public class ProfileCommand extends Command {
         try {
             if (!new Guild(event.getGuild().getIdLong()).getToggleStatus("profile")) return;
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), name, null).sendLog(false);
         }
+
+        User author = event.getAuthor();
+        User mentioned = (event.getMessage().getMentionedMembers().isEmpty() ? null : event.getMessage().getMentionedMembers().get(0).getUser());
 
         // Create File.
         var currentDir   = System.getProperty("user.dir");
@@ -54,16 +59,10 @@ public class ProfileCommand extends Command {
 
         // Create Image.
         try {
-            var profile = new Profile(event.getAuthor(), event.getGuild());
+            var profile = new Profile((mentioned == null ? author : mentioned), event.getGuild());
             ImageIO.write(profile.getImage(), "png", image);
-        } catch (IOException IOE) {
-            new Log(IOE, event, name).sendLogIOCommandEvent(true);
-            return;
-        } catch (SQLException sqlE) {
-            new Log(sqlE, event, name).sendLogSqlCommandEvent(true);
-            return;
-        } catch (NoninvertibleTransformException e) {
-            e.printStackTrace();
+        } catch (IOException | SQLException | NoninvertibleTransformException e) {
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
             return;
         }
 
@@ -77,7 +76,7 @@ public class ProfileCommand extends Command {
                 e.printStackTrace();
             }
 
-            if (!image.delete()) new Log(event, name).sendLogProfileDelete();
+            if (!image.delete()) new Log(null, event.getGuild(), event.getAuthor(), name, null).sendLog(false);
         });
 
         thread.start();
@@ -87,7 +86,7 @@ public class ProfileCommand extends Command {
             new servant.User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
             if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
         }
     }
 }

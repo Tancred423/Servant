@@ -1,3 +1,4 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package freeToAll.profile;
 
 import net.dv8tion.jda.core.entities.Guild;
@@ -133,7 +134,8 @@ public class Profile {
         // Most Used Command
         Map<String, Integer> mostUsedFeature = internalUser.getMostUsedFeature();
         Map.Entry<String, Integer> entry = mostUsedFeature.entrySet().iterator().next();
-        text = "Most used command: " + (entry.getKey().equals("Not found.") ? "" : internalGuild.getPrefix()) + entry.getKey() + " (" + entry.getValue() + " times)";
+        text = "Most used command: " + (entry.getKey().equals("Not found.") ? "" : internalGuild.getPrefix())
+                + entry.getKey() + (entry.getKey().equals("Not found.") ? "" : " (" + entry.getValue() + " times)");
         x = -437;
         y = 80;
         transform.translate(x, y);

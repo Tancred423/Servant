@@ -1,3 +1,4 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package interaction;
 
 import net.dv8tion.jda.core.Permission;
@@ -6,7 +7,7 @@ public class HugCommand extends InteractionCommand {
     public HugCommand() {
         this.name = "hug";
         this.aliases = new String[]{"cuddle"};
-        this.help = "mentions someone for a hug";
+        this.help = "Hug someone.";
         this.category = new Category("Interaction");
         this.arguments = "@user";
         this.hidden = false;

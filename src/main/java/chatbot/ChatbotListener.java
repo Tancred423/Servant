@@ -1,3 +1,4 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package chatbot;
 
 import moderation.guild.Guild;
@@ -17,7 +18,7 @@ public class ChatbotListener extends ListenerAdapter {
         try {
             if (event.getGuild() != null) if (!new Guild(event.getGuild().getIdLong()).getToggleStatus("baguette")) return;
         } catch (SQLException e) {
-            new Log(e, event, "chatbot").sendLogSqlMessageReceivedEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), "chatbot", null).sendLog(false);
         }
 
         // Do not react to other bots or yourself.

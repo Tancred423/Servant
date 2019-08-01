@@ -1,3 +1,4 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package interaction;
 
 import net.dv8tion.jda.core.Permission;
@@ -6,7 +7,7 @@ public class PatCommand extends InteractionCommand {
     public PatCommand() {
         this.name = "pat";
         this.aliases = new String[0];
-        this.help = "mentions someone for a pat";
+        this.help = "Pat someone.";
         this.category = new Category("Interaction");
         this.arguments = "@user";
         this.hidden = false;

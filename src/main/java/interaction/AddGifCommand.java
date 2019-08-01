@@ -1,11 +1,12 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package interaction;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import moderation.guild.Guild;
 import net.dv8tion.jda.core.Permission;
 import servant.*;
 import utilities.UsageEmbed;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.io.IOException;
 import java.net.URL;
@@ -16,10 +17,10 @@ public class AddGifCommand extends Command {
     public AddGifCommand() {
         this.name = "addgif";
         this.aliases = new String[]{"addjif"};
-        this.help = "adds a gif for the interaction commands";
+        this.help = "Adds gif for interactions.";
         this.category = new Category("Interaction");
         this.arguments = "<interaction> <gifUrl>";
-        this.hidden = true;
+        this.hidden = false;
         this.guildOnly = false;
         this.ownerCommand = true;
         this.cooldown = 0;
@@ -34,15 +35,17 @@ public class AddGifCommand extends Command {
         // Usage
         if (event.getArgs().isEmpty()) {
             try {
+                var description = "This is a command to add gifs for the interaction commands.";
+
                 var usage = "**Add a gif**\n" +
                         "Command: `" + prefix + name + " [interaction] [gifUrl]`\n" +
                         "Example: `" + prefix + name + " slap https://i.imgur.com/bbXmAx2.gif`\n";
 
                 var hint = "Image url has to be a [direct link](https://www.urbandictionary.com/define.php?term=direct%20link).";
 
-                event.reply(new UsageEmbed(name, event.getAuthor(), ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
             } catch (SQLException e) {
-                new Log(e, event, name).sendLogSqlCommandEvent(true);
+                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
             }
             return;
         }
@@ -70,7 +73,7 @@ public class AddGifCommand extends Command {
             url = new URL(gifUrl);
             c = url.openConnection();
         } catch (IOException e) {
-            new Log(e, event, name).sendLogHttpCommandEvent();
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
             return;
         }
         var contentType = c.getContentType();
@@ -87,7 +90,7 @@ public class AddGifCommand extends Command {
             insert.executeUpdate();
             connection.close();
         } catch (SQLException e) {
-           new Log(e, event, name).sendLogSqlCommandEvent(true);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
            return;
         }
 
@@ -98,7 +101,7 @@ public class AddGifCommand extends Command {
             new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
             if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
         }
     }
 }

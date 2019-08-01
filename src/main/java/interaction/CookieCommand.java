@@ -1,3 +1,4 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package interaction;
 
 import net.dv8tion.jda.core.Permission;
@@ -6,7 +7,7 @@ public class CookieCommand extends InteractionCommand {
     public CookieCommand() {
         this.name = "cookie";
         this.aliases = new String[]{"cookie", "biscuit"};
-        this.help = "mention someone to share a cookie";
+        this.help = "Give someone a cookie.";
         this.category = new Category("Interaction");
         this.arguments = "@user";
         this.hidden = false;

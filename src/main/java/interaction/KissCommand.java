@@ -1,3 +1,4 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package interaction;
 
 import net.dv8tion.jda.core.Permission;
@@ -6,7 +7,7 @@ public class KissCommand extends InteractionCommand {
     public KissCommand() {
         this.name = "kiss";
         this.aliases = new String[0];
-        this.help = "mentions someone for a kiss";
+        this.help = "Kiss someone.";
         this.category = new Category("Interaction");
         this.arguments = "@user";
         this.hidden = false;

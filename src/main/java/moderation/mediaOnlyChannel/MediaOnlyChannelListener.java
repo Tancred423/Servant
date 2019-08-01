@@ -1,3 +1,4 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package moderation.mediaOnlyChannel;
 
 import net.dv8tion.jda.core.MessageBuilder;
@@ -20,7 +21,7 @@ public class MediaOnlyChannelListener extends ListenerAdapter {
         try {
             if (!new moderation.guild.Guild(event.getGuild().getIdLong()).getToggleStatus("mediaonlychannel")) return;
         } catch (SQLException e) {
-            new Log(e, event, "mediaonlychannel").sendLogSqlGuildMessageReceivedEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), "mediaonlychannel", null).sendLog(false);
         }
 
         // Is message in mo-channel?
@@ -30,7 +31,7 @@ public class MediaOnlyChannelListener extends ListenerAdapter {
         try {
             internalGuild = new moderation.guild.Guild(guild.getIdLong());
         } catch (SQLException e) {
-            new Log(e, event, "mediaonlychannel").sendLogSqlCommandEvent(true);
+            new Log(e, event.getGuild(), event.getAuthor(), "mediaonlychannel", null).sendLog(false);
             return;
         }
         try {
@@ -62,7 +63,7 @@ public class MediaOnlyChannelListener extends ListenerAdapter {
                 }
             }
         } catch (SQLException e) {
-            new Log(e, event, "mediaonlychannellistener").sendLogSqlGuildMessageReceivedEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), "mediaonlychannel", null).sendLog(false);
         }
     }
 }

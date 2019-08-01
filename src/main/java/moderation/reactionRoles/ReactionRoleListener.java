@@ -1,3 +1,4 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package moderation.reactionRoles;
 
 import moderation.guild.Guild;
@@ -15,7 +16,7 @@ public class ReactionRoleListener extends ListenerAdapter {
         try {
             if (!new Guild(event.getGuild().getIdLong()).getToggleStatus("reactionrole")) return;
         } catch (SQLException e) {
-            new Log(e, event, "reactionrole").sendLogSqlGuildMessageReactionAddEvent();
+            new Log(e, event.getGuild(), event.getUser(), "reactionrole", null).sendLog(false);
         }
 
         if (event.getUser().isBot()) return;
@@ -26,6 +27,13 @@ public class ReactionRoleListener extends ListenerAdapter {
         String emoji = null;
         var emoteGuildId = 0L;
         var emoteId = 0L;
+        Guild internalGuild;
+        try {
+            internalGuild = new Guild(event.getGuild().getIdLong());
+        } catch (SQLException e) {
+            new Log(e, event.getGuild(), event.getUser(), "reactionrole", null).sendLog(false);
+            return;
+        }
 
         var reactionEmote = event.getReactionEmote();
         if (reactionEmote.isEmote()) {
@@ -37,8 +45,8 @@ public class ReactionRoleListener extends ListenerAdapter {
         }
 
         try {
-            if (ReactionRoleDatabase.hasEntry(guildId, channelId, messageId, emoji, emoteGuildId, emoteId)) {
-                long roleId = ReactionRoleDatabase.getRoleId(guildId, channelId, messageId, emoji, emoteGuildId, emoteId);
+            if (internalGuild.hasEntry(guildId, channelId, messageId, emoji, emoteGuildId, emoteId)) {
+                long roleId = internalGuild.getRoleId(guildId, channelId, messageId, emoji, emoteGuildId, emoteId);
                 try {
                     event.getGuild().getController().addSingleRoleToMember(event.getMember(), event.getGuild().getRoleById(roleId)).queue();
                 } catch (InsufficientPermissionException e) {
@@ -46,7 +54,7 @@ public class ReactionRoleListener extends ListenerAdapter {
                 }
             }
         } catch (SQLException e) {
-            new Log(e, event, "reactionrole").sendLogSqlGuildMessageReactionAddEvent();
+            new Log(e, event.getGuild(), event.getUser(), "reactionrole", null).sendLog(false);
         }
     }
 
@@ -55,7 +63,7 @@ public class ReactionRoleListener extends ListenerAdapter {
         try {
             if (!new Guild(event.getGuild().getIdLong()).getToggleStatus("reactionrole")) return;
         } catch (SQLException e) {
-            new Log(e, event, "reactionrole").sendLogSqlGuildMessageReactionRemoveEvent();
+            new Log(e, event.getGuild(), event.getUser(), "reactionrole", null).sendLog(false);
         }
 
         if (event.getUser().isBot()) return;
@@ -66,6 +74,13 @@ public class ReactionRoleListener extends ListenerAdapter {
         String emoji = null;
         var emoteGuildId = 0L;
         var emoteId = 0L;
+        Guild internalGuild;
+        try {
+            internalGuild = new Guild(event.getGuild().getIdLong());
+        } catch (SQLException e) {
+            new Log(e, event.getGuild(), event.getUser(), "reactionrole", null).sendLog(false);
+            return;
+        }
 
         var reactionEmote = event.getReactionEmote();
         if (reactionEmote.isEmote()) {
@@ -77,8 +92,8 @@ public class ReactionRoleListener extends ListenerAdapter {
         }
 
         try {
-            if (ReactionRoleDatabase.hasEntry(guildId, channelId, messageId, emoji, emoteGuildId, emoteId)) {
-                long roleId = ReactionRoleDatabase.getRoleId(guildId, channelId, messageId, emoji, emoteGuildId, emoteId);
+            if (internalGuild.hasEntry(guildId, channelId, messageId, emoji, emoteGuildId, emoteId)) {
+                long roleId = internalGuild.getRoleId(guildId, channelId, messageId, emoji, emoteGuildId, emoteId);
                 try {
                     event.getGuild().getController().removeSingleRoleFromMember(event.getMember(), event.getGuild().getRoleById(roleId)).queue();
                 } catch (InsufficientPermissionException e) {
@@ -86,7 +101,7 @@ public class ReactionRoleListener extends ListenerAdapter {
                 }
             }
         } catch (SQLException e) {
-            new Log(e, event, "reactionrole").sendLogSqlGuildMessageReactionRemoveEvent();
+            new Log(e, event.getGuild(), event.getUser(), "reactionrole", null).sendLog(false);
         }
     }
 }

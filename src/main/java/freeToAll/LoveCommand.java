@@ -1,12 +1,15 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package freeToAll;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import moderation.guild.Guild;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
 import servant.Log;
+import servant.Servant;
 import utilities.MessageHandler;
+import utilities.UsageEmbed;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -16,7 +19,7 @@ public class LoveCommand extends Command {
     public LoveCommand() {
         this.name = "love";
         this.aliases = new String[]{"ship", "uwu"};
-        this.help = "detects love percentage between two persons";
+        this.help = "I ship it!";
         this.category = new Command.Category("Free to all");
         this.arguments = "@user1 @user2";
         this.hidden = false;
@@ -32,17 +35,28 @@ public class LoveCommand extends Command {
     protected void execute(CommandEvent event) {
         // Enabled?
         try {
-            if (!new Guild(event.getGuild().getIdLong()).getToggleStatus("love")) return;
+            if (event.getGuild() != null) if (!new Guild(event.getGuild().getIdLong()).getToggleStatus("love")) return;
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
         }
 
         var message = event.getMessage();
         List<Member> mentioned = message.getMentionedMembers();
+        var prefix = Servant.config.getDefaultPrefix();
 
         if (mentioned.size() < 1) {
-            event.reactError();
-            event.reply("You didn't mention enough people");
+            try {
+                var description = "Ship two people or you with yourself.";
+
+                var usage = "Command: `" + prefix + name + " @user1 @user2`\n" +
+                        "Command: `" + prefix + name + " @user`";
+
+                var hint = "You only need to mention a person once, if you want to ship them with themselves.";
+
+                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+            } catch (SQLException e) {
+                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
+            }
             return;
         }
 
@@ -74,7 +88,7 @@ public class LoveCommand extends Command {
                     "https://i.imgur.com/JAKcV8F.png"
             );
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(true);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
         }
 
         // Statistics.
@@ -82,7 +96,7 @@ public class LoveCommand extends Command {
             new servant.User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
             if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
         }
     }
 

@@ -1,13 +1,14 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package moderation.autorole;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Role;
 import servant.Log;
 import servant.Servant;
 import utilities.Parser;
 import utilities.UsageEmbed;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.sql.SQLException;
 
@@ -15,9 +16,9 @@ public class AutoroleCommand extends Command {
     public AutoroleCommand() {
         this.name = "autorole";
         this.aliases = new String[]{"ar"};
-        this.help = "set the role any new member will receive | Manage Roles";
+        this.help = "New member role management.";
         this.category = new Category("Moderation");
-        this.arguments = "[set|unset|show] <on set: @role or role ID>";
+        this.arguments = null;
         this.hidden = false;
         this.guildOnly = true;
         this.ownerCommand = false;
@@ -33,7 +34,7 @@ public class AutoroleCommand extends Command {
         try {
             if (!new moderation.guild.Guild(event.getGuild().getIdLong()).getToggleStatus("autorole")) return;
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
         }
 
         var guild = event.getGuild();
@@ -41,13 +42,15 @@ public class AutoroleCommand extends Command {
         try {
             internalGuild = new moderation.guild.Guild(guild.getIdLong());
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(true);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
             return;
         }
         var prefix = Servant.config.getDefaultPrefix();
         // Usage
         if (event.getArgs().isEmpty()) {
             try {
+                var description = "This role will be automatically given to any new member.";
+
                 var usage = "**Setting up an autorole**\n" +
                         "Command: `" + prefix + name + " set [@role or role ID]`\n" +
                         "Example 1: `" + prefix + name + " set @Member`\n" +
@@ -63,9 +66,9 @@ public class AutoroleCommand extends Command {
                         "This requires you to ping it. To avoid it, you can do it in a hidden channel.\n" +
                         "Using the role ID instead of just pinging it, is nice if you don't want to annoy a lot of people.";
 
-                event.reply(new UsageEmbed(name, event.getAuthor(), ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
             } catch (SQLException e) {
-                new Log(e, event, name).sendLogSqlCommandEvent(true);
+                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
             }
             return;
         }
@@ -92,7 +95,7 @@ public class AutoroleCommand extends Command {
                 try {
                     internalGuild.setAutorole(role);
                 } catch (SQLException e) {
-                    new Log(e, event, name).sendLogSqlCommandEvent(true);
+                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                     return;
                 }
                 event.reactSuccess();
@@ -104,7 +107,7 @@ public class AutoroleCommand extends Command {
                 try {
                     wasUnset = internalGuild.unsetAutorole();
                 } catch (SQLException e) {
-                    new Log(e, event, name).sendLogSqlCommandEvent(true);
+                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                     return;
                 }
                 if (wasUnset) event.reactSuccess();
@@ -116,7 +119,7 @@ public class AutoroleCommand extends Command {
                 try {
                     role = internalGuild.getAutorole();
                 } catch (SQLException e) {
-                    new Log(e, event, name).sendLogSqlCommandEvent(true);
+                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                     return;
                 }
                 if (role == null) event.reply("There is no current autorole.");
@@ -133,7 +136,7 @@ public class AutoroleCommand extends Command {
             new servant.User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
             new moderation.guild.Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
         }
     }
 }

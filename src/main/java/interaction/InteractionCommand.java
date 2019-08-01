@@ -1,13 +1,14 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package interaction;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.core.entities.Emote;
 import moderation.guild.Guild;
 import servant.Log;
 import servant.Servant;
 import utilities.Parser;
 import utilities.UsageEmbed;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.sql.SQLException;
 
@@ -20,20 +21,23 @@ public abstract class InteractionCommand extends Command {
         try {
             if (!new Guild(event.getGuild().getIdLong()).getToggleStatus("interaction")) return;
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
         }
 
         var prefix = Servant.config.getDefaultPrefix();
         if (event.getArgs().isEmpty()) {
             // Usage
             try {
+                var description = "Interaction commands are like reactions, but way better.\n" +
+                        "Share your feelings or cookies with other people.";
+
                 var usage = "**" + name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase() + (name.toLowerCase().equals("dab") ? " on" : "") +  " someone**\n" +
                         "Command: `" + prefix + name + " [@user]`\n" +
                         "Example: `" + prefix + name + " @Servant`";
 
-                event.reply(new UsageEmbed(name, event.getAuthor(), ownerCommand, userPermissions, aliases, usage, null).getEmbed());
+                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, null).getEmbed());
             } catch (SQLException e) {
-                new Log(e, event, name).sendLogSqlCommandEvent(true);
+                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
             }
             return;
         }
@@ -55,7 +59,7 @@ public abstract class InteractionCommand extends Command {
         try {
             gif = InteractionDatabase.getGifUrl(name.toLowerCase());
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(true);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
             return;
         }
 
@@ -64,7 +68,7 @@ public abstract class InteractionCommand extends Command {
             internalAuthor.incrementInteractionCount(name, true);
             internalMentioned.incrementInteractionCount(name, false);
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(true);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
             return;
         }
 
@@ -75,7 +79,7 @@ public abstract class InteractionCommand extends Command {
             authorCount = internalAuthor.getInteractionCount(name, true);
             mentionedCount = internalMentioned.getInteractionCount(name, false);
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(true);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
             return;
         }
 
@@ -84,7 +88,7 @@ public abstract class InteractionCommand extends Command {
         try {
             emote = servant.Emote.getEmote(name);
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(true);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
             return;
         }
 
@@ -92,7 +96,7 @@ public abstract class InteractionCommand extends Command {
         try {
             embed = new InteractionEmbed(name, emote, emoji, gif, author, mentioned, authorCount, mentionedCount);
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(true);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
             return;
         }
 
@@ -103,7 +107,7 @@ public abstract class InteractionCommand extends Command {
             new servant.User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
             new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
         }
     }
 }

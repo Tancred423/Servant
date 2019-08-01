@@ -6,7 +6,7 @@
 
     <groupId>Servant</groupId>
     <artifactId>Servant</artifactId>
-    <version>4.14.0</version>
+    <version>4.15.0</version>
 
     <properties>
         <!-- Set java compiler to version 11. -->
@@ -36,14 +36,21 @@
             <artifactId>JDA</artifactId>
             <version>3.8.3_460</version>
         </dependency>
-        <!-- JDA Utilities -->
+        <!-- JSON-->
         <dependency>
-            <groupId>com.jagrosh</groupId>
-            <artifactId>jda-utilities</artifactId>
-            <version>2.1.5</version>
-            <scope>compile</scope>
-            <type>pom</type>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20180813</version>
         </dependency>
+
+        <!--        &lt;!&ndash; JDA Utilities &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>com.jagrosh</groupId>-->
+<!--            <artifactId>jda-utilities</artifactId>-->
+<!--            <version>2.1.5</version>-->
+<!--            <scope>compile</scope>-->
+<!--            <type>pom</type>-->
+<!--        </dependency>-->
         <!-- LavaPlayer -->
         <dependency>
             <groupId>com.sedmelluq</groupId>

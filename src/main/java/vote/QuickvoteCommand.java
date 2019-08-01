@@ -1,7 +1,6 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package vote;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import moderation.guild.Guild;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
@@ -9,6 +8,8 @@ import servant.Emote;
 import servant.Log;
 import servant.Servant;
 import servant.User;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
@@ -18,7 +19,7 @@ public class QuickvoteCommand extends Command {
     public QuickvoteCommand() {
         this.name = "quickvote";
         this.aliases = new String[]{"qv"};
-        this.help = "vote with \"upvote\", \"shrug\" and \"downvote\"";
+        this.help = "Smol vote with yes/no/idc.";
         this.category = new Category("Vote");
         this.arguments = "[optional text]";
         this.hidden = false;
@@ -36,7 +37,7 @@ public class QuickvoteCommand extends Command {
         try {
             if (!new Guild(event.getGuild().getIdLong()).getToggleStatus("guild")) return;
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
         }
 
         var message = event.getMessage();
@@ -47,7 +48,7 @@ public class QuickvoteCommand extends Command {
         try {
             eb.setColor(internalAuthor.getColor());
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(true);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
             return;
         }
         eb.setAuthor(author.getName() + " started a quickvote!", null, author.getAvatarUrl());
@@ -98,7 +99,7 @@ public class QuickvoteCommand extends Command {
                             ).queue());
                 }
             } catch (SQLException e) {
-                new Log(e, event, name).sendLogSqlCommandEvent(true);
+                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
             }
         });
 
@@ -109,7 +110,7 @@ public class QuickvoteCommand extends Command {
             new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
             if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
         }
     }
 }

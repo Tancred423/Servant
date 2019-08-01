@@ -1,8 +1,6 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package freeToAll.embed;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import moderation.guild.Guild;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
@@ -10,6 +8,9 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import servant.Log;
 import servant.Servant;
 import utilities.Parser;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
+import zJdaUtilsLib.com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
@@ -24,7 +25,7 @@ public class EmbedCommand extends Command {
     public EmbedCommand(EventWaiter waiter) {
         this.name = "embed";
         this.aliases = new String[0];
-        this.help = "creates customized embed message | Embed Links";
+        this.help = "Creates a customized embed message.";
         this.category = new Category("Free to all");
         this.arguments = null;
         this.hidden = false;
@@ -44,7 +45,7 @@ public class EmbedCommand extends Command {
         try {
             if (!new Guild(event.getGuild().getIdLong()).getToggleStatus("embed")) return;
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
         }
 
         List<Long> wizardMessageIds = new ArrayList<>();
@@ -344,7 +345,7 @@ public class EmbedCommand extends Command {
             new servant.User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
             if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
         }
     }
 

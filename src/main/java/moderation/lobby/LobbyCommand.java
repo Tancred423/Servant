@@ -1,13 +1,14 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package moderation.lobby;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.core.Permission;
 import servant.Log;
 import utilities.MessageHandler;
 import utilities.MyEntry;
 import utilities.Parser;
 import utilities.UsageEmbed;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -18,9 +19,9 @@ public class LobbyCommand extends Command {
     public LobbyCommand() {
         this.name = "lobby";
         this.aliases = new String[]{"autochannel", "ac"};
-        this.help = "set up lobbies for automated voice channels | Manage Channels";
+        this.help = "Voice channel lobbies.";
         this.category = new Category("Moderation");
-        this.arguments = "[set|unset|show] <on (un)set: #channel>";
+        this.arguments = null;
         this.hidden = false;
         this.guildOnly = true;
         this.ownerCommand = false;
@@ -36,7 +37,7 @@ public class LobbyCommand extends Command {
         try {
             if (!new moderation.guild.Guild(event.getGuild().getIdLong()).getToggleStatus("lobby")) return;
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
         }
 
         var guild = event.getGuild();
@@ -44,7 +45,7 @@ public class LobbyCommand extends Command {
         try {
             internalGuild = new moderation.guild.Guild(guild.getIdLong());
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(true);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
             return;
         }
 
@@ -53,6 +54,11 @@ public class LobbyCommand extends Command {
             var prefix = internalGuild.getPrefix();
             // Usage
             try {
+                var description = "If a member joins an voice channel that is marked as lobby, a copy of this voice channel will be made.\n" +
+                        "Then the member will be moved into this new voice channel.\n" +
+                        "Once everyone left the new channel, it will be deleted automatically.\n" +
+                        "This will save you a lot of space from unused voice channels.";
+
                 var usage = "**Set a voice channel lobby**\n" +
                         "Command: `" + prefix + name + " set <Voice Channel ID>`\n" +
                         "Example: `" + prefix + name + " set 999999999999999999`\n" +
@@ -67,9 +73,9 @@ public class LobbyCommand extends Command {
                         "**Toggle voice-text-channel mode**\n" +
                         "Command: `" + prefix + name + " toggletext`";
 
-                event.reply(new UsageEmbed(name, event.getAuthor(), ownerCommand, userPermissions, aliases, usage, null).getEmbed());
+                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, null).getEmbed());
             } catch (SQLException e) {
-                new Log(e, event, name).sendLogSqlCommandEvent(true);
+                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
             }
             return;
         }
@@ -95,7 +101,7 @@ public class LobbyCommand extends Command {
                 try {
                     internalGuild.setLobby(Long.parseLong(args[1]));
                 } catch (SQLException e) {
-                    new Log(e, event, name).sendLogSqlCommandEvent(true);
+                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                     return;
                 }
 
@@ -121,7 +127,7 @@ public class LobbyCommand extends Command {
                 try {
                     wasUnset = internalGuild.unsetLobby(Long.parseLong(args[1]));
                 } catch (SQLException e) {
-                    new Log(e, event, name).sendLogSqlCommandEvent(true);
+                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                     return;
                 }
 
@@ -138,7 +144,7 @@ public class LobbyCommand extends Command {
                 try {
                     lobbies = internalGuild.getLobbies();
                 } catch (SQLException e) {
-                    new Log(e, event, name).sendLogSqlCommandEvent(true);
+                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                     return;
                 }
 
@@ -158,7 +164,7 @@ public class LobbyCommand extends Command {
                 try {
                     fields.put("Voice Text", new MyEntry<>(internalGuild.isVoiceText() ? "Enabled" : "Disabled", false));
                 } catch (SQLException e) {
-                    new Log(e, event, name).sendLogSqlCommandEvent(true);
+                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                     return;
                 }
 
@@ -176,7 +182,7 @@ public class LobbyCommand extends Command {
                             "Type `" + internalGuild.getPrefix() + "lobby` to get help.",
                             null);
                 } catch (SQLException e) {
-                    new Log(e, event, name).sendLogSqlCommandEvent(true);
+                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                     return;
                 }
                 break;
@@ -189,7 +195,7 @@ public class LobbyCommand extends Command {
                     if (wasEnabled) event.reply("Voice text enabled.");
                     else event.reply("Voice text disabled.");
                 } catch (SQLException e) {
-                    new Log(e, event, name).sendLogSqlCommandEvent(true);
+                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                     event.reactWarning();
                 }
                 break;
@@ -205,7 +211,7 @@ public class LobbyCommand extends Command {
             new servant.User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
             if (event.getGuild() != null) new moderation.guild.Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
         }
     }
 }

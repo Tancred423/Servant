@@ -1,7 +1,6 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package freeToAll;
 
-import com.jagrosh.jdautilities.command.Command;
-import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.core.Permission;
 import patreon.PatreonHandler;
 import moderation.guild.Guild;
@@ -11,6 +10,8 @@ import servant.User;
 import utilities.MessageHandler;
 import utilities.MyEntry;
 import utilities.UsageEmbed;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -20,9 +21,9 @@ public class UserCommand extends Command {
     public UserCommand() {
         this.name = "user";
         this.aliases = new String[]{"member"};
-        this.help = "personalize the bot to your desire (user specific)";
+        this.help = "Bot personalization. (user specific)";
         this.category = new Category("Free to all");
-        this.arguments = "[set|unset] <setting> <value>";
+        this.arguments = null;
         this.hidden = false;
         this.guildOnly = false;
         this.ownerCommand = false;
@@ -38,13 +39,16 @@ public class UserCommand extends Command {
         try {
             if (event.getGuild() != null) if (!new Guild(event.getGuild().getIdLong()).getToggleStatus("user")) return;
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
         }
 
         var prefix = Servant.config.getDefaultPrefix();
         // Usage
         if (event.getArgs().isEmpty()) {
             try {
+                var description = "With this command you can personalize the bot to your desire.\n" +
+                        "Currently you can set a color (req: $10 Patron).";
+
                 var usage = "**Setting an embed color**\n" +
                         "Command: `" + prefix + name + " set color [color code]`\n" +
                         "Example 1: `" + prefix + name + " set color 0xFFFFFF`\n" +
@@ -60,9 +64,9 @@ public class UserCommand extends Command {
                 var hint = "An embed color is the color you can see right know on the left of this text field thingy.\n" +
                         "More settings will be added in future updates.";
 
-                event.reply(new UsageEmbed(name, event.getAuthor(), ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
             } catch (SQLException e) {
-                new Log(e, event, name).sendLogSqlCommandEvent(true);
+                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
             }
             return;
         }
@@ -103,7 +107,7 @@ public class UserCommand extends Command {
                         try {
                             internalUser.setColor(value);
                         } catch (SQLException e) {
-                            new Log(e, event, name).sendLogSqlCommandEvent(true);
+                            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                             return;
                         }
 
@@ -140,7 +144,7 @@ public class UserCommand extends Command {
                         try {
                             wasUnset = internalUser.unsetColor();
                         } catch (SQLException e) {
-                            new Log(e, event, name).sendLogSqlCommandEvent(true);
+                            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                             return;
                         }
 
@@ -162,7 +166,7 @@ public class UserCommand extends Command {
                     internalUser = new User(author.getIdLong());
                     colorCode = internalUser.getColorCode();
                 } catch (SQLException e) {
-                    new Log(e, event, name).sendLogSqlCommandEvent(true);
+                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                     return;
                 }
 
@@ -183,7 +187,7 @@ public class UserCommand extends Command {
                             null,
                             null);
                 } catch (SQLException e) {
-                    new Log(e, event, name).sendLogSqlCommandEvent(true);
+                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                 }
                 break;
 
@@ -196,7 +200,7 @@ public class UserCommand extends Command {
             new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
             if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
         } catch (SQLException e) {
-            new Log(e, event, name).sendLogSqlCommandEvent(false);
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
         }
     }
 }

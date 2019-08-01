@@ -1,8 +1,8 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package moderation.guild;
 
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.Role;
-import net.dv8tion.jda.core.entities.User;
 import servant.Database;
 import servant.Servant;
 
@@ -609,7 +609,7 @@ public class Guild {
         }
     }
 
-    public long getStreamChannel() throws SQLException {
+    public long getStreamChannelId() throws SQLException {
         var connection = Database.getConnection();
         var select = connection.prepareStatement("SELECT channel_id FROM stream_channel WHERE guild_id=?");
         select.setLong(1, guildId);
@@ -643,6 +643,63 @@ public class Guild {
         if (streamChannelHasEntry()) {
             var connection = Database.getConnection();
             var delete = connection.prepareStatement("DELETE FROM stream_channel WHERE guild_id=?");
+            delete.setLong(1, guildId);
+            delete.executeUpdate();
+            connection.close();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private boolean streamingRoleHasEntry() throws SQLException {
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT * FROM streaming_role WHERE guild_id=?");
+        select.setLong(1, guildId);
+        var resultSet = select.executeQuery();
+        if (resultSet.first()) {
+            connection.close();
+            return true;
+        } else {
+            connection.close();
+            return false;
+        }
+    }
+
+    public long getStreamingRoleId() throws SQLException {
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT role_id FROM streaming_role WHERE guild_id=?");
+        select.setLong(1, guildId);
+        var resultSet = select.executeQuery();
+        long role = 0;
+        if (resultSet.first()) role = resultSet.getLong("role_id");
+
+        connection.close();
+        return role;
+    }
+
+    public void setStreamingRole(long roleId) throws SQLException {
+        var connection = Database.getConnection();
+        if (streamingRoleHasEntry()) {
+            // Update.
+            var update = connection.prepareStatement("UPDATE streaming_role SET role_id=? WHERE guild_id=?");
+            update.setLong(1, roleId);
+            update.setLong(2, guildId);
+            update.executeUpdate();
+        } else {
+            // Insert.
+            var insert = connection.prepareStatement("INSERT INTO streaming_role (guild_id,role_id) VALUES (?,?)");
+            insert.setLong(1, guildId);
+            insert.setLong(2, roleId);
+            insert.executeUpdate();
+        }
+        connection.close();
+    }
+
+    public boolean unsetStreamingRole() throws SQLException {
+        if (streamingRoleHasEntry()) {
+            var connection = Database.getConnection();
+            var delete = connection.prepareStatement("DELETE FROM streaming_role WHERE guild_id=?");
             delete.setLong(1, guildId);
             delete.executeUpdate();
             connection.close();
@@ -700,5 +757,77 @@ public class Guild {
         } else {
             return false;
         }
+    }
+
+    // Reaction Role
+    public int setReactionRole(long guildId, long channelId, long messageId, String emoji, long emoteGuildId, long emoteId, long roleId) throws SQLException {
+        var connection = Database.getConnection();
+        if (hasEntry(guildId, channelId, messageId, emoji, emoteGuildId, emoteId)) {
+            return 1;
+        } else {
+            // Insert
+            var insert = connection.prepareStatement("INSERT INTO reaction_role (guild_id, channel_id, message_id, emoji, emote_guild_id, emote_id, role_id) VALUES (?,?,?,?,?,?,?)");
+            insert.setLong(1, guildId);
+            insert.setLong(2, channelId);
+            insert.setLong(3, messageId);
+            insert.setString(4, (emoji == null ? "" : emoji));
+            insert.setLong(5, emoteGuildId);
+            insert.setLong(6, emoteId);
+            insert.setLong(7, roleId);
+            insert.executeUpdate();
+            connection.close();
+            return 0;
+        }
+    }
+
+    public int unsetReactionRole(long guildId, long channelId, long messageId, String emoji, long emoteGuildId, long emoteId) throws SQLException {
+        var connection = Database.getConnection();
+        if (!hasEntry(guildId, channelId, messageId, emoji, emoteGuildId, emoteId)) {
+            return 1;
+        } else {
+            // Delete
+            var delete = connection.prepareStatement("DELETE FROM reaction_role WHERE guild_id=? AND channel_id=? AND message_id=? AND emoji=? AND emote_guild_id=? AND emote_id=?");
+            delete.setLong(1, guildId);
+            delete.setLong(2, channelId);
+            delete.setLong(3, messageId);
+            delete.setString(4, (emoji == null ? "" : emoji));
+            delete.setLong(5, emoteGuildId);
+            delete.setLong(6, emoteId);
+            delete.executeUpdate();
+            connection.close();
+            return 0;
+        }
+    }
+
+    public long getRoleId(long guildId, long channelId, long messageId, String emoji, long emoteGuildId, long emoteId) throws SQLException {
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT role_id FROM reaction_role WHERE guild_id=? AND channel_id=? AND message_id=? AND emoji=? AND emote_guild_id=? AND emote_id=?");
+        select.setLong(1, guildId);
+        select.setLong(2, channelId);
+        select.setLong(3, messageId);
+        select.setString(4, (emoji == null ? "" : emoji));
+        select.setLong(5, emoteGuildId);
+        select.setLong(6, emoteId);
+        var resultSet = select.executeQuery();
+        var roleId = 0L;
+        if (resultSet.first()) roleId = resultSet.getLong("role_id");
+        connection.close();
+        return roleId;
+    }
+
+    public boolean hasEntry(long guildId, long channelId, long messageId, String emoji, long emoteGuildId, long emoteId) throws SQLException {
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT role_id FROM reaction_role WHERE guild_id=? AND channel_id=? AND message_id=? AND emoji=? AND emote_guild_id=? AND emote_id=?");
+        select.setLong(1, guildId);
+        select.setLong(2, channelId);
+        select.setLong(3, messageId);
+        select.setString(4, (emoji == null ? "" : emoji));
+        select.setLong(5, emoteGuildId);
+        select.setLong(6, emoteId);
+        var resultSet = select.executeQuery();
+        var hasEntry = false;
+        if (resultSet.first()) hasEntry = true;
+        connection.close();
+        return hasEntry;
     }
 }
