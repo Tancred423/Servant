@@ -83,6 +83,20 @@ public class Guild {
         return isVoiceText;
     }
 
+    private boolean lobbyHasEntry() throws SQLException {
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT * FROM lobby WHERE guild_id=?");
+        select.setLong(1, guildId);
+        var resultSet = select.executeQuery();
+        if (resultSet.first()) {
+            connection.close();
+            return true;
+        } else {
+            connection.close();
+            return false;
+        }
+    }
+
     public List<Long> getLobbies() throws SQLException {
         var connection = Database.getConnection();
         var select = connection.prepareStatement("SELECT * FROM lobby WHERE guild_id=?");
@@ -105,7 +119,7 @@ public class Guild {
 
     public boolean unsetLobby(long channelId) throws SQLException {
         var connection = Database.getConnection();
-        if (prefixHasEntry()) {
+        if (lobbyHasEntry()) {
             //  Delete.
             var delete = connection.prepareStatement("DELETE FROM lobby WHERE guild_id=? and channel_id=?");
             delete.setLong(1, guildId);
