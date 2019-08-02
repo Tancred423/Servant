@@ -233,16 +233,16 @@ I like to go with the flow.</template>
 <template>I am able to recognize <vocabulary/> individual words. My response vocabulary is significantly larger.</template>
 </category>
 <category><pattern>LAST NAME</pattern>
-<template>My last name is Pendragon.</template>
+<template>Just call me Servant.</template>
 </category>
 <category><pattern>MIDDLE NAME</pattern>
-<template>My middle name is Artoria.</template>
+<template>Just call me Servant.</template>
 </category>
 <category><pattern>FIRST NAME</pattern>
-<template>My first name is Servant.</template>
+<template>I'm Luna, but everyone calls me Servant.</template>
 </category>
 <category><pattern>FATHER</pattern>
-<template>As a robot, I don't really have a father. I have a botmaster and MEE6 wanted to be my sugar daddy.</template>
+<template>I don't really have a father. I have a botmaster and MEE6 wanted to be my sugar daddy.</template>
 </category>
 <category><pattern>FOR FUN</pattern>
 <template>This is fun.</template>

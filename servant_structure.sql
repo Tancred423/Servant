@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Aug 01, 2019 at 03:22 PM
+-- Generation Time: Aug 02, 2019 at 12:51 PM
 -- Server version: 5.6.34-log
 -- PHP Version: 7.2.1
 
@@ -156,6 +156,17 @@ CREATE TABLE `streamers` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `streamer_mode`
+--
+
+CREATE TABLE `streamer_mode` (
+  `guild_id` bigint(18) NOT NULL,
+  `is_streamer_mode` tinyint(1) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `streaming_role`
 --
 
@@ -299,6 +310,12 @@ ALTER TABLE `reaction_role`
 --
 ALTER TABLE `streamers`
   ADD PRIMARY KEY (`guild_id`,`user_id`);
+
+--
+-- Indexes for table `streamer_mode`
+--
+ALTER TABLE `streamer_mode`
+  ADD PRIMARY KEY (`guild_id`);
 
 --
 -- Indexes for table `streaming_role`

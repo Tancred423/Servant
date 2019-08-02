@@ -45,7 +45,8 @@ public class StreamCommand extends Command {
                 var prefix = new Guild(event.getGuild().getIdLong()).getPrefix();
 
                 var description = "You can set up streamers, one stream notification channel and one streamer role.\n" +
-                        "Once a streamer goes online (Gets the \"Streaming...\" discord status), a notification will be posted and the streamer will receive the designated role.";
+                        "Once a streamer goes online, a notification **with** @everyone will be posted and the streamer will receive the set role.\n" +
+                        "If you toggle the streamer mode `off`, a notification **without** @everyone will be posted and the member will receive the set role.";
 
                 var usage = "**(Un)setting a streamer**\n" +
                         "Set: `" + prefix + name + " set @user`\n" +
@@ -58,6 +59,9 @@ public class StreamCommand extends Command {
                         "**(Un)settings the streaming role**\n" +
                         "Set: `" + prefix + name + " set @role`\n" +
                         "Unset: `" + prefix + name + " unset @role`\n" +
+                        "\n" +
+                        "**Toggle streamer mode**\n" +
+                        "Command: `" + prefix + name + " toggle`\n" +
                         "\n" +
                         "**Showing current stream settings**\n" +
                         "Command: `" + prefix + name + " show`";
@@ -77,6 +81,12 @@ public class StreamCommand extends Command {
             var internalGuild = new moderation.guild.Guild(guild.getIdLong());
             var args = arg.split(" ");
             switch (args[0].toLowerCase()) {
+                case "toggle":
+                case "t":
+                    internalGuild.toggleStreamerMode();
+                    event.reactSuccess();
+                    break;
+
                 case "set":
                 case "s":
                 case "add":

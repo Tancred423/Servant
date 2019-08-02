@@ -595,6 +595,51 @@ public class Guild {
     }
 
     // Stream
+    private boolean streamerModeHasEntry() throws SQLException {
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT * FROM streamer_mode WHERE guild_id=?");
+        select.setLong(1, guildId);
+        var resultSet = select.executeQuery();
+        if (resultSet.first()) {
+            connection.close();
+            return true;
+        } else {
+            connection.close();
+            return false;
+        }
+    }
+
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    public boolean isStreamerMode() throws SQLException {
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT is_streamer_mode FROM streamer_mode WHERE guild_id=?");
+        select.setLong(1, guildId);
+        var resultSet = select.executeQuery();
+        boolean channel = true;
+        if (resultSet.first()) channel = resultSet.getBoolean("is_streamer_mode");
+
+        connection.close();
+        return channel;
+    }
+
+    public void toggleStreamerMode() throws SQLException {
+        var connection = Database.getConnection();
+        if (streamerModeHasEntry()) {
+            // Update.
+            var update = connection.prepareStatement("UPDATE streammer_mode SET is_streamer_mode=? WHERE guild_id=?");
+            update.setBoolean(1, !isStreamerMode());
+            update.setLong(2, guildId);
+            update.executeUpdate();
+        } else {
+            // Insert.
+            var insert = connection.prepareStatement("INSERT INTO streamer_mode (guild_id,is_streamer_mode) VALUES (?,?)");
+            insert.setLong(1, guildId);
+            insert.setBoolean(2, !isStreamerMode());
+            insert.executeUpdate();
+        }
+        connection.close();
+    }
+
     private boolean streamChannelHasEntry() throws SQLException {
         var connection = Database.getConnection();
         var select = connection.prepareStatement("SELECT * FROM stream_channel WHERE guild_id=?");

@@ -27,25 +27,32 @@ public class StreamListener extends ListenerAdapter {
         var oldGame = event.getOldGame();
         var newGame = event.getNewGame();
 
-        // Get guilds and users
-        List<Long> streamers;
+        if (author.isBot()) return;
+
+        boolean isStreamerMode;
         try {
-            streamers = new Guild(guild.getIdLong()).getStreamers();
+            isStreamerMode = new Guild(guild.getIdLong()).isStreamerMode();
         } catch (SQLException e) {
             new Log(e, event.getGuild(), event.getUser(), "stream", null).sendLog(false);
             return;
         }
 
-        // Only the streamers get a mention.
-        if (author.isBot()) return;
-        if (!streamers.contains(author.getIdLong())) return;
+        // Check if user is streamer if guild is in streamer mode.
+        if (isStreamerMode) {
+            try {
+                if (!new Guild(guild.getIdLong()).getStreamers().contains(author.getIdLong())) return;
+            } catch (SQLException e) {
+                new Log(e, event.getGuild(), event.getUser(), "stream", null).sendLog(false);
+                return;
+            }
+        }
 
         // Check if guild owner started streaming.
         if (oldGame != null && newGame != null) {
             if (!oldGame.getType().toString().equalsIgnoreCase("streaming")
                     && newGame.getType().toString().equalsIgnoreCase("streaming")) {
                 try {
-                    sendNotification(author, newGame, guild, new Guild(guild.getIdLong()));
+                    sendNotification(author, newGame, guild, new Guild(guild.getIdLong()), isStreamerMode);
                     addRole(guild, event.getMember(), guild.getRoleById(new Guild(guild.getIdLong()).getStreamingRoleId()));
                 } catch (SQLException e) {
                     new Log(e, event.getGuild(), event.getUser(), "stream", null).sendLog(false);
@@ -61,7 +68,7 @@ public class StreamListener extends ListenerAdapter {
         } else if (newGame != null) {
             if (newGame.getType().toString().equalsIgnoreCase("streaming")) {
                 try {
-                    sendNotification(author, newGame, guild, new Guild(guild.getIdLong()));
+                    sendNotification(author, newGame, guild, new Guild(guild.getIdLong()), isStreamerMode);
                     addRole(guild, event.getMember(), guild.getRoleById(new Guild(guild.getIdLong()).getStreamingRoleId()));
                 } catch (SQLException e) {
                     new Log(e, event.getGuild(), event.getUser(), "stream", null).sendLog(false);
@@ -78,14 +85,14 @@ public class StreamListener extends ListenerAdapter {
         guild.getController().removeSingleRoleFromMember(member, role).queue();
     }
 
-    private static void sendNotification(User author, Game newGame, net.dv8tion.jda.core.entities.Guild guild, Guild internalGuild) throws SQLException {
-        guild.getTextChannelById(internalGuild.getStreamChannelId()).sendMessage(getNotifyMessage(author, newGame, guild, new servant.User(author.getIdLong()))).queue();
+    private static void sendNotification(User author, Game newGame, net.dv8tion.jda.core.entities.Guild guild, Guild internalGuild, boolean isStreamerMode) throws SQLException {
+        guild.getTextChannelById(internalGuild.getStreamChannelId()).sendMessage(getNotifyMessage(author, newGame, guild, new servant.User(author.getIdLong()), isStreamerMode)).queue();
     }
 
-    private static Message getNotifyMessage(User author, Game newGame, net.dv8tion.jda.core.entities.Guild guild, servant.User internalUser) throws SQLException {
+    private static Message getNotifyMessage(User author, Game newGame, net.dv8tion.jda.core.entities.Guild guild, servant.User internalUser, boolean isStreamerMode) throws SQLException {
         MessageBuilder mb = new MessageBuilder();
         EmbedBuilder eb = new EmbedBuilder();
-        mb.setContent(guild.getPublicRole().getAsMention());
+        if (isStreamerMode) mb.setContent(guild.getPublicRole().getAsMention());
         eb.setColor(Color.decode(internalUser.getColorCode()));
         eb.setAuthor("Livestream!", newGame.getUrl(), "https://i.imgur.com/BkMsIdz.png"); // Twitch Logo
         eb.setTitle(newGame.getName());
