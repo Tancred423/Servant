@@ -108,13 +108,7 @@ public class ToggleCommand extends Command {
             return;
         }
 
-        Guild internalGuild;
-        try {
-            internalGuild = new Guild(event.getGuild().getIdLong());
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-            return;
-        }
+        var internalGuild = new Guild(event.getGuild().getIdLong());
 
         if (arg1.equals("status")) {
             if (feature.equals("all")) {

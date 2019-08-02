@@ -14,13 +14,9 @@ import java.util.Map;
 
 public class Guild {
     private long guildId;
-    private String offset;
-    private String prefix;
 
-    public Guild(long guildId) throws SQLException {
+    public Guild(long guildId) {
         this.guildId = guildId;
-        thisOffset();
-        thisPrefix();
     }
 
     // Lobby.
@@ -135,7 +131,17 @@ public class Guild {
     }
 
     // Prefix.
-    public String getPrefix() { return prefix; }
+    public String getPrefix() throws SQLException {
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT * FROM guild_settings WHERE guild_id=? AND setting=?");
+        select.setLong(1, guildId);
+        select.setString(2, "prefix");
+        var resultSet = select.executeQuery();
+        var prefix = Servant.config.getDefaultPrefix();
+        if (resultSet.first()) prefix = resultSet.getString("value");
+        connection.close();
+        return prefix;
+    }
 
     private boolean prefixHasEntry() throws SQLException {
         var connection = Database.getConnection();
@@ -152,22 +158,8 @@ public class Guild {
         }
     }
 
-    private void thisPrefix() throws SQLException {
-        var connection = Database.getConnection();
-        var select = connection.prepareStatement("SELECT value FROM guild_settings WHERE guild_id=? AND setting=?");
-        select.setLong(1, guildId);
-        select.setString(2, "prefix");
-        var resultSet = select.executeQuery();
-        String prefix = null;
-        if (resultSet.first()) prefix = resultSet.getString("value");
-        if (prefix == null) this.prefix = Servant.config.getDefaultPrefix();
-        else this.prefix = prefix;
-        connection.close();
-    }
 
     public void setPrefix(String prefix) throws SQLException {
-        this.prefix = prefix;
-
         var connection = Database.getConnection();
         if (prefixHasEntry()) {
             //  Update.
@@ -188,8 +180,6 @@ public class Guild {
     }
 
     boolean unsetPrefix() throws SQLException {
-        this.prefix = Servant.config.getDefaultPrefix();
-
         var connection = Database.getConnection();
         if (prefixHasEntry()) {
             //  Delete.
@@ -207,7 +197,17 @@ public class Guild {
     }
 
     // Color.
-    public String getOffset() { return offset; }
+    public String getOffset() throws SQLException {
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT * FROM guild_settings WHERE guild_id=? AND setting=?");
+        select.setLong(1, guildId);
+        select.setString(2, "offset");
+        var resultSet = select.executeQuery();
+        var offset = Servant.config.getDefaultOffset();
+        if (resultSet.first()) offset = resultSet.getString("value");
+        connection.close();
+        return offset;
+    }
 
     private boolean offsetHasEntry() throws SQLException {
         var connection = Database.getConnection();
@@ -224,22 +224,7 @@ public class Guild {
         }
     }
 
-    private void thisOffset() throws SQLException {
-        var connection = Database.getConnection();
-        var select = connection.prepareStatement("SELECT value FROM guild_settings WHERE guild_id=? AND setting=?");
-        select.setLong(1, guildId);
-        select.setString(2, "offset");
-        var resultSet = select.executeQuery();
-        String offset = null;
-        if (resultSet.first()) offset = resultSet.getString("value");
-        if (offset == null) this.offset = Servant.config.getDefaultOffset();
-        else this.offset = offset;
-        connection.close();
-    }
-
     void setOffset(String offset) throws SQLException {
-        this.offset = offset;
-
         var connection = Database.getConnection();
         if (offsetHasEntry()) {
             //  Update.
@@ -260,8 +245,6 @@ public class Guild {
     }
 
     boolean unsetOffset() throws SQLException {
-        this.offset = Servant.config.getDefaultOffset();
-
         var connection = Database.getConnection();
         if (offsetHasEntry()) {
             //  Delete.
@@ -623,7 +606,6 @@ public class Guild {
         }
     }
 
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isStreamerMode() throws SQLException {
         var connection = Database.getConnection();
         var select = connection.prepareStatement("SELECT is_streamer_mode FROM streamer_mode WHERE guild_id=?");
@@ -640,7 +622,7 @@ public class Guild {
         var connection = Database.getConnection();
         if (streamerModeHasEntry()) {
             // Update.
-            var update = connection.prepareStatement("UPDATE streammer_mode SET is_streamer_mode=? WHERE guild_id=?");
+            var update = connection.prepareStatement("UPDATE streamer_mode SET is_streamer_mode=? WHERE guild_id=?");
             update.setBoolean(1, !isStreamerMode());
             update.setLong(2, guildId);
             update.executeUpdate();

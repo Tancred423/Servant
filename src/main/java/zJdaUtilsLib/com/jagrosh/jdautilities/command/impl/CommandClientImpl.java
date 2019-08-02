@@ -462,6 +462,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
         String rawContent = event.getMessage().getContentRaw();
 
         GuildSettingsProvider settings = event.isFromType(ChannelType.TEXT)? provideSettings(event.getGuild()) : null;
+        if (settings != null) if (settings.getPrefixes() != null && settings.getPrefixes().isEmpty()) settings = null;
 
         if (settings == null) {
             // Check for default prefix.

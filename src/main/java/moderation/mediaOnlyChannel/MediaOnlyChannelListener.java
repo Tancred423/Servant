@@ -27,13 +27,7 @@ public class MediaOnlyChannelListener extends ListenerAdapter {
         // Is message in mo-channel?
         var channel = event.getChannel();
         var guild = event.getGuild();
-        moderation.guild.Guild internalGuild;
-        try {
-            internalGuild = new moderation.guild.Guild(guild.getIdLong());
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), "mediaonlychannel", null).sendLog(false);
-            return;
-        }
+        var internalGuild = new moderation.guild.Guild(guild.getIdLong());
         try {
             if (internalGuild.mediaOnlyChannelHasEntry(channel)) {
                 // Has to have an attachment or a valid url.

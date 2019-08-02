@@ -74,13 +74,7 @@ public class ReactionRoleCommand extends Command {
         MessageChannel reactionChannel;
         long messageId;
         var guild = event.getGuild();
-        Guild internalGuild;
-        try {
-            internalGuild = new Guild(guild.getIdLong());
-        } catch (SQLException e) {
-            new Log(e, guild, event.getAuthor(), name, event).sendLog(true);
-            return;
-        }
+        var internalGuild = new Guild(guild.getIdLong());
 
         switch (args[0].toLowerCase()) {
             case "set":

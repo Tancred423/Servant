@@ -11,7 +11,6 @@ import servant.Log;
 
 import java.awt.*;
 import java.sql.SQLException;
-import java.util.List;
 
 public class StreamListener extends ListenerAdapter {
     public void onUserUpdateGame(UserUpdateGameEvent event) {

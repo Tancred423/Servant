@@ -55,13 +55,7 @@ public class EmbedCommand extends Command {
         channel.sendMessage("Embed to the embed message configuration wizard. In the following I will ask you to enter stuff. On every question you have 1 hour to answer, otherwise the configuration will be stopped and you will loose all the progress.\n" +
                 "To do this, you should know a bit about embeds. If you don't have any experience with embeds, I recommend you to type \"yes\" on the following question.\n" +
                 "**Do you want help with the embed layout? Yes/No:**").queue(sentMessage -> wizardMessageIds.add(sentMessage.getIdLong()));
-        final Guild internalGuild;
-        try {
-            internalGuild = new Guild(event.getGuild().getIdLong());
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return;
-        }
+        var internalGuild = new Guild(event.getGuild().getIdLong());
         waiter.waitForEvent(GuildMessageReceivedEvent.class,
                 helpEvent -> helpEvent.getAuthor().equals(event.getAuthor()) && helpEvent.getChannel().equals(event.getChannel()),
                 helpEvent -> {
@@ -286,7 +280,13 @@ public class EmbedCommand extends Command {
                                                                                                                                                                                                     var timestampMessage = timestampEvent.getMessage();
                                                                                                                                                                                                     wizardMessageIds.add(timestampMessage.getIdLong());
                                                                                                                                                                                                     var hasTimestamp = timestampMessage.getContentDisplay().toLowerCase().equals("yes");
-                                                                                                                                                                                                    var zoneId = internalGuild.getOffset() == null ? ZoneId.of("UTC") : ZoneId.of(internalGuild.getOffset());
+                                                                                                                                                                                                    ZoneId zoneId;
+                                                                                                                                                                                                    try {
+                                                                                                                                                                                                        zoneId = internalGuild.getOffset() == null ? ZoneId.of("UTC") : ZoneId.of(internalGuild.getOffset());
+                                                                                                                                                                                                    } catch (SQLException e) {
+                                                                                                                                                                                                        new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
+                                                                                                                                                                                                        return;
+                                                                                                                                                                                                    }
                                                                                                                                                                                                     if (hasTimestamp)
                                                                                                                                                                                                         embed.setTimestamp(OffsetDateTime.now(zoneId));
                                                                                                                                                                                                     else

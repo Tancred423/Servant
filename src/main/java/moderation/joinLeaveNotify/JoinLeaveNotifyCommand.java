@@ -37,13 +37,7 @@ public class JoinLeaveNotifyCommand extends Command {
         }
 
         var guild = event.getGuild();
-        moderation.guild.Guild internalGuild;
-        try {
-            internalGuild = new moderation.guild.Guild(guild.getIdLong());
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-            return;
-        }
+        var internalGuild = new moderation.guild.Guild(guild.getIdLong());
         var prefix = Servant.config.getDefaultPrefix();
         // Usage
         if (event.getArgs().isEmpty()) {

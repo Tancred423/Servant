@@ -20,13 +20,7 @@ public class JoinLeaveNotifyListener extends ListenerAdapter {
 
         var joinedUser = event.getUser();
         var guild = event.getGuild();
-        moderation.guild.Guild internalGuild;
-        try {
-            internalGuild = new moderation.guild.Guild(guild.getIdLong());
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getUser(), "join", null).sendLog(false);
-            return;
-        }
+        var internalGuild = new moderation.guild.Guild(guild.getIdLong());
 
         MessageChannel channel;
         try {
@@ -51,13 +45,7 @@ public class JoinLeaveNotifyListener extends ListenerAdapter {
 
         var leftUser = event.getUser();
         var guild = event.getGuild();
-        moderation.guild.Guild internalGuild;
-        try {
-            internalGuild = new moderation.guild.Guild(guild.getIdLong());
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getUser(), "join", null).sendLog(false);
-            return;
-        }
+        var internalGuild = new moderation.guild.Guild(guild.getIdLong());
 
         MessageChannel channel;
         try {

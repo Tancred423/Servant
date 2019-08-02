@@ -42,13 +42,7 @@ public class GuildCommand extends Command {
         }
 
         var guild = event.getGuild();
-        Guild internalGuild;
-        try {
-            internalGuild = new Guild(guild.getIdLong());
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-            return;
-        }
+        var internalGuild = new Guild(guild.getIdLong());
 
         var prefix = Servant.config.getDefaultPrefix();
         // Usage
@@ -193,8 +187,15 @@ public class GuildCommand extends Command {
                 var author = event.getAuthor();
                 internalUser = new User(author.getIdLong());
 
-                var showOffset = internalGuild.getOffset();
-                var showPrefix = internalGuild.getPrefix();
+                String showOffset;
+                String showPrefix;
+                try {
+                    showOffset = internalGuild.getOffset();
+                    showPrefix = internalGuild.getPrefix();
+                } catch (SQLException e) {
+                    new Log(e, guild, author, name, event).sendLog(true);
+                    return;
+                }
 
                 Map<String, Map.Entry<String, Boolean>> fields = new HashMap<>();
                 fields.put("Offset", new MyEntry<>(showOffset, true));

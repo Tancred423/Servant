@@ -3,7 +3,6 @@ package freeToAll.profile;
 
 import moderation.guild.Guild;
 import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.User;
 import servant.Log;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;

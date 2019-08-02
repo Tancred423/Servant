@@ -41,17 +41,17 @@ public class LobbyCommand extends Command {
         }
 
         var guild = event.getGuild();
-        moderation.guild.Guild internalGuild;
-        try {
-            internalGuild = new moderation.guild.Guild(guild.getIdLong());
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-            return;
-        }
+        var internalGuild = new moderation.guild.Guild(guild.getIdLong());
 
         var args = event.getArgs().split(" ");
         if (args.length < 1) {
-            var prefix = internalGuild.getPrefix();
+            String prefix;
+            try {
+                prefix = internalGuild.getPrefix();
+            } catch (SQLException e) {
+                new Log(e, guild, event.getAuthor(), name, event).sendLog(true);
+                return;
+            }
             // Usage
             try {
                 var description = "If a member joins an voice channel that is marked as lobby, a copy of this voice channel will be made.\n" +

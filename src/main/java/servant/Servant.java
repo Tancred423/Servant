@@ -40,7 +40,6 @@ import zJdaUtilsLib.com.jagrosh.jdautilities.examples.command.PingCommand;
 import zJdaUtilsLib.com.jagrosh.jdautilities.examples.command.ShutdownCommand;
 
 import javax.security.auth.login.LoginException;
-import java.awt.*;
 import java.io.IOException;
 
 public class Servant {

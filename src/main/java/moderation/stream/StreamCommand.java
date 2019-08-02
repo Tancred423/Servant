@@ -159,10 +159,13 @@ public class StreamCommand extends Command {
                     for (Long streamer : streamers)
                         sb.append(guild.getMemberById(streamer).getAsMention()).append("\n");
 
+                    boolean streamerMode = internalGuild.isStreamerMode();
+
                     eb.setColor(internalUser.getColor());
                     eb.setAuthor("Stream Settings", null, guild.getIconUrl());
-                    eb.addField("Notification Channel", (channelId == 0 ? "No channel set." : guild.getTextChannelById(channelId).getAsMention()), false);
-                    eb.addField("Streaming Role", (roleId == 0 ? "No role set." : guild.getRoleById(roleId).getAsMention()), false);
+                    eb.addField("Notification Channel", (channelId == 0 ? "No channel set." : guild.getTextChannelById(channelId).getAsMention()), true);
+                    eb.addField("Streaming Role", (roleId == 0 ? "No role set." : guild.getRoleById(roleId).getAsMention()), true);
+                    eb.addField("Streamer Mode", (streamerMode ? "Enabled." : "Disabled."), true);
                     eb.addField("Streamers", (streamers.isEmpty() ? "No streamers set." : sb.toString()), false);
 
                     event.reply(eb.build());

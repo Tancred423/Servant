@@ -43,13 +43,7 @@ public class LevelCommand extends Command {
         var author = event.getAuthor();
         var internalAuthor = new servant.User(author.getIdLong());
         var guild = event.getGuild();
-        Guild internalGuild;
-        try {
-            internalGuild = new Guild(guild.getIdLong());
-        } catch (SQLException e) {
-            new Log(e, guild, author, name, event).sendLog(true);
-            return;
-        }
+        var internalGuild = new Guild(guild.getIdLong());
         var prefix = Servant.config.getDefaultPrefix();
         // Usage
         if (event.getArgs().isEmpty()) {

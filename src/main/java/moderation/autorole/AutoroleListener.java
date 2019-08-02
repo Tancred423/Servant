@@ -21,13 +21,7 @@ public class AutoroleListener extends ListenerAdapter {
             new Log(e, event.getGuild(), event.getUser(), name, null).sendLog(false);
         }
 
-        Guild internalGuild;
-        try {
-            internalGuild = new Guild(event.getGuild().getIdLong());
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getUser(), name, null).sendLog(false);
-            return;
-        }
+        var internalGuild = new Guild(event.getGuild().getIdLong());
         try {
             if (internalGuild.hasAutorole()) {
                 event.getGuild().getController().addSingleRoleToMember(event.getMember(), internalGuild.getAutorole()).queue();
