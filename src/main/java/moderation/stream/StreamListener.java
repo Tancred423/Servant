@@ -77,6 +77,9 @@ public class StreamListener extends ListenerAdapter {
     }
 
     private static void addRole(net.dv8tion.jda.core.entities.Guild guild, Member member, Role role) {
+        System.out.println("guild: " + guild);
+        System.out.println("member: " + member);
+        System.out.println("role: " + role);
         guild.getController().addSingleRoleToMember(member, role).queue();
     }
 
@@ -91,7 +94,7 @@ public class StreamListener extends ListenerAdapter {
     private static Message getNotifyMessage(User author, Game newGame, net.dv8tion.jda.core.entities.Guild guild, servant.User internalUser, boolean isStreamerMode) throws SQLException {
         MessageBuilder mb = new MessageBuilder();
         EmbedBuilder eb = new EmbedBuilder();
-        if (isStreamerMode) mb.setContent(guild.getPublicRole().getAsMention());
+        if (isStreamerMode) mb.setContent("@here");
         eb.setColor(Color.decode(internalUser.getColorCode()));
         eb.setAuthor("Livestream!", newGame.getUrl(), "https://i.imgur.com/BkMsIdz.png"); // Twitch Logo
         eb.setTitle(newGame.getName());

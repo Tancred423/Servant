@@ -73,7 +73,11 @@ public class LobbyCommand extends Command {
                         "**Toggle voice-text-channel mode**\n" +
                         "Command: `" + prefix + name + " toggletext`";
 
-                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, null).getEmbed());
+                var hint = "**How to get ID's:**\n" +
+                        "1. Activate Discord Developer Mode: User Settings → Appearance → ADVANCED → Developer Mode\n" +
+                        "2. Rightclick voice channel → Copy ID";
+
+                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
             } catch (SQLException e) {
                 new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
             }

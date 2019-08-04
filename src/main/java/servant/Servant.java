@@ -2,9 +2,13 @@
 package servant;
 
 import freeToAll.*;
+import freeToAll.embed.CreateEmbedCommand;
+import freeToAll.embed.EditEmbedCommand;
 import freeToAll.profile.ProfileCommand;
 import moderation.stream.StreamCommand;
 import moderation.stream.StreamListener;
+import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.User;
 import vote.QuickvoteCommand;
 import vote.QuickvoteEndListener;
 import vote.QuickvoteMultipleVoteListener;
@@ -18,7 +22,6 @@ import moderation.lobby.LobbyCommand;
 import moderation.lobby.LobbyListener;
 import moderation.mediaOnlyChannel.MediaOnlyChannelCommand;
 import moderation.mediaOnlyChannel.MediaOnlyChannelListener;
-import freeToAll.embed.EmbedCommand;
 import moderation.reactionRoles.ReactionRoleCommand;
 import moderation.reactionRoles.ReactionRoleListener;
 import patreon.PatreonListener;
@@ -41,12 +44,15 @@ import zJdaUtilsLib.com.jagrosh.jdautilities.examples.command.ShutdownCommand;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Servant {
     public static JDA jda;
     public static ConfigFile config;
     public static ToggleFile toggle;
     public static Bot chatBot;
+    public static Map<User, Message> embeds = new HashMap<>();
 
     public static void main(String[] args) throws IOException, LoginException {
         config = new ConfigFile();
@@ -89,7 +95,8 @@ public class Servant {
                 new AvatarCommand(),
                 new BaguetteCommand(),
                 new CoinflipCommand(),
-                new EmbedCommand(waiter),
+                new CreateEmbedCommand(waiter),
+                new EditEmbedCommand(waiter),
                 new LevelCommand(),
                 new LoveCommand(),
                 new ProfileCommand(),
