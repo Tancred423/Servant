@@ -1265,7 +1265,7 @@ public class EditEmbedCommand extends Command {
                                     OffsetDateTime.now() :
                                     OffsetDateTime.of(
                                             LocalDateTime.parse(timestamp, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
-                                            ZoneOffset.of(embedUser.getOffset())
+                                            ZoneOffset.of(embedUser.getOffset().equals("00:00") ? "Z" : embedUser.getOffset())
                                     )));
 
                             ogMessage.editMessage(eb.build()).queue();

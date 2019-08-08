@@ -1106,7 +1106,7 @@ public class CreateEmbedCommand extends Command {
                             e.getMessage().delete().queue();
 
                             // Redo if user didn't provide valid direct url.
-                            if (!Parser.isValidDateTime(timestamp)) {
+                            if (!Parser.isValidDateTime(timestamp) && !timestamp.equalsIgnoreCase("now")) {
                                 processTimestamp(channel, author, message, embedUser, event, true);
                                 return;
                             }
@@ -1133,7 +1133,7 @@ public class CreateEmbedCommand extends Command {
                                     OffsetDateTime.now() :
                                     OffsetDateTime.of(
                                             LocalDateTime.parse(timestamp, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
-                                            ZoneOffset.of(embedUser.getOffset())
+                                            ZoneOffset.of(embedUser.getOffset().equals("00:00") ? "Z" : embedUser.getOffset())
                                     )));
 
                             ogMessage.editMessage(eb.build()).queue();

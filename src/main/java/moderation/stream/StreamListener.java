@@ -64,7 +64,7 @@ public class StreamListener extends ListenerAdapter {
                     new Log(e, event.getGuild(), event.getUser(), "stream", null).sendLog(false);
                 }
             }
-        } else if (newGame != null) {
+        } else if (oldGame == null && newGame != null) {
             if (newGame.getType().toString().equalsIgnoreCase("streaming")) {
                 try {
                     sendNotification(author, newGame, guild, new Guild(guild.getIdLong()), isStreamerMode);
@@ -77,21 +77,21 @@ public class StreamListener extends ListenerAdapter {
     }
 
     private static void addRole(net.dv8tion.jda.core.entities.Guild guild, Member member, Role role) {
-        System.out.println("guild: " + guild);
-        System.out.println("member: " + member);
-        System.out.println("role: " + role);
+        if (role == null) return;
         guild.getController().addSingleRoleToMember(member, role).queue();
     }
 
     private static void removeRole(net.dv8tion.jda.core.entities.Guild guild, Member member, Role role) {
+        if (role == null) return;
         guild.getController().removeSingleRoleFromMember(member, role).queue();
     }
 
     private static void sendNotification(User author, Game newGame, net.dv8tion.jda.core.entities.Guild guild, Guild internalGuild, boolean isStreamerMode) throws SQLException {
-        guild.getTextChannelById(internalGuild.getStreamChannelId()).sendMessage(getNotifyMessage(author, newGame, guild, new servant.User(author.getIdLong()), isStreamerMode)).queue();
+        if (internalGuild.getStreamChannelId() == 0) return;
+        guild.getTextChannelById(internalGuild.getStreamChannelId()).sendMessage(getNotifyMessage(author, newGame, new servant.User(author.getIdLong()), isStreamerMode)).queue();
     }
 
-    private static Message getNotifyMessage(User author, Game newGame, net.dv8tion.jda.core.entities.Guild guild, servant.User internalUser, boolean isStreamerMode) throws SQLException {
+    private static Message getNotifyMessage(User author, Game newGame, servant.User internalUser, boolean isStreamerMode) throws SQLException {
         MessageBuilder mb = new MessageBuilder();
         EmbedBuilder eb = new EmbedBuilder();
         if (isStreamerMode) mb.setContent("@here");

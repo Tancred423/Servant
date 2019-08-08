@@ -6,7 +6,7 @@
 
     <groupId>Servant</groupId>
     <artifactId>Servant</artifactId>
-    <version>4.16.0</version>
+    <version>4.16.3</version>
 
     <properties>
         <!-- Set java compiler to version 11. -->
