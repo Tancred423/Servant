@@ -47,7 +47,9 @@ public class UserCommand extends Command {
         if (event.getArgs().isEmpty()) {
             try {
                 var description = "With this command you can personalize the bot to your desire.\n" +
-                        "Currently you can set a color (req: $10 Patron).";
+                        "Currently you can...\n" +
+                        "...set a color (req: $10 Patron).\n" +
+                        "...hide yourself from being highlighted with streaming role while streaming.";
 
                 var usage = "**Setting an embed color**\n" +
                         "Command: `" + prefix + name + " set color [color code]`\n" +
@@ -57,6 +59,9 @@ public class UserCommand extends Command {
                         "\n" +
                         "**Unsetting the embed color**\n" +
                         "Command: `" + prefix + name + " unset color`\n" +
+                        "\n" +
+                        "**Hide yourself from stream highlighting**\n" +
+                        "Command: `" + prefix + name + " streamhide\n" +
                         "\n" +
                         "**Show your current settings**\n" +
                         "Command: `" + prefix + name + " show`";
@@ -75,7 +80,20 @@ public class UserCommand extends Command {
         var type = args[0].toLowerCase();
         String setting;
         var userId = event.getAuthor().getIdLong();
-        User internalUser;
+        User internalUser = new User(userId);
+
+        // Stream Hide
+        if (args.length == 1 && args[0].equalsIgnoreCase("streamhide")) {
+            try {
+                if (internalUser.setStreamHidden()) event.reply("You are now hidden!");
+                else event.reply("You are now visible!");
+            } catch (SQLException e) {
+                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
+                return;
+            }
+            event.reactSuccess();
+            return;
+        }
 
         switch (type) {
             case "set":
@@ -88,7 +106,6 @@ public class UserCommand extends Command {
 
                 setting = args[1].toLowerCase();
                 var value = args[2];
-                internalUser = new User(userId);
 
                 switch (setting) {
                     case "color":
@@ -162,9 +179,11 @@ public class UserCommand extends Command {
             case "sh":
                 var author = event.getAuthor();
                 String colorCode;
+                boolean isStreamHidden;
                 try {
                     internalUser = new User(author.getIdLong());
                     colorCode = internalUser.getColorCode();
+                    isStreamHidden = internalUser.isStreamHidden();
                 } catch (SQLException e) {
                     new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                     return;
@@ -172,6 +191,7 @@ public class UserCommand extends Command {
 
                 Map<String, Map.Entry<String, Boolean>> fields = new HashMap<>();
                 fields.put("Color", new MyEntry<>(colorCode, true));
+                fields.put("Stream Visibility", new MyEntry<>(isStreamHidden ? "Hidden" : "Visible", true));
 
                 try {
                     new MessageHandler().sendEmbed(event.getChannel(),

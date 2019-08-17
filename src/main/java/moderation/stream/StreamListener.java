@@ -28,6 +28,14 @@ public class StreamListener extends ListenerAdapter {
 
         if (author.isBot()) return;
 
+        // Users can hide themselves from this feature.
+        try {
+            if (new servant.User(author.getIdLong()).isStreamHidden()) return;
+        } catch (SQLException e) {
+            new Log(e, event.getGuild(), event.getUser(), "stream", null).sendLog(false);
+            return;
+        }
+
         boolean isStreamerMode;
         try {
             isStreamerMode = new Guild(guild.getIdLong()).isStreamerMode();
@@ -73,22 +81,28 @@ public class StreamListener extends ListenerAdapter {
                     new Log(e, event.getGuild(), event.getUser(), "stream", null).sendLog(false);
                 }
             }
+        } else if (oldGame != null) {
+            if (oldGame.getType().toString().equalsIgnoreCase("streaming")) {
+                try {
+                    removeRole(guild, event.getMember(), guild.getRoleById(new Guild(guild.getIdLong()).getStreamingRoleId()));
+                } catch (SQLException e) {
+                    new Log(e, event.getGuild(), event.getUser(), "stream", null).sendLog(false);
+                }
+            }
         }
     }
 
     private static void addRole(net.dv8tion.jda.core.entities.Guild guild, Member member, Role role) {
-        if (role == null) return;
-        guild.getController().addSingleRoleToMember(member, role).queue();
+        if (role != null) guild.getController().addSingleRoleToMember(member, role).queue();
     }
 
     private static void removeRole(net.dv8tion.jda.core.entities.Guild guild, Member member, Role role) {
-        if (role == null) return;
-        guild.getController().removeSingleRoleFromMember(member, role).queue();
+        if (role != null) guild.getController().removeSingleRoleFromMember(member, role).queue();
     }
 
     private static void sendNotification(User author, Game newGame, net.dv8tion.jda.core.entities.Guild guild, Guild internalGuild, boolean isStreamerMode) throws SQLException {
-        if (internalGuild.getStreamChannelId() == 0) return;
-        guild.getTextChannelById(internalGuild.getStreamChannelId()).sendMessage(getNotifyMessage(author, newGame, new servant.User(author.getIdLong()), isStreamerMode)).queue();
+        if (internalGuild.getStreamChannelId() != 0)
+            guild.getTextChannelById(internalGuild.getStreamChannelId()).sendMessage(getNotifyMessage(author, newGame, new servant.User(author.getIdLong()), isStreamerMode)).queue();
     }
 
     private static Message getNotifyMessage(User author, Game newGame, servant.User internalUser, boolean isStreamerMode) throws SQLException {

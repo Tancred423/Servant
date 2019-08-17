@@ -15,6 +15,44 @@ public class User {
         this.userId = userId;
     }
 
+    // Stream Hidden
+    public boolean isStreamHidden() throws SQLException {
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT value FROM user_settings WHERE user_id=? AND setting=?");
+        select.setLong(1, userId);
+        select.setString(2, "stream_hidden");
+        var resultSet = select.executeQuery();
+        boolean isStreamHiddden = false;
+        if (resultSet.first()) isStreamHiddden = true;
+        connection.close();
+        return isStreamHiddden;
+    }
+
+    public boolean setStreamHidden() throws SQLException {
+        if (!isStreamHidden()) {
+            var connection = Database.getConnection();
+            var insert = connection.prepareStatement("INSERT INTO user_settings (user_id,setting,value) VALUES (?,?,?)");
+            insert.setLong(1, userId);
+            insert.setString(2, "stream_hidden");
+            insert.setString(3, "1");
+            insert.executeUpdate();
+            connection.close();
+            return true;
+        } else {
+            unsetStreamHiden();
+            return false;
+        }
+    }
+
+    public void unsetStreamHiden() throws SQLException {
+        var connection = Database.getConnection();
+        var delete = connection.prepareStatement("DELETE FROM user_settings WHERE user_id=? AND setting=?");
+        delete.setLong(1, userId);
+        delete.setString(2, "stream_hidden");
+        delete.executeUpdate();
+        connection.close();
+    }
+
     // Color.
     public String getColorCode() throws SQLException {
         var connection = Database.getConnection();
@@ -37,7 +75,6 @@ public class User {
         return colorCode;
     }
 
-    // Color.
     public Color getColor() throws SQLException {
         var connection = Database.getConnection();
         var select = connection.prepareStatement("SELECT value FROM user_settings WHERE user_id=? AND setting=?");
