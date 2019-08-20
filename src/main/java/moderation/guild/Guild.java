@@ -205,6 +205,7 @@ public class Guild {
         var resultSet = select.executeQuery();
         var offset = Servant.config.getDefaultOffset();
         if (resultSet.first()) offset = resultSet.getString("value");
+        offset = offset.equals("00:00") ? "Z" : offset;
         connection.close();
         return offset;
     }

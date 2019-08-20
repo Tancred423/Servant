@@ -12,6 +12,7 @@ import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.sql.SQLException;
+import java.time.DateTimeException;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 
@@ -56,7 +57,7 @@ public class QuickvoteCommand extends Command {
         eb.setFooter("This vote is active.", event.getJDA().getSelfUser().getAvatarUrl());
         try {
             eb.setTimestamp(OffsetDateTime.now(ZoneId.of(new Guild(event.getGuild().getIdLong()).getOffset())));
-        } catch (SQLException e) {
+        } catch (SQLException | DateTimeException e) {
             eb.setTimestamp(OffsetDateTime.now(ZoneId.of(Servant.config.getDefaultOffset())).getOffset());
         }
         message.getChannel().sendMessage(eb.build()).queue(sentMessage -> {
