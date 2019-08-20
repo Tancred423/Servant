@@ -40,3 +40,6 @@ hs_err_pid*
 
 # Temporary Profile Files
 /profile_tmp/*
+
+# Image Files
+/images/*
