@@ -44,7 +44,8 @@ public class BirthdayCommand extends Command {
         if (event.getArgs().isEmpty()) {
             try {
                 var description = String.format(LanguageHandler.get(lang, "birthday_description"), Servant.jda.getSelfUser().getName());
-                var usage = String.format(LanguageHandler.get(lang, "birthday_usage"), name.substring(0, 1).toUpperCase(), name.substring(1).toLowerCase(), (name.toLowerCase().equals("dab") ? " on" : ""), p, name, p, name);
+                var usage = String.format(LanguageHandler.get(lang, "birthday_usage"),
+                        p, name, p, name, p, name, p, name, p, name, p, name, p, name);
                 var hint = LanguageHandler.get(lang, "birthday_hint");
                 event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
             } catch (SQLException e) {

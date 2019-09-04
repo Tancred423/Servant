@@ -112,10 +112,23 @@ public class LanguageFile {
                 "- Members can create a one-time list of all birthdays of this server.\n" +
                 "- Moderators can set up a notification channel, where %s will post a Happy-Birthday-Message.\n" +
                 "- Moderators can create a list of all birthdays of this server, which will be updated every day.");
-        en_gb.setProperty("birthday_usage", "**%s%s%s someone**\n" +
-                "Command: `%s%s [@user]`\n" +
-                "Example: `%s%s @Servant`");
-        en_gb.setProperty("birthday_hint", "There can only be one notification channel and one auto updating list.");
+        en_gb.setProperty("birthday_usage", "**Set notification channel**\n" +
+                "Command: `%s%s #channel`\n" +
+                "**Unset notification channel**\n" +
+                "Command: `%s%s unsetchannel`\n" +
+                "**Create an auto updating birthday list**\n" +
+                "Command: `%s%s updatelist`\n" +
+                "**Set birthday**\n" +
+                "Command: `%s%s yyyy-MM-dd`\n" +
+                "Example: `%s%s 1990-12-31`\n" +
+                "**Unset birthday**\n" +
+                "Command: `%s%s unsetbirthday`\n" +
+                "**Create a non-updating birthday list**\n" +
+                "Command: `%s%s list`");
+        en_gb.setProperty("birthday_hint", "The commands have different required permissions.\n" +
+                "See description:\n" +
+                "- \"Members\": Everyone\n" +
+                "- \"Moderators\": Manage Channels");
         en_gb.setProperty("birthday_countdown", "Countdown");
         en_gb.setProperty("birthday_countdown_value", "in %s days");
         en_gb.setProperty("birthday_date", "Date");
