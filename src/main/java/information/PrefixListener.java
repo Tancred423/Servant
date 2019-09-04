@@ -12,8 +12,7 @@ import java.sql.SQLException;
 public class PrefixListener extends ListenerAdapter {
     public void onMessageReceived(MessageReceivedEvent event) {
         if (event.getAuthor().isBot()) return;
-        if (event.getMessage().getMentionedUsers().isEmpty()) return;
-        if (!event.getMessage().getMentionedUsers().get(0).equals(event.getJDA().getSelfUser())) return;
+        if (!event.getMessage().getContentRaw().equals("<@!" + event.getJDA().getSelfUser().getIdLong() + ">")) return;
         var guild = event.getGuild();
         String prefix;
         String lang;
