@@ -11,7 +11,7 @@ import java.util.concurrent.ThreadLocalRandom;
 class InteractionDatabase {
     static String getGifUrl(String commandName) throws SQLException {
         var connection = Database.getConnection();
-        var select = connection.prepareStatement("SELECT gif FROM fun.interaction WHERE fun.interaction=?");
+        var select = connection.prepareStatement("SELECT gif FROM interaction WHERE interaction=?");
         select.setString(1, commandName);
         var resultSet = select.executeQuery();
         String gif = null;

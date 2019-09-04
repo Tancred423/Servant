@@ -356,7 +356,7 @@ public class User {
     // Interaction.
     public int getInteractionCount(String interaction, boolean isShared) throws SQLException {
         var connection = Database.getConnection();
-        var select = connection.prepareStatement("SELECT " + (isShared ? "shared" : "received") + " FROM interaction_count WHERE user_id=? AND fun.interaction=?");
+        var select = connection.prepareStatement("SELECT " + (isShared ? "shared" : "received") + " FROM interaction_count WHERE user_id=? AND interaction=?");
         select.setLong(1, userId);
         select.setString(2, interaction.toLowerCase());
         var resultSet = select.executeQuery();
@@ -369,16 +369,16 @@ public class User {
     public void incrementInteractionCount(String interaction, boolean isShared) throws SQLException {
         var count = getInteractionCount(interaction, isShared);
         var connection = Database.getConnection();
-        if (hasEntry("interaction_count", "fun/interaction", interaction, false)) {
+        if (hasEntry("interaction_count", "interaction", interaction, false)) {
             // Update.
-            var update = connection.prepareStatement("UPDATE interaction_count SET " + (isShared ? "shared" : "received") + "=? WHERE user_id=? AND fun.interaction=?");
+            var update = connection.prepareStatement("UPDATE interaction_count SET " + (isShared ? "shared" : "received") + "=? WHERE user_id=? AND interaction=?");
             update.setInt(1, count + 1);
             update.setLong(2, userId);
             update.setString(3, interaction.toLowerCase());
             update.executeUpdate();
         } else {
             // Insert.
-            var insert = connection.prepareStatement("INSERT INTO interaction_count (user_id,fun.interaction,shared,received) VALUES (?,?,?,?)");
+            var insert = connection.prepareStatement("INSERT INTO interaction_count (user_id,interaction,shared,received) VALUES (?,?,?,?)");
             insert.setLong(1, userId);
             insert.setString(2, interaction.toLowerCase());
             if (isShared) {

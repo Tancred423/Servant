@@ -30,7 +30,7 @@ public class BirthdayCommand extends Command {
         this.ownerCommand = false;
         this.cooldown = Constants.MOD_COOLDOWN;
         this.cooldownScope = CooldownScope.GUILD;
-        this.userPermissions = new Permission[]{Permission.MANAGE_CHANNEL};
+        this.userPermissions = new Permission[]{};
         this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
     }
 
