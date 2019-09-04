@@ -1,10 +1,15 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package moderation;
 
+import utilities.Image;
+import files.language.LanguageHandler;
+import moderation.guild.Guild;
+import moderation.user.User;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.core.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import servant.Log;
 import servant.Servant;
 
 import java.awt.*;
@@ -16,7 +21,14 @@ public class InviteKickListener extends ListenerAdapter {
         var guildOwner = guild.getOwner().getUser();
 
         guildOwner.openPrivateChannel().queue(privateChannel -> {
-            var internalGuildOwner = new servant.User(guildOwner.getIdLong());
+            var internalGuildOwner = new User(guildOwner.getIdLong());
+            String language;
+            try {
+                language = new Guild(guild.getIdLong()).getLanguage();
+            } catch (SQLException e) {
+                new Log(e, guild, guildOwner, "invite", null).sendLog(false);
+                return;
+            }
             var p = Servant.config.getDefaultPrefix();
             var botOwner = Servant.jda.getUserById(Servant.config.getBotOwnerId());
             var bot = event.getJDA().getSelfUser();
@@ -27,22 +39,11 @@ public class InviteKickListener extends ListenerAdapter {
             } catch (SQLException e) {
                 eb.setColor(Color.decode(Servant.config.getDefaultColorCode()));
             }
-            eb.setAuthor(bot.getName() + " at your service!", null, guild.getIconUrl());
-            eb.setDescription("Thank you for choosing me to assist you and your server.\n" +
-                    "I have a lot of features. Most of them are enabled by default but some of them are not.\n" +
-                    "Type `" + p + "toggle all status` to check the status of all available features.\n" +
-                    "Then you can enable/disable the features to your desire.\n" +
-                    "\n" +
-                    "To get started, I recommend you to use my `" + p + "help` command.\n" +
-                    "To get detailed help, you simply can type the command name without any arguments. E.g. `" + p + "toggle`\n" +
-                    "\n" +
-                    "If you need further help, you can join my support server or contact my creator directly.\n" +
-                    "Support Server: [Click to join](https://" + Servant.config.getSupportGuildInv() + ")\n" +
-                    "Creator Name: " + botOwner.getName() + "#" + botOwner.getDiscriminator() + "\n" +
-                    "\n" +
-                    "Have fun!");
-            eb.setImage("https://i.imgur.com/MDRt4fA.png");
-            eb.setFooter("You are receiving this message, because someone invited me to your guild (" + guild.getName() + ").", null);
+
+            eb.setAuthor(String.format(LanguageHandler.get(language, "invite_author"), bot.getName()), null, guild.getIconUrl());
+            eb.setDescription(String.format(LanguageHandler.get(language, "invite_description"), p, p, p, Servant.config.getSupportGuildInv(), botOwner.getName(), botOwner.getDiscriminator()));
+            eb.setImage(Image.getImageUrl("invite"));
+            eb.setFooter(String.format(LanguageHandler.get(language, "invite_footer"), guild.getName()), null);
 
             privateChannel.sendMessage(eb.build()).queue();
         });
@@ -53,7 +54,14 @@ public class InviteKickListener extends ListenerAdapter {
         var guildOwner = guild.getOwner().getUser();
 
         guildOwner.openPrivateChannel().queue(privateChannel -> {
-            var internalGuildOwner = new servant.User(guildOwner.getIdLong());
+            var internalGuildOwner = new User(guildOwner.getIdLong());
+            String language;
+            try {
+                language = new Guild(guild.getIdLong()).getLanguage();
+            } catch (SQLException e) {
+                new Log(e, guild, guildOwner, "invite", null).sendLog(false);
+                return;
+            }
             var botOwner = Servant.jda.getUserById(Servant.config.getBotOwnerId());
             var eb = new EmbedBuilder();
 
@@ -62,15 +70,10 @@ public class InviteKickListener extends ListenerAdapter {
             } catch (SQLException e) {
                 eb.setColor(Color.decode(Servant.config.getDefaultColorCode()));
             }
-            eb.setAuthor("Farewell!", null, guild.getIconUrl());
-            eb.setDescription("It's very sad to hear, that you don't need me anymore.\n" +
-                    "If there is anything to improve, I am always open for feedback.\n" +
-                    "\n" +
-                    "To submit feedback, you can join my support server or contact my creator directly.\n" +
-                    "Support Server: [Click to join](https://" + Servant.config.getSupportGuildInv() + ")\n" +
-                    "Creator Name: " + botOwner.getName() + "#" + botOwner.getDiscriminator() + "\n");
-            eb.setImage("https://i.imgur.com/MDRt4fA.png");
-            eb.setFooter("You are receiving this message, because someone kicked me from your guild (" + guild.getName() + ") or your guild was deleted.", null);
+            eb.setAuthor(LanguageHandler.get(language, "kick_author"), null, guild.getIconUrl());
+            eb.setDescription(String.format(LanguageHandler.get(language, "kick_description"), Servant.config.getSupportGuildInv(), botOwner.getName(), botOwner.getDiscriminator()));
+            eb.setImage(Image.getImageUrl("kick"));
+            eb.setFooter(String.format(LanguageHandler.get(language, "kick_footer"), guild.getName()), null);
 
             privateChannel.sendMessage(eb.build()).queue();
         });

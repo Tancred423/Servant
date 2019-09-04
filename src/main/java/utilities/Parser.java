@@ -2,16 +2,14 @@
 package utilities;
 
 import net.dv8tion.jda.core.entities.*;
-import servant.Servant;
-import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.awt.*;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -22,18 +20,35 @@ import java.util.List;
 public class Parser {
     public static boolean isValidMessageId(MessageChannel channel, String id) {
         try {
-            channel.getMessageById(id).queue();
+            channel.getMessageById(id).queue(ISnowflake::getId, Throwable::getMessage);
             return true;
         } catch (IllegalArgumentException e) {
             return false;
         }
     }
 
+    public static boolean isValidLanguage(String language) {
+        return language.equalsIgnoreCase("de_de") || language.equalsIgnoreCase("en_Gb");
+    }
+
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean isValidDateTime(String input) {
         try {
             LocalDateTime.parse(input, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
             return true;
         } catch (DateTimeParseException e) {
+            return false;
+        }
+    }
+
+    public static boolean isValidDate(String input) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        sdf.setLenient(false);
+
+        try {
+            sdf.parse(input);
+            return true;
+        } catch (ParseException e) {
             return false;
         }
     }
@@ -74,11 +89,7 @@ public class Parser {
         return colorCode;
     }
 
-    public static boolean isOlderThanTwoWeeks(OffsetDateTime creationTime) {
-        var twoWeeksAgo = System.currentTimeMillis() - 1000 * 3600 * 24 * 14; // 2 weeks
-        return creationTime.toEpochSecond() * 1000 < twoWeeksAgo;
-    }
-
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean hasMentionedUser(Message message) {
         return !message.getMentionedMembers().isEmpty();
     }
@@ -108,23 +119,6 @@ public class Parser {
         return level;
     }
 
-    // Autorole
-    public static Role getRoleFromMessage(CommandEvent event) {
-        Role role;
-        try {
-            role = event.getMessage().getMentionedRoles().get(0);
-        } catch (IndexOutOfBoundsException e) {
-            var args = event.getArgs().split(" ");
-            if (args.length < 2) return null;
-            var id = args[1];
-            if (!id.matches("[0-9]+") || id.length() != 18) return null;
-            var roleId = Long.parseLong(id);
-            role = Servant.jda.getGuildById(event.getGuild().getIdLong()).getRoleById(roleId);
-        }
-
-        return role;
-    }
-
     // Guild
     public static boolean isValidOffset(String offset) {
         var isValidOffset = true;
@@ -140,6 +134,7 @@ public class Parser {
         return isValidOffset;
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean isValidUrl(String urlString) {
         // Check for valid url.
         try {
@@ -173,6 +168,21 @@ public class Parser {
         someHardcodedStuff.add("insert");
         someHardcodedStuff.add("update");
         if (someHardcodedStuff.contains(prefix)) isValidPrefix = false;
+
+        return isValidPrefix;
+    }
+
+    public static boolean isSqlInjection(String text) {
+        var isValidPrefix = true;
+
+        // I will handle this properly in the future.
+        List<String> someHardcodedStuff = new ArrayList<>();
+        someHardcodedStuff.add("select");
+        someHardcodedStuff.add("drop");
+        someHardcodedStuff.add("delete");
+        someHardcodedStuff.add("insert");
+        someHardcodedStuff.add("update");
+        if (someHardcodedStuff.contains(text)) isValidPrefix = false;
 
         return isValidPrefix;
     }

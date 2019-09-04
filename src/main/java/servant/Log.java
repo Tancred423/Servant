@@ -23,7 +23,7 @@ public class Log {
     // Send generic log
     public void sendLog(boolean notifyUser) {
         if (commandEvent != null) commandEvent.reactWarning();
-        if (notifyUser && commandEvent != null) commandEvent.reply("Something went wrong, ...!\n" + "A report was sent to the bot owner.");
+        if (notifyUser && commandEvent != null) commandEvent.reply("Something went wrong, master!\n" + "A report was sent to the bot owner.");
         if (e != null) e.printStackTrace();
         Servant.jda.getUserById(Servant.config.getBotOwnerId()).openPrivateChannel().queue(privateChannel ->
                 privateChannel.sendMessage("```c\n" +

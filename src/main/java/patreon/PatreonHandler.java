@@ -1,6 +1,7 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package patreon;
 
+import files.language.LanguageHandler;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.MessageChannel;
@@ -11,6 +12,15 @@ import java.util.List;
 
 public class PatreonHandler {
     private static Guild g = Servant.jda.getGuildById(436925371577925642L);
+
+    public static String getPatreonRank(User user) {
+        if (is$10Patron(user)) return "$10";
+        else if (is$5Patron(user)) return "$5";
+        else if (is$3Patron(user)) return "$3";
+        else if (is$1Patron(user)) return "$1";
+        else if (isDonator(user)) return "donator";
+        else return "user";
+    }
 
     public static boolean isDonator(User user) {
         if (is$1Patron(user)) return true;
@@ -57,8 +67,8 @@ public class PatreonHandler {
         return false;
     }
 
-    public static void sendWarning(MessageChannel channel, String rank) {
-        var message = "You have to be a %s to use this feature!";
+    public static void sendWarning(MessageChannel channel, String rank, String lang) {
+        var message = LanguageHandler.get(lang, "patreon_warning");
         switch (rank) {
             case "donator":
                 channel.sendMessage(String.format(message, "donator")).queue();

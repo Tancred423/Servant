@@ -1,58 +1,82 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package servant;
 
-import freeToAll.*;
-import freeToAll.embed.CreateEmbedCommand;
-import freeToAll.embed.EditEmbedCommand;
-import freeToAll.profile.ProfileCommand;
-import moderation.stream.StreamCommand;
-import moderation.stream.StreamListener;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.User;
-import vote.QuickvoteCommand;
-import vote.QuickvoteEndListener;
-import vote.QuickvoteMultipleVoteListener;
+import easteregg.EasterEggsListener;
+import files.language.LanguageHandler;
+import fun.*;
+import fun.embed.CreateEmbedCommand;
+import fun.embed.EditEmbedCommand;
+import fun.flip.FlipCommand;
+import fun.flip.UnflipCommand;
+import fun.level.LevelCommand;
+import fun.level.LevelRoleCommand;
+import fun.music.MusicCommand;
+import fun.profile.ProfileCommand;
+import fun.randomAnimal.BirdCommand;
+import fun.randomAnimal.CatCommand;
+import fun.randomAnimal.DogCommand;
+import information.PatreonCommand;
+import information.PrefixListener;
+import information.ServerInfoCommand;
+import moderation.bestOfImage.BestOfImageCommand;
+import moderation.bestOfImage.BestOfImageListener;
+import moderation.bestOfQuote.BestOfQuoteCommand;
+import moderation.bestOfQuote.BestOfQuoteListener;
+import moderation.birthday.BirthdayCommand;
+import moderation.birthday.BirthdayListener;
+import moderation.leave.LeaveCommand;
+import moderation.leave.LeaveListener;
+import moderation.livestream.LivestreamCommand;
+import moderation.livestream.LivestreamListener;
+import moderation.toggle.ToggleCommand;
+import moderation.user.UserCommand;
+import owner.AddGifCommand;
 import moderation.*;
 import moderation.autorole.AutoroleCommand;
 import moderation.autorole.AutoroleListener;
-import moderation.guild.GuildCommand;
+import moderation.guild.ServerCommand;
 import moderation.guild.GuildManager;
-import moderation.joinLeaveNotify.JoinLeaveNotifyCommand;
-import moderation.lobby.LobbyCommand;
-import moderation.lobby.LobbyListener;
+import moderation.join.JoinCommand;
+import moderation.lobby.VoiceLobbyCommand;
+import moderation.lobby.VoiceLobbyListener;
 import moderation.mediaOnlyChannel.MediaOnlyChannelCommand;
 import moderation.mediaOnlyChannel.MediaOnlyChannelListener;
-import moderation.reactionRoles.ReactionRoleCommand;
-import moderation.reactionRoles.ReactionRoleListener;
+import moderation.reactionRole.ReactionRoleCommand;
+import moderation.reactionRole.ReactionRoleListener;
 import patreon.PatreonListener;
-import zChatLib.Bot;
-import config.ToggleFile;
-import moderation.joinLeaveNotify.JoinLeaveNotifyListener;
-import freeToAll.level.LevelCommand;
-import freeToAll.level.LevelListener;
-import config.ConfigFile;
-import interaction.*;
+import useful.alarm.AlarmCommand;
+import useful.alarm.AlarmListener;
+import useful.giveaway.GiveawayCommand;
+import useful.reminder.ReminderCommand;
+import useful.reminder.ReminderListener;
+import useful.votes.quickvote.QuickvoteCommand;
+import useful.votes.quickvote.QuickvoteEndListener;
+import useful.votes.quickvote.QuickvoteMultipleVoteListener;
+import moderation.toggle.ToggleFile;
+import moderation.join.JoinListener;
+import fun.level.LevelListener;
+import files.ConfigFile;
+import fun.interaction.*;
 import net.dv8tion.jda.core.*;
 import net.dv8tion.jda.core.entities.Game;
-import chatbot.ChatbotListener;
+import useful.timezone.TimezoneCommand;
+import useful.votes.vote.RadiovoteMultipleVoteListener;
+import useful.votes.vote.VoteCommand;
+import useful.votes.vote.VoteEndListener;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandClientBuilder;
 import zJdaUtilsLib.com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import zJdaUtilsLib.com.jagrosh.jdautilities.examples.command.AboutCommand;
-import zJdaUtilsLib.com.jagrosh.jdautilities.examples.command.GuildlistCommand;
-import zJdaUtilsLib.com.jagrosh.jdautilities.examples.command.PingCommand;
-import zJdaUtilsLib.com.jagrosh.jdautilities.examples.command.ShutdownCommand;
+import information.BotInfoCommand;
+import owner.ServerlistCommand;
+import owner.PingCommand;
+import owner.ShutdownCommand;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Servant {
     public static JDA jda;
     public static ConfigFile config;
     public static ToggleFile toggle;
-    public static Bot chatBot;
-    public static Map<User, Message> embeds = new HashMap<>();
 
     public static void main(String[] args) throws IOException, LoginException {
         config = new ConfigFile();
@@ -60,6 +84,8 @@ public class Servant {
             System.out.println("The bot was shut down.");
             return;
         }
+
+        LanguageHandler.initialize();
 
         toggle = new ToggleFile();
 
@@ -72,41 +98,63 @@ public class Servant {
         client.setServerInvite("discord.gg/4GpaH5V");
         client.setGuildSettingsManager(new GuildManager());
         client.addCommands(
-                // Default JDA utilities commands.
-                new AboutCommand("your multifuntional bot.",
-                        new String[]{"Moderation Tools", "Informative Commands", "Interactive Features", "Shit-post Features"},
-                        Permission.ADMINISTRATOR),
-                new GuildlistCommand(waiter),
+                // Owner
+                new AddGifCommand(),
                 new PingCommand(),
+                new ServerlistCommand(waiter),
                 new ShutdownCommand(),
 
                 // Moderation
                 new AutoroleCommand(),
+                new BirthdayCommand(),
+                new BestOfImageCommand(),
+                new BestOfQuoteCommand(),
                 new ClearCommand(),
-                new GuildCommand(),
-                new JoinLeaveNotifyCommand(),
-                new LobbyCommand(),
+                new JoinCommand(),
+                new LeaveCommand(),
+                new LevelRoleCommand(),
+                new LivestreamCommand(),
                 new MediaOnlyChannelCommand(),
                 new ReactionRoleCommand(),
-                new StreamCommand(),
+                new RoleCommand(),
+                new ServerCommand(),
+                new SetupWizardCommand(waiter),
                 new ToggleCommand(),
+                new UserCommand(),
+                new VoiceLobbyCommand(),
 
-                // Free to all
+                // Information
+                new BotInfoCommand(),
+                new PatreonCommand(),
+                new ServerInfoCommand(),
+
+                // Useful
+                new AlarmCommand(),
+                new GiveawayCommand(),
+                new ReminderCommand(),
+                new TimezoneCommand(),
+
+                /// Vote
+                new QuickvoteCommand(),
+                new VoteCommand(waiter),
+
+                // Fun
                 new AvatarCommand(),
                 new BaguetteCommand(),
+                new BirdCommand(),
+                new CatCommand(),
                 new CoinflipCommand(),
                 new CreateEmbedCommand(waiter),
+                new DogCommand(),
                 new EditEmbedCommand(waiter),
+                new FlipCommand(),
                 new LevelCommand(),
                 new LoveCommand(),
+                new MusicCommand(),
                 new ProfileCommand(),
-                new UserCommand(),
+                new UnflipCommand(),
 
-                // Vote
-                new QuickvoteCommand(),
-
-                // Interaction
-                new AddGifCommand(),
+                /// Interaction
                 new BegCommand(),
                 new CookieCommand(),
                 new DabCommand(),
@@ -128,18 +176,27 @@ public class Servant {
                 .addEventListener(waiter)
                 .addEventListener(client.build())
                 .addEventListener(new AutoroleListener())
-                .addEventListener(new ChatbotListener())
+                .addEventListener(new BirthdayListener())
                 .addEventListener(new InviteKickListener())
-                .addEventListener(new JoinLeaveNotifyListener())
+                .addEventListener(new JoinListener())
                 .addEventListener(new LevelListener())
-                .addEventListener(new LobbyListener())
+                .addEventListener(new VoiceLobbyListener())
                 .addEventListener(new MediaOnlyChannelListener())
                 .addEventListener(new PatreonListener())
                 .addEventListener(new ReactionRoleListener())
                 .addEventListener(new ReadyListener())
-                .addEventListener(new StreamListener())
+                .addEventListener(new LivestreamListener())
                 .addEventListener(new QuickvoteEndListener())
                 .addEventListener(new QuickvoteMultipleVoteListener())
+                .addEventListener(new VoteEndListener())
+                .addEventListener(new RadiovoteMultipleVoteListener())
+                .addEventListener(new LeaveListener())
+                .addEventListener(new EasterEggsListener())
+                .addEventListener(new BestOfImageListener())
+                .addEventListener(new BestOfQuoteListener())
+                .addEventListener(new ReminderListener())
+                .addEventListener(new AlarmListener())
+                .addEventListener(new PrefixListener())
 
                 // Start.
                 .build();

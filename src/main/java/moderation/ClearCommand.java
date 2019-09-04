@@ -1,62 +1,55 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package moderation;
 
+import files.language.LanguageHandler;
+import moderation.guild.GuildHandler;
+import moderation.toggle.Toggle;
+import moderation.user.User;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageHistory;
 import moderation.guild.Guild;
 import servant.Log;
-import servant.Servant;
-import servant.User;
+import utilities.Constants;
 import utilities.MessageHandler;
-import utilities.Parser;
 import utilities.UsageEmbed;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ClearCommand extends Command {
     public ClearCommand() {
         this.name = "clear";
-        this.aliases = new String[]{"clean", "delete", "purge"};
+        this.aliases = new String[]{"clean", "remove", "delete", "purge"};
         this.help = "Delete messages.";
         this.category = new Category("Moderation");
         this.arguments = "[1 - 100]";
         this.hidden = false;
         this.guildOnly = true;
         this.ownerCommand = false;
-        this.cooldown = 5;
-        this.cooldownScope = CooldownScope.USER;
+        this.cooldown = Constants.MOD_COOLDOWN;
+        this.cooldownScope = CooldownScope.GUILD;
         this.userPermissions = new Permission[]{Permission.MESSAGE_MANAGE};
-        this.botPermissions = new Permission[]{Permission.MESSAGE_MANAGE};
+        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_MANAGE};
     }
 
     @Override
     protected void execute(CommandEvent event) {
-        // Enabled?
-        try {
-            if (!new Guild(event.getGuild().getIdLong()).getToggleStatus("clear")) return;
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-        }
+        if (!Toggle.isEnabled(event, name)) return;
 
         var arg = event.getArgs();
-        var prefix = Servant.config.getDefaultPrefix();
-        // Usage
+        var lang = LanguageHandler.getLanguage(event, name);
+        var p = GuildHandler.getPrefix(event, name);
+
         if (arg.isEmpty()) {
             try {
-                var description = "Deletes 1 - 100 messages.\n" +
-                        "Messages older than two weeks cannot be deleted because of Discord's restrictions.";
-
-                var usage = "**Delete some messages**\n" +
-                        "Command: `" + prefix + name + " [1 - 100]`\n" +
-                        "Example: `" + prefix + name + " 50`";
-
-                var hint = "The range is inclusively, so you can also delete just 1 or a total of 100 messages.";
-
+                var description = LanguageHandler.get(lang, "clear_description");
+                var usage = String.format(LanguageHandler.get(lang, "clear_usage"), p, name, p, name, p, name);
+                var hint = LanguageHandler.get(lang, "clear_hint");
                 event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
             } catch (SQLException e) {
                 new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
@@ -64,36 +57,43 @@ public class ClearCommand extends Command {
             return;
         }
 
-        if (!arg.matches("[0-9]+")) {
-            event.reply("You only can put in numbers!");
-            return;
-        }
-
-        var clearValue = Integer.parseInt(arg);
-
-        if (clearValue < 0 || clearValue > 100) {
-            event.reply("Amount has to be between 1 and 100 inclusively.");
-            return;
-        }
-
         var channel = event.getChannel();
+        if (event.getMessage().getMentionedMembers().isEmpty()) {
+            if (!arg.matches("[0-9]+")) {
+                event.reply(LanguageHandler.get(lang, "clear_input"));
+                return;
+            }
 
-        // Clear messages.
-        event.getMessage().delete().complete();
-        var history = new MessageHistory(channel);
-        List<Message> messageList = history.retrievePast(clearValue).complete();
-        var actuallyCleared = 0;
-        for (var message : messageList) {
-            if (Parser.isOlderThanTwoWeeks(message.getCreationTime())) break;
-            message.delete().complete();
-            actuallyCleared++;
+            var clearValue = Math.min(Integer.parseInt(arg), 100);
+
+            if (clearValue < 1) {
+                event.reply(LanguageHandler.get(lang, "clear_sub_one"));
+                return;
+            }
+
+            event.getMessage().delete().queue(success -> new MessageHistory(channel).retrievePast(clearValue).queue(messages -> {
+                channel.purgeMessages(messages);
+
+                new MessageHandler().sendAndExpire(
+                        channel,
+                        new MessageBuilder().setContent(String.format(LanguageHandler.get(lang, "clear_cleared"), clearValue)).build(),
+                        5 * 1000 // 5 seconds.
+                );
+            }));
+        } else {
+            var user = event.getMessage().getMentionedMembers().get(0).getUser();
+            event.getMessage().delete().queue(success -> new MessageHistory(channel).retrievePast(100).queue(messages -> {
+                List<Message> deleteList = new ArrayList<>();
+                for (Message message : messages) if (message.getAuthor().equals(user)) deleteList.add(message);
+                channel.purgeMessages(deleteList);
+
+                new MessageHandler().sendAndExpire(
+                        channel,
+                        new MessageBuilder().setContent(String.format(LanguageHandler.get(lang, "clear_cleared"), deleteList.size())).build(),
+                        5 * 1000 // 5 seconds.
+                );
+            }));
         }
-
-        new MessageHandler().sendAndExpire(
-                channel,
-                new MessageBuilder().setContent(actuallyCleared + " messages cleared").build(),
-                5 * 1000 // 5 seconds.
-        );
 
         // Statistics.
         try {

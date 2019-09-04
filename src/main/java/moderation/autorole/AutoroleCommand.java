@@ -1,11 +1,14 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package moderation.autorole;
 
+import files.language.LanguageHandler;
+import moderation.guild.GuildHandler;
+import moderation.user.User;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Role;
 import servant.Log;
-import servant.Servant;
-import utilities.Parser;
+import moderation.toggle.Toggle;
+import utilities.Constants;
 import utilities.UsageEmbed;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
@@ -15,51 +18,32 @@ import java.sql.SQLException;
 public class AutoroleCommand extends Command {
     public AutoroleCommand() {
         this.name = "autorole";
-        this.aliases = new String[]{"ar"};
-        this.help = "New member role management.";
+        this.aliases = new String[0];
+        this.help = "Role for new members.";
         this.category = new Category("Moderation");
         this.arguments = null;
         this.hidden = false;
         this.guildOnly = true;
         this.ownerCommand = false;
-        this.cooldown = 5;
-        this.cooldownScope = CooldownScope.USER;
+        this.cooldown = Constants.MOD_COOLDOWN;
+        this.cooldownScope = CooldownScope.GUILD;
         this.userPermissions = new Permission[]{Permission.MANAGE_ROLES};
-        this.botPermissions = new Permission[]{Permission.MANAGE_ROLES};
+        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS, Permission.MANAGE_ROLES};
     }
 
     @Override
     protected void execute(CommandEvent event) {
-        // Enabled?
-        try {
-            if (!new moderation.guild.Guild(event.getGuild().getIdLong()).getToggleStatus("autorole")) return;
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-        }
+        if (!Toggle.isEnabled(event, name)) return;
 
-        var guild = event.getGuild();
-        var internalGuild = new moderation.guild.Guild(guild.getIdLong());
-        var prefix = Servant.config.getDefaultPrefix();
-        // Usage
+        var internalGuild = new moderation.guild.Guild(event.getGuild().getIdLong());
+        var lang = LanguageHandler.getLanguage(event, name);
+        var p = GuildHandler.getPrefix(event, name);
+
         if (event.getArgs().isEmpty()) {
             try {
-                var description = "This role will be automatically given to any new member.";
-
-                var usage = "**Setting up an autorole**\n" +
-                        "Command: `" + prefix + name + " set [@role or role ID]`\n" +
-                        "Example 1: `" + prefix + name + " set @Member`\n" +
-                        "Example 2: `" + prefix + name + " set 999999999999999999`\n" +
-                        "\n" +
-                        "**Unsetting the autorole**\n" +
-                        "Command: `" + prefix + name + " unset`\n" +
-                        "\n" +
-                        "**Showing current autorole**\n" +
-                        "Command: `" + prefix + name + " show`";
-
-                var hint = "You can get the role ID by writing `\\@role`.\n" +
-                        "This requires you to ping it. To avoid it, you can do it in a hidden channel.\n" +
-                        "Using the role ID instead of just pinging it, is nice if you don't want to annoy a lot of people.";
-
+                var description = LanguageHandler.get(lang, "autorole_description");
+                var usage = String.format(LanguageHandler.get(lang, "autorole_usage"), p, name, p, name, p, name, p, name, p, name);
+                var hint = LanguageHandler.get(lang, "autorole_hint");
                 event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
             } catch (SQLException e) {
                 new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
@@ -68,26 +52,27 @@ public class AutoroleCommand extends Command {
         }
 
         var args = event.getArgs().split(" ");
-
         Role role;
 
         switch (args[0].toLowerCase()) {
             case "set":
             case "s":
-                if (args.length < 2) {
-                    event.reply("You did not provide a role mention or role ID.");
+                if (event.getMessage().getMentionedRoles().isEmpty()) {
+                    event.reply(LanguageHandler.get(lang, "autorole_no_role"));
                     return;
                 }
 
-                role = Parser.getRoleFromMessage(event);
+                role = event.getMessage().getMentionedRoles().get(0);
 
-                if (role == null) {
-                    event.reply("The given role is invalid.");
-                    return;
+                int delay;
+                try {
+                    delay = Integer.parseInt(args[args.length - 1]);
+                } catch (NumberFormatException e) {
+                    delay = 0;
                 }
 
                 try {
-                    internalGuild.setAutorole(role);
+                    internalGuild.setAutorole(role.getIdLong(), delay);
                 } catch (SQLException e) {
                     new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                     return;
@@ -105,29 +90,30 @@ public class AutoroleCommand extends Command {
                     return;
                 }
                 if (wasUnset) event.reactSuccess();
-                else event.reply("No autorole was set.");
+                else event.reply(LanguageHandler.get(lang, "autorole_missing"));
                 break;
 
             case "show":
             case "sh":
                 try {
-                    role = internalGuild.getAutorole();
+                    var roleAndDelay = internalGuild.getAutorole();
+                    role = roleAndDelay.entrySet().iterator().next().getKey();
+                    delay = roleAndDelay.get(role);
                 } catch (SQLException e) {
                     new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                     return;
                 }
-                if (role == null) event.reply("There is no current autorole.");
-                else event.reply("The current autorole is: " + role.getName() + " (" + role.getIdLong() + ").");
+                if (role == null) event.reply(LanguageHandler.get(lang, "autorole_no_current"));
+                else event.reply(String.format(LanguageHandler.get(lang, "autorole_current"), role.getName(), role.getIdLong(), delay));
                 break;
 
             default:
-                event.reply("Invalid first argument.\n" +
-                        "Either `set`, `unset` or `show`");
+                event.reply(LanguageHandler.get(lang, "autorole_first_arg"));
         }
 
         // Statistics.
         try {
-            new servant.User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
+            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
             new moderation.guild.Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
         } catch (SQLException e) {
             new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);

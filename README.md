@@ -5,14 +5,17 @@ Multifunctional Discord Bot
 
 ![Servant](https://i.imgur.com/MDRt4fA.png)
 
-## What she does
-* Coming Soon™
+## What she has
+* Moderation Tools
+* Informative Commands
+* Interactive Features
+* Shit-post Features
 
 ## How to get Servant
-* Coming Soon™
+* [Click here](https://discordapp.com/oauth2/authorize?client_id=436916794796670977&scope=bot&permissions=8)
 
 ## Support
-* Coming Soon™
+* [Join the support server](https://discord.gg/4GpaH5V)
 
 ## Built with
 * [Java 11](https://openjdk.java.net/projects/jdk/11/) - Programming Language
@@ -23,3 +26,15 @@ Multifunctional Discord Bot
 
 ## Author
 * [Tancred#9056](https://github.com/Tancred423)
+
+## Shout-Outs
+* [NavuArt](https://twitter.com/navuart) - Art & Illustrations
+* [Maselkov](https://github.com/Maselkov) - Motivation & Support
+* fschill - Support
+* [MEE6](https://mee6.xyz/) - Inspiration & Stolen Level Formula :P
+* [Ser Aymeric](http://www.seraymeric.com) - Flip Idea
+* [Random Bird Pictures](http://random.birb.pw)
+* [Random Cat Pictures](http://random.cat)
+* [Random Dog Pictures](https://dog.ceo/dog-api)
+* [Compliment API](https://complimentr.com)
+* [Inspiration & Libraries](https://github.com/jagrosh)

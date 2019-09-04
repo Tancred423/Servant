@@ -18,6 +18,7 @@
 // Also better help message via embeds.
 package zJdaUtilsLib.com.jagrosh.jdautilities.command.impl;
 
+import files.language.LanguageHandler;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.Event;
@@ -54,6 +55,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.events.ShutdownEvent;
+import servant.Log;
 import servant.Servant;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.*;
 import zJdaUtilsLib.com.jagrosh.jdautilities.commons.utils.FixedSizeCache;
@@ -138,7 +140,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
         this.helpConsumer = helpConsumer==null ? (event) -> {
             var eb = new EmbedBuilder();
             try {
-                eb.setColor(new servant.User(event.getAuthor().getIdLong()).getColor());
+                eb.setColor(new moderation.user.User(event.getAuthor().getIdLong()).getColor());
             } catch (SQLException e) {
                 eb.setColor(Color.decode(Servant.config.getDefaultColorCode()));
             }
@@ -162,7 +164,16 @@ public class CommandClientImpl implements CommandClient, EventListener {
                         }
                     }
 
-                    builder.append("\n`").append(textPrefix).append(prefix == null ? " " : "").append(command.getName())
+                    String userPrefix;
+                    try {
+                        userPrefix = event.getGuild() == null ?
+                                new moderation.user.User(event.getAuthor().getIdLong()).getPrefix() :
+                                new moderation.guild.Guild(event.getGuild().getIdLong()).getPrefix();
+                    } catch (SQLException e) {
+                        userPrefix = Servant.config.getDefaultPrefix();
+                    }
+
+                    builder.append("\n`").append(userPrefix).append(prefix == null ? " " : "").append(command.getName())
                             .append(command.getArguments() == null ? "`" : " " + command.getArguments() + "`")
                             .append(" - ").append(command.getHelp());
                     previousCategory = category;
@@ -180,7 +191,13 @@ public class CommandClientImpl implements CommandClient, EventListener {
 
             if (event.isFromType(ChannelType.TEXT)) event.reactSuccess();
             event.replyInDm(eb.build(), unused -> {
-            }, t -> event.replyWarning("Help cannot be sent because you are blocking Direct Messages."));
+            }, t -> {
+                try {
+                    event.replyWarning(LanguageHandler.get(new moderation.user.User(event.getAuthor().getIdLong()).getLanguage(), "blocking_dm"));
+                } catch (SQLException e) {
+                    new Log(e, event.getGuild(), event.getAuthor(), "CommandClientImpl", null).sendLog(false);
+                }
+            });
         } : helpConsumer;
 
         // Load commands
@@ -465,9 +482,15 @@ public class CommandClientImpl implements CommandClient, EventListener {
         if (settings != null) if (settings.getPrefixes() != null && settings.getPrefixes().isEmpty()) settings = null;
 
         if (settings == null) {
+            String userPrefix;
+            try {
+                userPrefix = new moderation.user.User(event.getAuthor().getIdLong()).getPrefix();
+            } catch (SQLException e) {
+                userPrefix = Servant.config.getDefaultPrefix();
+            }
             // Check for default prefix.
-            if(rawContent.toLowerCase().startsWith(prefix.toLowerCase()))
-                parts = splitOnPrefixLength(rawContent, prefix.length());
+            if(rawContent.toLowerCase().startsWith(userPrefix.toLowerCase()))
+                parts = splitOnPrefixLength(rawContent, userPrefix.length());
             // Check for alternate prefix
             if(parts == null && altprefix != null && rawContent.toLowerCase().startsWith(altprefix.toLowerCase()))
                 parts = splitOnPrefixLength(rawContent, altprefix.length());

@@ -6,7 +6,7 @@
 
     <groupId>Servant</groupId>
     <artifactId>Servant</artifactId>
-    <version>4.17.1</version>
+    <version>4.18.0</version>
 
     <properties>
         <!-- Set java compiler to version 11. -->
@@ -67,4 +67,17 @@
             <version>2.10.2</version>
         </dependency>
     </dependencies>
+
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+            <archive>
+                <manifest>
+                    <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                    <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                </manifest>
+            </archive>
+        </configuration>
+    </plugin>
 </project>

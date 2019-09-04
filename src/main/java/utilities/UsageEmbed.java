@@ -12,7 +12,7 @@ public class UsageEmbed {
     private MessageEmbed embed;
 
     public UsageEmbed(String commandName, User author, String description, boolean ownerCommand, Permission[] permissions, String[] aliases, String usage, String hint) throws SQLException {
-        var internalUser = new servant.User(author.getIdLong());
+        var internalUser = new moderation.user.User(author.getIdLong());
 
         var stringBuilder = new StringBuilder();
         for (var perm : permissions) stringBuilder.append(perm.getName()).append("\n");
