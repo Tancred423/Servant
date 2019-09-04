@@ -816,9 +816,12 @@ public class Guild {
             update.executeUpdate();
         } else {
             // Insert.
-            var insert = connection.prepareStatement("INSERT INTO guild (guild_id,language) VALUES (?,?)");
+            var insert = connection.prepareStatement("INSERT INTO guild (guild_id,prefix,offset,language,birthday_channel_id) VALUES (?,?,?,?,?)");
             insert.setLong(1, guildId);
-            insert.setString(2, language);
+            insert.setString(2, Servant.config.getDefaultPrefix());
+            insert.setString(3, Servant.config.getDefaultOffset());
+            insert.setString(4, language);
+            insert.setLong(5, 0);
             insert.executeUpdate();
         }
         connection.close();

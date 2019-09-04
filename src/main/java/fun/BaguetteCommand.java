@@ -43,7 +43,7 @@ public class BaguetteCommand extends Command {
         else if (random > 15) random = ThreadLocalRandom.current().nextInt(11, 20 + 1); // 11-20 | 5% Chance
         else if (random > 10) random = ThreadLocalRandom.current().nextInt(21, 30 + 1); // 21-30 | 5% Chance
         else if (random > 5) random = ThreadLocalRandom.current().nextInt(31, 40 + 1); // 31-40 | 5% Chance
-        else random = ThreadLocalRandom.current().nextInt(41, 50); // 41-50 | 5% Chance
+        else random = ThreadLocalRandom.current().nextInt(41, 50 + 1); // 41-50 | 5% Chance
 
         String baguette1;
         String baguette2;
