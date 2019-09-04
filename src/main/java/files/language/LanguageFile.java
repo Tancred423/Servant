@@ -63,10 +63,10 @@ public class LanguageFile {
         en_gb.setProperty("patreon_warning", "You have to be a %s to use this feature!");
 
         /// Presence
-        en_gb.setProperty("presence_0", "%shelp | v%s");
-        en_gb.setProperty("presence_1", "%s users");
-        en_gb.setProperty("presence_2", "%s servers");
-        en_gb.setProperty("presence_3", "%spatreon");
+        en_gb.setProperty("presence_0", "v%s | %shelp");
+        en_gb.setProperty("presence_1", "%s users | %shelp");
+        en_gb.setProperty("presence_2", "%s servers | %help");
+        en_gb.setProperty("presence_3", "%spatreon | %shelp");
         en_gb.setProperty("presence_4", "Mistlock Best Server");
 
         // Owner

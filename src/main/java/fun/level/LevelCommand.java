@@ -31,7 +31,7 @@ public class LevelCommand extends Command {
         this.name = "level";
         this.aliases = new String[]{"rank"};
         this.help = "Check levels.";
-        this.category = new Category("Free to all");
+        this.category = new Category("Fun");
         this.arguments = "[show|@user|leaderboard]";
         this.hidden = false;
         this.guildOnly = true;
