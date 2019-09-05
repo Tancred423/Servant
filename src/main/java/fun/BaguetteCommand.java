@@ -66,9 +66,24 @@ public class BaguetteCommand extends Command {
 
         event.reply(baguettes);
 
-        // Statistics.
+
         try {
-            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
+            // Baguette Counter
+            var internalUser = new User(event.getAuthor().getIdLong());
+            var baguette = internalUser.getBaguette();
+            if (baguette.isEmpty()) {
+                internalUser.setBaguette(random, 1);
+            } else {
+                var currentBaguette = baguette.entrySet().iterator().next();
+                if (random > currentBaguette.getKey()) {
+                    internalUser.setBaguette(random, 1);
+                } else if (random == currentBaguette.getKey()) {
+                    internalUser.setBaguette(random, currentBaguette.getValue() + 1);
+                }
+            }
+
+            // Statistics.
+            internalUser.incrementFeatureCount(name.toLowerCase());
             if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
         } catch (SQLException e) {
             new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);

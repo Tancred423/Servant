@@ -37,13 +37,13 @@ public class ReadyListener extends ListenerAdapter {
         System.out.println(event.getJDA().getSelfUser().getName() + " ready.");
     }
 
-    public void onResume(ResumedEvent event) {
-        setPresence(event);
-    }
-
-    public void onReconnect(ReconnectedEvent event) {
-        setPresence(event);
-    }
+//    public void onResume(ResumedEvent event) {
+//        setPresence(event);
+//    }
+//
+//    public void onReconnect(ReconnectedEvent event) {
+//        setPresence(event);
+//    }
 
     private void setPresence(ReadyEvent event) {
         ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
@@ -53,7 +53,7 @@ public class ReadyListener extends ListenerAdapter {
             } catch (IOException | SAXException | ParserConfigurationException e) {
                 new Log(e, null, event.getJDA().getSelfUser(), "ReadyListener - Presence", null).sendLog(false);
             }
-        }, 0, 60, TimeUnit.SECONDS);
+        }, 0, 5, TimeUnit.MINUTES);
     }
 
     private void setPresence(ResumedEvent event) {
@@ -64,7 +64,7 @@ public class ReadyListener extends ListenerAdapter {
             } catch (IOException | SAXException | ParserConfigurationException e) {
                 new Log(e, null, event.getJDA().getSelfUser(), "ReadyListener - Presence", null).sendLog(false);
             }
-        }, 0, 60, TimeUnit.SECONDS);
+        }, 0, 5, TimeUnit.MINUTES);
     }
 
     private void setPresence(ReconnectedEvent event) {
@@ -75,7 +75,7 @@ public class ReadyListener extends ListenerAdapter {
             } catch (IOException | SAXException | ParserConfigurationException e) {
                 new Log(e, null, event.getJDA().getSelfUser(), "ReadyListener - Presence", null).sendLog(false);
             }
-        }, 0, 60, TimeUnit.SECONDS);
+        }, 0, 5, TimeUnit.MINUTES);
     }
 
     private void settingPresence() throws IOException, SAXException, ParserConfigurationException {

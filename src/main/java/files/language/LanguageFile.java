@@ -65,9 +65,9 @@ public class LanguageFile {
         /// Presence
         en_gb.setProperty("presence_0", "v%s | %shelp");
         en_gb.setProperty("presence_1", "%s users | %shelp");
-        en_gb.setProperty("presence_2", "%s servers | %help");
+        en_gb.setProperty("presence_2", "%s servers | %shelp");
         en_gb.setProperty("presence_3", "%spatreon | %shelp");
-        en_gb.setProperty("presence_4", "Mistlock Best Server");
+        en_gb.setProperty("presence_4", "Mistlock Best Server ♥");
 
         // Owner
         /// Add Gif
@@ -933,6 +933,9 @@ public class LanguageFile {
         en_gb.setProperty("profile_achievements", "Achievements");
         en_gb.setProperty("profile_footer1", "Also try \"%s%s @user\"");
         en_gb.setProperty("profile_footer2", "Also try \"%s%s\"");
+        en_gb.setProperty("profile_baguettecounter", "Baguette Statistics");
+        en_gb.setProperty("profile_nobaguette", "No baguette yet");
+        en_gb.setProperty("profile_baguette", "Biggest baguette: %s (%s times)");
 
         /// Unflip
         en_gb.setProperty("unflip_description", "Unlip a user.");

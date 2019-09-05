@@ -1,9 +1,9 @@
--- phpMyAdmin SQL Dump
+﻿-- phpMyAdmin SQL Dump
 -- version 4.7.0
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Erstellungszeit: 04. Sep 2019 um 20:12
+-- Erstellungszeit: 05. Sep 2019 um 17:00
 -- Server-Version: 5.6.34-log
 -- PHP-Version: 7.1.5
 
@@ -55,6 +55,18 @@ CREATE TABLE `autorole` (
   `guild_id` bigint(20) NOT NULL,
   `role_id` bigint(20) NOT NULL,
   `delay` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `baguette_counter`
+--
+
+CREATE TABLE `baguette_counter` (
+  `user_id` bigint(18) NOT NULL,
+  `baguette_size` int(11) NOT NULL,
+  `size_counter` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -467,6 +479,12 @@ ALTER TABLE `alarm`
 --
 ALTER TABLE `autorole`
   ADD PRIMARY KEY (`guild_id`);
+
+--
+-- Indizes für die Tabelle `baguette_counter`
+--
+ALTER TABLE `baguette_counter`
+  ADD PRIMARY KEY (`user_id`);
 
 --
 -- Indizes für die Tabelle `best_of_image`

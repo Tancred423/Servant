@@ -19,6 +19,52 @@ public class User {
         this.userId = userId;
     }
 
+    // Baguette
+    public Map<Integer, Integer> getBaguette() throws SQLException {
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT * FROM baguette_counter WHERE user_id=?");
+        select.setLong(1, userId);
+        var resultSet = select.executeQuery();
+        var baguette = new HashMap<Integer, Integer>();
+        if (resultSet.first()) baguette.put(resultSet.getInt("baguette_size"), resultSet.getInt("size_counter"));
+        connection.close();
+        return baguette;
+    }
+
+    private boolean baguetteHasEntry() throws SQLException {
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT * FROM baguette_counter WHERE user_id=?");
+        select.setLong(1, userId);
+        var resultSet = select.executeQuery();
+        if (resultSet.first()) {
+            connection.close();
+            return true;
+        } else {
+            connection.close();
+            return false;
+        }
+    }
+
+    public void setBaguette(int baguetteSize, int sizeCounter) throws SQLException {
+        var connection = Database.getConnection();
+        if (baguetteHasEntry()) {
+            //  Update.
+            var update = connection.prepareStatement("UPDATE baguette_counter SET baguette_size=?, size_counter=? WHERE user_id=?");
+            update.setInt(1, baguetteSize);
+            update.setInt(2, sizeCounter);
+            update.setLong(3, userId);
+            update.executeUpdate();
+        } else {
+            // Insert.
+            var insert = connection.prepareStatement("INSERT INTO baguette_counter (user_id,baguette_size,size_counter) VALUES (?,?,?)");
+            insert.setLong(1, userId);
+            insert.setInt(2, baguetteSize);
+            insert.setInt(3, sizeCounter);
+            insert.executeUpdate();
+        }
+        connection.close();
+    }
+
     // Achievement
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean hasAchievement(String achievement) throws SQLException {

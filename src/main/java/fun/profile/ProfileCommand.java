@@ -86,6 +86,9 @@ public class ProfileCommand extends Command {
                 text = String.format(LanguageHandler.get(lang, "profile_mostused_value"), p, entry.getKey(), entry.getValue());
             }
 
+            // Baguette
+            var baguette = internalAuthor.getBaguette().entrySet().iterator().hasNext() ? internalAuthor.getBaguette().entrySet().iterator().next() : null;
+
             // Description
             var desc = JsonReader.readJsonFromUrl("https://complimentr.com/api").getString("compliment");
             desc = desc.substring(0, 1).toUpperCase() + desc.substring(1).toLowerCase() + ".";
@@ -101,7 +104,10 @@ public class ProfileCommand extends Command {
             eb.setDescription(desc);
             eb.addField(LanguageHandler.get(lang, "profile_level"), currentLevel + " (" + currentExpOnThisLevel + "/" + neededExp + ")\n" +
                    String.format(LanguageHandler.get(lang, "profile_rank"),  internalGuild.getUserRank(profileUser.getIdLong())), false);
-            eb.addField(LanguageHandler.get(lang, "profile_mostused"), text, false);
+            eb.addField(LanguageHandler.get(lang, "profile_mostused"), text, true);
+            eb.addField(LanguageHandler.get(lang, "profile_baguettecounter"), baguette == null ?
+                    LanguageHandler.get(lang, "profile_nobaguette") :
+                    String.format(LanguageHandler.get(lang, "profile_baguette"), baguette.getKey(), baguette.getValue()), true);
             eb.addField(LanguageHandler.get(lang, "profile_achievements"), achievementBuilder.toString(), false);
             eb.setImage(Image.getImageUrl(PatreonHandler.getPatreonRank(profileUser)));
             eb.setFooter(profileUser.equals(author) ?
