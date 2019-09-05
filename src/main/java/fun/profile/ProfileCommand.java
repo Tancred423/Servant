@@ -87,7 +87,7 @@ public class ProfileCommand extends Command {
             }
 
             // Baguette
-            var baguette = internalAuthor.getBaguette().entrySet().iterator().hasNext() ? internalAuthor.getBaguette().entrySet().iterator().next() : null;
+            var baguette = internalProfileUser.getBaguette().entrySet().iterator().hasNext() ? internalProfileUser.getBaguette().entrySet().iterator().next() : null;
 
             // Description
             var desc = JsonReader.readJsonFromUrl("https://complimentr.com/api").getString("compliment");
