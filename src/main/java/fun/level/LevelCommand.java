@@ -49,6 +49,8 @@ public class LevelCommand extends Command {
         var lang = LanguageHandler.getLanguage(event, name);
         var p = GuildHandler.getPrefix(event, name);
 
+        event.getChannel().sendTyping().queue();
+
         var author = event.getAuthor();
         var internalAuthor = new User(author.getIdLong());
         var guild = event.getGuild();

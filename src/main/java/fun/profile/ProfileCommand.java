@@ -61,7 +61,7 @@ public class ProfileCommand extends Command {
 
             // Achievements
             Map<String, Integer> achievements;
-            achievements = internalAuthor.getAchievements();
+            achievements = internalProfileUser.getAchievements();
             var achievementBuilder = new StringBuilder();
             achievementBuilder.append("AP: ").append(internalProfileUser.getTotelAP()).append("\n")
                     .append("```c\n").append(StringFormat.fillWithWhitespace(LanguageHandler.get(lang, "profile_name"), 32))
