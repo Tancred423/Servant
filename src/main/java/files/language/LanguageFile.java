@@ -19,16 +19,16 @@ public class LanguageFile {
         // Features
         /// Achievement
         en_gb.setProperty("achievement_excalibur", "Excalibur");
-        en_gb.setProperty("achievement", "Level 10");
-        en_gb.setProperty("achievement", "Level 20");
-        en_gb.setProperty("achievement", "Level 30");
-        en_gb.setProperty("achievement", "Level 40");
-        en_gb.setProperty("achievement", "Level 50");
-        en_gb.setProperty("achievement", "Level 60");
-        en_gb.setProperty("achievement", "Level 70");
-        en_gb.setProperty("achievement", "Level 80");
-        en_gb.setProperty("achievement", "Level 90");
-        en_gb.setProperty("achievement", "Level 100");
+        en_gb.setProperty("achievement_level10", "Level 10");
+        en_gb.setProperty("achievement_level20", "Level 20");
+        en_gb.setProperty("achievement_level30", "Level 30");
+        en_gb.setProperty("achievement_level40", "Level 40");
+        en_gb.setProperty("achievement_level50", "Level 50");
+        en_gb.setProperty("achievement_level60", "Level 60");
+        en_gb.setProperty("achievement_level70", "Level 70");
+        en_gb.setProperty("achievement_level80", "Level 80");
+        en_gb.setProperty("achievement_level90", "Level 90");
+        en_gb.setProperty("achievement_level100", "Level 100");
 
         /// Invite
         en_gb.setProperty("invite_author", "%s, at your service!");

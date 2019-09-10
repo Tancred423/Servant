@@ -98,7 +98,7 @@ public class User {
         select.setLong(1, userId);
         var resultSet = select.executeQuery();
         var ap = 0;
-        if (resultSet.first()) ap += resultSet.getInt("ap");
+        if (resultSet.first()) do ap += resultSet.getInt("ap"); while (resultSet.next());
         connection.close();
         return ap;
     }
