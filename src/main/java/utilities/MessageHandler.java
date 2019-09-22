@@ -39,7 +39,7 @@ public class MessageHandler {
         channel.sendMessage(eb.build()).queue();
     }
 
-    public void reachtAchievement(Message message) {
+    public void reactAchievement(Message message) {
         var emote = Emote.getEmoji("achievement");
         if (emote != null) message.addReaction(emote).queue();
         else message.addReaction(Emote.getEmoji("achievement")).queue();

@@ -118,7 +118,7 @@ public class Servant {
                 new ReactionRoleCommand(),
                 new RoleCommand(),
                 new ServerCommand(),
-                new SetupWizardCommand(waiter),
+                new ServerSetupCommand(waiter),
                 new ToggleCommand(),
                 new UserCommand(),
                 new VoiceLobbyCommand(),

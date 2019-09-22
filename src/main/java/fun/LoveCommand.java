@@ -8,6 +8,7 @@ import moderation.user.User;
 import moderation.guild.Guild;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.Message;
 import servant.Log;
 import utilities.Constants;
 import utilities.MessageHandler;
@@ -68,6 +69,8 @@ public class LoveCommand extends Command {
         var shippingName = getShippingName(first, second);
 
         try {
+            checkLoveAchievements(internalAuthor, message, love);
+
             new MessageHandler().sendEmbed(event.getChannel(),
                     internalAuthor.getColor(),
                     quote,
@@ -124,53 +127,35 @@ public class LoveCommand extends Command {
 
     private String getQuote(int love, boolean isSelfLove, String lang) {
         if (isSelfLove) {
-            if (love >= 100) {
-                return LanguageHandler.get(lang, "love_self_100");
-            } else if (love >= 90) {
-                return LanguageHandler.get(lang, "love_self_90");
-            } else if (love >= 80) {
-                return LanguageHandler.get(lang, "love_self_80");
-            } else if (love >= 70) {
-                return LanguageHandler.get(lang, "love_self_70");
-            } else if (love >= 60) {
-                return LanguageHandler.get(lang, "love_self_60");
-            } else if (love >= 50) {
-                return LanguageHandler.get(lang, "love_self_50");
-            } else if (love >= 40) {
-                return LanguageHandler.get(lang, "love_self_40");
-            } else if (love >= 30) {
-                return LanguageHandler.get(lang, "love_self_30");
-            } else if (love >= 20) {
-                return LanguageHandler.get(lang, "love_self_20");
-            } else if (love >= 10) {
-                return LanguageHandler.get(lang, "love_self_10");
-            } else if (love >= 0) {
-                return LanguageHandler.get(lang, "love_self_0");
-            } else return LanguageHandler.get(lang, "love_fallback");
+            if (love >= 100) return LanguageHandler.get(lang, "love_self_100");
+            else if (love >= 90) return LanguageHandler.get(lang, "love_self_90");
+            else if (love >= 80) return LanguageHandler.get(lang, "love_self_80");
+            else if (love >= 70) return LanguageHandler.get(lang, "love_self_70");
+            else if (love == 69) return LanguageHandler.get(lang, "love_self_69");
+            else if (love >= 60) return LanguageHandler.get(lang, "love_self_60");
+            else if (love >= 50) return LanguageHandler.get(lang, "love_self_50");
+            else if (love == 42) return LanguageHandler.get(lang, "love_self_42");
+            else if (love >= 40) return LanguageHandler.get(lang, "love_self_40");
+            else if (love >= 30) return LanguageHandler.get(lang, "love_self_30");
+            else if (love >= 20) return LanguageHandler.get(lang, "love_self_20");
+            else if (love >= 10) return LanguageHandler.get(lang, "love_self_10");
+            else if (love >= 0) return LanguageHandler.get(lang, "love_self_0");
+            else return LanguageHandler.get(lang, "love_fallback");
         } else {
-            if (love >= 100) {
-                return LanguageHandler.get(lang, "love_noself_100");
-            } else if (love >= 90) {
-                return LanguageHandler.get(lang, "love_noself_90");
-            } else if (love >= 80) {
-                return LanguageHandler.get(lang, "love_noself_80");
-            } else if (love >= 70) {
-                return LanguageHandler.get(lang, "love_noself_70");
-            } else if (love >= 60) {
-                return LanguageHandler.get(lang, "love_noself_60");
-            } else if (love >= 50) {
-                return LanguageHandler.get(lang, "love_noself_50");
-            } else if (love >= 40) {
-                return LanguageHandler.get(lang, "love_noself_40");
-            } else if (love >= 30) {
-                return LanguageHandler.get(lang, "love_noself_30");
-            } else if (love >= 20) {
-                return LanguageHandler.get(lang, "love_noself_20");
-            } else if (love >= 10) {
-                return LanguageHandler.get(lang, "love_noself_10");
-            } else if (love >= 0) {
-                return LanguageHandler.get(lang, "love_noself_0");
-            } else return LanguageHandler.get(lang, "love_fallback");
+            if (love >= 100) return LanguageHandler.get(lang, "love_noself_100");
+            else if (love >= 90) return LanguageHandler.get(lang, "love_noself_90");
+            else if (love >= 80) return LanguageHandler.get(lang, "love_noself_80");
+            else if (love >= 70) return LanguageHandler.get(lang, "love_noself_70");
+            else if (love == 69) return LanguageHandler.get(lang, "love_noself_69");
+            else if (love >= 60) return LanguageHandler.get(lang, "love_noself_60");
+            else if (love >= 50) return LanguageHandler.get(lang, "love_noself_50");
+            else if (love == 42) return LanguageHandler.get(lang, "love_noself_42");
+            else if (love >= 40) return LanguageHandler.get(lang, "love_noself_40");
+            else if (love >= 30) return LanguageHandler.get(lang, "love_noself_30");
+            else if (love >= 20) return LanguageHandler.get(lang, "love_noself_20");
+            else if (love >= 10) return LanguageHandler.get(lang, "love_noself_10");
+            else if (love >= 0) return LanguageHandler.get(lang, "love_noself_0");
+            else return LanguageHandler.get(lang, "love_fallback");
         }
     }
 
@@ -179,5 +164,19 @@ public class LoveCommand extends Command {
         String secondName = second.getEffectiveName();
         return firstName.substring(0, 1).toUpperCase() + firstName.substring(1, firstName.length() / 2).toLowerCase()
                 + secondName.substring(secondName.length() / 2).toLowerCase();
+    }
+
+    private void checkLoveAchievements(User internalAuthor, Message message, int love) throws SQLException {
+        if (love == 69) {
+            if (!internalAuthor.hasAchievement("love69")) {
+                internalAuthor.setAchievement("love69", 69);
+                new MessageHandler().reactAchievement(message);
+            }
+        } else if (love == 42) {
+            if (!internalAuthor.hasAchievement("love42")) {
+                internalAuthor.setAchievement("love42", 42);
+                new MessageHandler().reactAchievement(message);
+            }
+        }
     }
 }

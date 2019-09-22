@@ -324,11 +324,16 @@ public class User {
         if (resultSet.first()) colorCode = resultSet.getString("value");
         else {
             var user = Servant.jda.getUserById(userId);
-            if (PatreonHandler.is$10Patron(user)) colorCode = "#29b6f6";
-            else if (PatreonHandler.is$5Patron(user)) colorCode = "#01ca9e";
-            else if (PatreonHandler.is$3Patron(user)) colorCode = "#ffca28";
-            else if (PatreonHandler.is$1Patron(user)) colorCode = "#bebebe";
-            else if (PatreonHandler.isDonator(user)) colorCode = "#cd7f32";
+            var guild = Servant.jda.getGuildById(436925371577925642L);
+            Color color = null;
+            if (PatreonHandler.is$10Patron(user)) color = guild.getRoleById(502472869234868224L).getColor();
+            else if (PatreonHandler.is$5Patron(user)) color = guild.getRoleById(502472823638458380L).getColor();
+            else if (PatreonHandler.is$3Patron(user)) color = guild.getRoleById(502472546600353796L).getColor();
+            else if (PatreonHandler.is$1Patron(user)) color = guild.getRoleById(502472440455233547L).getColor();
+            else if (PatreonHandler.isDonator(user)) color = guild.getRoleById(489738762838867969L).getColor();
+
+            if (color != null)
+                colorCode = String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
             else colorCode = Servant.config.getDefaultColorCode();
         }
         connection.close();

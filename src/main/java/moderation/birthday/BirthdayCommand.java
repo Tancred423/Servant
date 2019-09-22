@@ -58,6 +58,7 @@ public class BirthdayCommand extends Command {
         var args = event.getArgs();
         var guild = event.getGuild();
         var internalGuild = new Guild(guild.getIdLong());
+        var bot = event.getSelfUser();
 
         try {
             if (!message.getMentionedChannels().isEmpty()) {
@@ -93,6 +94,13 @@ public class BirthdayCommand extends Command {
             } else if (args.equalsIgnoreCase("list")) {
                 // User - One Time List
                 BirthdayHandler.sendList(false, name, event);
+            } else if (args.equalsIgnoreCase(bot.getName())) {
+                // Mod - Add or remove bot's birthday
+                if (event.getMember().hasPermission(Permission.MESSAGE_MANAGE)) {
+                    if (internalGuild.getBirthdays().containsKey(bot.getIdLong())) internalGuild.unsetBirthday(bot.getIdLong());
+                    else internalGuild.setBirthday(bot.getIdLong(), "2018-04-06");
+                    event.reactSuccess();
+                } else event.reply(String.format(LanguageHandler.get(lang, "permission"), Permission.MESSAGE_MANAGE.getName()));
             } else {
                 event.reply(LanguageHandler.get(lang, "birthday_invalid"));
             }

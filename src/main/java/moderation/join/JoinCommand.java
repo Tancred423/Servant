@@ -19,7 +19,7 @@ public class JoinCommand extends Command {
     public JoinCommand() {
         this.name = "join";
         this.aliases = new String[0];
-        this.help = "Alert for new member.";
+        this.help = "Alert for joining user.";
         this.category = new Category("Moderation");
         this.arguments = null;
         this.hidden = false;

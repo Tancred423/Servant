@@ -39,7 +39,7 @@ public class VoteCommand extends Command {
         this.aliases = new String[]{"v"};
         this.help = "Host a voting.";
         this.category = new Category("*Votes*");
-        this.arguments = null;
+        this.arguments = "<question>/<answer1>/(...)/<answer10>";
         this.hidden = false;
         this.guildOnly = true;
         this.ownerCommand = false;
@@ -93,9 +93,11 @@ public class VoteCommand extends Command {
                             && (e.getReactionEmote().getName().equals(accept)
                             || e.getReactionEmote().getName().equals(decline)),
                     e -> {
-                        message.delete().queue();
                         if (e.getReactionEmote().getName().equals(accept)) processVote(event, question, answers, lang, true);
                         else processVote(event, question, answers, lang, false);
+
+                        message.delete().queue();
+                        event.getMessage().delete().queue();
                     }, 15, TimeUnit.MINUTES, () -> timeout(message, event, lang));
         });
 

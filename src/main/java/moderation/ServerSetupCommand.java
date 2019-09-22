@@ -20,13 +20,13 @@ import zJdaUtilsLib.com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import java.sql.SQLException;
 import java.util.concurrent.TimeUnit;
 
-public class SetupWizardCommand extends Command {
+public class ServerSetupCommand extends Command {
     private final EventWaiter waiter;
     private String accept = "✅";
     private String decline = "❌";
 
-    public SetupWizardCommand(EventWaiter waiter) {
-        this.name = "setupwizard";
+    public ServerSetupCommand(EventWaiter waiter) {
+        this.name = "serversetup";
         this.aliases = new String[]{"setup"};
         this.help = "Initial server setup wizard.";
         this.category = new Category("Moderation");

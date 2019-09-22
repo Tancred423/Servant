@@ -1,8 +1,6 @@
 # Servant
 Multifunctional Discord Bot
 
-**This bot is currently in development and not ready to use!**
-
 ![Servant](https://i.imgur.com/MDRt4fA.png)
 
 ## What she has

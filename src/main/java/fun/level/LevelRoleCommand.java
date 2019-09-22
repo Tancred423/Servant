@@ -28,7 +28,7 @@ public class LevelRoleCommand extends Command {
     public LevelRoleCommand() {
         this.name = "levelrole";
         this.aliases = new String[]{"rankrole"};
-        this.help = "Gain roles on certain levels";
+        this.help = "Gain roles on certain levels.";
         this.category = new Category("Moderation");
         this.arguments = "[set|unset] [level] @role";
         this.hidden = false;

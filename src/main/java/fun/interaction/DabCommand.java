@@ -7,7 +7,7 @@ import utilities.Constants;
 public class DabCommand extends InteractionCommand {
     public DabCommand() {
         this.name = "dab";
-        this.aliases = new String[0];
+        this.aliases = new String[]{"yeet"};
         this.help = "Dab one someone.";
         this.category = new Category("*Interaction*");
         this.arguments = "@user";

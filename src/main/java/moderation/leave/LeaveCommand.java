@@ -19,7 +19,7 @@ public class LeaveCommand extends Command {
     public LeaveCommand() {
         this.name = "leave";
         this.aliases = new String[0];
-        this.help = "Alert for leaving member.";
+        this.help = "Alert for leaving user.";
         this.category = new Category("Moderation");
         this.arguments = null;
         this.hidden = false;

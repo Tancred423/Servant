@@ -112,7 +112,7 @@ class BirthdayHandler {
 
         sb.append("```c\n")
                 .append(countdown).append(" ").append(date).append(" ").append(name).append("\n")
-                .append("-".repeat(countdown.length())).append(" ").append("-".repeat(date.length())).append(" ").append("-".repeat(32)).append("\n");
+                .append("-".repeat(countdown.length())).append(" ").append("-".repeat(date.length())).append(" ").append("-".repeat(16)).append("\n");
         for (Map.Entry<Long, String> entry : birthdaysSorted.entrySet()) {
             sb.append(String.format(LanguageHandler.get(lang, "birthday_countdown_value"), StringFormat.pushWithWhitespace(String.valueOf(entry.getKey()), 3)))
                     .append(" ")

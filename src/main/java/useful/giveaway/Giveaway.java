@@ -6,6 +6,7 @@ import moderation.guild.Guild;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.User;
 import servant.Database;
 import servant.Log;
 import servant.Servant;
@@ -70,7 +71,7 @@ class Giveaway {
 
             var remainingTimeMillis = zonedDateTimeDifference(now, giveaway);
 
-            if (remainingTimeMillis <= 0) announceWinners(messageNew, amountWinners, prize, service, lang);
+            if (remainingTimeMillis <= 0) announceWinners(messageNew, amountWinners, prize, service, lang, message.getAuthor());
             else {
                 remainingTimeMillis = zonedDateTimeDifference(now, giveaway);
                 var remainingTimeString = formatDifference(remainingTimeMillis, lang);
@@ -91,7 +92,7 @@ class Giveaway {
         });
     }
 
-    private static void announceWinners(Message message, int amountWinners, String prize, ScheduledExecutorService scheduledExecutorService, String lang) {
+    private static void announceWinners(Message message, int amountWinners, String prize, ScheduledExecutorService scheduledExecutorService, String lang, User author) {
         if (message.getReactions().size() == 0) {
             message.getChannel().sendMessage(LanguageHandler.get(lang, "giveaway_noreactions")).queue();
             return;
@@ -118,7 +119,7 @@ class Giveaway {
                         } catch (SQLException e) {
                             eb.setColor(Color.decode(Servant.config.getDefaultColorCode()));
                         }
-                        eb.setAuthor(String.format(LanguageHandler.get(lang, "giveaway_from"), message.getAuthor().getName()), null, message.getAuthor().getEffectiveAvatarUrl());
+                        eb.setAuthor(String.format(LanguageHandler.get(lang, "giveaway_from"), author.getName()), null, author.getEffectiveAvatarUrl());
                         eb.setDescription(String.format(LanguageHandler.get(lang, "giveaway_description_nowinner"), prize, amountWinners));
                         eb.setFooter(LanguageHandler.get(lang, "giveaway_endedat"), null);
                         eb.setTimestamp(now);
@@ -138,7 +139,7 @@ class Giveaway {
                         } catch (SQLException e) {
                             eb.setColor(Color.decode(Servant.config.getDefaultColorCode()));
                         }
-                        eb.setAuthor(String.format(LanguageHandler.get(lang, "giveaway_from"), message.getAuthor().getName()), null, message.getAuthor().getEffectiveAvatarUrl());
+                        eb.setAuthor(String.format(LanguageHandler.get(lang, "giveaway_from"), author.getName()), null, author.getEffectiveAvatarUrl());
                         eb.setDescription(String.format(LanguageHandler.get(lang, "giveaway_description_end"), prize, amountWinners, winners));
                         eb.setFooter(LanguageHandler.get(lang, "giveaway_endedat"), null);
                         eb.setTimestamp(now);
@@ -326,6 +327,7 @@ class Giveaway {
         var finalPrize1 = prize;
 
         message.getTextChannel().sendMessage(eb.build()).queue((messageNew -> {
+            var author = message.getAuthor();
             message.delete().queue();
             try {
                 insertGiveawayToDb(messageNew.getGuild().getIdLong(), messageNew.getChannel().getIdLong(), messageNew.getIdLong(), message.getAuthor().getIdLong(), finalPrize1);

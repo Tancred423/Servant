@@ -54,7 +54,7 @@ public class QuickvoteCommand extends Command {
         }
         eb.setAuthor(String.format(LanguageHandler.get(lang, "quickvote_started"), author.getName()), null, author.getEffectiveAvatarUrl());
         eb.setDescription(event.getArgs());
-        eb.setFooter(LanguageHandler.get(lang, "vote_active"), event.getJDA().getSelfUser().getAvatarUrl());
+        eb.setFooter(LanguageHandler.get(lang, "votes_active"), event.getJDA().getSelfUser().getAvatarUrl());
         try {
             eb.setTimestamp(OffsetDateTime.now(ZoneId.of(new Guild(event.getGuild().getIdLong()).getOffset())));
         } catch (SQLException | DateTimeException e) {

@@ -25,10 +25,13 @@ public class LanguageFile {
         en_gb.setProperty("achievement_level40", "Level 40");
         en_gb.setProperty("achievement_level50", "Level 50");
         en_gb.setProperty("achievement_level60", "Level 60");
+        en_gb.setProperty("achievement_level69", "Nice Level");
         en_gb.setProperty("achievement_level70", "Level 70");
         en_gb.setProperty("achievement_level80", "Level 80");
         en_gb.setProperty("achievement_level90", "Level 90");
         en_gb.setProperty("achievement_level100", "Level 100");
+        en_gb.setProperty("achievement_love42", "Found the answer.");
+        en_gb.setProperty("achievement_love69", "Nice Love");
 
         /// Invite
         en_gb.setProperty("invite_author", "%s, at your service!");
@@ -67,7 +70,6 @@ public class LanguageFile {
         en_gb.setProperty("presence_1", "%s users | %shelp");
         en_gb.setProperty("presence_2", "%s servers | %shelp");
         en_gb.setProperty("presence_3", "%spatreon | %shelp");
-        en_gb.setProperty("presence_4", "Mistlock Best Server ♥");
 
         // Owner
         /// Add Gif
@@ -215,7 +217,7 @@ public class LanguageFile {
         en_gb.setProperty("joinleave_current", "Current channel: %s");
 
         /// Join
-        en_gb.setProperty("join_description", "The bot will post a notification once a new member joins the server.");
+        en_gb.setProperty("join_description", "The bot will post a notification once a user joins the server.");
         en_gb.setProperty("join_usage", "**Setting up a join notification channel**\n" +
                 "Command: `%s%s set [#channel]`\n" +
                 "Example: `%s%s set #welcome`\n" +
@@ -229,7 +231,7 @@ public class LanguageFile {
         en_gb.setProperty("join_joined", "%s#%s just joined %s!");
 
         /// Leave
-        en_gb.setProperty("leave_description", "The bot will post a notification once a member leaves the server.");
+        en_gb.setProperty("leave_description", "The bot will post a notification once a user leaves the server.");
         en_gb.setProperty("leave_usage", "**Setting up a leave notification channel**\n" +
                 "Command: `%s%s set [#channel]`\n" +
                 "Example: `%s%s set #welcome`\n" +
@@ -412,7 +414,7 @@ public class LanguageFile {
         en_gb.setProperty("server_settings", "Guild Settings");
         en_gb.setProperty("server_firstarg", "The first argument has to be either `set`, `unset` or `show`.");
 
-        /// Setup Wizard
+        /// Server Setup
         en_gb.setProperty("setupwizard_introduction", "Welcome to the server setup wizard!\n" +
                 "After doing this, you have all (3) base settings set up and we are ready to go!\n" +
                 "On each question you have 15 minutes to answer, otherwise this setup will time out.\n" +
@@ -447,26 +449,27 @@ public class LanguageFile {
         /// Toggle
         en_gb.setProperty("toggle_description", "You can toggle almost every feature on or off.\n" +
                 "The level-feature is off by default in case you want to use it.\n" +
-                "To check what features are toggleable, just use `%s%s all status`");
+                "To check what features are toggleable, just use `%s%s all show`");
         en_gb.setProperty("toggle_usage", "**Manage one feautre**\n" +
-                "Command: `%s%s [feature] [on|off|status]`\n" +
+                "Command: `%s%s [feature] [on|off|show]`\n" +
                 "Example 1: `%s%s level on`\n" +
                 "Example 2: `%s%s level off`\n" +
-                "Example 3: `%s%s level status`\n" +
+                "Example 3: `%s%s level show`\n" +
                 "\n" +
                 "**Manage all features**\n" +
-                "Command: `%s%s all [on|off|status]`\n" +
+                "Command: `%s%s all [on|off|show]`\n" +
                 "Example 1: `%s%s all on`\n" +
                 "Example 2: `%s%s all off`\n" +
-                "Example 3: `%s%s all status`\n");
-        en_gb.setProperty("toggle_hint", "Be careful with toggling all features on or off, as you may delete your perfect set-up.\n" +
+                "Example 3: `%s%s all show`\n");
+        en_gb.setProperty("toggle_hint", "Be careful with toggling all features on or off, as you may delete your perfect setup.\n" +
                 "You may write `everything` instead of `all`.\n" +
-                "Status will only show the current status without changing any values.");
+                "You may write `status` instead of `show`.\n" +
+                "Show will only show the current status without changing any values.");
         en_gb.setProperty("toggle_args", "Too few arguments.\n" +
-                "toggle [feature] <on|off|status>\n" +
+                "toggle [feature] [on|off|show]\n" +
                 "e.g.: toggle level off");
         en_gb.setProperty("toggle_invalid_feature", "Invalid feature.");
-        en_gb.setProperty("toggle_invalid_argument", "Argument has to be `on`, `off` or `status`.");
+        en_gb.setProperty("toggle_invalid_argument", "Argument has to be `on`, `off` or `show`.");
 
         /// User
         en_gb.setProperty("user_description", "With this command you can personalize the bot to your desire.");
@@ -748,7 +751,7 @@ public class LanguageFile {
         en_gb.setProperty("timezone_description", "Convert a date and time from one timezone to another");
         en_gb.setProperty("timezone_usage", "Command: `%s%s yyyy-MM-dd HH:mm <current timezone> <target timezone>`\n" +
                 "Example: `%s%s 2019-01-01 22:00 PST CET`");
-        en_gb.setProperty("timezone_hint", "Image url has to be a [direct link](https://www.urbandictionary.com/define.php?term=direct%20link).");
+        en_gb.setProperty("timezone_hint", "This command uses the 24 hour system.");
         en_gb.setProperty("timezone_missingargs", "Missing arguments.");
         en_gb.setProperty("timezone_conversion", "Timezone Conversion");
         en_gb.setProperty("timezone_input", "Input");
@@ -899,8 +902,10 @@ public class LanguageFile {
         en_gb.setProperty("love_self_90", "Pretty self confident, don't you think?");
         en_gb.setProperty("love_self_80", "So narcissistic...");
         en_gb.setProperty("love_self_70", "You love yourself more than others love you.");
+        en_gb.setProperty("love_self_69", "Nice.");
         en_gb.setProperty("love_self_60", "Seems like you are accepting yourself.");
         en_gb.setProperty("love_self_50", "You seem to be undecided if you like yourself or not.");
+        en_gb.setProperty("love_self_42", "You found the answer.");
         en_gb.setProperty("love_self_40", "Now, you can look into the mirror with pride.");
         en_gb.setProperty("love_self_30", "A bit unsecure, but I'm sure you can handle it.");
         en_gb.setProperty("love_self_20", "You are doing great. Build some self confidence!");
@@ -910,8 +915,10 @@ public class LanguageFile {
         en_gb.setProperty("love_noself_90", "Get up and invite them for a dinner.");
         en_gb.setProperty("love_noself_80", "You sure, you don't wanna date?");
         en_gb.setProperty("love_noself_70", "I call a sis-/bromance.");
+        en_gb.setProperty("love_noself_69", "Nice.");
         en_gb.setProperty("love_noself_60", "There is a chance.");
         en_gb.setProperty("love_noself_50", "I bet you can be friends. :)");
+        en_gb.setProperty("love_noself_42", "You found the answer.");
         en_gb.setProperty("love_noself_40", "At least you are trying.");
         en_gb.setProperty("love_noself_30", "I think this won't work out.");
         en_gb.setProperty("love_noself_20", "At least a bit, amirite.");

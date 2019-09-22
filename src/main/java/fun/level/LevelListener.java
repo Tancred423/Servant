@@ -134,70 +134,77 @@ public class LevelListener extends ListenerAdapter {
         if (level >= 10) {
             if (!internalAuthor.hasAchievement("level10")) {
                 internalAuthor.setAchievement("level10", 10);
-                new MessageHandler().reachtAchievement(message);
+                new MessageHandler().reactAchievement(message);
             }
         }
 
         if (level >= 20) {
             if (!internalAuthor.hasAchievement("level20")) {
                 internalAuthor.setAchievement("level20", 20);
-                new MessageHandler().reachtAchievement(message);
+                new MessageHandler().reactAchievement(message);
             }
         }
 
         if (level >= 30) {
             if (!internalAuthor.hasAchievement("level30")) {
                 internalAuthor.setAchievement("level30", 30);
-                new MessageHandler().reachtAchievement(message);
+                new MessageHandler().reactAchievement(message);
             }
         }
 
         if (level >= 40) {
             if (!internalAuthor.hasAchievement("level40")) {
                 internalAuthor.setAchievement("level40", 40);
-                new MessageHandler().reachtAchievement(message);
+                new MessageHandler().reactAchievement(message);
             }
         }
 
         if (level >= 50) {
             if (!internalAuthor.hasAchievement("level50")) {
                 internalAuthor.setAchievement("level50", 50);
-                new MessageHandler().reachtAchievement(message);
+                new MessageHandler().reactAchievement(message);
             }
         }
 
         if (level >= 60) {
             if (!internalAuthor.hasAchievement("level60")) {
                 internalAuthor.setAchievement("level60", 60);
-                new MessageHandler().reachtAchievement(message);
+                new MessageHandler().reactAchievement(message);
+            }
+        }
+
+        if (level >= 69) {
+            if (!internalAuthor.hasAchievement("level69")) {
+                internalAuthor.setAchievement("level69", 69);
+                new MessageHandler().reactAchievement(message);
             }
         }
 
         if (level >= 70) {
             if (!internalAuthor.hasAchievement("level70")) {
                 internalAuthor.setAchievement("level70", 70);
-                new MessageHandler().reachtAchievement(message);
+                new MessageHandler().reactAchievement(message);
             }
         }
 
         if (level >= 80) {
             if (!internalAuthor.hasAchievement("level80")) {
                 internalAuthor.setAchievement("level80", 80);
-                new MessageHandler().reachtAchievement(message);
+                new MessageHandler().reactAchievement(message);
             }
         }
 
         if (level >= 90) {
             if (!internalAuthor.hasAchievement("level90")) {
                 internalAuthor.setAchievement("level90", 90);
-                new MessageHandler().reachtAchievement(message);
+                new MessageHandler().reactAchievement(message);
             }
         }
 
         if (level >= 100) {
             if (!internalAuthor.hasAchievement("level100")) {
                 internalAuthor.setAchievement("level100", 100);
-                new MessageHandler().reachtAchievement(message);
+                new MessageHandler().reactAchievement(message);
             }
         }
     }

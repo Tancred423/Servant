@@ -37,37 +37,7 @@ public class ReadyListener extends ListenerAdapter {
         System.out.println(event.getJDA().getSelfUser().getName() + " ready.");
     }
 
-//    public void onResume(ResumedEvent event) {
-//        setPresence(event);
-//    }
-//
-//    public void onReconnect(ReconnectedEvent event) {
-//        setPresence(event);
-//    }
-
     private void setPresence(ReadyEvent event) {
-        ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
-        service.scheduleAtFixedRate(() -> {
-            try {
-                settingPresence();
-            } catch (IOException | SAXException | ParserConfigurationException e) {
-                new Log(e, null, event.getJDA().getSelfUser(), "ReadyListener - Presence", null).sendLog(false);
-            }
-        }, 0, 5, TimeUnit.MINUTES);
-    }
-
-    private void setPresence(ResumedEvent event) {
-        ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
-        service.scheduleAtFixedRate(() -> {
-            try {
-                settingPresence();
-            } catch (IOException | SAXException | ParserConfigurationException e) {
-                new Log(e, null, event.getJDA().getSelfUser(), "ReadyListener - Presence", null).sendLog(false);
-            }
-        }, 0, 5, TimeUnit.MINUTES);
-    }
-
-    private void setPresence(ReconnectedEvent event) {
         ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
         service.scheduleAtFixedRate(() -> {
             try {
@@ -89,11 +59,9 @@ public class ReadyListener extends ListenerAdapter {
             Servant.jda.getPresence().setPresence(OnlineStatus.ONLINE, Game.watching(String.format(LanguageHandler.get(lang, "presence_2"), Servant.jda.getGuilds().size(), Servant.config.getDefaultPrefix())));
         else if (counter == 3)
             Servant.jda.getPresence().setPresence(OnlineStatus.ONLINE, Game.playing(String.format(LanguageHandler.get(lang, "presence_3"), Servant.config.getDefaultPrefix(), Servant.config.getDefaultPrefix())));
-        else if (counter == 4)
-            Servant.jda.getPresence().setPresence(OnlineStatus.ONLINE, Game.playing(LanguageHandler.get(lang, "presence_4")));
 
         counter++;
-        if (counter == 5) counter = 0;
+        if (counter == 4) counter = 0;
     }
 
     private synchronized String getVersion() throws ParserConfigurationException, IOException, SAXException {

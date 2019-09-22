@@ -36,7 +36,7 @@ public class JoinListener extends ListenerAdapter {
 
         if (channel != null)
             channel.sendMessage(
-                    String.format(LanguageHandler.get(lang, "leave_left"), joinedUser.getName(), joinedUser.getDiscriminator(), guild.getName())
+                    String.format(LanguageHandler.get(lang, "join_joined"), joinedUser.getName(), joinedUser.getDiscriminator(), guild.getName())
             ).queue();
     }
 }

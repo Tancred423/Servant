@@ -14,10 +14,14 @@ public class Achievement {
             case "level40": return LanguageHandler.get(lang, "achievement_level40");
             case "level50": return LanguageHandler.get(lang, "achievement_level50");
             case "level60": return LanguageHandler.get(lang, "achievement_level60");
+            case "level69": return LanguageHandler.get(lang, "achievement_level69");
             case "level70": return LanguageHandler.get(lang, "achievement_level70");
             case "level80": return LanguageHandler.get(lang, "achievement_level80");
             case "level90": return LanguageHandler.get(lang, "achievement_level90");
             case "level100": return LanguageHandler.get(lang, "achievement_level100");
+
+            case "love42": return LanguageHandler.get(lang, "achievement_love42");
+            case "love69": return LanguageHandler.get(lang, "achievement_love69");
 
             default: return name;
         }

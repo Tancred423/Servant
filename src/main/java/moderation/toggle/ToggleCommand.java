@@ -22,7 +22,7 @@ public class ToggleCommand extends Command {
         this.aliases = new String[0];
         this.help = "Toggles bot's features.";
         this.category = new Command.Category("Moderation");
-        this.arguments = "<feature> [on|off|status]";
+        this.arguments = "<feature> [on|off|show]";
         this.hidden = false;
         this.guildOnly = true;
         this.ownerCommand = false;
@@ -119,14 +119,14 @@ public class ToggleCommand extends Command {
         }
 
         var arg1 = args[1].toLowerCase();
-        if (!arg1.equals("on") && !arg1.equals("off") && !arg1.equals("status")) {
+        if (!arg1.equals("on") && !arg1.equals("off") && !arg1.equals("status") && !arg1.equals("show")) {
             event.reply(LanguageHandler.get(lang, "toggle_invalid_argument"));
             return;
         }
 
         var internalGuild = new Guild(event.getGuild().getIdLong());
 
-        if (arg1.equals("status")) {
+        if (arg1.equals("show") || arg1.equals("status")) {
             if (feature.equals("all")) {
                 // Toggle Status All Features
                 var stringBuilder = new StringBuilder();
