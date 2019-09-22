@@ -9,6 +9,7 @@ import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import servant.Log;
+import utilities.Image;
 import utilities.StringFormat;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
@@ -129,7 +130,7 @@ class BirthdayHandler {
             eb.setColor(internalAuthor.getColor());
             eb.setAuthor(String.format(LanguageHandler.get(lang, "birthday_guild"), guild.getName() + (guild.getName().toLowerCase().endsWith("s") ? "'" : "'s")), null, guild.getIconUrl());
             eb.setDescription(sb.toString());
-            eb.setFooter(LanguageHandler.get(lang, "birthday_as_of"), "https://i.imgur.com/PA3Xzgu.png");
+            eb.setFooter(LanguageHandler.get(lang, "birthday_as_of"), Image.getImageUrl("clock"));
             eb.setTimestamp(OffsetDateTime.now());
 
             return eb.build();

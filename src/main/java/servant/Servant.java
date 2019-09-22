@@ -8,10 +8,9 @@ import fun.embed.CreateEmbedCommand;
 import fun.embed.EditEmbedCommand;
 import fun.flip.FlipCommand;
 import fun.flip.UnflipCommand;
-import fun.level.LevelCommand;
 import fun.level.LevelRoleCommand;
 import fun.music.MusicCommand;
-import fun.profile.ProfileCommand;
+import fun.level.ProfileCommand;
 import fun.randomAnimal.BirdCommand;
 import fun.randomAnimal.CatCommand;
 import fun.randomAnimal.DogCommand;
@@ -148,7 +147,7 @@ public class Servant {
                 new DogCommand(),
                 new EditEmbedCommand(waiter),
                 new FlipCommand(),
-                new LevelCommand(),
+//                new LevelCommand(), // is now in profile
                 new LoveCommand(),
                 new MusicCommand(),
                 new ProfileCommand(),

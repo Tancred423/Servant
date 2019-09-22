@@ -42,7 +42,7 @@ public class EditEmbedCommand extends Command {
         this.aliases = new String[0];
         this.help = "Edit an embed of the bot.";
         this.category = new Category("Fun");
-        this.arguments = "#channel [message ID]";
+        this.arguments = null;
         this.hidden = false;
         this.guildOnly = true;
         this.ownerCommand = false;

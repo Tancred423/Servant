@@ -27,7 +27,7 @@ public class ClearCommand extends Command {
         this.aliases = new String[]{"clean", "remove", "delete", "purge"};
         this.help = "Delete messages.";
         this.category = new Category("Moderation");
-        this.arguments = "[1 - 100]";
+        this.arguments = null;
         this.hidden = false;
         this.guildOnly = true;
         this.ownerCommand = false;

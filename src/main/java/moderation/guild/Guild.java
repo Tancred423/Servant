@@ -1308,7 +1308,7 @@ public class Guild {
 
     public void setLeaveNotifierChannel(MessageChannel channel) throws SQLException {
         var connection = Database.getConnection();
-        if (joinNotifierHasEntry()) {
+        if (leaveNotifierHasEntry()) {
             // Update.
             var update = connection.prepareStatement("UPDATE leave_notifier SET channel_id=? WHERE guild_id=?");
             update.setLong(1, channel.getIdLong());

@@ -11,6 +11,7 @@ import servant.Database;
 import servant.Log;
 import servant.Servant;
 import utilities.Emote;
+import utilities.Image;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.awt.*;
@@ -84,7 +85,7 @@ class Giveaway {
                 }
                 eb.setAuthor(String.format(LanguageHandler.get(lang, "giveaway_from"), message.getAuthor().getName()), null, message.getAuthor().getEffectiveAvatarUrl());
                 eb.setDescription(String.format(LanguageHandler.get(lang, "giveaway_description_running"), prize, amountWinners, remainingTimeString, Emote.getEmoji("tada")));
-                eb.setFooter(LanguageHandler.get(lang, "giveaway_endsat"), null);
+                eb.setFooter(LanguageHandler.get(lang, "giveaway_endsat"), Image.getImageUrl("clock"));
                 eb.setTimestamp(giveaway);
 
                 messageNew.editMessage(eb.build()).queue();
@@ -121,7 +122,7 @@ class Giveaway {
                         }
                         eb.setAuthor(String.format(LanguageHandler.get(lang, "giveaway_from"), author.getName()), null, author.getEffectiveAvatarUrl());
                         eb.setDescription(String.format(LanguageHandler.get(lang, "giveaway_description_nowinner"), prize, amountWinners));
-                        eb.setFooter(LanguageHandler.get(lang, "giveaway_endedat"), null);
+                        eb.setFooter(LanguageHandler.get(lang, "giveaway_endedat"), Image.getImageUrl("clock"));
                         eb.setTimestamp(now);
                         message.editMessage(eb.build()).queue();
                     } else {
@@ -319,7 +320,7 @@ class Giveaway {
         }
         eb.setAuthor(String.format(LanguageHandler.get(lang, "giveaway_from"), message.getAuthor().getName()), null, message.getAuthor().getEffectiveAvatarUrl());
         eb.setDescription(String.format(LanguageHandler.get(lang, "giveaway_description_running"), prize, amountWinners, remainingTimeString, Emote.getEmoji("tada")));
-        eb.setFooter(LanguageHandler.get(lang, "giveaway_endsat"), null);
+        eb.setFooter(LanguageHandler.get(lang, "giveaway_endsat"), Image.getImageUrl("clock"));
         eb.setTimestamp(dateGiveaway);
 
         var finalPrize = prize;
@@ -327,7 +328,6 @@ class Giveaway {
         var finalPrize1 = prize;
 
         message.getTextChannel().sendMessage(eb.build()).queue((messageNew -> {
-            var author = message.getAuthor();
             message.delete().queue();
             try {
                 insertGiveawayToDb(messageNew.getGuild().getIdLong(), messageNew.getChannel().getIdLong(), messageNew.getIdLong(), message.getAuthor().getIdLong(), finalPrize1);

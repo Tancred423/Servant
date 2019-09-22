@@ -4,13 +4,21 @@ package moderation.join;
 import files.language.LanguageHandler;
 import moderation.guild.Guild;
 import moderation.toggle.Toggle;
+import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.MessageChannel;
+import net.dv8tion.jda.core.entities.MessageEmbed;
+import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import servant.Log;
 import servant.Servant;
+import utilities.Image;
 
+import java.awt.*;
 import java.sql.SQLException;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 
 public class JoinListener extends ListenerAdapter {
     public void onGuildMemberJoin(GuildMemberJoinEvent event) {
@@ -34,9 +42,26 @@ public class JoinListener extends ListenerAdapter {
             return;
         }
 
-        if (channel != null)
-            channel.sendMessage(
-                    String.format(LanguageHandler.get(lang, "join_joined"), joinedUser.getName(), joinedUser.getDiscriminator(), guild.getName())
-            ).queue();
+        if (channel != null) channel.sendMessage(getEmbed(joinedUser, guild, internalGuild, lang)).queue();
+    }
+
+    private MessageEmbed getEmbed(User joinedUser, net.dv8tion.jda.core.entities.Guild guild, Guild internalGuild, String lang) {
+        var eb = new EmbedBuilder();
+        var internalJoinedUser = new moderation.user.User(joinedUser.getIdLong());
+        try {
+            eb.setColor(internalJoinedUser.getColor());
+        } catch (SQLException e) {
+            eb.setColor(Color.decode(Servant.config.getDefaultColorCode()));
+        }
+        eb.setAuthor(String.format(LanguageHandler.get(lang, "join_author"), joinedUser.getName(), joinedUser.getDiscriminator(), guild.getName()), null, guild.getIconUrl());
+        eb.setDescription(LanguageHandler.get(lang, "join_embeddescription"));
+        eb.setThumbnail(joinedUser.getEffectiveAvatarUrl());
+        eb.setFooter(LanguageHandler.get(lang, "join_footer"), Image.getImageUrl("clock"));
+        try {
+            eb.setTimestamp(OffsetDateTime.now(ZoneOffset.of(internalGuild.getOffset())));
+        } catch (SQLException e) {
+            eb.setTimestamp(OffsetDateTime.now(ZoneOffset.UTC));
+        }
+        return eb.build();
     }
 }

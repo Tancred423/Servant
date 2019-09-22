@@ -97,45 +97,44 @@ public class LevelCommand extends Command {
             eb.setFooter(String.format(LanguageHandler.get(lang, "level_leaderboard_footer"), p, p), event.getSelfUser().getAvatarUrl());
             eb.setDescription(leaderboard.toString());
             event.reply(eb.build());
-            return;
-        }
+        } else {
+            var mentioned = (event.getMessage().getMentionedMembers().isEmpty() ? null : event.getMessage().getMentionedMembers().get(0).getUser());
 
-        var mentioned = (event.getMessage().getMentionedMembers().isEmpty() ? null : event.getMessage().getMentionedMembers().get(0).getUser());
+            // Create File.
+            var image = new File(OffsetDateTime.now(ZoneOffset.UTC).toEpochSecond() + ".png");
 
-        // Create File.
-        var imageDir = OffsetDateTime.now(ZoneOffset.UTC).toEpochSecond() + ".png";
-        var image = new File(imageDir);
-
-        try {
-            var profile = new LevelImage((mentioned == null ? author : mentioned), event.getGuild(), lang);
-            ImageIO.write(profile.getImage(), "png", image);
-        } catch (IOException | SQLException | NoninvertibleTransformException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-            return;
-        }
-
-        var eb = new EmbedBuilder();
-        try {
-            eb.setColor(internalAuthor.getColor());
-        } catch (SQLException e) {
-            eb.setColor(Color.decode(Servant.config.getDefaultColorCode()));
-        }
-        eb.setImage("attachment://" + image.getPath());
-        eb.setFooter(String.format(LanguageHandler.get(lang, "level_footer"), (mentioned == null ? "\"" + p + "level @user\"" : "\"" + p + "level\""), p), event.getSelfUser().getAvatarUrl());
-        event.getChannel().sendFile(image, image.getPath()).embed(eb.build()).queue();
-
-        // Delete File.
-        var thread = new Thread(() -> {
             try {
-                TimeUnit.MILLISECONDS.sleep(10000); // 10 seconds.
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                var profile = new LevelImage((mentioned == null ? author : mentioned), event.getGuild(), lang);
+                ImageIO.write(profile.getImage(), "png", image);
+            } catch (IOException | SQLException | NoninvertibleTransformException e) {
+                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
+                return;
             }
 
-            if (!image.delete()) new Log(null, event.getGuild(), event.getAuthor(), name, null).sendLog(false);
-        });
+            var eb = new EmbedBuilder();
+            try {
+                eb.setColor(internalAuthor.getColor());
+            } catch (SQLException e) {
+                eb.setColor(Color.decode(Servant.config.getDefaultColorCode()));
+            }
+            eb.setImage("attachment://" + image.getPath());
+            eb.setFooter(String.format(LanguageHandler.get(lang, "level_footer"), (mentioned == null ? "\"" + p + "level @user\"" : "\"" + p + "level\""), p), event.getSelfUser().getAvatarUrl());
+            event.getChannel().sendFile(image, image.getPath()).embed(eb.build()).queue();
 
-        thread.start();
+            // Delete File.
+            var thread = new Thread(() -> {
+                try {
+                    TimeUnit.MILLISECONDS.sleep(10000); // 10 seconds.
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                if (!image.delete()) new Log(null, event.getGuild(), event.getAuthor(), name, null).sendLog(false);
+            });
+
+            thread.start();
+
+        }
 
         // Statistics.
         try {

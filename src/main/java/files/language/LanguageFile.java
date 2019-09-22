@@ -90,7 +90,7 @@ public class LanguageFile {
         /// Auto Role
         en_gb.setProperty("autorole_description", "This role will be automatically given to any new member.");
         en_gb.setProperty("autorole_usage", "**Setting up an autorole**\n" +
-                "Command: `%s%s set <@role> <opt. delay (min)>`\n" +
+                "Command: `%s%s set [@role] [optinal delay]`\n" +
                 "Example 1: `%s%s set @Member`\n" +
                 "Example 2: `%s%s set @Member 10` - Role after 10 minutes.\n" +
                 "\n" +
@@ -152,7 +152,7 @@ public class LanguageFile {
 
         /// Best of's
         en_gb.setProperty("bestof_usage", "**Set up vote-emote/emoji**\n" +
-                "Command: `%s%s <emoji or emote>`\n" +
+                "Command: `%s%s [emoji or emote]`\n" +
                 "Example (Emoji): `%s%s ⭐`\n" +
                 "Example (Emote): `%s%s` %s\n" +
                 "\n" +
@@ -160,11 +160,11 @@ public class LanguageFile {
                 "Command: `%s%s #channel`\n" +
                 "\n" +
                 "**Set up a number of people that have to vote**\n" +
-                "Command: `%s%s <number>`\n" +
+                "Command: `%s%s [number]`\n" +
                 "Example: `%s%s 10`\n" +
                 "\n" +
                 "**Set up a percentage of online members that have to vote**\n" +
-                "Command: `%s%s <percentage>%s`\n" +
+                "Command: `%s%s [percentage]%s`\n" +
                 "Example: `%s%s 50%s`\n" +
                 "\n" +
                 "**Show current set up**\n" +
@@ -202,7 +202,7 @@ public class LanguageFile {
                 "Can delete user specific messages from the past 100 messages.\n" +
                 "Messages older than two weeks cannot be deleted because of Discord's restrictions.");
         en_gb.setProperty("clear_usage", "**Delete some messages**\n" +
-                "Command: `%s%s <[1 - 100]|@user>`\n" +
+                "Command: `%s%s [1 - 100 OR @user]`\n" +
                 "Example 1: `%s%s 50`\n" +
                 "Example 2: `%s%s @name");
         en_gb.setProperty("clear_hint", "The range is inclusively, so you can also delete just 1 or a total of 100 messages.");
@@ -215,6 +215,7 @@ public class LanguageFile {
         en_gb.setProperty("joinleave_unset_fail", "No channel was set yet.");
         en_gb.setProperty("joinleave_nochannel_set", "No channel is set.");
         en_gb.setProperty("joinleave_current", "Current channel: %s");
+        en_gb.setProperty("joinleave_firstarg", "Either `set`, `unset` or `show`");
 
         /// Join
         en_gb.setProperty("join_description", "The bot will post a notification once a user joins the server.");
@@ -228,7 +229,9 @@ public class LanguageFile {
                 "**Showing current notification channel**\n" +
                 "Command: `%s%s show`");
         en_gb.setProperty("join_hint", "Shows a message like \"Name#1234 just joined GuildName!\"");
-        en_gb.setProperty("join_joined", "%s#%s just joined %s!");
+        en_gb.setProperty("join_author", "Welcome %s#%s to %s");
+        en_gb.setProperty("join_embeddescription", "Enjoy your stay!");
+        en_gb.setProperty("join_footer", "Joined at");
 
         /// Leave
         en_gb.setProperty("leave_description", "The bot will post a notification once a user leaves the server.");
@@ -243,6 +246,9 @@ public class LanguageFile {
                 "Command: `%s%s show`");
         en_gb.setProperty("leave_hint", "Shows a message like \"Name#1234 just left GuildName!\"");
         en_gb.setProperty("leave_left", "%s#%s just left %s!");
+        en_gb.setProperty("leave_author", "Farewell %s#%s");
+        en_gb.setProperty("leave_embeddescription", "We are sorry to see you go!");
+        en_gb.setProperty("leave_footer", "Left at");
 
         /// Level Role
         en_gb.setProperty("levelrole_description", "Set up roles that are assigned if a member hits a certain level.");
@@ -364,7 +370,7 @@ public class LanguageFile {
 
         /// Role
         en_gb.setProperty("role_description", "Assing or remove roles from members.");
-        en_gb.setProperty("role_usage", "Command: `%s%s @user <roleName>`\n" +
+        en_gb.setProperty("role_usage", "Command: `%s%s @user [roleName]`\n" +
                 "Example: `%s%s @name member`");
         en_gb.setProperty("role_hint", "I will remove the role if the member already has it and provide it if the member doesn't have it already.");
         en_gb.setProperty("role_missing", "Missing role name.");
@@ -541,11 +547,11 @@ public class LanguageFile {
                 "Once everyone left the new channel, it will be deleted automatically.\n" +
                 "This will save you a lot of space from unused voice channels.");
         en_gb.setProperty("voicelobby_usage", "**Set a voice channel lobby**\n" +
-                "Command: `%s%s set <Voice Channel ID>`\n" +
+                "Command: `%s%s set [Voice Channel ID]`\n" +
                 "Example: `%s%s set 999999999999999999`\n" +
                 "\n" +
                 "**Unset a voice channel lobby**\n" +
-                "Command: `%s%s unset <Voice Channel ID>`\n" +
+                "Command: `%s%s unset [Voice Channel ID]`\n" +
                 "Example: `%s%s unset 999999999999999999`\n" +
                 "\n" +
                 "**Show current voice channel lobbies**\n" +
@@ -692,7 +698,7 @@ public class LanguageFile {
         /// Giveaway
         en_gb.setProperty("giveaway_description", "- Start a giveaway that draws a given amount of people as winners after a given time.\n" +
                 "- List all running giveaways of the current server.");
-        en_gb.setProperty("giveaway_usage", "- Start giveaway: `%sgiveaway \"<prize name>\" <amount of winners> <time>`\n" +
+        en_gb.setProperty("giveaway_usage", "- Start giveaway: `%sgiveaway \"[prize name]\" [amount of winners] [time]`\n" +
                 "   \u200B⤷ Example: `%sgiveaway \"100 Cookies\" 1 12h`\n" +
                 "- List giveaways: `%sgiveaway list`");
         en_gb.setProperty("giveaway_hint", "- Time formats: d = days, h = hours, m = minutes\n" +
@@ -735,7 +741,7 @@ public class LanguageFile {
                 "If you didn't set one up, it will use UTC.\n" +
                 "To set one up, use the `%suser` command.\n" +
                 "You can add a topic about what you want to be reminded.");
-        en_gb.setProperty("reminder_usage", "Command: `%s%s yyyy-MM-dd HH:mm <topic>`\n" +
+        en_gb.setProperty("reminder_usage", "Command: `%s%s yyyy-MM-dd HH:mm [topic]`\n" +
                 "Example: `%s%s 2020-01-01 00:00 Happy New Year`");
         en_gb.setProperty("reminder_hint", "You cannot set reminders in the past.");
         en_gb.setProperty("reminder_missingargs", "Missing arguments! Please add a date and a time.");
@@ -749,7 +755,7 @@ public class LanguageFile {
 
         /// Timezone
         en_gb.setProperty("timezone_description", "Convert a date and time from one timezone to another");
-        en_gb.setProperty("timezone_usage", "Command: `%s%s yyyy-MM-dd HH:mm <current timezone> <target timezone>`\n" +
+        en_gb.setProperty("timezone_usage", "Command: `%s%s yyyy-MM-dd HH:mm [current timezone] [target timezone]`\n" +
                 "Example: `%s%s 2019-01-01 22:00 PST CET`");
         en_gb.setProperty("timezone_hint", "This command uses the 24 hour system.");
         en_gb.setProperty("timezone_missingargs", "Missing arguments.");
@@ -773,7 +779,7 @@ public class LanguageFile {
 
         /// Vote
         en_gb.setProperty("vote_description", "Create a vote with up to 10 custom answers.");
-        en_gb.setProperty("vote_usage", "Command: `%s%s <question>/<answer1>/(...)/<answer10>`\n" +
+        en_gb.setProperty("vote_usage", "Command: `%s%s [question]/[answer1]/(...)/[answer10]`\n" +
                 "Example: `%s%s When do you have time?/Mon/Tue/Wed/Thu/Fri/Sat/Sun`");
         en_gb.setProperty("vote_hint", "After executing this command, you will be asked if you want to allow multiple answers.");
         en_gb.setProperty("vote_amount", "Invalid amount of arguments. There has to be at least one answer to your question and a maximum of 10 answers.");
@@ -859,7 +865,7 @@ public class LanguageFile {
 
         //// Edit Embed
         en_gb.setProperty("editembed_description", "Edit an embed that was made by %s.");
-        en_gb.setProperty("editembed_usage", "Command: `%s%s #channel <message ID of the embed>`\n" +
+        en_gb.setProperty("editembed_usage", "Command: `%s%s #channel [message ID of the embed]`\n" +
                 "Example: `%s%s #info 999999999999999999`");
         en_gb.setProperty("editembed_hint", "**How to get ID's:**\n" +
                 "1. Activate Discord Developer Mode: User Settings → Appearance → ADVANCED → Developer Mode\n" +
@@ -931,12 +937,12 @@ public class LanguageFile {
         /// Profile
         en_gb.setProperty("profile_name", "Name");
         en_gb.setProperty("profile_ap", "AP");
+        en_gb.setProperty("profile_amount", "Amount");
         en_gb.setProperty("profile_noachievements", "No achievements");
         en_gb.setProperty("profile_nocommands", "No commands were used yet");
-        en_gb.setProperty("profile_mostused_value", "%s%s (%s times)");
         en_gb.setProperty("profile_level", "Level");
         en_gb.setProperty("profile_rank",  "Rank #%s");
-        en_gb.setProperty("profile_mostused", "Most used command");
+        en_gb.setProperty("profile_mostused", "Most used commands");
         en_gb.setProperty("profile_achievements", "Achievements");
         en_gb.setProperty("profile_footer1", "Also try \"%s%s @user\"");
         en_gb.setProperty("profile_footer2", "Also try \"%s%s\"");

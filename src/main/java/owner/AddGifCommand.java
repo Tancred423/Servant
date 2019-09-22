@@ -23,7 +23,7 @@ public class AddGifCommand extends Command {
         this.aliases = new String[]{"addjif"};
         this.help = "Adds gif for interactions.";
         this.category = new Category("Owner");
-        this.arguments = "<interaction> <gifUrl>";
+        this.arguments = null;
         this.hidden = false;
         this.guildOnly = false;
         this.ownerCommand = true;

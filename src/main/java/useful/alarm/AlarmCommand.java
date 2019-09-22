@@ -25,7 +25,7 @@ public class AlarmCommand extends Command {
         this.aliases = new String[0];
         this.help = "Set up an alarm.";
         this.category = new Category("Useful");
-        this.arguments = "[time]";
+        this.arguments = null;
         this.hidden = false;
         this.guildOnly = false;
         this.ownerCommand = false;

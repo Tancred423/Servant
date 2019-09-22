@@ -87,7 +87,8 @@ public class JoinCommand extends Command {
                 else event.reply(LanguageHandler.get(lang, "joinleave_unset_fail"));
                 break;
 
-            case "status":
+            case "show":
+            case "sh":
                 try {
                     channel = internalGuild.getJoinNotifierChannel();
                 } catch (SQLException e) {
@@ -96,6 +97,11 @@ public class JoinCommand extends Command {
                 }
                 if (channel == null) event.reply(LanguageHandler.get(lang, "joinleave_nochannel_set"));
                 else event.reply(String.format(LanguageHandler.get(lang, "joinleave_current"), channel.getName()));
+                break;
+
+            default:
+                event.reply(LanguageHandler.get(lang, "joinleave_firstarg"));
+                event.reactError();
                 break;
         }
 

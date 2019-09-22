@@ -24,7 +24,7 @@ public class GiveawayCommand extends Command {
         this.aliases = new String[0];
         this.help = "Host a giveaway.";
         this.category = new Category("Useful");
-        this.arguments = "\"<prize name>\" <amount of winners> <time>";
+        this.arguments = null;
         this.hidden = false;
         this.guildOnly = true;
         this.ownerCommand = false;

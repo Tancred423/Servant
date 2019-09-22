@@ -25,7 +25,7 @@ public class ReminderCommand extends Command {
         this.aliases = new String[0];
         this.help = "Set up a reminder.";
         this.category = new Category("Useful");
-        this.arguments = "[date] [time] [topic]";
+        this.arguments = null;
         this.hidden = false;
         this.guildOnly = false;
         this.ownerCommand = false;

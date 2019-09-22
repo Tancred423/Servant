@@ -22,7 +22,7 @@ public class ToggleCommand extends Command {
         this.aliases = new String[0];
         this.help = "Toggles bot's features.";
         this.category = new Command.Category("Moderation");
-        this.arguments = "<feature> [on|off|show]";
+        this.arguments = null;
         this.hidden = false;
         this.guildOnly = true;
         this.ownerCommand = false;

@@ -7,10 +7,8 @@ import servant.Servant;
 
 import java.awt.*;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 public class User {
     private long userId;
@@ -513,13 +511,19 @@ public class User {
         connection.close();
     }
 
-    public Map<String, Integer> getMostUsedFeature() throws SQLException {
+    public Map<String, Integer> getTop10MostUsedFeatures() throws SQLException {
         var connection = Database.getConnection();
         var select = connection.prepareStatement("SELECT * FROM feature_count WHERE id=? ORDER BY count DESC");
         select.setLong(1, userId);
         var resultSet = select.executeQuery();
-        Map<String, Integer> feature = new HashMap<>();
-        if (resultSet.first()) feature.put(resultSet.getString("feature"), resultSet.getInt("count"));
+        var feature = new LinkedHashMap<String, Integer>();
+        var counter = 0;
+        if (resultSet.first())
+            do {
+                feature.put(resultSet.getString("feature"), resultSet.getInt("count"));
+                if (counter < 9) counter++;
+                else break;
+            } while (resultSet.next());
         connection.close();
         return feature;
     }

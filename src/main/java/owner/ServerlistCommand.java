@@ -24,7 +24,7 @@ public class ServerlistCommand extends Command {
         this.aliases = new String[]{"guildlist"};
         this.help = "Servers the bot is on.";
         this.category = new Category("Owner");
-        this.arguments = "[pagenum]";
+        this.arguments = null;
         this.hidden = false;
         this.guildOnly = false;
         this.ownerCommand = true;
@@ -72,7 +72,7 @@ public class ServerlistCommand extends Command {
         Paginator p;
         try {
             p = pbuilder.setColor(new User(event.getAuthor().getIdLong()).getColor())
-                    .setText(event.getClient().getSuccess() + String.format(LanguageHandler.get(lang, "guildlist_connected"), event.getSelfUser().getName()) +
+                    .setText(String.format(LanguageHandler.get(lang, "guildlist_connected"), event.getSelfUser().getName()) +
                             (event.getJDA().getShardInfo() == null ? ":" : "(Shard ID " + event.getJDA().getShardInfo().getShardId() + "):"))
                     .setUsers(event.getAuthor())
                     .build();

@@ -4,13 +4,20 @@ package moderation.leave;
 import files.language.LanguageHandler;
 import moderation.guild.Guild;
 import moderation.toggle.Toggle;
+import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.MessageChannel;
+import net.dv8tion.jda.core.entities.MessageEmbed;
+import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberLeaveEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import servant.Log;
 import servant.Servant;
+import utilities.Image;
 
+import java.awt.*;
 import java.sql.SQLException;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 public class LeaveListener extends ListenerAdapter {
     public void onGuildMemberLeave(GuildMemberLeaveEvent event) {
@@ -34,9 +41,26 @@ public class LeaveListener extends ListenerAdapter {
             return;
         }
 
-        if (channel != null)
-            channel.sendMessage(
-                    String.format(LanguageHandler.get(lang, "leave_left"), leftUser.getName(), leftUser.getDiscriminator(), guild.getName())
-            ).queue();
+        if (channel != null) channel.sendMessage(getEmbed(leftUser, guild, internalGuild, lang)).queue();
+    }
+
+    private MessageEmbed getEmbed(User leftUser, net.dv8tion.jda.core.entities.Guild guild, Guild internalGuild, String lang) {
+        var eb = new EmbedBuilder();
+        var internalLeftUser = new moderation.user.User(leftUser.getIdLong());
+        try {
+            eb.setColor(internalLeftUser.getColor());
+        } catch (SQLException e) {
+            eb.setColor(Color.decode(Servant.config.getDefaultColorCode()));
+        }
+        eb.setAuthor(String.format(LanguageHandler.get(lang, "leave_author"), leftUser.getName(), leftUser.getDiscriminator()), null, guild.getIconUrl());
+        eb.setDescription(LanguageHandler.get(lang, "leave_embeddescription"));
+        eb.setThumbnail(leftUser.getEffectiveAvatarUrl());
+        eb.setFooter(LanguageHandler.get(lang, "leave_footer"), Image.getImageUrl("clock"));
+        try {
+            eb.setTimestamp(OffsetDateTime.now(ZoneOffset.of(internalGuild.getOffset())));
+        } catch (SQLException e) {
+            eb.setTimestamp(OffsetDateTime.now(ZoneOffset.UTC));
+        }
+        return eb.build();
     }
 }
