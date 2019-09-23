@@ -32,6 +32,7 @@ public class LanguageFile {
         en_gb.setProperty("achievement_level100", "Level 100");
         en_gb.setProperty("achievement_love42", "Found the answer.");
         en_gb.setProperty("achievement_love69", "Nice Love");
+        en_gb.setProperty("achievement_kind", "You were kind to %s.");
 
         /// Invite
         en_gb.setProperty("invite_author", "%s, at your service!");
@@ -66,7 +67,7 @@ public class LanguageFile {
         en_gb.setProperty("patreon_warning", "You have to be a %s to use this feature!");
 
         /// Presence
-        en_gb.setProperty("presence_0", "v%s | %shelp");
+        en_gb.setProperty("presence_0", "v%s \uD83C\uDF41 | %shelp");
         en_gb.setProperty("presence_1", "%s users | %shelp");
         en_gb.setProperty("presence_2", "%s servers | %shelp");
         en_gb.setProperty("presence_3", "%spatreon | %shelp");

@@ -23,7 +23,7 @@ import java.sql.SQLException;
 public class CatCommand extends Command {
     public CatCommand() {
         this.name = "cat";
-        this.aliases = new String[0];
+        this.aliases = new String[]{"catto"};
         this.help = "Random cat picture.";
         this.category = new Category("Fun");
         this.arguments = null;

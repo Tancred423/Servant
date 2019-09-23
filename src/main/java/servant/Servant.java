@@ -147,10 +147,10 @@ public class Servant {
                 new DogCommand(),
                 new EditEmbedCommand(waiter),
                 new FlipCommand(),
-//                new LevelCommand(), // is now in profile
                 new LoveCommand(),
                 new MusicCommand(),
                 new ProfileCommand(),
+                new ThanksCommand(jda == null ? "Servant" : jda.getSelfUser().getName()),
                 new UnflipCommand(),
 
                 /// Interaction

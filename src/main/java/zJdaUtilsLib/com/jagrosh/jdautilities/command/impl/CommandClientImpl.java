@@ -504,6 +504,12 @@ public class CommandClientImpl implements CommandClient, EventListener {
             }
         }
 
+        if (parts == null) {
+            if (event.getMessage().getContentRaw().startsWith("<@!" + event.getJDA().getSelfUser().getIdLong() + ">")) {
+                parts = splitOnMention(event.getMessage().getContentRaw(), event.getJDA().getSelfUser().getIdLong());
+            }
+        }
+
         if(parts != null) // Starts with valid prefix.
             if(useHelp && (parts[0].equalsIgnoreCase(helpWord) || parts[0].equalsIgnoreCase(helpWorldAlias))) {
                 CommandEvent cevent = new CommandEvent(event, parts[1]==null ? "" : parts[1], this);
@@ -513,24 +519,22 @@ public class CommandClientImpl implements CommandClient, EventListener {
                 if(listener!=null)
                     listener.onCompletedCommand(cevent, null);
                 return; // Help Consumer is done
-            }
-            else if(event.isFromType(ChannelType.PRIVATE) || event.getTextChannel().canTalk()) {
+            } else if(event.isFromType(ChannelType.PRIVATE) || event.getTextChannel().canTalk()) {
                 String name = parts[0];
-                String args = parts[1]==null ? "" : parts[1];
+                String args = parts[1] == null ? "" : parts[1];
                 final Command command; // this will be null if it's not a command
-                if(commands.size() < INDEX_LIMIT + 1)
+                if (commands.size() < INDEX_LIMIT + 1)
                     command = commands.stream().filter(cmd -> cmd.isCommandFor(name)).findAny().orElse(null);
                 else {
-                    synchronized(commandIndex) {
+                    synchronized (commandIndex) {
                         int i = commandIndex.getOrDefault(name.toLowerCase(), -1);
-                        command = i != -1? commands.get(i) : null;
+                        command = i != -1 ? commands.get(i) : null;
                     }
                 }
 
-                if(command != null) {
+                if (command != null) {
                     CommandEvent cevent = new CommandEvent(event, args, this);
-
-                    if(listener != null)
+                    if (listener != null)
                         listener.onCommand(cevent, command);
                     uses.put(command.getName(), uses.getOrDefault(command.getName(), 0) + 1);
                     command.run(cevent);
@@ -538,7 +542,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
                 }
             }
 
-        if (listener != null)listener.onNonCommandMessage(event);
+        if (listener != null) listener.onNonCommandMessage(event);
     }
 
     private void sendStats(JDA jda) {
@@ -650,25 +654,6 @@ public class CommandClientImpl implements CommandClient, EventListener {
                         LOG.error("Failed to retrieve bot shard information from bots.discord.pw ", e);
                     }
                 });
-
-                // Good thing to keep in mind:
-                // We used to make the request above by blocking the thread and waiting for DBots
-                // to respond. For the future (should we succeed in not blocking that as well),
-                // let's not do this again, okay?
-
-                /*try(Reader reader = client.newCall(new Request.Builder()
-                        .get().url("https://bots.discord.pw/api/bots/" + jda.getSelfUser().getId() + "/stats")
-                        .header("Authorization", botsKey)
-                        .header("Content-Type", "application/json")
-                        .build()).execute().body().charStream()) {
-                    JSONArray array = new JSONObject(new JSONTokener(reader)).getJSONArray("stats");
-                    int total = 0;
-                    for (int i = 0; i < array.length(); i++)
-                        total += array.getJSONObject(i).getInt("server_count");
-                    this.totalGuilds = total;
-                } catch (Exception e) {
-                    LOG.error("Failed to retrieve bot shard information from bots.discord.pw ", e);
-                }*/
             }
         }
     }
@@ -698,6 +683,10 @@ public class CommandClientImpl implements CommandClient, EventListener {
 
     private static String[] splitOnPrefixLength(String rawContent, int length) {
         return Arrays.copyOf(rawContent.substring(length).trim().split("\\s+", 2), 2);
+    }
+
+    private static String[] splitOnMention(String rawContent, long botId) {
+        return Arrays.copyOf(rawContent.replaceAll("<@!" + botId + ">", "").trim().split("\\s+", 2), 2);
     }
 
     public void linkIds(long callId, Message message)
