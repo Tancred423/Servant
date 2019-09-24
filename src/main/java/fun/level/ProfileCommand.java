@@ -61,16 +61,16 @@ public class ProfileCommand extends Command {
             Map<String, Integer> achievements;
             achievements = internalProfileUser.getAchievements();
             var achievementBuilder = new StringBuilder();
-            achievementBuilder.append("AP: ").append(internalProfileUser.getTotelAP()).append("\n")
-                    .append("```c\n").append(StringFormat.fillWithWhitespace(LanguageHandler.get(lang, "profile_name"), 32))
+            achievementBuilder.append("**AP: ").append(internalProfileUser.getTotelAP()).append("**\n")
+                    .append("```c\n").append(StringFormat.fillWithWhitespace(LanguageHandler.get(lang, "profile_name"), 22))
                     .append(" ")
-                    .append(StringFormat.pushWithWhitespace(LanguageHandler.get(lang, "profile_ap"), 5))
+                    .append(StringFormat.pushWithWhitespace(LanguageHandler.get(lang, "profile_ap"), 3))
                     .append("\n");
-            achievementBuilder.append("-".repeat(32)).append(" ").append("-".repeat(5)).append("\n");
+            achievementBuilder.append("-".repeat(22)).append(" ").append("-".repeat(3)).append("\n");
             for (Map.Entry<String, Integer> achievement : achievements.entrySet())
-                achievementBuilder.append(StringFormat.fillWithWhitespace(Achievement.getFancyName(achievement.getKey(), lang), 32))
+                achievementBuilder.append(StringFormat.fillWithWhitespace(Achievement.getFancyName(achievement.getKey(), lang), 22))
                         .append(" ")
-                        .append(StringFormat.pushWithWhitespace(String.valueOf(achievement.getValue()), 5))
+                        .append(StringFormat.pushWithWhitespace(String.valueOf(achievement.getValue()), 3))
                         .append("\n");
             achievementBuilder.append("```");
             if (achievements.isEmpty()) achievementBuilder = new StringBuilder().append(LanguageHandler.get(lang, "profile_noachievements"));
