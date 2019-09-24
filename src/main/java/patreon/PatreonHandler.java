@@ -68,7 +68,7 @@ public class PatreonHandler {
         return false;
     }
 
-    public static boolean isVIP(User user) {
+    private static boolean isVIP(User user) {
         List<Member> members = g.getMembers();
         for (var member : members)
             if (member.getUser().equals(user))
