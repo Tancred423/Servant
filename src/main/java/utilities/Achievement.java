@@ -2,6 +2,7 @@
 package utilities;
 
 import files.language.LanguageHandler;
+import servant.Servant;
 
 public class Achievement {
     public static String getFancyName(String name, String lang) {
@@ -22,6 +23,8 @@ public class Achievement {
 
             case "love42": return LanguageHandler.get(lang, "achievement_love42");
             case "love69": return LanguageHandler.get(lang, "achievement_love69");
+
+            case "kind": return String.format(LanguageHandler.get(lang, "achievement_kind"), Servant.jda.getSelfUser().getName());
 
             default: return name;
         }

@@ -32,6 +32,7 @@ public class LanguageFile {
         en_gb.setProperty("achievement_level100", "Level 100");
         en_gb.setProperty("achievement_love42", "Found the answer.");
         en_gb.setProperty("achievement_love69", "Nice Love");
+        en_gb.setProperty("achievement_kind", "You were kind to %s.");
 
         /// Invite
         en_gb.setProperty("invite_author", "%s, at your service!");

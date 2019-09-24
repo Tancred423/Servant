@@ -60,10 +60,19 @@ public class PatreonHandler {
     }
 
     public static boolean is$10Patron(User user) {
+        if (isVIP(user)) return true;
         List<Member> members = g.getMembers();
         for (var member : members)
             if (member.getUser().equals(user))
                 return g.getMemberById(user.getIdLong()).getRoles().contains(g.getRoleById(502472869234868224L));
+        return false;
+    }
+
+    public static boolean isVIP(User user) {
+        List<Member> members = g.getMembers();
+        for (var member : members)
+            if (member.getUser().equals(user))
+                return g.getMemberById(user.getIdLong()).getRoles().contains(g.getRoleById(510204269568458753L));
         return false;
     }
 

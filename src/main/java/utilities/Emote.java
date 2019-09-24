@@ -79,6 +79,9 @@ public class Emote {
             case "tada":
                 return "\uD83C\uDF89";
 
+            case "love":
+                return "♥";
+
             default:
                 return null;
         }

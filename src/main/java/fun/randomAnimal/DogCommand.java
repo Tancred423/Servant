@@ -19,7 +19,7 @@ import java.sql.SQLException;
 public class DogCommand extends Command {
     public DogCommand() {
         this.name = "dog";
-        this.aliases = new String[0];
+        this.aliases = new String[]{"doggo"};
         this.help = "Random dog picture.";
         this.category = new Category("Fun");
         this.arguments = null;
