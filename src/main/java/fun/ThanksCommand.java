@@ -1,5 +1,6 @@
 package fun;
 
+import moderation.guild.Guild;
 import moderation.user.User;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Message;
@@ -12,10 +13,10 @@ import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 import java.sql.SQLException;
 
 public class ThanksCommand extends Command {
-    public ThanksCommand(String botName) {
+    public ThanksCommand() {
         this.name = "thanks";
         this.aliases = new String[]{"thank", "thankyou"};
-        this.help = "Thank " + botName + " for her work.";
+        this.help = "Thank Servant for her work.";
         this.category = new Category("Fun");
         this.arguments = null;
         this.hidden = true;
@@ -34,6 +35,14 @@ public class ThanksCommand extends Command {
             checkAchievement(new User(event.getAuthor().getIdLong()), event.getMessage());
         } catch (SQLException e) {
             new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
+        }
+
+        // Statistics.
+        try {
+            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
+            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
+        } catch (SQLException e) {
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
         }
     }
 

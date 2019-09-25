@@ -150,7 +150,7 @@ public class Servant {
                 new LoveCommand(),
                 new MusicCommand(),
                 new ProfileCommand(),
-                new ThanksCommand(jda == null ? "Servant" : jda.getSelfUser().getName()),
+                new ThanksCommand(),
                 new UnflipCommand(),
 
                 /// Interaction

@@ -505,7 +505,9 @@ public class CommandClientImpl implements CommandClient, EventListener {
         }
 
         if (parts == null) {
-            if (event.getMessage().getContentRaw().startsWith("<@!" + event.getJDA().getSelfUser().getIdLong() + ">")) {
+            var contentRaw = event.getMessage().getContentRaw();
+            var selfUserId = event.getJDA().getSelfUser().getIdLong();
+            if (contentRaw.startsWith("<@!" + selfUserId + ">") || contentRaw.startsWith("<@" + selfUserId + ">")) {
                 parts = splitOnMention(event.getMessage().getContentRaw(), event.getJDA().getSelfUser().getIdLong());
             }
         }
