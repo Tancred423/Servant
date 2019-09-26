@@ -23,9 +23,8 @@ import java.util.concurrent.TimeUnit;
 
 class BirthdayHandler {
     static void updateLists(JDA jda) throws SQLException {
-        System.out.println("Updating lists...");
         List<Guild> guilds = jda.getGuilds();
-        for (Guild guild : guilds) {
+        for (var guild : guilds) {
             var internalGuild = new moderation.guild.Guild(guild.getIdLong());
             if (internalGuild.birthdayMessagesHasEntry()) {
                 var channelId = internalGuild.getBirthdayMessageChannelId();
@@ -62,19 +61,18 @@ class BirthdayHandler {
     }
 
     static void checkBirthdays(JDA jda) throws SQLException {
-        System.out.println("Checking birthdays...");
         List<Guild> guilds = jda.getGuilds();
-        for (Guild guild : guilds) {
+        for (var guild : guilds) {
             var internalGuild = new moderation.guild.Guild(guild.getIdLong());
 
-            OffsetDateTime now = OffsetDateTime.now(ZoneOffset.of(internalGuild.getOffset()));
-            var nowString = now.toString().substring(0, 10);
+            var now = OffsetDateTime.now(ZoneOffset.of(internalGuild.getOffset()));
+            var nowString = now.toString().substring(4, 10);
 
             Map<Long, String> birthdays = internalGuild.getBirthdays();
 
             for (Map.Entry<Long, String> birthday : birthdays.entrySet()) {
                 var userId = birthday.getKey();
-                if (nowString.equals(birthday.getValue())) {
+                if (nowString.equals(birthday.getValue().substring(4))) {
                     if (!internalGuild.wasGratulated(userId)) {
                         gratulate(guild, userId);
                         internalGuild.setGratulated(userId);
@@ -96,7 +94,7 @@ class BirthdayHandler {
         var internalAuthor = new User(author.getIdLong());
 
         Map<Long, String> birthdays = internalGuild.getBirthdays();
-        StringBuilder sb = new StringBuilder();
+        var sb = new StringBuilder();
         var lang = internalGuild.getLanguage();
         var countdown = StringFormat.fillWithWhitespace(LanguageHandler.get(lang, "birthday_countdown"),
                 String.format(LanguageHandler.get(lang, "birthday_countdown_value"), 999).length());
