@@ -68,10 +68,9 @@ public class ReminderCommand extends Command {
             var date = args[0];
             var time = args[1];
             var offset = new User(event.getAuthor().getIdLong()).getOffset();
-            var zone = offset.equals("00:00") ? "Z" : offset;
-            var reminderDate = OffsetDateTime.parse(date + "T" + time + zone);
+            var reminderDate = OffsetDateTime.parse(date + "T" + time + offset);
 
-            if (!reminderDate.isAfter(OffsetDateTime.now(ZoneId.of(zone)))) {
+            if (!reminderDate.isAfter(OffsetDateTime.now(ZoneId.of(offset)))) {
                 event.replyError(LanguageHandler.get(lang, "reminder_past"));
                 return;
             }

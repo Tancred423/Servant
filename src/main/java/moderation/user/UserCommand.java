@@ -250,6 +250,7 @@ public class UserCommand extends Command {
                     colorCode = internalUser.getColorCode();
                     prefix = internalUser.getPrefix();
                     offset = internalUser.getOffset();
+                    if (offset.equals("Z")) offset = "00:00";
                     language = internalUser.getLanguage();
                     streamHiddenGuilds = internalUser.getStreamHiddenGuilds();
                 } catch (SQLException e) {

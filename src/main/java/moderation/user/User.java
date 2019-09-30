@@ -164,7 +164,7 @@ public class User {
         var offset = Servant.config.getDefaultOffset();
         if (resultSet.first()) offset = resultSet.getString("offset");
         connection.close();
-        return offset;
+        return offset.equals("00:00") ? "Z" : offset;
     }
 
     private boolean offsetHasEntry() throws SQLException {
