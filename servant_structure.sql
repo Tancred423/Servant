@@ -1,9 +1,9 @@
-﻿-- phpMyAdmin SQL Dump
+-- phpMyAdmin SQL Dump
 -- version 4.7.0
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Erstellungszeit: 05. Sep 2019 um 17:00
+-- Erstellungszeit: 30. Sep 2019 um 20:30
 -- Server-Version: 5.6.34-log
 -- PHP-Version: 7.1.5
 
@@ -19,7 +19,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Datenbank: `servant_structure`
+-- Datenbank: `servant_dev`
 --
 
 -- --------------------------------------------------------
@@ -119,6 +119,17 @@ CREATE TABLE `best_of_quote` (
 
 CREATE TABLE `best_of_quote_bl` (
   `message_id` bigint(18) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `bio`
+--
+
+CREATE TABLE `bio` (
+  `user_id` bigint(18) NOT NULL,
+  `text` varchar(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -509,6 +520,12 @@ ALTER TABLE `best_of_quote`
 --
 ALTER TABLE `best_of_quote_bl`
   ADD PRIMARY KEY (`message_id`);
+
+--
+-- Indizes für die Tabelle `bio`
+--
+ALTER TABLE `bio`
+  ADD PRIMARY KEY (`user_id`);
 
 --
 -- Indizes für die Tabelle `birthdays`
