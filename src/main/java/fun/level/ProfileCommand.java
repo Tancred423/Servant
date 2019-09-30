@@ -96,8 +96,7 @@ public class ProfileCommand extends Command {
             var baguette = internalProfileUser.getBaguette().entrySet().iterator().hasNext() ? internalProfileUser.getBaguette().entrySet().iterator().next() : null;
 
             // Description
-            var desc = JsonReader.readJsonFromUrl("https://complimentr.com/api").getString("compliment");
-            desc = desc.substring(0, 1).toUpperCase() + desc.substring(1).toLowerCase() + ".";
+            var bio = internalProfileUser.getBio();
 
             // Level
             // Create File.
@@ -119,7 +118,7 @@ public class ProfileCommand extends Command {
             }
             eb.setAuthor(profileUser.getName() + "#" + profileUser.getDiscriminator(), null, guild.getIconUrl());
             eb.setThumbnail(profileUser.getEffectiveAvatarUrl());
-            eb.setDescription(desc);
+            eb.setDescription(bio);
             eb.addField(LanguageHandler.get(lang, "profile_baguettecounter"), baguette == null ?
                     LanguageHandler.get(lang, "profile_nobaguette") :
                     String.format(LanguageHandler.get(lang, "profile_baguette"), baguette.getKey(), baguette.getValue()), false);

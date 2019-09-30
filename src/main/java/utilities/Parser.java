@@ -15,6 +15,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Parser {
@@ -172,19 +173,12 @@ public class Parser {
         return isValidPrefix;
     }
 
+    // I will handle this properly in the future.
     public static boolean isSqlInjection(String text) {
-        var isValidPrefix = true;
-
-        // I will handle this properly in the future.
-        List<String> someHardcodedStuff = new ArrayList<>();
-        someHardcodedStuff.add("select");
-        someHardcodedStuff.add("drop");
-        someHardcodedStuff.add("delete");
-        someHardcodedStuff.add("insert");
-        someHardcodedStuff.add("update");
-        if (someHardcodedStuff.contains(text)) isValidPrefix = false;
-
-        return isValidPrefix;
+        var isSqlInjection = false;
+        var hardcodedShit = new String[]{"select", "drop", "delete", "insert", "update"};
+        if (Arrays.stream(hardcodedShit).parallel().anyMatch(text::contains)) isSqlInjection = true;
+        return isSqlInjection;
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")

@@ -78,7 +78,7 @@ public class ReminderCommand extends Command {
 
             var topic = new StringBuilder();
             for (int i = 2; i < args.length; i++) topic.append(args[i]).append(" ");
-            if (topic.length() > 1000 || !Parser.isSqlInjection(topic.toString())) {
+            if (topic.length() > 1000 || Parser.isSqlInjection(topic.toString())) {
                 event.replyError(LanguageHandler.get(lang, "reminder_invalidtopic"));
                 return;
             }

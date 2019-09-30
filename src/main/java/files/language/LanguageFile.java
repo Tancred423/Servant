@@ -19,6 +19,8 @@ public class LanguageFile {
         // Features
         /// Achievement
         en_gb.setProperty("achievement_excalibur", "Excalibur");
+        en_gb.setProperty("unlimited_blade_works", "Unlimited Blade Works");
+        en_gb.setProperty("gae_bolg", "The Legend of Lancer");
         en_gb.setProperty("achievement_level10", "Level 10");
         en_gb.setProperty("achievement_level20", "Level 20");
         en_gb.setProperty("achievement_level30", "Level 30");
@@ -33,6 +35,7 @@ public class LanguageFile {
         en_gb.setProperty("achievement_love42", "Found the answer");
         en_gb.setProperty("achievement_love69", "Nice Love");
         en_gb.setProperty("achievement_kind", "You were kind to %s");
+        en_gb.setProperty("navi", "Hey Listen!");
 
         /// Invite
         en_gb.setProperty("invite_author", "%s, at your service!");

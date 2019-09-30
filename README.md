@@ -34,5 +34,4 @@ Multifunctional Discord Bot
 * [Random Bird Pictures](http://random.birb.pw)
 * [Random Cat Pictures](http://random.cat)
 * [Random Dog Pictures](https://dog.ceo/dog-api)
-* [Compliment API](https://complimentr.com)
 * [Inspiration & Libraries](https://github.com/jagrosh)

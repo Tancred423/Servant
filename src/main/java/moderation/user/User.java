@@ -17,6 +17,50 @@ public class User {
         this.userId = userId;
     }
 
+    // Offset
+    public String getBio() throws SQLException {
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT text FROM bio WHERE user_id=?");
+        select.setLong(1, userId);
+        var resultSet = select.executeQuery();
+        var text = "";
+        if (resultSet.first()) text = resultSet.getString("text");
+        connection.close();
+        return text;
+    }
+
+    private boolean bioHasEntry() throws SQLException {
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT text FROM bio WHERE user_id=?");
+        select.setLong(1, userId);
+        var resultSet = select.executeQuery();
+        if (resultSet.first()) {
+            connection.close();
+            return true;
+        } else {
+            connection.close();
+            return false;
+        }
+    }
+
+    public void setBio(String text) throws SQLException {
+        var connection = Database.getConnection();
+        if (bioHasEntry()) {
+            //  Update.
+            var update = connection.prepareStatement("UPDATE bio SET text=? WHERE user_id=?");
+            update.setString(1, text);
+            update.setLong(2, userId);
+            update.executeUpdate();
+        } else {
+            // Insert.
+            var insert = connection.prepareStatement("INSERT INTO bio (user_id,text) VALUES (?,?)");
+            insert.setLong(1, userId);
+            insert.setString(2, text);
+            insert.executeUpdate();
+        }
+        connection.close();
+    }
+
     // Baguette
     public Map<Integer, Integer> getBaguette() throws SQLException {
         var connection = Database.getConnection();
@@ -117,7 +161,7 @@ public class User {
         var select = connection.prepareStatement("SELECT offset FROM user WHERE user_id=?");
         select.setLong(1, userId);
         var resultSet = select.executeQuery();
-        String offset = Servant.config.getDefaultOffset();
+        var offset = Servant.config.getDefaultOffset();
         if (resultSet.first()) offset = resultSet.getString("offset");
         connection.close();
         return offset;

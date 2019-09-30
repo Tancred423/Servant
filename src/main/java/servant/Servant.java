@@ -8,6 +8,7 @@ import fun.embed.CreateEmbedCommand;
 import fun.embed.EditEmbedCommand;
 import fun.flip.FlipCommand;
 import fun.flip.UnflipCommand;
+import fun.level.BioCommand;
 import fun.level.LevelRoleCommand;
 import fun.music.MusicCommand;
 import fun.level.ProfileCommand;
@@ -141,6 +142,7 @@ public class Servant {
                 new AvatarCommand(),
                 new BaguetteCommand(),
                 new BirdCommand(),
+                new BioCommand(),
                 new CatCommand(),
                 new CoinflipCommand(),
                 new CreateEmbedCommand(waiter),
