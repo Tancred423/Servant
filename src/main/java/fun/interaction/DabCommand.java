@@ -8,7 +8,7 @@ public class DabCommand extends InteractionCommand {
     public DabCommand() {
         this.name = "dab";
         this.aliases = new String[]{"yeet"};
-        this.help = "Dab one someone.";
+        this.help = "Dab on someone.";
         this.category = new Category("*Interaction*");
         this.arguments = "@user";
         this.hidden = false;
