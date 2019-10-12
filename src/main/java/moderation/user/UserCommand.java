@@ -44,7 +44,7 @@ public class UserCommand extends Command {
             try {
                 var description = LanguageHandler.get(lang, "user_description");
                 var usage = String.format(LanguageHandler.get(lang, "user_usage"),
-                        p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name);
+                        p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name);
                 var hint = String.format(LanguageHandler.get(lang, "user_hint"), p);
                 event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
             } catch (SQLException e) {

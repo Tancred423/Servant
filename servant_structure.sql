@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Erstellungszeit: 30. Sep 2019 um 20:30
+-- Erstellungszeit: 12. Okt 2019 um 11:21
 -- Server-Version: 5.6.34-log
 -- PHP-Version: 7.1.5
 
@@ -19,7 +19,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Datenbank: `servant_dev`
+-- Datenbank: `servant_structure`
 --
 
 -- --------------------------------------------------------
@@ -343,6 +343,19 @@ CREATE TABLE `reminder` (
 -- --------------------------------------------------------
 
 --
+-- Tabellenstruktur für Tabelle `signup`
+--
+
+CREATE TABLE `signup` (
+  `message_id` bigint(18) NOT NULL,
+  `author_id` bigint(18) NOT NULL,
+  `amount` int(11) NOT NULL,
+  `title` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
 -- Tabellenstruktur für Tabelle `streamers`
 --
 
@@ -628,6 +641,12 @@ ALTER TABLE `reaction_role`
 --
 ALTER TABLE `reminder`
   ADD PRIMARY KEY (`user_id`,`reminder_time`);
+
+--
+-- Indizes für die Tabelle `signup`
+--
+ALTER TABLE `signup`
+  ADD PRIMARY KEY (`message_id`);
 
 --
 -- Indizes für die Tabelle `streamers`

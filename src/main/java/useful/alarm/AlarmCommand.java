@@ -119,7 +119,7 @@ public class AlarmCommand extends Command {
         // Statistics.
         try {
             new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
+            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
         } catch (SQLException e) {
             new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
         }

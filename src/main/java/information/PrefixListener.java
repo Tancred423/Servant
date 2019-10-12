@@ -12,26 +12,28 @@ import java.sql.SQLException;
 public class PrefixListener extends ListenerAdapter {
     public void onMessageReceived(MessageReceivedEvent event) {
         if (event.getAuthor().isBot()) return;
-        if (!event.getMessage().getContentRaw().equals("<@!" + event.getJDA().getSelfUser().getIdLong() + ">")) return;
-        var guild = event.getGuild();
-        String prefix;
-        String lang;
+        if (event.getMessage().getContentRaw().equals("<@!" + event.getJDA().getSelfUser().getIdLong() + ">")
+                || event.getMessage().getContentRaw().equals("<@" + event.getJDA().getSelfUser().getIdLong() + ">")) {
+            var guild = event.getGuild();
+            String prefix;
+            String lang;
 
-        try {
-            if (guild == null) {
-                var internalUser = new User(event.getAuthor().getIdLong());
-                prefix = internalUser.getPrefix();
-                lang = internalUser.getLanguage();
-            } else {
-                var internalGuild = new Guild(event.getGuild().getIdLong());
-                prefix = internalGuild.getPrefix();
-                lang = internalGuild.getLanguage();
+            try {
+                if (guild == null) {
+                    var internalUser = new User(event.getAuthor().getIdLong());
+                    prefix = internalUser.getPrefix();
+                    lang = internalUser.getLanguage();
+                } else {
+                    var internalGuild = new Guild(event.getGuild().getIdLong());
+                    prefix = internalGuild.getPrefix();
+                    lang = internalGuild.getLanguage();
+                }
+            } catch (SQLException e) {
+                prefix = Servant.config.getDefaultPrefix();
+                lang = Servant.config.getDefaultLanguage();
             }
-        } catch (SQLException e) {
-            prefix = Servant.config.getDefaultPrefix();
-            lang = Servant.config.getDefaultLanguage();
-        }
 
-        event.getChannel().sendMessage(String.format(LanguageHandler.get(lang, "current_prefix"), prefix)).queue();
+            event.getChannel().sendMessage(String.format(LanguageHandler.get(lang, "current_prefix"), prefix)).queue();
+        }
     }
 }

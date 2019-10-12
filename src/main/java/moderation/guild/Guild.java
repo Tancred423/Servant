@@ -21,6 +21,70 @@ public class Guild {
         this.guildId = guildId;
     }
 
+    // Signup
+    public boolean isSignupMessage(long messageId) throws SQLException {
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT message_id FROM signup WHERE message_id=?");
+        select.setLong(1, messageId);
+        var resultSet = select.executeQuery();
+        var isSignupMessage = false;
+        if (resultSet.first()) isSignupMessage = true;
+        connection.close();
+        return isSignupMessage;
+    }
+
+    public long getSignupAuthorId(long messageId) throws SQLException {
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT author_id FROM signup WHERE message_id=?");
+        select.setLong(1, messageId);
+        var resultSet = select.executeQuery();
+        var authorId = 0L;
+        if (resultSet.first()) authorId = resultSet.getLong("author_id");
+        connection.close();
+        return authorId;
+    }
+
+    public int getSignupAmount(long messageId) throws SQLException {
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT amount FROM signup WHERE message_id=?");
+        select.setLong(1, messageId);
+        var resultSet = select.executeQuery();
+        var amount = 0;
+        if (resultSet.first()) amount = resultSet.getInt("amount");
+        connection.close();
+        return amount;
+    }
+
+    public String getSignupTitle(long messageId) throws SQLException {
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT title FROM signup WHERE message_id=?");
+        select.setLong(1, messageId);
+        var resultSet = select.executeQuery();
+        String authorId = null;
+        if (resultSet.first()) authorId = resultSet.getString("title");
+        connection.close();
+        return authorId;
+    }
+
+    public void setSignup(long messageId, long authorId, int amount, String title) throws SQLException {
+        var connection = Database.getConnection();
+        var insert = connection.prepareStatement("INSERT INTO signup (message_id,author_id,amount,title) VALUES (?,?,?,?)");
+        insert.setLong(1, messageId);
+        insert.setLong(2, authorId);
+        insert.setInt(3, amount);
+        insert.setString(4, title);
+        insert.executeUpdate();
+        connection.close();
+    }
+
+    public void unsetSignup(long messageId) throws SQLException {
+        var connection = Database.getConnection();
+        var delete = connection.prepareStatement("DELETE FROM signup WHERE message_id=?");
+        delete.setLong(1, messageId);
+        delete.executeUpdate();
+        connection.close();
+    }
+
     // BestOfQuote
     private boolean bestOfQuoteHasEntry() throws SQLException {
         Connection connection = Database.getConnection();

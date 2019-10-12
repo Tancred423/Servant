@@ -34,6 +34,7 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.requests.Requester;
 import net.dv8tion.jda.core.utils.Checks;
 import okhttp3.*;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -508,7 +509,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
             var contentRaw = event.getMessage().getContentRaw();
             var selfUserId = event.getJDA().getSelfUser().getIdLong();
             if (contentRaw.startsWith("<@!" + selfUserId + ">") || contentRaw.startsWith("<@" + selfUserId + ">")) {
-                parts = splitOnMention(event.getMessage().getContentRaw(), event.getJDA().getSelfUser().getIdLong());
+                parts = splitOnMention(event.getMessage().getContentRaw(), event.getJDA().getSelfUser().getIdLong(), contentRaw.startsWith("<@!"));
             }
         }
 
@@ -566,13 +567,13 @@ public class CommandClientImpl implements CommandClient, EventListener {
 
             client.newCall(builder.build()).enqueue(new Callback() {
                 @Override
-                public void onResponse(Call call, Response response) {
+                public void onResponse(@NotNull Call call, @NotNull Response response) {
                     LOG.info("Successfully send information to carbonitex.net");
                     response.close();
                 }
 
                 @Override
-                public void onFailure(Call call, IOException e) {
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
                     LOG.error("Failed to send information to carbonitex.net ", e);
                 }
             });
@@ -596,13 +597,13 @@ public class CommandClientImpl implements CommandClient, EventListener {
             
             client.newCall(builder.build()).enqueue(new Callback() {
                 @Override
-                public void onResponse(Call call, Response response) {
+                public void onResponse(@NotNull Call call, @NotNull Response response) {
                     LOG.info("Successfully send information to discordbots.org");
                     response.close();
                 }
 
                 @Override
-                public void onFailure(Call call, IOException e) {
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
                     LOG.error("Failed to send information to discordbots.org ", e);
                 }
             });
@@ -617,13 +618,13 @@ public class CommandClientImpl implements CommandClient, EventListener {
 
             client.newCall(builder.build()).enqueue(new Callback() {
                 @Override
-                public void onResponse(Call call, Response response) {
+                public void onResponse(@NotNull Call call, @NotNull Response response) {
                     LOG.info("Successfully send information to bots.discord.pw");
                     response.close();
                 }
 
                 @Override
-                public void onFailure(Call call, IOException e) {
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
                     LOG.error("Failed to send information to bots.discord.pw ", e);
                 }
             });
@@ -638,21 +639,20 @@ public class CommandClientImpl implements CommandClient, EventListener {
 
                 client.newCall(b.build()).enqueue(new Callback() {
                     @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        try(Reader reader = response.body().charStream()) {
+                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                        assert response.body() != null;
+                        try (response; Reader reader = response.body().charStream()) {
                             JSONArray array = new JSONObject(new JSONTokener(reader)).getJSONArray("stats");
                             int total = 0;
-                            for(int i = 0; i < array.length(); i++)
+                            for (int i = 0; i < array.length(); i++)
                                 total += array.getJSONObject(i).getInt("server_count");
                             totalGuilds = total;
-                        } finally {
-                            // Close the response
-                            response.close();
                         }
+                        // Close the response
                     }
 
                     @Override
-                    public void onFailure(Call call, IOException e) {
+                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
                         LOG.error("Failed to retrieve bot shard information from bots.discord.pw ", e);
                     }
                 });
@@ -677,7 +677,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
 
     private GuildSettingsProvider provideSettings(Guild guild) {
         Object settings = getSettingsFor(guild);
-        if(settings != null && settings instanceof GuildSettingsProvider)
+        if(settings instanceof GuildSettingsProvider)
             return (GuildSettingsProvider)settings;
         else
             return null;
@@ -687,8 +687,8 @@ public class CommandClientImpl implements CommandClient, EventListener {
         return Arrays.copyOf(rawContent.substring(length).trim().split("\\s+", 2), 2);
     }
 
-    private static String[] splitOnMention(String rawContent, long botId) {
-        return Arrays.copyOf(rawContent.replaceAll("<@!" + botId + ">", "").trim().split("\\s+", 2), 2);
+    private static String[] splitOnMention(String rawContent, long botId, boolean hasExclamationPoint) {
+        return Arrays.copyOf(rawContent.replaceAll((hasExclamationPoint ? "<@!" : "<@") + botId + ">", "").trim().split("\\s+", 2), 2);
     }
 
     public void linkIds(long callId, Message message)

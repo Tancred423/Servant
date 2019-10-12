@@ -77,6 +77,7 @@ public class ToggleCommand extends Command {
             add("alarm");
             add("giveaway");
             add("reminder");
+            add("signup");
             add("timezone");
 
             /// votes
@@ -95,7 +96,6 @@ public class ToggleCommand extends Command {
             add("flip");
             add("level");
             add("love");
-            add("music");
             add("profile");
 
             /// interaction
@@ -251,6 +251,8 @@ public class ToggleCommand extends Command {
                 return "giveaway";
             case "reminder":
                 return "reminder";
+            case "signup":
+                return "signup";
             case "timezone":
                 return "timezone";
 
@@ -292,9 +294,6 @@ public class ToggleCommand extends Command {
             case "love":
             case "ship":
                 return "love";
-            case "music":
-            case "m":
-                return "music";
             case "profile":
                 return "profile";
 

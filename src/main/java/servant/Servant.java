@@ -10,7 +10,6 @@ import fun.flip.FlipCommand;
 import fun.flip.UnflipCommand;
 import fun.level.BioCommand;
 import fun.level.LevelRoleCommand;
-import fun.music.MusicCommand;
 import fun.level.ProfileCommand;
 import fun.randomAnimal.BirdCommand;
 import fun.randomAnimal.CatCommand;
@@ -49,6 +48,8 @@ import useful.alarm.AlarmListener;
 import useful.giveaway.GiveawayCommand;
 import useful.reminder.ReminderCommand;
 import useful.reminder.ReminderListener;
+import useful.signup.SignupCommand;
+import useful.signup.SignupListener;
 import useful.votes.quickvote.QuickvoteCommand;
 import useful.votes.quickvote.QuickvoteEndListener;
 import useful.votes.quickvote.QuickvoteMultipleVoteListener;
@@ -132,6 +133,7 @@ public class Servant {
                 new AlarmCommand(),
                 new GiveawayCommand(),
                 new ReminderCommand(),
+                new SignupCommand(),
                 new TimezoneCommand(),
 
                 /// Vote
@@ -150,7 +152,6 @@ public class Servant {
                 new EditEmbedCommand(waiter),
                 new FlipCommand(),
                 new LoveCommand(),
-                new MusicCommand(),
                 new ProfileCommand(),
                 new ThanksCommand(),
                 new UnflipCommand(),
@@ -198,6 +199,7 @@ public class Servant {
                 .addEventListener(new ReminderListener())
                 .addEventListener(new AlarmListener())
                 .addEventListener(new PrefixListener())
+                .addEventListener(new SignupListener())
 
                 // Start.
                 .build();

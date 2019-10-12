@@ -6,7 +6,9 @@ import moderation.guild.Guild;
 import moderation.guild.GuildHandler;
 import moderation.toggle.Toggle;
 import moderation.user.User;
+import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.exceptions.HierarchyException;
 import servant.Log;
 import utilities.Constants;
 import utilities.StringFormat;
@@ -56,12 +58,14 @@ public class FlipCommand extends Command {
         var effectiveName = mentioned.getEffectiveName();
         var flipped = StringFormat.flipString(effectiveName);
         event.reply("(╯°□°)╯︵ " + flipped);
-        event.getGuild().getController().setNickname(mentioned, flipped).queue();
+        if (event.getGuild().getMemberById(event.getSelfUser().getIdLong()).canInteract(mentioned))
+            event.getGuild().getController().setNickname(mentioned, flipped).queue();
+
 
         // Statistics.
         try {
             new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
+            new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
         } catch (SQLException e) {
             new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
         }

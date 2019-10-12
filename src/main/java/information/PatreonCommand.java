@@ -2,9 +2,11 @@
 package information;
 
 import files.language.LanguageHandler;
+import moderation.guild.Guild;
 import moderation.user.User;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
+import servant.Log;
 import servant.Servant;
 import utilities.Constants;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
@@ -52,5 +54,13 @@ public class PatreonCommand extends Command {
 
         eb.setFooter(LanguageHandler.get(lang, "patreon_thanks"), event.getSelfUser().getAvatarUrl());
         event.reply(eb.build());
+
+        // Statistics.
+        try {
+            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
+            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
+        } catch (SQLException e) {
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
+        }
     }
 }

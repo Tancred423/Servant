@@ -36,6 +36,7 @@ public class LanguageFile {
         en_gb.setProperty("achievement_love69", "Nice Love");
         en_gb.setProperty("achievement_kind", "Being kind to %s");
         en_gb.setProperty("navi", "Hey Listen!");
+        en_gb.setProperty("deusvult", "DEUS VULT!");
 
         /// Invite
         en_gb.setProperty("invite_author", "%s, at your service!");
@@ -757,6 +758,22 @@ public class LanguageFile {
         en_gb.setProperty("reminder_remind_notopic", "Hi master, I should remind you at this time.");
         en_gb.setProperty("reminder_remind_topic", "Hi master, I should remind you at this time about:\n**%s**");
 
+        /// Signup
+        en_gb.setProperty("signup_description", "Let people sign up for an event like a raid or something.");
+        en_gb.setProperty("signup_usage", "Command: `%s%s [amount of people] [optional title]`\n" +
+                "Example: `%s%s 10 Holy Grail War`");
+        en_gb.setProperty("signup_hint", "The title of your event is optional, but you have to provide the amount of people that are allowed to sign up.\n" +
+                "The mount of people that are allowed to sign up has to be within 1 and 100.");
+        en_gb.setProperty("signup_embedtitle", "Sign up %s %s");
+        en_gb.setProperty("signup_embeddescription", "%s people can participate!\n\n" +
+                "Click on %s to participate.\n" +
+                "Remove said reaction if you have changed your mind.");
+        en_gb.setProperty("signup_invalidamount", "Your given amount doesn't make sense.");
+        en_gb.setProperty("signup_amountrange", "Your given amount has be within 1 to 100 participants.");
+        en_gb.setProperty("signup_titlelength", "The title must not be longer than 256 characters.");
+        en_gb.setProperty("signup_embeddescriptionend", "%s people could participate!\n\n" +
+                "These are the participants:");
+
         /// Timezone
         en_gb.setProperty("timezone_description", "Convert a date and time from one timezone to another");
         en_gb.setProperty("timezone_usage", "Command: `%s%s yyyy-MM-dd HH:mm [current timezone] [target timezone]`\n" +
@@ -935,8 +952,6 @@ public class LanguageFile {
         en_gb.setProperty("love_noself_10", "Dats pretty low, tho.");
         en_gb.setProperty("love_noself_0", "Well, that won't work out.");
         en_gb.setProperty("love_fallback", "Urgh!");
-
-        /// Music
 
         /// Profile
         en_gb.setProperty("profile_name", "Name");

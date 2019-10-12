@@ -32,6 +32,7 @@ public class ToggleFile {
     private boolean alarm;
     private boolean giveaway;
     private boolean reminder;
+    private boolean signup;
     private boolean timezone;
 
     /// Votes
@@ -51,7 +52,6 @@ public class ToggleFile {
     private boolean flip;
     private boolean level;
     private boolean love;
-    private boolean music;
     private boolean profile;
 
     /// Interaction
@@ -112,6 +112,7 @@ public class ToggleFile {
         toggle.setProperty("alarm", "on");
         toggle.setProperty("giveaway", "on");
         toggle.setProperty("reminder", "on");
+        toggle.setProperty("signup", "on");
         toggle.setProperty("timezone", "on");
 
         /// Votes
@@ -131,7 +132,6 @@ public class ToggleFile {
         toggle.setProperty("flip", "on");
         toggle.setProperty("level", "off");
         toggle.setProperty("love", "on");
-        toggle.setProperty("music", "on");
         toggle.setProperty("profile", "on");
 
         /// Interaction
@@ -176,6 +176,7 @@ public class ToggleFile {
         this.alarm = toggle.getProperty("alarm").equals("on");
         this.giveaway = toggle.getProperty("giveaway").equals("on");
         this.reminder = toggle.getProperty("reminder").equals("on");
+        this.signup = toggle.getProperty("signup").equals("on");
         this.timezone = toggle.getProperty("timezone").equals("on");
 
         /// Votes
@@ -195,7 +196,6 @@ public class ToggleFile {
         this.flip = toggle.getProperty("flip").equals("on");
         this.level = toggle.getProperty("level").equals("on");
         this.love = toggle.getProperty("love").equals("on");
-        this.music = toggle.getProperty("music").equals("on");
         this.profile = toggle.getProperty("profile").equals("on");
 
         /// Interaction
@@ -231,6 +231,7 @@ public class ToggleFile {
             case "alarm": return alarm;
             case "giveaway": return giveaway;
             case "reminder": return reminder;
+            case "signup": return signup;
             case "timezone": return timezone;
 
             /// Votes
@@ -250,7 +251,6 @@ public class ToggleFile {
             case "flip": return flip;
             case "level": return level;
             case "love": return love;
-            case "music": return music;
             case "profile": return profile;
 
             /// Interaction
