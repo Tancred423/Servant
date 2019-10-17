@@ -7,16 +7,22 @@ import moderation.toggle.Toggle;
 import moderation.user.User;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
+import org.xml.sax.SAXException;
 import servant.Log;
 import servant.Servant;
 import utilities.Constants;
 import utilities.Emote;
+import utilities.Image;
 import utilities.UsageEmbed;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.awt.*;
 import java.sql.SQLException;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.Calendar;
+import java.util.Date;
 
 public class SignupCommand extends Command {
     public SignupCommand() {
@@ -72,8 +78,8 @@ public class SignupCommand extends Command {
         }
 
         var sb = new StringBuilder();
-        for (int i = 1; i < args.length; i++) sb.append(args[i]);
-        var title = sb.toString();
+        for (int i = 1; i < args.length; i++) sb.append(args[i]).append(" ");
+        var title = sb.toString().trim();
 
         if (title.length() > 256) {
             event.reactWarning();
@@ -96,8 +102,16 @@ public class SignupCommand extends Command {
         } catch (SQLException e) {
             eb.setColor(Color.decode(Servant.config.getDefaultColorCode()));
         }
-        eb.setTitle(String.format(LanguageHandler.get(lang, "signup_embedtitle"), (title.isEmpty() ? "" : "for "), title));
+        eb.setTitle(String.format(LanguageHandler.get(lang, "signup_embedtitle"), (title.isEmpty() ? "" : "for"), title));
         eb.setDescription(String.format(LanguageHandler.get(lang, "signup_embeddescription"), amount, upvote));
+        eb.setFooter(LanguageHandler.get(lang, "signup_timeout"), Image.getImageUrl("clock"));
+        ZonedDateTime now;
+        try {
+            now = ZonedDateTime.now(ZoneOffset.of(new Guild(event.getGuild().getIdLong()).getOffset()));
+        } catch (SQLException e) {
+            now = ZonedDateTime.now(ZoneOffset.of(Servant.config.getDefaultOffset()));
+        }
+        eb.setTimestamp(now.toInstant().plusMillis(7 * 24 * 60 * 60 * 1000)); // 1 week
 
         event.getChannel().sendMessage(eb.build()).queue(sentMessage -> {
             try {
@@ -110,6 +124,17 @@ public class SignupCommand extends Command {
             } catch (SQLException e) {
                 sentMessage.addReaction(Emote.getEmoji("upvote")).queue();
             }
+
+            new java.util.Timer().schedule(
+                    new java.util.TimerTask() {
+                        @Override
+                        public void run() {
+                            var guild = event.getGuild();
+                            var internalGuild = new Guild(guild.getIdLong());
+                            SignupListener.endSignup(internalGuild, sentMessage.getIdLong(), sentMessage, guild, author);
+                        }
+                    }, 7 * 24 * 60 * 60 * 1000 // 1 week
+            );
         });
 
         // Statistics.

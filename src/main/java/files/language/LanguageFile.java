@@ -19,8 +19,8 @@ public class LanguageFile {
         // Features
         /// Achievement
         en_gb.setProperty("achievement_excalibur", "Excalibur");
-        en_gb.setProperty("unlimited_blade_works", "Unlimited Blade Works");
-        en_gb.setProperty("gae_bolg", "The Legend of Lancer");
+        en_gb.setProperty("achievement_unlimited_blade_works", "Unlimited Blade Works");
+        en_gb.setProperty("achievement_gae_bolg", "The Legend of Lancer");
         en_gb.setProperty("achievement_level10", "Level 10");
         en_gb.setProperty("achievement_level20", "Level 20");
         en_gb.setProperty("achievement_level30", "Level 30");
@@ -35,8 +35,8 @@ public class LanguageFile {
         en_gb.setProperty("achievement_love42", "Found the answer");
         en_gb.setProperty("achievement_love69", "Nice Love");
         en_gb.setProperty("achievement_kind", "Being kind to %s");
-        en_gb.setProperty("navi", "Hey Listen!");
-        en_gb.setProperty("deusvult", "DEUS VULT!");
+        en_gb.setProperty("achievement_navi", "Hey Listen!");
+        en_gb.setProperty("achievement_deusvult", "DEUS VULT!");
 
         /// Invite
         en_gb.setProperty("invite_author", "%s, at your service!");
@@ -605,18 +605,14 @@ public class LanguageFile {
         en_gb.setProperty("patreon_subscription", "You can become a patron and support Servant with a monthly payment.\n" +
                 "Each patreon rank will have its own embed colour and profile image.\n" +
                 "[Click here to get to the Patreon page.](https://www.patreon.com/tancred)");
-        en_gb.setProperty("patreon_$1", "Colour: Silver");
-        en_gb.setProperty("patreon_$3", "Colour: Gold");
-        en_gb.setProperty("patreon_$5", "Colour: Platinum");
-        en_gb.setProperty("patreon_$10", "Colour: Diamond\n" +
-                "Also, you can change your colour to **whatever** colour you want **whenever** you want!\n\u200B");
+        en_gb.setProperty("patreon_$1", "✓ Caster Profile Image\n✓ Orange Embeds");
+        en_gb.setProperty("patreon_$3", "✓ Lancer Profile Image\n✓ Yellow Embeds");
+        en_gb.setProperty("patreon_$5", "✓ Archer Profile Image\n✓ Green Embeds");
+        en_gb.setProperty("patreon_$10", "✓ Saber Profile Image\n✓ Blue Embeds\n✓ Custom Colour Embeds");
         en_gb.setProperty("patreon_donation", "You can send Servant a donation.\n" +
-                "[Click here to get to the PayPal.me donation page.](https://www.paypal.me/servantdiscord)\n" +
-                "- Add your discord name and numbers into the donation message so I can see where the donation comes from.\n" +
-                "- If you have donated at least $5 in total:\n" +
-                "... you will get a special role on the Servant Support Server for lifetime.\n" +
-                "... your embeds will have the colour bronze showing everyone your big support.\n" +
-                "... your profile will get a new image.");
+                "Add your Discord Name#1234 into the donation message so I can see who sent the donation.\n" +
+                "[Click here to get to the PayPal.me donation page.](https://www.paypal.me/servantdiscord)\n");
+        en_gb.setProperty("patreon_donation_$5", "✓ Assassin Profile Image\n✓ Red Embeds");
         en_gb.setProperty("patreon_thanks", "Thanks to every supporter <3");
 
         /// Server Info
@@ -773,6 +769,7 @@ public class LanguageFile {
         en_gb.setProperty("signup_titlelength", "The title must not be longer than 256 characters.");
         en_gb.setProperty("signup_embeddescriptionend", "%s people could participate!\n\n" +
                 "These are the participants:");
+        en_gb.setProperty("signup_timeout", "Times out at");
 
         /// Timezone
         en_gb.setProperty("timezone_description", "Convert a date and time from one timezone to another");

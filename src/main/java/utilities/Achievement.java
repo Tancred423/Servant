@@ -8,8 +8,8 @@ public class Achievement {
     public static String getFancyName(String name, String lang) {
         switch (name.toLowerCase()) {
             case "excalibur": return LanguageHandler.get(lang, "achievement_excalibur");
-            case "unlimited_blade_works": return LanguageHandler.get(lang, "unlimited_blade_works");
-            case "gae_bolg": return LanguageHandler.get(lang, "gae_bolg");
+            case "unlimited_blade_works": return LanguageHandler.get(lang, "achievement_unlimited_blade_works");
+            case "gae_bolg": return LanguageHandler.get(lang, "achievement_gae_bolg");
 
             case "navi": return LanguageHandler.get(lang, "achievement_navi");
             case "deusvult": return LanguageHandler.get(lang, "achievement_deusvult");

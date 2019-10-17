@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Erstellungszeit: 12. Okt 2019 um 11:21
+-- Erstellungszeit: 17. Okt 2019 um 16:39
 -- Server-Version: 5.6.34-log
 -- PHP-Version: 7.1.5
 
