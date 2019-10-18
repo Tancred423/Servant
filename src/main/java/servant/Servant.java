@@ -29,6 +29,9 @@ import moderation.livestream.LivestreamCommand;
 import moderation.livestream.LivestreamListener;
 import moderation.toggle.ToggleCommand;
 import moderation.user.UserCommand;
+import net.dv8tion.jda.bot.sharding.DefaultShardManager;
+import net.dv8tion.jda.bot.sharding.DefaultShardManagerBuilder;
+import net.dv8tion.jda.core.hooks.EventListener;
 import owner.AddGifCommand;
 import moderation.*;
 import moderation.autorole.AutoroleCommand;
@@ -73,6 +76,9 @@ import owner.ShutdownCommand;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 public class Servant {
     public static JDA jda;
@@ -91,7 +97,7 @@ public class Servant {
         toggle = new ToggleFile();
 
         var waiter = new EventWaiter(); // Has to be added to JDABuilder.
-        var client = new CommandClientBuilder(); // Command management by JDA utilities.
+        var client = new CommandClientBuilder();
 
         client.setOwnerId(config.getBotOwnerId());
         client.setEmojis("✅", "⚠", "❌"); // ✅, ⚠, ❌.
@@ -174,7 +180,6 @@ public class Servant {
                 .setStatus(OnlineStatus.DO_NOT_DISTURB)
                 .setGame(Game.playing("loading..."))
 
-                // Add event listeners.
                 .addEventListener(waiter)
                 .addEventListener(client.build())
                 .addEventListener(new AutoroleListener())
@@ -201,7 +206,6 @@ public class Servant {
                 .addEventListener(new PrefixListener())
                 .addEventListener(new SignupListener())
 
-                // Start.
                 .build();
     }
 }

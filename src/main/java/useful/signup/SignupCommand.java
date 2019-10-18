@@ -111,7 +111,7 @@ public class SignupCommand extends Command {
         } catch (SQLException e) {
             now = ZonedDateTime.now(ZoneOffset.of(Servant.config.getDefaultOffset()));
         }
-        eb.setTimestamp(now.toInstant().plusMillis(7 * 24 * 60 * 60 * 1000)); // 1 week
+        eb.setTimestamp(now.toInstant().plusMillis(Constants.SIGNUP_TIMEOUT));
 
         event.getChannel().sendMessage(eb.build()).queue(sentMessage -> {
             try {
@@ -133,7 +133,7 @@ public class SignupCommand extends Command {
                             var internalGuild = new Guild(guild.getIdLong());
                             SignupListener.endSignup(internalGuild, sentMessage.getIdLong(), sentMessage, guild, author);
                         }
-                    }, 7 * 24 * 60 * 60 * 1000 // 1 week
+                    }, Constants.SIGNUP_TIMEOUT
             );
         });
 

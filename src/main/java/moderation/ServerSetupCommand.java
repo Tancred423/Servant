@@ -138,14 +138,18 @@ public class ServerSetupCommand extends Command {
                         e -> {
                             var offset = e.getMessage().getContentRaw();
                             e.getMessage().delete().queue();
-                            if (Parser.isValidOffset(offset)) {
-                                try {
-                                    internalGuild.setOffset(offset);
-                                } catch (SQLException ex) {
-                                    new Log(ex, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                                }
-                                processFinish(message, event, lang);
-                            } else processOffset(channel, author, previous, event, lang, true, internalGuild);
+                            try {
+                                if (Parser.isValidOffset(offset)) {
+                                    try {
+                                        internalGuild.setOffset(offset);
+                                    } catch (SQLException ex) {
+                                        new Log(ex, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
+                                    }
+                                    processFinish(message, event, lang);
+                                } else processOffset(channel, author, previous, event, lang, true, internalGuild);
+                            } catch (NumberFormatException ex) {
+                                processOffset(channel, author, previous, event, lang, true, internalGuild);
+                            }
                         }, 15, TimeUnit.MINUTES, () -> timeout(event, message, lang)));
     }
 

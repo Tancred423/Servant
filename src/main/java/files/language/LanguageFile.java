@@ -42,7 +42,7 @@ public class LanguageFile {
         en_gb.setProperty("invite_author", "%s, at your service!");
         en_gb.setProperty("invite_description", "Thank you for choosing me to assist you and your server.\n" +
                 "I have a lot of features. Most of them are enabled by default but some of them are not.\n" +
-                "Type `%sguild togglestatus` to check the status of all available features.\n" +
+                "Type `%stoggle all status` to check the status of all available features.\n" +
                 "Then you can enable/disable the features to your desire.\n" +
                 "\n" +
                 "To get started, I recommend you to use my `%shelp` command.\n" +
@@ -484,14 +484,7 @@ public class LanguageFile {
 
         /// User
         en_gb.setProperty("user_description", "With this command you can personalize the bot to your desire.");
-        en_gb.setProperty("user_usage", "**Setting an embed colour**\n" +
-                "Command: `%s%s set colour [color code]`\n" +
-                "Example: `%s%s set colour #FFFFFF`\n" +
-                "\n" +
-                "**Unsetting the embed colour**\n" +
-                "Command: `%s%s unset colour`\n" +
-                "\n" +
-                "**Setting an offset**\n" +
+        en_gb.setProperty("user_usage", "**Setting an offset**\n" +
                 "Command: `%s%s set offset [offset]`\n" +
                 "Example: `%s%s set offset +02:00`\n" +
                 "\n" +
@@ -514,6 +507,13 @@ public class LanguageFile {
                 "\n" +
                 "**Hide yourself from stream highlighting**\n" +
                 "Command: `%s%s streamhide [opt. guild ID]`\n" +
+                "\n" +
+                "**Setting an embed colour**\n" +
+                "Command: `%s%s set colour [color code]`\n" +
+                "Example: `%s%s set colour #FFFFFF`\n" +
+                "\n" +
+                "**Unsetting the embed colour**\n" +
+                "Command: `%s%s unset colour`\n" +
                 "\n" +
                 "**Show your current settings**\n" +
                 "Command: `%s%s show`");
@@ -601,7 +601,8 @@ public class LanguageFile {
 
         /// Patreon
         en_gb.setProperty("patreon_supportserver", "Support Servant");
-        en_gb.setProperty("patreon_description", "You can support Servant in two different ways:");
+        en_gb.setProperty("patreon_description", "You can support Servant in three different ways:");
+        en_gb.setProperty("patreon_patreontitle", "Patreon");
         en_gb.setProperty("patreon_subscription", "You can become a patron and support Servant with a monthly payment.\n" +
                 "Each patreon rank will have its own embed colour and profile image.\n" +
                 "[Click here to get to the Patreon page.](https://www.patreon.com/tancred)");
@@ -609,10 +610,14 @@ public class LanguageFile {
         en_gb.setProperty("patreon_$3", "✓ Lancer Profile Image\n✓ Yellow Embeds");
         en_gb.setProperty("patreon_$5", "✓ Archer Profile Image\n✓ Green Embeds");
         en_gb.setProperty("patreon_$10", "✓ Saber Profile Image\n✓ Blue Embeds\n✓ Custom Colour Embeds");
+        en_gb.setProperty("patreon_donationtitle", "Donation");
         en_gb.setProperty("patreon_donation", "You can send Servant a donation.\n" +
                 "Add your Discord Name#1234 into the donation message so I can see who sent the donation.\n" +
                 "[Click here to get to the PayPal.me donation page.](https://www.paypal.me/servantdiscord)\n");
         en_gb.setProperty("patreon_donation_$5", "✓ Assassin Profile Image\n✓ Red Embeds");
+        en_gb.setProperty("patreon_serverboosttitle", "Server Boost");
+        en_gb.setProperty("patreon_serverboost", "You can boost Servant's Kingdom with Discord Nitro to unlock new Discord server perks.\n" +
+                "✓ Berserker Profile Image\n✓ Pink Embeds");
         en_gb.setProperty("patreon_thanks", "Thanks to every supporter <3");
 
         /// Server Info
@@ -868,7 +873,7 @@ public class LanguageFile {
                 "Are you prepared?");
         en_gb.setProperty("createembed_author_name", "Author name (can point to URL)");
         en_gb.setProperty("createembed_title", "Title (can point to URL)");
-        en_gb.setProperty("createembed_descriptiopn", "Description\n" +
+        en_gb.setProperty("createembed_description", "Description\n" +
                 "The title will be white if it's not a hyperlink.\n" +
                 "Any image URL's have to be direct links.\n" +
                 "The timestamp is not part of the footer text, but a standalone date and time.");

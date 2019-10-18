@@ -83,7 +83,7 @@ public class TimezoneCommand extends Command {
         }
 
         try {
-            var start = OffsetDateTime.parse(date + "T" + time + zone);
+            var start = OffsetDateTime.parse(date + "T" + time + (zone.equals("00:00") ? "Z" : zone));
             var formatStart = start.format(DateTimeFormatter.RFC_1123_DATE_TIME);
             var offsetStart = start.getOffset().toString().replaceAll(":", "");
             formatStart = formatStart.replaceAll(Pattern.quote(offsetStart), args[2].toUpperCase());
@@ -104,6 +104,7 @@ public class TimezoneCommand extends Command {
             eb.addField(LanguageHandler.get(lang, "timezone_output"), formatTarget, false);
             event.reply(eb.build());
         } catch (Exception e) {
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
             event.reply(LanguageHandler.get(lang, "timezone_invalid"));
             event.reactError();
         }

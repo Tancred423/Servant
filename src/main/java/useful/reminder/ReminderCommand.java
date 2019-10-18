@@ -18,6 +18,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeParseException;
 
 public class ReminderCommand extends Command {
     public ReminderCommand() {
@@ -68,7 +69,13 @@ public class ReminderCommand extends Command {
             var date = args[0];
             var time = args[1];
             var offset = new User(event.getAuthor().getIdLong()).getOffset();
-            var reminderDate = OffsetDateTime.parse(date + "T" + time + offset);
+            OffsetDateTime reminderDate;
+            try {
+                reminderDate = OffsetDateTime.parse(date + "T" + time + offset);
+            } catch (DateTimeParseException e) {
+                event.replyError(LanguageHandler.get(lang, "reminder_invalidinput"));
+                return;
+            }
 
             if (!reminderDate.isAfter(OffsetDateTime.now(ZoneId.of(offset)))) {
                 event.replyError(LanguageHandler.get(lang, "reminder_past"));

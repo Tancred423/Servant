@@ -22,7 +22,7 @@ import java.sql.SQLException;
 public class PatreonCommand extends Command {
     public PatreonCommand() {
         this.name = "patreon";
-        this.aliases = new String[]{"donation"};
+        this.aliases = new String[]{"donation", "serverboost", "boost"};
         this.help = "Support me <3";
         this.category = new Category("Information");
         this.arguments = null;
@@ -48,13 +48,14 @@ public class PatreonCommand extends Command {
         eb.setAuthor(LanguageHandler.get(lang, "patreon_supportserver"), null, "https://i.imgur.com/rCnhGKA.jpg"); // Patreon Icon
         eb.setDescription(LanguageHandler.get(lang, "patreon_description"));
         eb.setThumbnail(Image.getImageUrl("love"));
-        eb.addField("1. Patreon", LanguageHandler.get(lang, "patreon_subscription"), false);
+        eb.addField("1. " + LanguageHandler.get(lang, "patreon_patreontitle"), LanguageHandler.get(lang, "patreon_subscription"), false);
         eb.addField("$1+/month", LanguageHandler.get(lang, "patreon_$1"), true);
         eb.addField("$3+/month", LanguageHandler.get(lang, "patreon_$3"), true);
         eb.addField("$5+/month", LanguageHandler.get(lang, "patreon_$5"), true);
         eb.addField("$10+/month", LanguageHandler.get(lang, "patreon_$10"), true);
-        eb.addField("2. Donation", LanguageHandler.get(lang, "patreon_donation"), false);
+        eb.addField("2. " + LanguageHandler.get(lang, "patreon_donationtitle"), LanguageHandler.get(lang, "patreon_donation"), false);
         eb.addField("$5+ Donated In Lifetime", LanguageHandler.get(lang, "patreon_donation_$5"), true);
+        eb.addField("3. " + LanguageHandler.get(lang, "patreon_serverboosttitle"), LanguageHandler.get(lang, "patreon_serverboost"), false);
 
         eb.setFooter(LanguageHandler.get(lang, "patreon_thanks"), event.getSelfUser().getAvatarUrl());
         event.reply(eb.build());

@@ -59,16 +59,16 @@ public class ProfileCommand extends Command {
         try {
             // Achievements
             Map<String, Integer> achievements;
-            achievements = internalProfileUser.getAchievements();
+            achievements = StringFormat.sortByValues( internalProfileUser.getAchievements());
             var achievementBuilder = new StringBuilder();
             achievementBuilder.append("**AP: ").append(internalProfileUser.getTotelAP()).append("**\n")
-                    .append("```c\n").append(StringFormat.fillWithWhitespace(LanguageHandler.get(lang, "profile_name"), 22))
+                    .append("```c\n").append(StringFormat.fillWithWhitespace(LanguageHandler.get(lang, "profile_name"), 23))
                     .append(" ")
                     .append(StringFormat.pushWithWhitespace(LanguageHandler.get(lang, "profile_ap"), 3))
                     .append("\n");
-            achievementBuilder.append("-".repeat(22)).append(" ").append("-".repeat(3)).append("\n");
+            achievementBuilder.append("-".repeat(23)).append(" ").append("-".repeat(3)).append("\n");
             for (Map.Entry<String, Integer> achievement : achievements.entrySet())
-                achievementBuilder.append(StringFormat.fillWithWhitespace(Achievement.getFancyName(achievement.getKey(), lang), 22))
+                achievementBuilder.append(StringFormat.fillWithWhitespace(Achievement.getFancyName(achievement.getKey(), lang), 23))
                         .append(" ")
                         .append(StringFormat.pushWithWhitespace(String.valueOf(achievement.getValue()), 3))
                         .append("\n");
@@ -81,10 +81,10 @@ public class ProfileCommand extends Command {
             if (features.isEmpty()) top10Features.append(LanguageHandler.get(lang, "profile_nocommands"));
             else {
                 top10Features.append("```c\n");
-                top10Features.append(StringFormat.fillWithWhitespace(LanguageHandler.get(lang, "profile_name"), 15)).append(" ").append(StringFormat.pushWithWhitespace(LanguageHandler.get(lang, "profile_amount"), 10)).append("\n");
-                top10Features.append("-".repeat(15)).append(" ").append("-".repeat(10)).append("\n");
+                top10Features.append(StringFormat.fillWithWhitespace(LanguageHandler.get(lang, "profile_name"), 16)).append(" ").append(StringFormat.pushWithWhitespace(LanguageHandler.get(lang, "profile_amount"), 10)).append("\n");
+                top10Features.append("-".repeat(16)).append(" ").append("-".repeat(10)).append("\n");
                 for (Map.Entry<String, Integer> feature : features.entrySet()) {
-                    top10Features.append(StringFormat.fillWithWhitespace(feature.getKey(), 15))
+                    top10Features.append(StringFormat.fillWithWhitespace(feature.getKey(), 16))
                             .append(" ")
                             .append(StringFormat.pushWithWhitespace(String.valueOf(feature.getValue()), 10))
                             .append("\n");

@@ -15,7 +15,6 @@ import utilities.Emote;
 
 import java.awt.*;
 import java.sql.SQLException;
-import java.util.List;
 
 public class SignupListener extends ListenerAdapter {
     public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {

@@ -1,6 +1,8 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package utilities;
 
+import java.util.*;
+
 public class StringFormat {
     public static String fillWithWhitespace(String text, int desiredStringLength) {
         if (desiredStringLength <= text.length()) return text;
@@ -16,8 +18,8 @@ public class StringFormat {
         var normal = "abcdefghijklmnopqrstuvwxyz_,;.?!/\\'ɐqɔpǝɟbɥıظʞןɯuodbɹsʇnʌʍxʎz‾'؛˙¿¡/\\,";
         var split  = "ɐqɔpǝɟbɥıظʞןɯuodbɹsʇnʌʍxʎz‾'؛˙¿¡/\\,abcdefghijklmnopqrstuvwxyz_,;.?!/\\'";
         //maj
-        normal += "ABCDEFGHIJKLMNOPQRSTUVWXYZ∀qϽᗡƎℲƃHIſʞ˥WNOԀὉᴚS⊥∩ΛMXʎZ";
-        split  += "∀qϽᗡƎℲƃHIſʞ˥WNOԀὉᴚS⊥∩ΛMXʎZABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        normal += "ABCDEFGHIJKLMNOPQRSTUVWXYZ∀ꓭϽᗡƎℲƃHIſʞ˥WNOԀὉᴚS⊥∩ΛMXʎZ";
+        split  += "∀ꓭϽᗡƎℲƃHIſʞ˥WNOԀὉᴚS⊥∩ΛMXʎZABCDEFGHIJKLMNOPQRSTUVWXYZ";
         //number
         normal += "01234567890ƖᄅƐㄣϛ9ㄥ86";
         split  += "0ƖᄅƐㄣϛ9ㄥ860123456789";
@@ -31,5 +33,13 @@ public class StringFormat {
         }
 
         return flipped.reverse().toString();
+    }
+
+    public static <K extends Comparable,V extends Comparable> Map<K,V> sortByValues(Map<K,V> map){
+        List<Map.Entry<K,V>> entries = new LinkedList<>(map.entrySet());
+        entries.sort(Comparator.comparing(Map.Entry::getValue));
+        Map<K,V> sortedMap = new LinkedHashMap<K,V>();
+        for(Map.Entry<K,V> entry: entries) sortedMap.put(entry.getKey(), entry.getValue());
+        return sortedMap;
     }
 }

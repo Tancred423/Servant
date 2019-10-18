@@ -108,7 +108,7 @@ public class CreateEmbedCommand extends Command {
 
     // Introduction
     private void processIntroduction(MessageChannel channel, User author, EmbedUser embedUser, CommandEvent event, String lang) {
-        channel.sendMessage(LanguageHandler.get(lang, "embed_introduction")).queue(message -> {
+        channel.sendMessage(LanguageHandler.get(lang, "createembed_introduction")).queue(message -> {
             message.addReaction(accept).queue();
             message.addReaction(decline).queue();
 

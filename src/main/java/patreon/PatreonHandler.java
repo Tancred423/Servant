@@ -13,15 +13,6 @@ import java.util.List;
 public class PatreonHandler {
     private static Guild g = Servant.jda.getGuildById(436925371577925642L);
 
-    public static String getPatreonRank(User user) {
-        if (is$10Patron(user)) return "$10";
-        else if (is$5Patron(user)) return "$5";
-        else if (is$3Patron(user)) return "$3";
-        else if (is$1Patron(user)) return "$1";
-        else if (isDonator(user)) return "donator";
-        else return "user";
-    }
-
     public static boolean isDonator(User user) {
         if (is$1Patron(user)) return true;
         List<Member> members = g.getMembers();

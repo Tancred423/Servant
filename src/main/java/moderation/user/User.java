@@ -311,13 +311,13 @@ public class User {
     public boolean isStreamHidden(long guildId) throws SQLException {
         var connection = Database.getConnection();
         var select = connection.prepareStatement("SELECT * FROM streamhidden WHERE guild_id=? AND user_id=?");
-        select.setLong(1, userId);
-        select.setLong(2, guildId);
+        select.setLong(1, guildId);
+        select.setLong(2, userId);
         var resultSet = select.executeQuery();
-        boolean isStreamHiddden = false;
-        if (resultSet.first()) isStreamHiddden = true;
+        boolean isStreamHidden = false;
+        if (resultSet.first()) isStreamHidden = true;
         connection.close();
-        return isStreamHiddden;
+        return isStreamHidden;
     }
 
     List<Long> getStreamHiddenGuilds() throws SQLException {
@@ -341,12 +341,12 @@ public class User {
             connection.close();
             return true;
         } else {
-            unsetStreamHiden(guildId);
+            unsetStreamHidden(guildId);
             return false;
         }
     }
 
-    private void unsetStreamHiden(long guildId) throws SQLException {
+    private void unsetStreamHidden(long guildId) throws SQLException {
         var connection = Database.getConnection();
         var delete = connection.prepareStatement("DELETE FROM streamhidden WHERE guild_id=? AND user_id=?");
         delete.setLong(1, guildId);

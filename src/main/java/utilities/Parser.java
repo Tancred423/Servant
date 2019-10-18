@@ -121,7 +121,7 @@ public class Parser {
     }
 
     // Guild
-    public static boolean isValidOffset(String offset) {
+    public static boolean isValidOffset(String offset) throws NumberFormatException {
         var isValidOffset = true;
         if (offset.length() != 6) isValidOffset = false;
         if (!offset.startsWith("+") && !offset.startsWith("-")) isValidOffset = false;

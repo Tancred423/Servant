@@ -7,4 +7,5 @@ public class Constants {
     final public static int MOD_COOLDOWN = 1;
     final public static int PATRON_COOLDOWN = 0;
     final public static int OWNER_COOLDOWN = 0;
+    final public static int SIGNUP_TIMEOUT = 7 * 24 * 60 * 60 * 1000; // 1 week
 }
