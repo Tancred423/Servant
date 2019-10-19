@@ -513,7 +513,9 @@ public class CommandClientImpl implements CommandClient, EventListener {
             }
         }
 
-        if(parts != null) // Starts with valid prefix.
+        if (parts != null) { // Starts with valid prefix.
+            System.out.println("Command executed: " + event.getMessage().getContentDisplay() + ". Guild: " + (event.getGuild() == null ? "DM" : event.getGuild().getName() + " (" + event.getGuild().getIdLong() + ")") + ". User: " + event.getAuthor().getName() + "#" + event.getAuthor().getDiscriminator() + " (" + event.getAuthor().getIdLong() + ").");
+
             if(useHelp && (parts[0].equalsIgnoreCase(helpWord) || parts[0].equalsIgnoreCase(helpWorldAlias))) {
                 CommandEvent cevent = new CommandEvent(event, parts[1]==null ? "" : parts[1], this);
                 if(listener!=null)
@@ -544,6 +546,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
                     return; // Command is done
                 }
             }
+        }
 
         if (listener != null) listener.onNonCommandMessage(event);
     }

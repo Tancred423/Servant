@@ -20,6 +20,8 @@ public class InviteKickListener extends ListenerAdapter {
         var guild = event.getGuild();
         var guildOwner = guild.getOwner().getUser();
 
+        System.out.println("Servant was invited to " + guild.getName() + " (" + guild.getIdLong() + "). Owner: " + guildOwner.getName() + "#" + guildOwner.getDiscriminator() + " (" + guildOwner.getIdLong() + ").");
+
         guildOwner.openPrivateChannel().queue(privateChannel -> {
             var internalGuildOwner = new User(guildOwner.getIdLong());
             String language;
@@ -52,6 +54,8 @@ public class InviteKickListener extends ListenerAdapter {
     public void onGuildLeave(GuildLeaveEvent event) {
         var guild = event.getGuild();
         var guildOwner = guild.getOwner().getUser();
+
+        System.out.println("Servant was kicked from " + guild.getName() + " (" + guild.getIdLong() + "). Owner: " + guildOwner.getName() + "#" + guildOwner.getDiscriminator() + " (" + guildOwner.getIdLong() + ").");
 
         guildOwner.openPrivateChannel().queue(privateChannel -> {
             var internalGuildOwner = new User(guildOwner.getIdLong());
