@@ -1353,6 +1353,7 @@ public class LanguageFile {
         de_de.setProperty("reactionrole_notset", "This emoji or emote was not set.");
         de_de.setProperty("reactionrole_firstarg", "Either `set` or `unset` a reaction.");
         de_de.setProperty("reactionrole_insufficient", "Insufficient permissions or problem with hierarchy.");
+        de_de.setProperty("reactionrole_invalidmessageid", "Ungültige Nachrichten ID.");
 
         /// Role
         de_de.setProperty("role_description", "Assing or remove roles from members.");
