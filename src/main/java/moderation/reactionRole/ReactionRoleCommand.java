@@ -84,7 +84,13 @@ public class ReactionRoleCommand extends Command {
                reactionChannel = event.getGuild().getTextChannelById(channelId);
 
                 // Message ID
-                messageId = Long.parseLong(args[2]);
+                try {
+                    messageId = Long.parseLong(args[2]);
+                } catch (NumberFormatException e) {
+                    event.replyError(LanguageHandler.get(lang, "reactionrole_invalidmessageid"));
+                    return;
+                }
+
                 reactionChannel.getMessageById(messageId).queue(reactionMessage -> {
                     // Emoji / Emote
                     String emoji = null;

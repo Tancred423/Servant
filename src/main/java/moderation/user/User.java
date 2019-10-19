@@ -368,7 +368,8 @@ public class User {
             var user = Servant.jda.getUserById(userId);
             var guild = Servant.jda.getGuildById(436925371577925642L);
             Color color = null;
-            if (PatreonHandler.is$10Patron(user)) color = guild.getRoleById(502472869234868224L).getColor();
+            if (PatreonHandler.isVIP(user)) color = guild.getRoleById(510204269568458753L).getColor();
+            else if (PatreonHandler.is$10Patron(user)) color = guild.getRoleById(502472869234868224L).getColor();
             else if (PatreonHandler.is$5Patron(user)) color = guild.getRoleById(502472823638458380L).getColor();
             else if (PatreonHandler.is$3Patron(user)) color = guild.getRoleById(502472546600353796L).getColor();
             else if (PatreonHandler.is$1Patron(user)) color = guild.getRoleById(502472440455233547L).getColor();
@@ -393,7 +394,8 @@ public class User {
         else {
             var user = Servant.jda.getUserById(userId);
             var guild = Servant.jda.getGuildById(436925371577925642L);
-            if (PatreonHandler.is$10Patron(user)) color = guild.getRoleById(502472869234868224L).getColor();
+            if (PatreonHandler.isVIP(user)) color = guild.getRoleById(510204269568458753L).getColor();
+            else if (PatreonHandler.is$10Patron(user)) color = guild.getRoleById(502472869234868224L).getColor();
             else if (PatreonHandler.is$5Patron(user)) color = guild.getRoleById(502472823638458380L).getColor();
             else if (PatreonHandler.is$3Patron(user)) color = guild.getRoleById(502472546600353796L).getColor();
             else if (PatreonHandler.is$1Patron(user)) color = guild.getRoleById(502472440455233547L).getColor();
