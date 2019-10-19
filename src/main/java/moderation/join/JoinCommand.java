@@ -57,7 +57,7 @@ public class JoinCommand extends Command {
         switch (args[0].toLowerCase()) {
             case "set":
             case "s":
-                if (args.length < 2) {
+                if (args.length < 2 || event.getMessage().getMentionedChannels().isEmpty()) {
                     event.reply(LanguageHandler.get(lang, "joinleave_nochannel_mention"));
                     return;
                 }

@@ -28,11 +28,10 @@ public class AutoroleListener extends ListenerAdapter {
                         TimeUnit.MINUTES.sleep(roleAndDelay.entrySet().iterator().next().getValue());
                         var guild = event.getGuild();
                         var member = event.getMember();
-                        if (guild.getMemberById(event.getJDA().getSelfUser().getIdLong()).canInteract(member))
-                            guild.getController().addSingleRoleToMember(member, internalGuild.getAutorole().entrySet().iterator().next().getKey()).queue();
+                        guild.getController().addSingleRoleToMember(member, internalGuild.getAutorole().entrySet().iterator().next().getKey()).queue();
                     } catch (SQLException | InterruptedException e) {
                         new Log(e, event.getGuild(), eventUser, "Autorole Listener", null).sendLog(false);
-                    }
+                    } catch (HierarchyException ignored) { }
                 });
 
                 delay.start();
