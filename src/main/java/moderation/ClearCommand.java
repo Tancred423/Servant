@@ -64,7 +64,13 @@ public class ClearCommand extends Command {
                 return;
             }
 
-            var clearValue = Math.min(Integer.parseInt(arg), 100);
+            int clearValue;
+            try {
+                clearValue = Math.min(Integer.parseInt(arg), 100);
+            } catch (NumberFormatException e) {
+                event.replyError(LanguageHandler.get(lang, "clear_invalid"));
+                return;
+            }
 
             if (clearValue < 1) {
                 event.reply(LanguageHandler.get(lang, "clear_sub_one"));

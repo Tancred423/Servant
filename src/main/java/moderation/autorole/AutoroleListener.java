@@ -3,6 +3,7 @@ package moderation.autorole;
 
 import moderation.toggle.Toggle;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
+import net.dv8tion.jda.core.exceptions.HierarchyException;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import moderation.guild.Guild;
 import servant.Log;
@@ -25,7 +26,10 @@ public class AutoroleListener extends ListenerAdapter {
                     try {
                         var roleAndDelay = internalGuild.getAutorole();
                         TimeUnit.MINUTES.sleep(roleAndDelay.entrySet().iterator().next().getValue());
-                        event.getGuild().getController().addSingleRoleToMember(event.getMember(), internalGuild.getAutorole().entrySet().iterator().next().getKey()).queue();
+                        var guild = event.getGuild();
+                        var member = event.getMember();
+                        if (guild.getMemberById(event.getJDA().getSelfUser().getIdLong()).canInteract(member))
+                            guild.getController().addSingleRoleToMember(member, internalGuild.getAutorole().entrySet().iterator().next().getKey()).queue();
                     } catch (SQLException | InterruptedException e) {
                         new Log(e, event.getGuild(), eventUser, "Autorole Listener", null).sendLog(false);
                     }

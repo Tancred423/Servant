@@ -32,7 +32,7 @@ import moderation.user.UserCommand;
 import net.dv8tion.jda.bot.sharding.DefaultShardManager;
 import net.dv8tion.jda.bot.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.core.hooks.EventListener;
-import owner.AddGifCommand;
+import owner.*;
 import moderation.*;
 import moderation.autorole.AutoroleCommand;
 import moderation.autorole.AutoroleListener;
@@ -70,9 +70,6 @@ import useful.votes.vote.VoteEndListener;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandClientBuilder;
 import zJdaUtilsLib.com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import information.BotInfoCommand;
-import owner.ServerlistCommand;
-import owner.PingCommand;
-import owner.ShutdownCommand;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
@@ -107,6 +104,7 @@ public class Servant {
         client.addCommands(
                 // Owner
                 new AddGifCommand(),
+                new EvalCommand(),
                 new PingCommand(),
                 new ServerlistCommand(waiter),
                 new ShutdownCommand(),

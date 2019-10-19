@@ -61,7 +61,7 @@ public class AvatarCommand extends Command {
         var message = event.getMessage();
         var channel = message.getChannel();
         var author = message.getAuthor();
-        var mentioned = message.getMentionedMembers().get(0).getUser();
+        var mentioned = message.getMentionedUsers().get(0);
         var avatarUrl = mentioned.getAvatarUrl();
         Color color;
         try {

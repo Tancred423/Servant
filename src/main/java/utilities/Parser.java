@@ -92,7 +92,7 @@ public class Parser {
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean hasMentionedUser(Message message) {
-        return !message.getMentionedMembers().isEmpty();
+        return !message.getMentionedUsers().isEmpty();
     }
 
     // z1 should be the saved time; z2 should be the current time.
