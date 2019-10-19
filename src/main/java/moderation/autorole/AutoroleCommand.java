@@ -52,7 +52,8 @@ public class AutoroleCommand extends Command {
         }
 
         var args = event.getArgs().split(" ");
-        Role role;
+        Role role = null;
+        int delay = 0;
 
         switch (args[0].toLowerCase()) {
             case "set":
@@ -64,12 +65,9 @@ public class AutoroleCommand extends Command {
 
                 role = event.getMessage().getMentionedRoles().get(0);
 
-                int delay;
                 try {
                     delay = Integer.parseInt(args[args.length - 1]);
-                } catch (NumberFormatException e) {
-                    delay = 0;
-                }
+                } catch (NumberFormatException ignored) { }
 
                 try {
                     internalGuild.setAutorole(role.getIdLong(), delay);
@@ -97,8 +95,10 @@ public class AutoroleCommand extends Command {
             case "sh":
                 try {
                     var roleAndDelay = internalGuild.getAutorole();
-                    role = roleAndDelay.entrySet().iterator().next().getKey();
-                    delay = roleAndDelay.get(role);
+                    if (!roleAndDelay.isEmpty()) {
+                        role = roleAndDelay.entrySet().iterator().next().getKey();
+                        delay = roleAndDelay.get(role);
+                    }
                 } catch (SQLException e) {
                     new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                     return;
