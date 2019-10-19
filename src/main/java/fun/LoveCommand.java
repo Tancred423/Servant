@@ -28,7 +28,7 @@ public class LoveCommand extends Command {
         this.category = new Command.Category("Fun");
         this.arguments = "@user1 @user2";
         this.hidden = false;
-        this.guildOnly = false;
+        this.guildOnly = true;
         this.ownerCommand = false;
         this.cooldown = Constants.USER_COOLDOWN;
         this.cooldownScope = CooldownScope.USER;

@@ -382,6 +382,7 @@ public class LanguageFile {
         en_gb.setProperty("role_hint", "I will remove the role if the member already has it and provide it if the member doesn't have it already.");
         en_gb.setProperty("role_missing", "Missing role name.");
         en_gb.setProperty("role_notfound", "Sorry, master! I couldn't find a role with that name.");
+        en_gb.setProperty("role_missingrolename", "Please also provide the role name.");
 
         /// Server
         en_gb.setProperty("server_description", "With this command you can personalize the bot to your server's desire.");
@@ -973,7 +974,7 @@ public class LanguageFile {
         // Interaction
         en_gb.setProperty("interaction_description", "Interaction commands are like reactions, but way better.\n" +
                 "Share your feelings or cookies with other people.");
-        en_gb.setProperty("interaction_usage", "**%s%s%s someone**\n" +
+        en_gb.setProperty("interaction_usage", "**%s%s someone**\n" +
                 "Command: `%s%s [@user]`\n" +
                 "Example: `%s%s @Servant`");
         en_gb.setProperty("interaction_usage_dab", "**%s%s on someone**\n" +
@@ -1362,6 +1363,7 @@ public class LanguageFile {
         de_de.setProperty("role_hint", "I will remove the role if the member already has it and provide it if the member doesn't have it already.");
         de_de.setProperty("role_missing", "Missing role name.");
         de_de.setProperty("role_notfound", "Sorry, master! I couldn't find a role with that name.");
+        de_de.setProperty("role_missingrolename", "Please also provide the role name.");
 
         /// Server
         de_de.setProperty("server_description", "With this command you can personalize the bot to your guild's desire.");
@@ -1953,7 +1955,7 @@ public class LanguageFile {
         // Interaction
         de_de.setProperty("interaction_description", "Interaction commands are like reactions, but way better.\n" +
                 "Share your feelings or cookies with other people.");
-        de_de.setProperty("interaction_usage", "**%s%s%s someone**\n" +
+        de_de.setProperty("interaction_usage", "**%s%s someone**\n" +
                 "Command: `%s%s [@user]`\n" +
                 "Example: `%s%s @Servant`");
         de_de.setProperty("interaction_usage_dab", "**%s%s on someone**\n" +

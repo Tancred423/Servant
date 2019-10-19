@@ -53,7 +53,13 @@ public class RoleCommand extends Command {
         }
 
         var mentioned = message.getMentionedMembers().get(0);
-        var roleName = message.getContentRaw().split(">")[1].trim();
+        String roleName;
+        try {
+            roleName = message.getContentRaw().split(">")[1].trim();
+        } catch (ArrayIndexOutOfBoundsException e) {
+            event.replyError(LanguageHandler.get(lang, "role_missingrolename"));
+            return;
+        }
 
         if (roleName.isEmpty()) {
             event.reply(LanguageHandler.get(lang, "role_missing"));
