@@ -10,6 +10,7 @@ import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
+import net.dv8tion.jda.core.exceptions.HierarchyException;
 import servant.Log;
 import servant.Servant;
 import utilities.Constants;
@@ -167,8 +168,11 @@ public class LevelRoleCommand extends Command {
                         List<Long> roleIds = internalGuild.getLevelRolesForLevel(currentLevel);
 
                         for (Long roleId : roleIds)
-                            if (guild.getRoleById(roleId) != null)
-                                guild.getController().addSingleRoleToMember(member, guild.getRoleById(roleId)).queue();
+                            if (guild.getRoleById(roleId) != null) {
+                                try {
+                                    guild.getController().addSingleRoleToMember(member, guild.getRoleById(roleId)).queue();
+                                } catch (HierarchyException ignored) { }
+                            }
                     }
                     event.reactSuccess();
                 } catch (SQLException e) {
