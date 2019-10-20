@@ -139,6 +139,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
         this.compiler = compiler;
         this.manager = manager;
         this.helpConsumer = helpConsumer==null ? (event) -> {
+            System.out.println("Command executed: " + event.getMessage().getContentDisplay() + ". Guild: " + (event.getGuild() == null ? "DM" : event.getGuild().getName() + " (" + event.getGuild().getIdLong() + ")") + ". User: " + event.getAuthor().getName() + "#" + event.getAuthor().getDiscriminator() + " (" + event.getAuthor().getIdLong() + ").");
             var eb = new EmbedBuilder();
             try {
                 eb.setColor(new moderation.user.User(event.getAuthor().getIdLong()).getColor());
@@ -514,8 +515,6 @@ public class CommandClientImpl implements CommandClient, EventListener {
         }
 
         if (parts != null) { // Starts with valid prefix.
-            System.out.println("Command executed: " + event.getMessage().getContentDisplay() + ". Guild: " + (event.getGuild() == null ? "DM" : event.getGuild().getName() + " (" + event.getGuild().getIdLong() + ")") + ". User: " + event.getAuthor().getName() + "#" + event.getAuthor().getDiscriminator() + " (" + event.getAuthor().getIdLong() + ").");
-
             if(useHelp && (parts[0].equalsIgnoreCase(helpWord) || parts[0].equalsIgnoreCase(helpWorldAlias))) {
                 CommandEvent cevent = new CommandEvent(event, parts[1]==null ? "" : parts[1], this);
                 if(listener!=null)
@@ -538,6 +537,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
                 }
 
                 if (command != null) {
+                    System.out.println("Command executed: " + event.getMessage().getContentDisplay() + ". Guild: " + (event.getGuild() == null ? "DM" : event.getGuild().getName() + " (" + event.getGuild().getIdLong() + ")") + ". User: " + event.getAuthor().getName() + "#" + event.getAuthor().getDiscriminator() + " (" + event.getAuthor().getIdLong() + ").");
                     CommandEvent cevent = new CommandEvent(event, args, this);
                     if (listener != null)
                         listener.onCommand(cevent, command);

@@ -282,6 +282,8 @@ public class LanguageFile {
         en_gb.setProperty("levelrole_role_singular", "You also gained following role:");
         en_gb.setProperty("levelrole_role_plural", "You also gained following roles:");
         en_gb.setProperty("levelrole_levelup", "LEVEL UP");
+        en_gb.setProperty("level_missingpermission_embed", "I don't have the permission to create embeds (Embed Links), that's why you see the budget level up announcement.");
+        en_gb.setProperty("level_hierarchy", "Couldn't add role \"%s\", because they are higher than me in hierarchy.");
 
         /// Livestream
         en_gb.setProperty("livestream_description", "You can set up streamers, one stream notification channel and one streamer role.\n" +
@@ -1897,6 +1899,8 @@ public class LanguageFile {
         de_de.setProperty("level_rank", "Rank");
         de_de.setProperty("level_up", "%s just reached level %s! \uD83C\uDF89");
         de_de.setProperty("level_footer", "Also try %s and \"%slevel leaderboard\"!");
+        de_de.setProperty("level_missingpermission_embed", "I don't have the permission to create embeds (Embed Links), that's why you see the budget level up announcement.");
+        de_de.setProperty("level_hierarchy", "Couldn't add role \"%s\", because they are higher than me in hierarchy.");
 
         /// Love
         de_de.setProperty("love_description","Ship two people or just one with themselves.");

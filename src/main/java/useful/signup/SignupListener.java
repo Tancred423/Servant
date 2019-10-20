@@ -53,7 +53,13 @@ public class SignupListener extends ListenerAdapter {
             if (signupReaction == null) return;
 
             signupReaction.getUsers().queue(users -> {
-                for (var user : users) if (user.isBot()) users.remove(user);
+                for (int i = 0; i < users.size(); i++) {
+                    var user = users.get(i);
+                    if (user.isBot()) {
+                        users.remove(user);
+                        i--;
+                    }
+                }
                 if (users.size() == amount) {
                     String lang;
                     try {

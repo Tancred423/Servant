@@ -4,10 +4,11 @@ package fun.level;
 import files.language.LanguageHandler;
 import moderation.toggle.Toggle;
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.core.exceptions.HierarchyException;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import servant.Log;
 import servant.Servant;
@@ -92,36 +93,56 @@ public class LevelListener extends ListenerAdapter {
             try {
                 checkForAchievements(updatedLevel, event);
                 var sb = new StringBuilder();
-                List<Role> roles = checkForNewRole(updatedLevel, event);
-                if (!roles.isEmpty()) for (Role role : roles) sb.append(role.getName()).append("\n");
-                var eb = new EmbedBuilder();
-                try {
-                    eb.setColor(new moderation.user.User(authorId).getColor());
-                } catch (SQLException ex) {
-                    eb.setColor(Color.decode(Servant.config.getDefaultColorCode()));
+                List<String> roles = checkForNewRole(updatedLevel, event, lang);
+                if (!roles.isEmpty()) for (var roleName : roles) sb.append(roleName).append("\n");
+
+                if (event.getGuild().getMemberById(event.getJDA().getSelfUser().getIdLong()).hasPermission(Permission.MESSAGE_EMBED_LINKS)) {
+                    var eb = new EmbedBuilder();
+                    try {
+                        eb.setColor(new moderation.user.User(authorId).getColor());
+                    } catch (SQLException ex) {
+                        eb.setColor(Color.decode(Servant.config.getDefaultColorCode()));
+                    }
+                    eb.setAuthor(LanguageHandler.get(lang, "levelrole_levelup"), null, null);
+                    eb.setThumbnail(author.getEffectiveAvatarUrl());
+                    eb.setDescription(String.format(LanguageHandler.get(lang, "level_up"), author.getAsMention(), updatedLevel));
+                    if (!roles.isEmpty()) eb.addField(roles.size() == 1 ?
+                            LanguageHandler.get(lang, "levelrole_role_singular") :
+                            LanguageHandler.get(lang, "levelrole_role_plural"), sb.toString(), false);
+                    event.getChannel().sendMessage(eb.build()).queue();
+                } else {
+                    var mb = new StringBuilder();
+                    mb.append("**").append(LanguageHandler.get(lang, "levelrole_levelup")).append("**\n");
+                    mb.append(String.format(LanguageHandler.get(lang, "level_up"), author.getAsMention(), updatedLevel)).append("**\n");
+                    if (!roles.isEmpty()) {
+                        mb.append(roles.size() == 1 ?
+                                LanguageHandler.get(lang, "levelrole_role_singular") :
+                                LanguageHandler.get(lang, "levelrole_role_plural")).append("\n");
+                        mb.append(sb.toString()).append("\n");
+                    }
+                    mb.append("_").append(LanguageHandler.get(lang, "level_missingpermission_embed")).append("_");
+                    event.getChannel().sendMessage(mb.toString()).queue();
                 }
-                eb.setAuthor(LanguageHandler.get(lang, "levelrole_levelup"), null, null);
-                eb.setThumbnail(author.getEffectiveAvatarUrl());
-                eb.setDescription(String.format(LanguageHandler.get(lang, "level_up"), author.getAsMention(), updatedLevel));
-                if (!roles.isEmpty()) eb.addField(roles.size() == 1 ?
-                        LanguageHandler.get(lang, "levelrole_role_singular") :
-                        LanguageHandler.get(lang, "levelrole_role_plural"), sb.toString(), false);
-                event.getChannel().sendMessage(eb.build()).queue();
             } catch (SQLException e) {
                 new Log(e, guild, author, "level", null).sendLog(false);
             }
         }
     }
 
-    private List<Role> checkForNewRole(int level, GuildMessageReceivedEvent event) throws SQLException {
+    private List<String> checkForNewRole(int level, GuildMessageReceivedEvent event, String lang) throws SQLException {
         var guild = event.getGuild();
         var internalGuild = new moderation.guild.Guild(guild.getIdLong());
         var roleIds = internalGuild.getLevelRole(level);
-        List<Role> roles = new ArrayList<>();
+        List<String> roles = new ArrayList<>();
         for (Long roleId : roleIds)
-            if (guild.getRoleById(roleId) != null) {
-                guild.getController().addSingleRoleToMember(event.getMember(), guild.getRoleById(roleId)).queue();
-                roles.add(guild.getRoleById(roleId));
+            if (guild.getRoleById(roleId) != null
+                    && event.getGuild().getMemberById(event.getJDA().getSelfUser().getIdLong()).hasPermission(Permission.MANAGE_ROLES)) {
+                try {
+                    guild.getController().addSingleRoleToMember(event.getMember(), guild.getRoleById(roleId)).queue();
+                    roles.add(guild.getRoleById(roleId).getName());
+                } catch (HierarchyException e) {
+                    roles.add(String.format(LanguageHandler.get(lang, "level_hierarchy"), guild.getRoleById(roleId).getName()));
+                }
             }
         return roles;
     }

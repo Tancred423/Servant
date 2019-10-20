@@ -58,28 +58,31 @@ public class InviteKickListener extends ListenerAdapter {
         System.out.println("Servant was kicked from " + guild.getName() + " (" + guild.getIdLong() + "). Owner: " + guildOwner.getName() + "#" + guildOwner.getDiscriminator() + " (" + guildOwner.getIdLong() + ").");
 
         guildOwner.openPrivateChannel().queue(privateChannel -> {
-            var internalGuildOwner = new User(guildOwner.getIdLong());
-            String language;
-            try {
-                language = new Guild(guild.getIdLong()).getLanguage();
-            } catch (SQLException e) {
-                new Log(e, guild, guildOwner, "invite", null).sendLog(false);
-                return;
-            }
-            var botOwner = Servant.jda.getUserById(Servant.config.getBotOwnerId());
-            var eb = new EmbedBuilder();
+                    var internalGuildOwner = new User(guildOwner.getIdLong());
+                    String language;
+                    try {
+                        language = new Guild(guild.getIdLong()).getLanguage();
+                    } catch (SQLException e) {
+                        new Log(e, guild, guildOwner, "invite", null).sendLog(false);
+                        return;
+                    }
+                    var botOwner = Servant.jda.getUserById(Servant.config.getBotOwnerId());
+                    var eb = new EmbedBuilder();
 
-            try {
-                eb.setColor(internalGuildOwner.getColor());
-            } catch (SQLException e) {
-                eb.setColor(Color.decode(Servant.config.getDefaultColorCode()));
-            }
-            eb.setAuthor(LanguageHandler.get(language, "kick_author"), null, guild.getIconUrl());
-            eb.setDescription(String.format(LanguageHandler.get(language, "kick_description"), Servant.config.getSupportGuildInv(), botOwner.getName(), botOwner.getDiscriminator()));
-            eb.setImage(Image.getImageUrl("kick"));
-            eb.setFooter(String.format(LanguageHandler.get(language, "kick_footer"), guild.getName()), null);
+                    try {
+                        eb.setColor(internalGuildOwner.getColor());
+                    } catch (SQLException e) {
+                        eb.setColor(Color.decode(Servant.config.getDefaultColorCode()));
+                    }
+                    eb.setAuthor(LanguageHandler.get(language, "kick_author"), null, guild.getIconUrl());
+                    eb.setDescription(String.format(LanguageHandler.get(language, "kick_description"), Servant.config.getSupportGuildInv(), botOwner.getName(), botOwner.getDiscriminator()));
+                    eb.setImage(Image.getImageUrl("kick"));
+                    eb.setFooter(String.format(LanguageHandler.get(language, "kick_footer"), guild.getName()), null);
 
-            privateChannel.sendMessage(eb.build()).queue();
-        });
+                    privateChannel.sendMessage(eb.build()).queue();
+                },
+                fail -> {
+                    // ignore
+                });
     }
 }
