@@ -73,14 +73,16 @@ public class MediaOnlyChannelCommand extends Command {
                     return;
                 }
 
+                boolean success;
                 try {
-                    internalGuild.addMediaOnlyChannel(channel);
+                    success = internalGuild.addMediaOnlyChannel(channel);
                 } catch (SQLException e) {
                     new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                     return;
                 }
 
-                event.reactSuccess();
+                if (success) event.reactSuccess();
+                else event.replyError(LanguageHandler.get(lang, "mediaonlychannel_alreadyset"));
                 break;
 
             case "unset":

@@ -354,6 +354,7 @@ public class LanguageFile {
                 "- Send upload files with an optional description.\n" +
                 "- Post a valid url with an optional description.\n" +
                 "*This message will be deleted in 30 seconds.*");
+        en_gb.setProperty("mediaonlychannel_alreadyset", "This channel was already set.");
 
         /// Reaction Role
         en_gb.setProperty("reactionrole_description", "You can add reaction to a message via this command. Once a member clicks on the corresponding reaction, he will get the designated role\n" +
@@ -1335,6 +1336,7 @@ public class LanguageFile {
                 "- Send upload files with an optional description.\n" +
                 "- Post a valid url with an optional description.\n" +
                 "*This message will be deleted in 30 seconds.*");
+        de_de.setProperty("mediaonlychannel_alreadyset", "This channel was already set.");
 
         /// Reaction Role
         de_de.setProperty("reactionrole_description", "You can add reaction to a message via this command. Once a member clicks on the corresponding reaction, he will get the designated role\n" +

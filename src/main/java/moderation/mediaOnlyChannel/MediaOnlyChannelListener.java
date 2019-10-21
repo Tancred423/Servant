@@ -39,7 +39,9 @@ public class MediaOnlyChannelListener extends ListenerAdapter {
                 if (attachments.isEmpty()) {
                     String url = null;
                     var args = event.getMessage().getContentDisplay().split(" ");
-                    for (var arg : args) if (arg.startsWith("http")) url = arg;
+                    for (var arg : args)
+                        if (arg.startsWith("http")) url = arg;
+                        else if (arg.startsWith("||http") && arg.endsWith("||")) url = arg.substring(2, arg.length() - 2); // killing spoiler tags
 
                     if (url == null) validMessage = false;
                     else if (!Parser.isValidUrl(url)) validMessage = false;

@@ -1186,13 +1186,15 @@ public class Guild {
         }
     }
 
-    public void addMediaOnlyChannel(MessageChannel channel) throws SQLException {
+    public boolean addMediaOnlyChannel(MessageChannel channel) throws SQLException {
+        if (mediaOnlyChannelHasEntry(channel)) return false;
         var connection = Database.getConnection();
         var insert = connection.prepareStatement("INSERT INTO mediaonlychannel (guild_id,channel_id) VALUES (?,?)");
         insert.setLong(1, guildId);
         insert.setLong(2, channel.getIdLong());
         insert.executeUpdate();
         connection.close();
+        return true;
     }
 
     public boolean unsetMediaOnlyChannel(MessageChannel channel) throws SQLException {
