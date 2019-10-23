@@ -9,6 +9,7 @@ import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.user.update.UserUpdateGameEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import owner.blacklist.Blacklist;
 import servant.Log;
 import servant.Servant;
 
@@ -17,6 +18,12 @@ import java.sql.SQLException;
 
 public class LivestreamListener extends ListenerAdapter {
     public void onUserUpdateGame(UserUpdateGameEvent event) {
+        try {
+            if (Blacklist.isBlacklisted(event.getUser().getIdLong())) return;
+            if (event.getGuild() != null) if (Blacklist.isBlacklisted(event.getGuild().getIdLong())) return;
+        } catch (SQLException e) {
+            new Log(e, event.getGuild(), event.getUser(), "livestream", null).sendLog(false);
+        }
         if (!Toggle.isEnabled(event, "livestream")) return;
 
         var guild = event.getGuild();

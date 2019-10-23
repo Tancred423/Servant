@@ -90,6 +90,7 @@ public class LanguageFile {
         /// Server List
         en_gb.setProperty("guildlist_members", "Members");
         en_gb.setProperty("guildlist_connected", " Servers that **%s** is connected to");
+        en_gb.setProperty("blacklist_empty", "No blacklisted ID's.");
 
         // Moderation
         /// Auto Role
@@ -779,6 +780,7 @@ public class LanguageFile {
         en_gb.setProperty("signup_embeddescriptionend", "%s people could participate!\n\n" +
                 "These are the participants:");
         en_gb.setProperty("signup_timeout", "Times out at");
+        en_gb.setProperty("signup_nobody", "Nobody signed up");
 
         /// Timezone
         en_gb.setProperty("timezone_description", "Convert a date and time from one timezone to another");
@@ -1072,6 +1074,10 @@ public class LanguageFile {
         de_de.setProperty("addgif_args", "2 Arugmente sind nötig.\n... [interaktion] [GIF URL]");
         de_de.setProperty("addgif_interaction", "Ungültige Interaktion.");
         de_de.setProperty("addgif_direct_link", "Keine gültige GIF URL. Es muss ein direct link sein!");
+
+        /// Blacklist
+        de_de.setProperty("blacklist_missingid", "Add an ID");
+        de_de.setProperty("blacklist_empty", "No blacklisted ID's.");
 
         /// Server List
         de_de.setProperty("guildlist_members", "Mitglieder");
@@ -1761,6 +1767,7 @@ public class LanguageFile {
         de_de.setProperty("signup_embeddescriptionend", "%s people could participate!\n\n" +
                 "These are the participants:");
         de_de.setProperty("signup_timeout", "Times out at");
+        de_de.setProperty("signup_nobody", "Nobody signed up");
 
         /// Timezone
         de_de.setProperty("timezone_description", "Convert a date and time from one timezone to another");

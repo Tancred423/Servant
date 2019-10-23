@@ -89,12 +89,6 @@ public class SignupCommand extends Command {
 
         var author = event.getAuthor();
         var internalAuthor = new User(author.getIdLong());
-        String upvote;
-        try {
-            upvote = Emote.getEmoteMention("upvote");
-        } catch (SQLException e) {
-            upvote = Emote.getEmoji("upvote");
-        }
 
         var eb = new EmbedBuilder();
         try {
@@ -103,7 +97,7 @@ public class SignupCommand extends Command {
             eb.setColor(Color.decode(Servant.config.getDefaultColorCode()));
         }
         eb.setTitle(String.format(LanguageHandler.get(lang, "signup_embedtitle"), (title.isEmpty() ? "" : "for"), title));
-        eb.setDescription(String.format(LanguageHandler.get(lang, "signup_embeddescription"), amount, upvote));
+        eb.setDescription(String.format(LanguageHandler.get(lang, "signup_embeddescription"), amount, Emote.getEmoji("upvote")));
         eb.setFooter(LanguageHandler.get(lang, "signup_timeout"), Image.getImageUrl("clock"));
         ZonedDateTime now;
         try {
@@ -114,15 +108,15 @@ public class SignupCommand extends Command {
         eb.setTimestamp(now.toInstant().plusMillis(Constants.SIGNUP_TIMEOUT));
 
         event.getChannel().sendMessage(eb.build()).queue(sentMessage -> {
-            try {
-                var upvoteEmote = Emote.getEmote("upvote");
-                if (upvoteEmote == null) sentMessage.addReaction(Emote.getEmoji("upvote")).queue();
-                else sentMessage.addReaction(upvoteEmote).queue();
+            sentMessage.addReaction(Emote.getEmoji("upvote")).queue();
+            sentMessage.addReaction(Emote.getEmoji("end")).queue();
+            var internalGuild = new Guild(event.getGuild().getIdLong());
 
-                var internalGuild = new Guild(event.getGuild().getIdLong());
+            try {
                 internalGuild.setSignup(sentMessage.getIdLong(), author.getIdLong(), amount, title);
             } catch (SQLException e) {
-                sentMessage.addReaction(Emote.getEmoji("upvote")).queue();
+                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
+                return;
             }
 
             new java.util.Timer().schedule(
@@ -131,7 +125,7 @@ public class SignupCommand extends Command {
                         public void run() {
                             var guild = event.getGuild();
                             var internalGuild = new Guild(guild.getIdLong());
-                            SignupListener.endSignup(internalGuild, sentMessage.getIdLong(), sentMessage, guild, author);
+                            SignupListener.endSignup(internalGuild, sentMessage.getIdLong(), sentMessage, guild, author, true);
                         }
                     }, Constants.SIGNUP_TIMEOUT
             );

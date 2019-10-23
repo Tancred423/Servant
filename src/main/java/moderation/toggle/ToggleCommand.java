@@ -71,17 +71,16 @@ public class ToggleCommand extends Command {
 
             // information
             add("botinfo");
+            add("ping");
             add("serverinfo");
 
             // useful
             add("alarm");
             add("giveaway");
+            add("quickvote");
             add("reminder");
             add("signup");
             add("timezone");
-
-            /// votes
-            add("quickvote");
             add("vote");
 
             // fun
@@ -98,7 +97,7 @@ public class ToggleCommand extends Command {
             add("love");
             add("profile");
 
-            /// interaction
+            // interaction
             add("interaction");
         }};
 
@@ -240,6 +239,9 @@ public class ToggleCommand extends Command {
             case "botinfo":
             case "about":
                 return "botinfo";
+            case "ping":
+            case "pong":
+                return "ping";
             case "serverinfo":
             case "guildinfo":
                 return "serverinfo";
@@ -251,15 +253,13 @@ public class ToggleCommand extends Command {
                 return "giveaway";
             case "reminder":
                 return "reminder";
+            case "quickvote":
+            case "qv":
+                return "quickvote";
             case "signup":
                 return "signup";
             case "timezone":
                 return "timezone";
-
-            /// votes
-            case "quickvote":
-            case "qv":
-                return "quickvote";
             case "vote":
             case "v":
                 return "vote";

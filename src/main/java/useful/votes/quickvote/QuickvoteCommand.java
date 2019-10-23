@@ -25,7 +25,7 @@ public class QuickvoteCommand extends Command {
         this.name = "quickvote";
         this.aliases = new String[]{"qv"};
         this.help = "Smol vote with yes/shrug/no.";
-        this.category = new Category("*Votes*");
+        this.category = new Category("Useful");
         this.arguments = "[optional text]";
         this.hidden = false;
         this.guildOnly = true;

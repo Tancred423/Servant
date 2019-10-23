@@ -124,14 +124,16 @@ public class Parser {
     public static boolean isValidOffset(String offset) throws NumberFormatException {
         var isValidOffset = true;
         if (offset.length() != 6) isValidOffset = false;
-        if (!offset.startsWith("+") && !offset.startsWith("-")) isValidOffset = false;
-        if (!offset.substring(1, 3).matches("[0-9]+")) isValidOffset = false;
-        var hours = Integer.parseInt(offset.substring(1, 3));
-        if (hours < 0 || hours > 14) isValidOffset = false;
-        if (!offset.substring(3, 4).equals(":")) isValidOffset = false;
-        if (!offset.substring(4, 6).matches("[0-9]+")) isValidOffset = false;
-        var minutes = Integer.parseInt(offset.substring(4, 6));
-        if (minutes < 0 || minutes > 59) isValidOffset = false;
+        else {
+            if (!offset.startsWith("+") && !offset.startsWith("-")) isValidOffset = false;
+            if (!offset.substring(1, 3).matches("[0-9]+")) isValidOffset = false;
+            var hours = Integer.parseInt(offset.substring(1, 3));
+            if (hours < 0 || hours > 14) isValidOffset = false;
+            if (!offset.substring(3, 4).equals(":")) isValidOffset = false;
+            if (!offset.substring(4, 6).matches("[0-9]+")) isValidOffset = false;
+            var minutes = Integer.parseInt(offset.substring(4, 6));
+            if (minutes < 0 || minutes > 59) isValidOffset = false;
+        }
         return isValidOffset;
     }
 
@@ -186,5 +188,9 @@ public class Parser {
         if (!id.matches("[0-9]+") || id.length() != 18) return false;
         guild.getVoiceChannelById(id);
         return true;
+    }
+
+    public static boolean isValidId(String id) {
+        return id.matches("[0-9]+") && id.length() == 18;
     }
 }

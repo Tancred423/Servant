@@ -10,6 +10,7 @@ import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import owner.blacklist.Blacklist;
 import servant.Log;
 import servant.Servant;
 
@@ -25,6 +26,12 @@ public class BestOfImageListener extends ListenerAdapter {
 
     public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {
         if (event.getUser().isBot()) return;
+        try {
+            if (Blacklist.isBlacklisted(event.getUser().getIdLong())) return;
+            if (event.getGuild() != null) if (Blacklist.isBlacklisted(event.getGuild().getIdLong())) return;
+        } catch (SQLException e) {
+            new Log(e, event.getGuild(), event.getUser(), "bestofimage", null).sendLog(false);
+        }
         if (!Toggle.isEnabled(event, "bestOfImage")) return;
 
         var messageId = event.getMessageIdLong();

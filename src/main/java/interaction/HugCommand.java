@@ -1,5 +1,5 @@
 // Author: Tancred423 (https://github.com/Tancred423)
-package fun.interaction;
+package interaction;
 
 import net.dv8tion.jda.core.Permission;
 import utilities.Constants;
@@ -9,7 +9,7 @@ public class HugCommand extends InteractionCommand {
         this.name = "hug";
         this.aliases = new String[0];
         this.help = "Hug someone.";
-        this.category = new Category("*Interaction*");
+        this.category = new Category("Interaction");
         this.arguments = "@user";
         this.hidden = false;
         this.guildOnly = true;

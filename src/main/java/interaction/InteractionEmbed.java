@@ -1,5 +1,5 @@
 // Author: Tancred423 (https://github.com/Tancred423)
-package fun.interaction;
+package interaction;
 
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Emote;

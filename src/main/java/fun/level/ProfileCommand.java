@@ -83,7 +83,7 @@ public class ProfileCommand extends Command {
                 top10Features.append("```c\n");
                 top10Features.append(StringFormat.fillWithWhitespace(LanguageHandler.get(lang, "profile_name"), 16)).append(" ").append(StringFormat.pushWithWhitespace(LanguageHandler.get(lang, "profile_amount"), 10)).append("\n");
                 top10Features.append("-".repeat(16)).append(" ").append("-".repeat(10)).append("\n");
-                for (Map.Entry<String, Integer> feature : features.entrySet()) {
+                for (var feature : features.entrySet()) {
                     top10Features.append(StringFormat.fillWithWhitespace(feature.getKey(), 16))
                             .append(" ")
                             .append(StringFormat.pushWithWhitespace(String.valueOf(feature.getValue()), 10))

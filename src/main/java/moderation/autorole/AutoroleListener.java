@@ -6,6 +6,7 @@ import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.core.exceptions.HierarchyException;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import moderation.guild.Guild;
+import owner.blacklist.Blacklist;
 import servant.Log;
 
 import java.sql.SQLException;
@@ -16,6 +17,12 @@ public class AutoroleListener extends ListenerAdapter {
         var name = "autorole";
         var eventUser = event.getUser();
         if (eventUser.isBot()) return;
+        try {
+            if (Blacklist.isBlacklisted(event.getUser().getIdLong())) return;
+            if (event.getGuild() != null) if (Blacklist.isBlacklisted(event.getGuild().getIdLong())) return;
+        } catch (SQLException e) {
+            new Log(e, event.getGuild(), event.getUser(), "autorole", null).sendLog(false);
+        }
 
         if (!Toggle.isEnabled(event, name)) return;
 

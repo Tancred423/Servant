@@ -46,6 +46,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.List;
@@ -56,6 +57,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.events.ShutdownEvent;
+import owner.blacklist.Blacklist;
 import servant.Log;
 import servant.Servant;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.*;
@@ -139,7 +141,11 @@ public class CommandClientImpl implements CommandClient, EventListener {
         this.compiler = compiler;
         this.manager = manager;
         this.helpConsumer = helpConsumer==null ? (event) -> {
-            System.out.println("Command executed: " + event.getMessage().getContentDisplay() + ". Guild: " + (event.getGuild() == null ? "DM" : event.getGuild().getName() + " (" + event.getGuild().getIdLong() + ")") + ". User: " + event.getAuthor().getName() + "#" + event.getAuthor().getDiscriminator() + " (" + event.getAuthor().getIdLong() + ").");
+            System.out.println("[" + OffsetDateTime.now(ZoneId.of("+02:00")).toString().replaceAll("T", " ").substring(0, 19) + "] " +
+                    "Command executed: " + event.getMessage().getContentDisplay() + ". " +
+                    "Guild: " + (event.getGuild() == null ? "DM" : event.getGuild().getName() + " (" + event.getGuild().getIdLong() + ")") + ". " +
+                    "User: " + event.getAuthor().getName() + "#" + event.getAuthor().getDiscriminator() + " (" + event.getAuthor().getIdLong() + ").");
+
             var eb = new EmbedBuilder();
             try {
                 eb.setColor(new moderation.user.User(event.getAuthor().getIdLong()).getColor());
@@ -474,8 +480,14 @@ public class CommandClientImpl implements CommandClient, EventListener {
     }
 
     private void onMessageReceived(MessageReceivedEvent event) {
-        // Return if it's a bot
-        if(event.getAuthor().isBot()) return;
+        // Return if it's a bot or the user or guild is blacklisted
+        if (event.getAuthor().isBot()) return;
+        try {
+            if (Blacklist.isBlacklisted(event.getAuthor().getIdLong())) return;
+            if (event.getGuild() != null) if (Blacklist.isBlacklisted(event.getGuild().getIdLong())) return;
+        } catch (SQLException e) {
+            new Log(e, event.getGuild(), event.getAuthor(), "CommandClientImpl", null).sendLog(false);
+        }
 
         String[] parts = null;
         String rawContent = event.getMessage().getContentRaw();
@@ -537,7 +549,10 @@ public class CommandClientImpl implements CommandClient, EventListener {
                 }
 
                 if (command != null) {
-                    System.out.println("Command executed: " + event.getMessage().getContentDisplay() + ". Guild: " + (event.getGuild() == null ? "DM" : event.getGuild().getName() + " (" + event.getGuild().getIdLong() + ")") + ". User: " + event.getAuthor().getName() + "#" + event.getAuthor().getDiscriminator() + " (" + event.getAuthor().getIdLong() + ").");
+                    System.out.println("[" + OffsetDateTime.now(ZoneId.of("+02:00")).toString().replaceAll("T", " ").substring(0, 19) + "] " +
+                            "Command executed: " + event.getMessage().getContentDisplay() + ". " +
+                            "Guild: " + (event.getGuild() == null ? "DM" : event.getGuild().getName() + " (" + event.getGuild().getIdLong() + ")") + ". " +
+                            "User: " + event.getAuthor().getName() + "#" + event.getAuthor().getDiscriminator() + " (" + event.getAuthor().getIdLong() + ").");
                     CommandEvent cevent = new CommandEvent(event, args, this);
                     if (listener != null)
                         listener.onCommand(cevent, command);

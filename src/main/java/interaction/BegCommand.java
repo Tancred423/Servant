@@ -1,15 +1,16 @@
 // Author: Tancred423 (https://github.com/Tancred423)
-package fun.interaction;
+package interaction;
+
 
 import net.dv8tion.jda.core.Permission;
 import utilities.Constants;
 
-public class PatCommand extends InteractionCommand {
-    public PatCommand() {
-        this.name = "pat";
-        this.aliases = new String[]{"pet"};
-        this.help = "Pat someone.";
-        this.category = new Category("*Interaction*");
+public class BegCommand extends InteractionCommand {
+    public BegCommand() {
+        this.name = "beg";
+        this.aliases = new String[0];
+        this.help = "Beg someone.";
+        this.category = new Category("Interaction");
         this.arguments = "@user";
         this.hidden = false;
         this.guildOnly = true;
@@ -19,6 +20,6 @@ public class PatCommand extends InteractionCommand {
         this.userPermissions = new Permission[0];
         this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
 
-        this.emoji = "\uD83D\uDC4B"; // 👋.
+        this.emoji = "\uD83D\uDE4C"; // 🙌.
     }
 }

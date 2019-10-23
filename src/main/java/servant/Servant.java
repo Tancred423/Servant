@@ -14,9 +14,7 @@ import fun.level.ProfileCommand;
 import fun.randomAnimal.BirdCommand;
 import fun.randomAnimal.CatCommand;
 import fun.randomAnimal.DogCommand;
-import information.PatreonCommand;
-import information.PrefixListener;
-import information.ServerInfoCommand;
+import information.*;
 import moderation.bestOfImage.BestOfImageCommand;
 import moderation.bestOfImage.BestOfImageListener;
 import moderation.bestOfQuote.BestOfQuoteCommand;
@@ -29,9 +27,6 @@ import moderation.livestream.LivestreamCommand;
 import moderation.livestream.LivestreamListener;
 import moderation.toggle.ToggleCommand;
 import moderation.user.UserCommand;
-import net.dv8tion.jda.bot.sharding.DefaultShardManager;
-import net.dv8tion.jda.bot.sharding.DefaultShardManagerBuilder;
-import net.dv8tion.jda.core.hooks.EventListener;
 import owner.*;
 import moderation.*;
 import moderation.autorole.AutoroleCommand;
@@ -45,6 +40,7 @@ import moderation.mediaOnlyChannel.MediaOnlyChannelCommand;
 import moderation.mediaOnlyChannel.MediaOnlyChannelListener;
 import moderation.reactionRole.ReactionRoleCommand;
 import moderation.reactionRole.ReactionRoleListener;
+import owner.blacklist.BlacklistCommand;
 import patreon.PatreonListener;
 import useful.alarm.AlarmCommand;
 import useful.alarm.AlarmListener;
@@ -60,7 +56,7 @@ import moderation.toggle.ToggleFile;
 import moderation.join.JoinListener;
 import fun.level.LevelListener;
 import files.ConfigFile;
-import fun.interaction.*;
+import interaction.*;
 import net.dv8tion.jda.core.*;
 import net.dv8tion.jda.core.entities.Game;
 import useful.timezone.TimezoneCommand;
@@ -69,13 +65,9 @@ import useful.votes.vote.VoteCommand;
 import useful.votes.vote.VoteEndListener;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandClientBuilder;
 import zJdaUtilsLib.com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import information.BotInfoCommand;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
 
 public class Servant {
     public static JDA jda;
@@ -104,8 +96,9 @@ public class Servant {
         client.addCommands(
                 // Owner
                 new AddGifCommand(),
+                new BlacklistCommand(),
                 new EvalCommand(),
-                new PingCommand(),
+                new RefreshCommand(),
                 new ServerlistCommand(waiter),
                 new ShutdownCommand(),
 
@@ -131,17 +124,16 @@ public class Servant {
                 // Information
                 new BotInfoCommand(),
                 new PatreonCommand(),
+                new PingCommand(),
                 new ServerInfoCommand(),
 
                 // Useful
                 new AlarmCommand(),
                 new GiveawayCommand(),
+                new QuickvoteCommand(),
                 new ReminderCommand(),
                 new SignupCommand(),
                 new TimezoneCommand(),
-
-                /// Vote
-                new QuickvoteCommand(),
                 new VoteCommand(waiter),
 
                 // Fun
@@ -160,7 +152,7 @@ public class Servant {
                 new ThanksCommand(),
                 new UnflipCommand(),
 
-                /// Interaction
+                // Interaction
                 new BegCommand(),
                 new CookieCommand(),
                 new DabCommand(),

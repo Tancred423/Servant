@@ -5,6 +5,8 @@ import moderation.guild.Guild;
 import moderation.user.User;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import owner.blacklist.Blacklist;
+import servant.Log;
 import servant.Servant;
 
 import java.sql.SQLException;
@@ -12,6 +14,13 @@ import java.sql.SQLException;
 public class PrefixListener extends ListenerAdapter {
     public void onMessageReceived(MessageReceivedEvent event) {
         if (event.getAuthor().isBot()) return;
+        try {
+            if (Blacklist.isBlacklisted(event.getAuthor().getIdLong())) return;
+            if (event.getGuild() != null) if (Blacklist.isBlacklisted(event.getGuild().getIdLong())) return;
+        } catch (SQLException e) {
+            new Log(e, event.getGuild(), event.getAuthor(), "prefixlistener", null).sendLog(false);
+        }
+
         if (event.getMessage().getContentRaw().equals("<@!" + event.getJDA().getSelfUser().getIdLong() + ">")
                 || event.getMessage().getContentRaw().equals("<@" + event.getJDA().getSelfUser().getIdLong() + ">")) {
             var guild = event.getGuild();

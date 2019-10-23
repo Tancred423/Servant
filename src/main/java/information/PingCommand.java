@@ -1,13 +1,15 @@
 // Modified by: Tancred423 (https://github.com/Tancred423)
-package owner;
+package information;
 
 import java.sql.SQLException;
 import java.time.temporal.ChronoUnit;
 
 import moderation.guild.Guild;
+import moderation.toggle.Toggle;
 import moderation.user.User;
 import net.dv8tion.jda.core.Permission;
 import servant.Log;
+import utilities.Constants;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 import zJdaUtilsLib.com.jagrosh.jdautilities.examples.doc.Author;
@@ -18,12 +20,12 @@ public class PingCommand extends Command {
         this.name = "ping";
         this.aliases = new String[]{"pong"};
         this.help = "Bot's latency.";
-        this.category = new Category("Owner");
+        this.category = new Category("Information");
         this.arguments = null;
         this.hidden = false;
         this.guildOnly = false;
-        this.ownerCommand = true;
-        this.cooldown = 0;
+        this.ownerCommand = false;
+        this.cooldown = Constants.USER_COOLDOWN;
         this.cooldownScope = CooldownScope.USER;
         this.userPermissions = new Permission[0];
         this.botPermissions = new Permission[0];
@@ -31,6 +33,8 @@ public class PingCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
+        if (!Toggle.isEnabled(event, name)) return;
+
         event.reply("Ping: ...", m -> {
             long ping = event.getMessage().getCreationTime().until(m.getCreationTime(), ChronoUnit.MILLIS);
             m.editMessage("Ping: " + ping  + "ms | Websocket: " + event.getJDA().getPing() + "ms").queue();

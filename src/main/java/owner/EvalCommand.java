@@ -1,10 +1,15 @@
 package owner;
 
 import groovy.lang.GroovyShell;
+import moderation.guild.Guild;
+import moderation.user.User;
 import net.dv8tion.jda.core.Permission;
+import servant.Log;
 import utilities.Constants;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
+
+import java.sql.SQLException;
 
 public class EvalCommand extends Command {
     private final GroovyShell engine;
@@ -16,7 +21,7 @@ public class EvalCommand extends Command {
         this.help = "Evaluates groovy code";
         this.category = new Category("Owner");
         this.arguments = "[code]";
-        this.hidden = true;
+        this.hidden = false;
         this.guildOnly = false;
         this.ownerCommand = true;
         this.cooldown = Constants.OWNER_COOLDOWN;
@@ -56,9 +61,18 @@ public class EvalCommand extends Command {
             var script = imports + event.getMessage().getContentRaw().split("\\s+", 2)[1];
             var out = engine.evaluate(script);
 
-            event.getChannel().sendMessage(out == null ? "Executed without error" : out.toString()).queue();
+            if (out == null) event.reactSuccess();
+            else event.getChannel().sendMessage(out.toString()).queue();
         } catch (Exception e) {
             event.reply(e.getMessage());
+        }
+
+        // Statistics.
+        try {
+            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
+            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
+        } catch (SQLException e) {
+            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
         }
     }
 }

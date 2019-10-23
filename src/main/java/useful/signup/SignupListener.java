@@ -32,23 +32,32 @@ public class SignupListener extends ListenerAdapter {
             return;
         }
 
-        event.getChannel().getMessageById(messageId).queue(message -> endSignup(internalGuild, messageId, message, guild, event.getUser()));
+        var forceEnd = false;
+        var endEmoji = Emote.getEmoji("end");
+        try {
+            if (!event.getReactionEmote().isEmote() && event.getReactionEmote().getName().equals(endEmoji)) {
+                if (event.getUser().getIdLong() != internalGuild.getSignupAuthorId(event.getMessageIdLong()))
+                    event.getReaction().removeReaction(event.getUser()).queue();
+                else forceEnd = true;
+            }
+        } catch (SQLException e) {
+            new Log(e, guild, event.getUser(), "signup", null).sendLog(false);
+            return;
+        }
+        var finalForceEnd = forceEnd;
+        event.getChannel().getMessageById(messageId).queue(message -> endSignup(internalGuild, messageId, message, guild, event.getUser(), finalForceEnd));
     }
 
-    static void endSignup(Guild internalGuild, long messageId, Message message, net.dv8tion.jda.core.entities.Guild guild, net.dv8tion.jda.core.entities.User author) {
+    static void endSignup(Guild internalGuild, long messageId, Message message, net.dv8tion.jda.core.entities.Guild guild, net.dv8tion.jda.core.entities.User author, boolean forceEnd) {
         try {
+            if (!internalGuild.isSignupMessage(messageId)) return;
             var amount = internalGuild.getSignupAmount(messageId);
             var reactionList = message.getReactions();
-            var upvoteEmote = Emote.getEmote("upvote");
             var upvoteEmoji = Emote.getEmoji("upvote");
             MessageReaction signupReaction = null;
             for (var reaction : reactionList)
-                if (upvoteEmote == null) {
-                    if (reaction.getReactionEmote().getName().equals(upvoteEmoji)) signupReaction = reaction;
-                } else {
-                    if (reaction.getReactionEmote().isEmote())
-                        if (reaction.getReactionEmote().getEmote().equals(upvoteEmote)) signupReaction = reaction;
-                }
+                if (reaction.getReactionEmote().getName().equals(upvoteEmoji))
+                    signupReaction = reaction;
 
             if (signupReaction == null) return;
 
@@ -60,7 +69,7 @@ public class SignupListener extends ListenerAdapter {
                         i--;
                     }
                 }
-                if (users.size() == amount) {
+                if (users.size() == amount || forceEnd) {
                     String lang;
                     try {
                         lang = internalGuild.getLanguage();
@@ -78,7 +87,8 @@ public class SignupListener extends ListenerAdapter {
                         eb.setTitle(String.format(LanguageHandler.get(lang, "signup_embedtitle"), (title.isEmpty() ? "" : "for "), title));
 
                         eb.setDescription(String.format(LanguageHandler.get(lang, "signup_embeddescriptionend"), amount) + "\n");
-                        for (var user : users) eb.appendDescription(user.getAsMention() + "\n");
+                        if (users.isEmpty()) eb.appendDescription(LanguageHandler.get(lang, "signup_nobody"));
+                        else for (var user : users) eb.appendDescription(user.getAsMention() + "\n");
                         message.editMessage(eb.build()).queue();
                         message.clearReactions().queue();
                         internalGuild.unsetSignup(messageId);

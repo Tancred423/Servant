@@ -26,17 +26,16 @@ public class ToggleFile {
 
     // Information
     private boolean botinfo;
+    private boolean ping;
     private boolean guildinfo;
 
     // Useful
     private boolean alarm;
     private boolean giveaway;
+    private boolean quickvote;
     private boolean reminder;
     private boolean signup;
     private boolean timezone;
-
-    /// Votes
-    private boolean quickvote;
     private boolean vote;
 
     // Fun
@@ -54,7 +53,7 @@ public class ToggleFile {
     private boolean love;
     private boolean profile;
 
-    /// Interaction
+    // Interaction
     private boolean interaction;
 
     // Constructor.
@@ -106,17 +105,16 @@ public class ToggleFile {
 
         // Information
         toggle.setProperty("botinfo", "on");
+        toggle.setProperty("ping", "on");
         toggle.setProperty("guildinfo", "on");
 
         // Useful
         toggle.setProperty("alarm", "on");
         toggle.setProperty("giveaway", "on");
+        toggle.setProperty("quickvote", "on");
         toggle.setProperty("reminder", "on");
         toggle.setProperty("signup", "on");
         toggle.setProperty("timezone", "on");
-
-        /// Votes
-        toggle.setProperty("quickvote", "on");
         toggle.setProperty("vote", "on");
 
         // Fun
@@ -134,7 +132,7 @@ public class ToggleFile {
         toggle.setProperty("love", "on");
         toggle.setProperty("profile", "on");
 
-        /// Interaction
+        // Interaction
         toggle.setProperty("interaction", "on");
 
         toggle.store(os,
@@ -170,17 +168,16 @@ public class ToggleFile {
 
         // Information
         this.botinfo = toggle.getProperty("botinfo").equals("on");
+        this.ping = toggle.getProperty("ping").equals("on");
         this.guildinfo = toggle.getProperty("guildinfo").equals("on");
 
         // Useful
         this.alarm = toggle.getProperty("alarm").equals("on");
         this.giveaway = toggle.getProperty("giveaway").equals("on");
+        this.quickvote = toggle.getProperty("quickvote").equals("on");
         this.reminder = toggle.getProperty("reminder").equals("on");
         this.signup = toggle.getProperty("signup").equals("on");
         this.timezone = toggle.getProperty("timezone").equals("on");
-
-        /// Votes
-        this.quickvote = toggle.getProperty("quickvote").equals("on");
         this.vote = toggle.getProperty("vote").equals("on");
 
         // Fun
@@ -198,7 +195,7 @@ public class ToggleFile {
         this.love = toggle.getProperty("love").equals("on");
         this.profile = toggle.getProperty("profile").equals("on");
 
-        /// Interaction
+        // Interaction
         this.interaction = toggle.getProperty("interaction").equals("on");
     }
 
@@ -225,17 +222,16 @@ public class ToggleFile {
 
             // Information
             case "botinfo": return botinfo;
+            case "ping": return ping;
             case "guildinfo": return guildinfo;
 
             // Useful
             case "alarm": return alarm;
             case "giveaway": return giveaway;
+            case "quickvote": return quickvote;
             case "reminder": return reminder;
             case "signup": return signup;
             case "timezone": return timezone;
-
-            /// Votes
-            case "quickvote": return quickvote;
             case "vote": return vote;
 
             // Fun
@@ -253,7 +249,7 @@ public class ToggleFile {
             case "love": return love;
             case "profile": return profile;
 
-            /// Interaction
+            // Interaction
             case "interaction": return interaction;
 
             default: return true;

@@ -38,7 +38,7 @@ public class VoteCommand extends Command {
         this.name = "vote";
         this.aliases = new String[]{"v"};
         this.help = "Host a voting.";
-        this.category = new Category("*Votes*");
+        this.category = new Category("Useful");
         this.arguments = null;
         this.hidden = false;
         this.guildOnly = true;

@@ -10,6 +10,7 @@ import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.exceptions.HierarchyException;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import owner.blacklist.Blacklist;
 import servant.Log;
 import servant.Servant;
 import utilities.MessageHandler;
@@ -37,6 +38,12 @@ public class LevelListener extends ListenerAdapter {
         var guild = event.getGuild();
 
         if (author.isBot()) return;
+        try {
+            if (Blacklist.isBlacklisted(event.getAuthor().getIdLong())) return;
+            if (event.getGuild() != null) if (Blacklist.isBlacklisted(event.getGuild().getIdLong())) return;
+        } catch (SQLException e) {
+            new Log(e, event.getGuild(), event.getAuthor(), "level", null).sendLog(false);
+        }
 
         if (!Toggle.isEnabled(event, "level")) return;
 
@@ -162,6 +169,7 @@ public class LevelListener extends ListenerAdapter {
         if (level >= 20) {
             if (!internalAuthor.hasAchievement("level20")) {
                 internalAuthor.setAchievement("level20", 20);
+                internalAuthor.unsetAchievement("level10");
                 new MessageHandler().reactAchievement(message);
             }
         }
@@ -169,6 +177,7 @@ public class LevelListener extends ListenerAdapter {
         if (level >= 30) {
             if (!internalAuthor.hasAchievement("level30")) {
                 internalAuthor.setAchievement("level30", 30);
+                internalAuthor.unsetAchievement("level20");
                 new MessageHandler().reactAchievement(message);
             }
         }
@@ -176,6 +185,7 @@ public class LevelListener extends ListenerAdapter {
         if (level >= 40) {
             if (!internalAuthor.hasAchievement("level40")) {
                 internalAuthor.setAchievement("level40", 40);
+                internalAuthor.unsetAchievement("level30");
                 new MessageHandler().reactAchievement(message);
             }
         }
@@ -183,6 +193,7 @@ public class LevelListener extends ListenerAdapter {
         if (level >= 50) {
             if (!internalAuthor.hasAchievement("level50")) {
                 internalAuthor.setAchievement("level50", 50);
+                internalAuthor.unsetAchievement("level40");
                 new MessageHandler().reactAchievement(message);
             }
         }
@@ -190,6 +201,7 @@ public class LevelListener extends ListenerAdapter {
         if (level >= 60) {
             if (!internalAuthor.hasAchievement("level60")) {
                 internalAuthor.setAchievement("level60", 60);
+                internalAuthor.unsetAchievement("level50");
                 new MessageHandler().reactAchievement(message);
             }
         }
@@ -204,6 +216,7 @@ public class LevelListener extends ListenerAdapter {
         if (level >= 70) {
             if (!internalAuthor.hasAchievement("level70")) {
                 internalAuthor.setAchievement("level70", 70);
+                internalAuthor.unsetAchievement("level60");
                 new MessageHandler().reactAchievement(message);
             }
         }
@@ -211,6 +224,7 @@ public class LevelListener extends ListenerAdapter {
         if (level >= 80) {
             if (!internalAuthor.hasAchievement("level80")) {
                 internalAuthor.setAchievement("level80", 80);
+                internalAuthor.unsetAchievement("level70");
                 new MessageHandler().reactAchievement(message);
             }
         }
@@ -218,6 +232,7 @@ public class LevelListener extends ListenerAdapter {
         if (level >= 90) {
             if (!internalAuthor.hasAchievement("level90")) {
                 internalAuthor.setAchievement("level90", 90);
+                internalAuthor.unsetAchievement("level80");
                 new MessageHandler().reactAchievement(message);
             }
         }
@@ -225,6 +240,7 @@ public class LevelListener extends ListenerAdapter {
         if (level >= 100) {
             if (!internalAuthor.hasAchievement("level100")) {
                 internalAuthor.setAchievement("level100", 100);
+                internalAuthor.unsetAchievement("level90");
                 new MessageHandler().reactAchievement(message);
             }
         }

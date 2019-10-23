@@ -108,7 +108,6 @@ public class User {
     }
 
     // Achievement
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean hasAchievement(String achievement) throws SQLException {
         var connection = Database.getConnection();
         var select = connection.prepareStatement("SELECT * FROM achievement WHERE user_id=? AND achievement=?");
@@ -134,6 +133,21 @@ public class User {
         return achievements;
     }
 
+    public List<String> getLevelAchievements() throws SQLException {
+        var connection = Database.getConnection();
+        var select = connection.prepareStatement("SELECT achievement FROM achievement WHERE user_id=?");
+        select.setLong(1, userId);
+        var resultSet = select.executeQuery();
+        List<String> achievements = new LinkedList<>();
+        if (resultSet.first())
+            do {
+                var achievement = resultSet.getString("achievement");
+                if (achievement.startsWith("level")) achievements.add(achievement);
+            } while (resultSet.next());
+        connection.close();
+        return achievements;
+    }
+
     public int getTotelAP() throws SQLException {
         var connection = Database.getConnection();
         var select = connection.prepareStatement("SELECT * FROM achievement WHERE user_id=?");
@@ -146,13 +160,26 @@ public class User {
     }
 
     public void setAchievement(String achievement, int ap) throws SQLException {
-        var connection = Database.getConnection();
-        var insert = connection.prepareStatement("INSERT INTO achievement (user_id,achievement,ap) VALUES (?,?,?)");
-        insert.setLong(1, userId);
-        insert.setString(2, achievement.toLowerCase());
-        insert.setInt(3, ap);
-        insert.executeUpdate();
-        connection.close();
+        if (!hasAchievement(achievement)) {
+            var connection = Database.getConnection();
+            var insert = connection.prepareStatement("INSERT INTO achievement (user_id,achievement,ap) VALUES (?,?,?)");
+            insert.setLong(1, userId);
+            insert.setString(2, achievement.toLowerCase());
+            insert.setInt(3, ap);
+            insert.executeUpdate();
+            connection.close();
+        }
+    }
+
+    public void unsetAchievement(String achievement) throws SQLException {
+        if (hasAchievement(achievement)) {
+            var connection = Database.getConnection();
+            var delete = connection.prepareStatement("DELETE FROM achievement WHERE user_id=? AND achievement=?");
+            delete.setLong(1, userId);
+            delete.setString(2, achievement.toLowerCase());
+            delete.executeUpdate();
+            connection.close();
+        }
     }
 
     // Offset
