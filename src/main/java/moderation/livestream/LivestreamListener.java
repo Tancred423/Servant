@@ -18,12 +18,6 @@ import java.sql.SQLException;
 
 public class LivestreamListener extends ListenerAdapter {
     public void onUserUpdateGame(UserUpdateGameEvent event) {
-        try {
-            if (Blacklist.isBlacklisted(event.getUser().getIdLong())) return;
-            if (event.getGuild() != null) if (Blacklist.isBlacklisted(event.getGuild().getIdLong())) return;
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getUser(), "livestream", null).sendLog(false);
-        }
         if (!Toggle.isEnabled(event, "livestream")) return;
 
         var guild = event.getGuild();
@@ -39,6 +33,7 @@ public class LivestreamListener extends ListenerAdapter {
         }
 
         if (author.isBot()) return;
+//        if (Blacklist.isBlacklisted(event.getUser(), event.getGuild())) return;
 
         // Users can hide themselves from this feature.
         try {
@@ -105,11 +100,11 @@ public class LivestreamListener extends ListenerAdapter {
     }
 
     private static void addRole(net.dv8tion.jda.core.entities.Guild guild, Member member, Role role) {
-        if (role != null) guild.getController().addSingleRoleToMember(member, role).queue();
+        if (role != null && guild.getMemberById(guild.getJDA().getSelfUser().getIdLong()).canInteract(member)) guild.getController().addSingleRoleToMember(member, role).queue();
     }
 
     private static void removeRole(net.dv8tion.jda.core.entities.Guild guild, Member member, Role role) {
-        if (role != null) guild.getController().removeSingleRoleFromMember(member, role).queue();
+        if (role != null && guild.getMemberById(guild.getJDA().getSelfUser().getIdLong()).canInteract(member)) guild.getController().removeSingleRoleFromMember(member, role).queue();
     }
 
     private static void sendNotification(User author, Game newGame, net.dv8tion.jda.core.entities.Guild guild, Guild internalGuild, boolean isStreamerMode, String lang) throws SQLException {

@@ -4,15 +4,10 @@ package servant;
 import files.language.LanguageHandler;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.Game;
-import net.dv8tion.jda.core.events.ReconnectedEvent;
-import net.dv8tion.jda.core.events.ResumedEvent;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import utilities.Constants;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.sql.SQLException;
 import java.util.concurrent.Executors;
@@ -32,27 +27,21 @@ public class ReadyListener extends ListenerAdapter {
             return;
         }
 
-        setPresence(event);
+        setPresence();
 
         System.out.println(event.getJDA().getSelfUser().getName() + " ready.");
     }
 
-    private void setPresence(ReadyEvent event) {
+    private void setPresence() {
         ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
-        service.scheduleAtFixedRate(() -> {
-            try {
-                settingPresence();
-            } catch (IOException | SAXException | ParserConfigurationException e) {
-                new Log(e, null, event.getJDA().getSelfUser(), "ReadyListener - Presence", null).sendLog(false);
-            }
-        }, 0, 5, TimeUnit.MINUTES);
+        service.scheduleAtFixedRate(this::settingPresence, 0, 5, TimeUnit.MINUTES);
     }
 
-    private void settingPresence() throws IOException, SAXException, ParserConfigurationException {
+    private void settingPresence() {
         var lang = Servant.config.getDefaultLanguage();
 
         if (counter == 0)
-            Servant.jda.getPresence().setPresence(OnlineStatus.ONLINE, Game.playing(String.format(LanguageHandler.get(lang, "presence_0"), getVersion(), Servant.config.getDefaultPrefix())));
+            Servant.jda.getPresence().setPresence(OnlineStatus.ONLINE, Game.playing(String.format(LanguageHandler.get(lang, "presence_0"), Constants.VERSION, Servant.config.getDefaultPrefix())));
         else if (counter == 1)
             Servant.jda.getPresence().setPresence(OnlineStatus.ONLINE, Game.watching(String.format(LanguageHandler.get(lang, "presence_1"), Servant.jda.getUsers().size(), Servant.config.getDefaultPrefix())));
         else if (counter == 2)
@@ -62,23 +51,5 @@ public class ReadyListener extends ListenerAdapter {
 
         counter++;
         if (counter == 4) counter = 0;
-    }
-
-    private synchronized String getVersion() throws ParserConfigurationException, IOException, SAXException {
-        var builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        var src = new InputSource();
-        src.setCharacterStream(new StringReader(getPomXml()));
-        return builder.parse(src).getElementsByTagName("version").item(0).getTextContent();
-    }
-
-    private synchronized String getPomXml() throws IOException {
-        var bufferedReader = new BufferedReader(new FileReader(new File("pom.xml")));
-        var stringBuilder = new StringBuilder();
-        var line = bufferedReader.readLine();
-        while (line != null) {
-            stringBuilder.append(line).append("\n");
-            line = bufferedReader.readLine();
-        }
-        return stringBuilder.toString();
     }
 }

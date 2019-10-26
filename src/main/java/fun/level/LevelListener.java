@@ -38,14 +38,8 @@ public class LevelListener extends ListenerAdapter {
         var guild = event.getGuild();
 
         if (author.isBot()) return;
-        try {
-            if (Blacklist.isBlacklisted(event.getAuthor().getIdLong())) return;
-            if (event.getGuild() != null) if (Blacklist.isBlacklisted(event.getGuild().getIdLong())) return;
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), "level", null).sendLog(false);
-        }
-
         if (!Toggle.isEnabled(event, "level")) return;
+//        if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
 
         String lang;
         try {

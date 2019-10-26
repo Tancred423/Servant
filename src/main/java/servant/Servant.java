@@ -1,6 +1,7 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package servant;
 
+import com.ea.async.Async;
 import easteregg.EasterEggsListener;
 import files.language.LanguageHandler;
 import fun.*;
@@ -75,6 +76,8 @@ public class Servant {
     public static ToggleFile toggle;
 
     public static void main(String[] args) throws IOException, LoginException {
+//        Async.init();
+
         config = new ConfigFile();
         if (config.isMissing()) {
             System.out.println("The bot was shut down.");
@@ -96,7 +99,7 @@ public class Servant {
         client.addCommands(
                 // Owner
                 new AddGifCommand(),
-                new BlacklistCommand(),
+//                new BlacklistCommand(),
                 new EvalCommand(),
                 new RefreshCommand(),
                 new ServerlistCommand(waiter),

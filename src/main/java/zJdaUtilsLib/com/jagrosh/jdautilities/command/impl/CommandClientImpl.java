@@ -57,7 +57,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.events.ShutdownEvent;
-import owner.blacklist.Blacklist;
 import servant.Log;
 import servant.Servant;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.*;
@@ -480,14 +479,8 @@ public class CommandClientImpl implements CommandClient, EventListener {
     }
 
     private void onMessageReceived(MessageReceivedEvent event) {
-        // Return if it's a bot or the user or guild is blacklisted
+        // Return if it's a bot
         if (event.getAuthor().isBot()) return;
-        try {
-            if (Blacklist.isBlacklisted(event.getAuthor().getIdLong())) return;
-            if (event.getGuild() != null) if (Blacklist.isBlacklisted(event.getGuild().getIdLong())) return;
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), "CommandClientImpl", null).sendLog(false);
-        }
 
         String[] parts = null;
         String rawContent = event.getMessage().getContentRaw();
@@ -527,6 +520,8 @@ public class CommandClientImpl implements CommandClient, EventListener {
         }
 
         if (parts != null) { // Starts with valid prefix.
+//            if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
+
             if(useHelp && (parts[0].equalsIgnoreCase(helpWord) || parts[0].equalsIgnoreCase(helpWorldAlias))) {
                 CommandEvent cevent = new CommandEvent(event, parts[1]==null ? "" : parts[1], this);
                 if(listener!=null)

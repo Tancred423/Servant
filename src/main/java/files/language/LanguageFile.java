@@ -87,6 +87,10 @@ public class LanguageFile {
         en_gb.setProperty("addgif_interaction", "Invalid interaction.");
         en_gb.setProperty("addgif_direct_link", "Not a valid gif url. It has to be a direct link!");
 
+        /// Blacklist
+        en_gb.setProperty("blacklist_missingid", "Add an ID");
+        en_gb.setProperty("blacklist_empty", "No blacklisted ID's.");
+
         /// Server List
         en_gb.setProperty("guildlist_members", "Members");
         en_gb.setProperty("guildlist_connected", " Servers that **%s** is connected to");

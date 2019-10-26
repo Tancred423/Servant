@@ -53,6 +53,7 @@ public class RefreshCommand extends Command {
         var success = true;
         var guilds = event.getJDA().getGuilds();
         for (var guild : guilds) {
+            if (guild.getIdLong() == 264445053596991498L) continue;
             var members = guild.getMembers();
             for (var member : members) {
                 try {

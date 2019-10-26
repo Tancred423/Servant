@@ -17,18 +17,12 @@ public class AutoroleListener extends ListenerAdapter {
         var name = "autorole";
         var eventUser = event.getUser();
         if (eventUser.isBot()) return;
-        try {
-            if (Blacklist.isBlacklisted(event.getUser().getIdLong())) return;
-            if (event.getGuild() != null) if (Blacklist.isBlacklisted(event.getGuild().getIdLong())) return;
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getUser(), "autorole", null).sendLog(false);
-        }
-
         if (!Toggle.isEnabled(event, name)) return;
 
         var internalGuild = new Guild(event.getGuild().getIdLong());
         try {
             if (internalGuild.hasAutorole()) {
+//                if (Blacklist.isBlacklisted(event.getUser(), event.getGuild())) return;
                 Thread delay = new Thread(() -> {
                     try {
                         var roleAndDelay = internalGuild.getAutorole();

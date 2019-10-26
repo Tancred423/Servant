@@ -1,6 +1,7 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package moderation;
 
+import static com.ea.async.Async.await;
 import owner.blacklist.Blacklist;
 import utilities.Image;
 import files.language.LanguageHandler;
@@ -23,15 +24,11 @@ public class InviteKickListener extends ListenerAdapter {
 
         System.out.println("Servant was invited to " + guild.getName() + " (" + guild.getIdLong() + "). Owner: " + guildOwner.getName() + "#" + guildOwner.getDiscriminator() + " (" + guildOwner.getIdLong() + ").");
 
-        try {
-            if (Blacklist.isBlacklisted(event.getGuild().getIdLong())) {
-                event.getGuild().leave().queue();
-                System.out.println("Servant left " + guild.getName() + " because this guild was blacklisted.");
-                return;
-            }
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getGuild().getOwner().getUser(), "invite", null).sendLog(false);
-        }
+//        if (Blacklist.isBlacklisted(guildOwner, guild)) {
+//            event.getGuild().leave().queue();
+//            System.out.println("Servant left " + guild.getName() + " because this guild was blacklisted.");
+//            return;
+//        }
 
         guildOwner.openPrivateChannel().queue(privateChannel -> {
             var internalGuildOwner = new User(guildOwner.getIdLong());
@@ -66,11 +63,7 @@ public class InviteKickListener extends ListenerAdapter {
         var guild = event.getGuild();
         var guildOwner = guild.getOwner().getUser();
 
-        try {
-            if (Blacklist.isBlacklisted(guild.getIdLong())) return;
-        } catch (SQLException e) {
-            new Log(e, guild, guildOwner, "kicklistener", null).sendLog(false);
-        }
+//        if (Blacklist.isBlacklisted(guildOwner, guild)) return;
 
         System.out.println("Servant was kicked from " + guild.getName() + " (" + guild.getIdLong() + "). Owner: " + guildOwner.getName() + "#" + guildOwner.getDiscriminator() + " (" + guildOwner.getIdLong() + ").");
 

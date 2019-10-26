@@ -2,6 +2,8 @@
 package utilities;
 
 public class Constants {
+    final public static String VERSION = "4.25.2";
+
     // in seconds
     final public static int USER_COOLDOWN = 3;
     final public static int MOD_COOLDOWN = 1;

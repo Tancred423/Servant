@@ -6,7 +6,6 @@ import moderation.guild.Guild;
 import moderation.user.User;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
-import org.apache.commons.codec.language.bm.Lang;
 import servant.Log;
 import servant.Servant;
 import utilities.Constants;
