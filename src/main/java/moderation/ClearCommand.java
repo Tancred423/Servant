@@ -82,11 +82,11 @@ public class ClearCommand extends Command {
                 }
 
                 event.getMessage().delete().queue(success -> new MessageHistory(channel).retrievePast(clearValue).queue(messages -> {
-                    var deletedMessages = channel.purgeMessages(messages);
+                    channel.purgeMessages(messages);
 
                     new MessageHandler().sendAndExpire(
                             channel,
-                            new MessageBuilder().setContent(String.format(LanguageHandler.get(lang, "clear_cleared"), deletedMessages.size())).build(),
+                            new MessageBuilder().setContent(String.format(LanguageHandler.get(lang, "clear_cleared"), clearValue)).build(),
                             5 * 1000 // 5 seconds.
                     );
                 }));
@@ -95,11 +95,11 @@ public class ClearCommand extends Command {
                 event.getMessage().delete().queue(success -> new MessageHistory(channel).retrievePast(100).queue(messages -> {
                     List<Message> deleteList = new ArrayList<>();
                     for (Message message : messages) if (message.getAuthor().equals(user)) deleteList.add(message);
-                    var deletedMessages = channel.purgeMessages(deleteList);
+                    channel.purgeMessages(deleteList);
 
                     new MessageHandler().sendAndExpire(
                             channel,
-                            new MessageBuilder().setContent(String.format(LanguageHandler.get(lang, "clear_cleared"), deletedMessages.size())).build(),
+                            new MessageBuilder().setContent(String.format(LanguageHandler.get(lang, "clear_cleared"), deleteList.size())).build(),
                             5 * 1000 // 5 seconds.
                     );
                 }));
