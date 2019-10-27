@@ -125,7 +125,7 @@ public class User {
         var select = connection.prepareStatement("SELECT * FROM achievement WHERE user_id=?");
         select.setLong(1, userId);
         var resultSet = select.executeQuery();
-        Map<String, Integer> achievements = new HashMap<>();
+        var achievements = new TreeMap<String, Integer>();
         if (resultSet.first())
             do achievements.put(resultSet.getString("achievement"), resultSet.getInt("ap"));
             while (resultSet.next());

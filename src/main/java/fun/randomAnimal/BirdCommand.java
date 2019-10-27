@@ -15,6 +15,7 @@ import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.concurrent.CompletableFuture;
 
 public class BirdCommand extends Command {
     public BirdCommand() {
@@ -34,26 +35,28 @@ public class BirdCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        if (!Toggle.isEnabled(event, name)) return;
-        event.getChannel().sendTyping().queue();
+        CompletableFuture.runAsync(() -> {
+            if (!Toggle.isEnabled(event, name)) return;
+            event.getChannel().sendTyping().queue();
 
-        JSONObject json;
-        try {
-            json = JsonReader.readJsonFromUrl("http://random.birb.pw/tweet.json/");
-            var eb = new EmbedBuilder();
-            eb.setColor(new User(event.getAuthor().getIdLong()).getColor());
-            eb.setImage("https://random.birb.pw/img/" + json.get("file"));
-            event.reply(eb.build());
-        } catch (IOException | SQLException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-        }
+            JSONObject json;
+            try {
+                json = JsonReader.readJsonFromUrl("http://random.birb.pw/tweet.json/");
+                var eb = new EmbedBuilder();
+                eb.setColor(new User(event.getAuthor().getIdLong()).getColor());
+                eb.setImage("https://random.birb.pw/img/" + json.get("file"));
+                event.reply(eb.build());
+            } catch (IOException | SQLException e) {
+                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
+            }
 
-        // Statistics.
-        try {
-            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-        }
+            // Statistics.
+            try {
+                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
+                if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
+            } catch (SQLException e) {
+                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
+            }
+        });
     }
 }

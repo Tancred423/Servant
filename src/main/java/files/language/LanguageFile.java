@@ -828,7 +828,8 @@ public class LanguageFile {
         en_gb.setProperty("avatar_stolen", "%s just stole %s's avatar!");
 
         /// Baguette
-        en_gb.setProperty("baguette_jackpot", "JACKPOT! Now you're cool.");
+        en_gb.setProperty("baguette_49", "Unlucky");
+        en_gb.setProperty("baguette_50", "JACKPOT! Now you're cool.");
 
         /// Coin Flip
         en_gb.setProperty("coinflip_head", "Head!");
@@ -1815,7 +1816,8 @@ public class LanguageFile {
         de_de.setProperty("avatar_stolen", "%s just stole %s's avatar!");
 
         /// Baguette
-        de_de.setProperty("baguette_jackpot", "JACKPOT! Now you're cool.");
+        de_de.setProperty("baguette_49", "Unlucky");
+        de_de.setProperty("baguette_50", "JACKPOT! Now you're cool.");
 
         /// Coin Flip
         de_de.setProperty("coinflip_head", "Head!");

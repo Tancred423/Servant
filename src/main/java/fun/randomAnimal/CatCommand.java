@@ -19,6 +19,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
+import java.util.concurrent.CompletableFuture;
 
 public class CatCommand extends Command {
     public CatCommand() {
@@ -38,25 +39,27 @@ public class CatCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        if (!Toggle.isEnabled(event, name)) return;
-        event.getChannel().sendTyping().queue();
+        CompletableFuture.runAsync(() -> {
+            if (!Toggle.isEnabled(event, name)) return;
+            event.getChannel().sendTyping().queue();
 
-         try {
-             var eb = new EmbedBuilder();
-             eb.setColor(new User(event.getAuthor().getIdLong()).getColor());
-             eb.setImage(getImageUrl());
-             event.reply(eb.build());
-         } catch (IOException | IllegalArgumentException | SQLException e) {
-             new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-         }
+            try {
+                var eb = new EmbedBuilder();
+                eb.setColor(new User(event.getAuthor().getIdLong()).getColor());
+                eb.setImage(getImageUrl());
+                event.reply(eb.build());
+            } catch (IOException | IllegalArgumentException | SQLException e) {
+                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
+            }
 
-        // Statistics.
-        try {
-            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-        }
+            // Statistics.
+            try {
+                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
+                if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
+            } catch (SQLException e) {
+                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
+            }
+        });
     }
 
     private String getImageUrl() throws IOException {

@@ -11,6 +11,7 @@ import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
+import owner.blacklist.Blacklist;
 import servant.Log;
 import utilities.*;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
@@ -18,6 +19,7 @@ import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 import zJdaUtilsLib.com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
 import java.sql.SQLException;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 public class ServerSetupCommand extends Command {
@@ -44,39 +46,42 @@ public class ServerSetupCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        if (!Toggle.isEnabled(event, name)) return;
+        CompletableFuture.runAsync(() -> {
+            if (!Toggle.isEnabled(event, name)) return;
+            if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
 
-        var lang = LanguageHandler.getLanguage(event, name);
-        var p = GuildHandler.getPrefix(event, name);
+            var lang = LanguageHandler.getLanguage(event, name);
+            var p = GuildHandler.getPrefix(event, name);
 
-        var author = event.getAuthor();
-        var channel = event.getChannel();
-        channel.sendMessage(LanguageHandler.get(lang, "setupwizard_introduction")).queue(message -> {
-            message.addReaction(accept).queue();
-            message.addReaction(decline).queue();
+            var author = event.getAuthor();
+            var channel = event.getChannel();
+            channel.sendMessage(LanguageHandler.get(lang, "setupwizard_introduction")).queue(message -> {
+                message.addReaction(accept).queue();
+                message.addReaction(decline).queue();
 
-            waiter.waitForEvent(GuildMessageReactionAddEvent.class,
-                    e -> e.getUser().equals(author)
-                            && (e.getReactionEmote().getName().equals(accept)
-                            || e.getReactionEmote().getName().equals(decline)),
-                    e -> {
-                        if (e.getReactionEmote().getName().equals(accept)) {
-                            message.clearReactions().queue();
-                            processLanguage(channel, author, message, event, lang, p, false, new Guild(event.getGuild().getIdLong()));
-                        } else {
-                            message.delete().queue();
-                            event.reactWarning();
-                        }
-                    }, 15, TimeUnit.MINUTES, () -> timeout(event, message, lang));
+                waiter.waitForEvent(GuildMessageReactionAddEvent.class,
+                        e -> e.getUser().equals(author)
+                                && (e.getReactionEmote().getName().equals(accept)
+                                || e.getReactionEmote().getName().equals(decline)),
+                        e -> {
+                            if (e.getReactionEmote().getName().equals(accept)) {
+                                message.clearReactions().queue();
+                                processLanguage(channel, author, message, event, lang, p, false, new Guild(event.getGuild().getIdLong()));
+                            } else {
+                                message.delete().queue();
+                                event.reactWarning();
+                            }
+                        }, 15, TimeUnit.MINUTES, () -> timeout(event, message, lang));
+            });
+
+            // Statistics.
+            try {
+                new moderation.user.User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
+                new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
+            } catch (SQLException e) {
+                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
+            }
         });
-
-        // Statistics.
-        try {
-            new moderation.user.User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-        }
     }
 
     // Timeout

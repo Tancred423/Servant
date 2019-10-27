@@ -17,32 +17,35 @@ import utilities.Image;
 import java.awt.*;
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.util.concurrent.CompletableFuture;
 
 public class JoinListener extends ListenerAdapter {
     public void onGuildMemberJoin(GuildMemberJoinEvent event) {
-        if (!Toggle.isEnabled(event, "join")) return;
-        String lang;
-        try {
-            lang = new Guild(event.getGuild().getIdLong()).getLanguage();
-        } catch (SQLException e) {
-            lang = Servant.config.getDefaultLanguage();
-        }
+        CompletableFuture.runAsync(() -> {
+            if (!Toggle.isEnabled(event, "join")) return;
 
-        var joinedUser = event.getUser();
-        var guild = event.getGuild();
-        var internalGuild = new moderation.guild.Guild(guild.getIdLong());
+            String lang;
+            try {
+                lang = new Guild(event.getGuild().getIdLong()).getLanguage();
+            } catch (SQLException e) {
+                lang = Servant.config.getDefaultLanguage();
+            }
 
-        MessageChannel channel;
-        try {
-            channel = internalGuild.getJoinNotifierChannel();
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getUser(), "join", null).sendLog(false);
-            return;
-        }
+            var joinedUser = event.getUser();
+            var guild = event.getGuild();
+            var internalGuild = new moderation.guild.Guild(guild.getIdLong());
 
-        if (channel != null) channel.sendMessage(getEmbed(joinedUser, guild, internalGuild, lang)).queue();
+            MessageChannel channel;
+            try {
+                channel = internalGuild.getJoinNotifierChannel();
+            } catch (SQLException e) {
+                new Log(e, event.getGuild(), event.getUser(), "join", null).sendLog(false);
+                return;
+            }
+
+            if (channel != null) channel.sendMessage(getEmbed(joinedUser, guild, internalGuild, lang)).queue();
+        });
     }
 
     private MessageEmbed getEmbed(User joinedUser, net.dv8tion.jda.core.entities.Guild guild, Guild internalGuild, String lang) {

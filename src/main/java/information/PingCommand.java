@@ -3,11 +3,13 @@ package information;
 
 import java.sql.SQLException;
 import java.time.temporal.ChronoUnit;
+import java.util.concurrent.CompletableFuture;
 
 import moderation.guild.Guild;
 import moderation.toggle.Toggle;
 import moderation.user.User;
 import net.dv8tion.jda.core.Permission;
+import owner.blacklist.Blacklist;
 import servant.Log;
 import utilities.Constants;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
@@ -33,19 +35,22 @@ public class PingCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        if (!Toggle.isEnabled(event, name)) return;
+        CompletableFuture.runAsync(() -> {
+            if (!Toggle.isEnabled(event, name)) return;
+            if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
 
-        event.reply("Ping: ...", m -> {
-            long ping = event.getMessage().getCreationTime().until(m.getCreationTime(), ChronoUnit.MILLIS);
-            m.editMessage("Ping: " + ping  + "ms | Websocket: " + event.getJDA().getPing() + "ms").queue();
+            event.reply("Ping: ...", m -> {
+                long ping = event.getMessage().getCreationTime().until(m.getCreationTime(), ChronoUnit.MILLIS);
+                m.editMessage("Ping: " + ping  + "ms | Websocket: " + event.getJDA().getPing() + "ms").queue();
+            });
+
+            // Statistics.
+            try {
+                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
+                if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
+            } catch (SQLException e) {
+                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
+            }
         });
-
-        // Statistics.
-        try {
-            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-        }
     }
 }

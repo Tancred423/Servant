@@ -7,6 +7,7 @@ import moderation.user.User;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.*;
+import owner.blacklist.Blacklist;
 import servant.Log;
 import servant.Servant;
 import utilities.Constants;
@@ -19,6 +20,7 @@ import java.sql.SQLException;
 import java.time.DateTimeException;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.util.concurrent.CompletableFuture;
 
 @Author("John Grosh (jagrosh)")
 public class ServerInfoCommand extends Command {
@@ -39,21 +41,25 @@ public class ServerInfoCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        if (!Toggle.isEnabled(event, name)) return;
-        var lang = LanguageHandler.getLanguage(event, name);
-        var guild = event.getGuild();
+        CompletableFuture.runAsync(() -> {
+            if (!Toggle.isEnabled(event, name)) return;
+            if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
 
-        if (guild.getFeatures().contains("VANITY_URL"))
-            guild.getVanityUrl().queue(vanityUrl -> processInfo(event, guild, vanityUrl, lang));
-        else processInfo(event, guild, null, lang);
+            var lang = LanguageHandler.getLanguage(event, name);
+            var guild = event.getGuild();
 
-        // Statistics.
-        try {
-            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            new moderation.guild.Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-        }
+            if (guild.getFeatures().contains("VANITY_URL"))
+                guild.getVanityUrl().queue(vanityUrl -> processInfo(event, guild, vanityUrl, lang));
+            else processInfo(event, guild, null, lang);
+
+            // Statistics.
+            try {
+                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
+                new moderation.guild.Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
+            } catch (SQLException e) {
+                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
+            }
+        });
     }
 
     private void processInfo(CommandEvent event, Guild guild, String vanityUrl, String lang) {

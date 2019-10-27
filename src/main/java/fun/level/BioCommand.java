@@ -1,3 +1,4 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package fun.level;
 
 import moderation.guild.Guild;
@@ -11,6 +12,7 @@ import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.sql.SQLException;
+import java.util.concurrent.CompletableFuture;
 
 public class BioCommand extends Command {
     public BioCommand() {
@@ -30,25 +32,27 @@ public class BioCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        if (!Toggle.isEnabled(event, "profile")) return;
-        var args = event.getArgs();
+        CompletableFuture.runAsync(() -> {
+            if (!Toggle.isEnabled(event, "profile")) return;
+            var args = event.getArgs();
 
-        if (!Parser.isSqlInjection(args) && args.length() <= 2000) {
+            if (!Parser.isSqlInjection(args) && args.length() <= 2000) {
+                try {
+                    new User(event.getAuthor().getIdLong()).setBio(args);
+                    event.reactSuccess();
+                } catch (SQLException e) {
+                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
+                    event.reactWarning();
+                }
+            } else event.reactError();
+
+            // Statistics.
             try {
-                new User(event.getAuthor().getIdLong()).setBio(args);
-                event.reactSuccess();
+                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
+                if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
             } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                event.reactWarning();
+                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
             }
-        } else event.reactError();
-
-        // Statistics.
-        try {
-            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-        }
+        });
     }
 }

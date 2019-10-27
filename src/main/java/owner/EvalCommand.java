@@ -1,3 +1,4 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package owner;
 
 import groovy.lang.GroovyShell;
@@ -10,6 +11,7 @@ import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.sql.SQLException;
+import java.util.concurrent.CompletableFuture;
 
 public class EvalCommand extends Command {
     private final GroovyShell engine;
@@ -44,35 +46,37 @@ public class EvalCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        if (event.getArgs().isEmpty()) {
-            event.reply("Missing arguments");
-            return;
-        }
+        CompletableFuture.runAsync(() -> {
+            if (event.getArgs().isEmpty()) {
+                event.reply("Missing arguments");
+                return;
+            }
 
-        try {
-            engine.setProperty("args", event.getArgs().split(" "));
-            engine.setProperty("event", event);
-            engine.setProperty("message", event.getMessage());
-            engine.setProperty("channel", event.getChannel());
-            engine.setProperty("jda", event.getJDA());
-            engine.setProperty("guild", event.getGuild());
-            engine.setProperty("member", event.getMember());
+            try {
+                engine.setProperty("args", event.getArgs().split(" "));
+                engine.setProperty("event", event);
+                engine.setProperty("message", event.getMessage());
+                engine.setProperty("channel", event.getChannel());
+                engine.setProperty("jda", event.getJDA());
+                engine.setProperty("guild", event.getGuild());
+                engine.setProperty("member", event.getMember());
 
-            var script = imports + event.getMessage().getContentRaw().split("\\s+", 2)[1];
-            var out = engine.evaluate(script);
+                var script = imports + event.getMessage().getContentRaw().split("\\s+", 2)[1];
+                var out = engine.evaluate(script);
 
-            if (out == null) event.reactSuccess();
-            else event.getChannel().sendMessage(out.toString()).queue();
-        } catch (Exception e) {
-            event.reply(e.getMessage());
-        }
+                if (out == null) event.reactSuccess();
+                else event.getChannel().sendMessage(out.toString()).queue();
+            } catch (Exception e) {
+                event.reply(e.getMessage());
+            }
 
-        // Statistics.
-        try {
-            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-        }
+            // Statistics.
+            try {
+                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
+                if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
+            } catch (SQLException e) {
+                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
+            }
+        });
     }
 }

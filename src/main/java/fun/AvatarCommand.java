@@ -7,6 +7,7 @@ import moderation.toggle.Toggle;
 import moderation.user.User;
 import net.dv8tion.jda.core.Permission;
 import moderation.guild.Guild;
+import owner.blacklist.Blacklist;
 import servant.Log;
 import utilities.Constants;
 import utilities.MessageHandler;
@@ -17,6 +18,7 @@ import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.awt.*;
 import java.sql.SQLException;
+import java.util.concurrent.CompletableFuture;
 
 public class AvatarCommand extends Command {
     public AvatarCommand() {
@@ -36,60 +38,63 @@ public class AvatarCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        if (!Toggle.isEnabled(event, name)) return;
+        CompletableFuture.runAsync(() -> {
+            if (!Toggle.isEnabled(event, name)) return;
+            if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
 
-        var lang = LanguageHandler.getLanguage(event, name);
-        var p = GuildHandler.getPrefix(event, name);
+            var lang = LanguageHandler.getLanguage(event, name);
+            var p = GuildHandler.getPrefix(event, name);
 
-        if (event.getArgs().isEmpty()) {
+            if (event.getArgs().isEmpty()) {
+                try {
+                    var description = LanguageHandler.get(lang, "avatar_description");
+                    var usage = String.format(LanguageHandler.get(lang, "avatar_usage"), p, name);
+                    event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, null).getEmbed());
+                } catch (SQLException e) {
+                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
+                }
+                return;
+            }
+
+            // Check mentioned user.
+            if (!Parser.hasMentionedUser(event.getMessage())) {
+                event.reply(LanguageHandler.get(lang, "invalid_mention"));
+                return;
+            }
+
+            var message = event.getMessage();
+            var channel = message.getChannel();
+            var author = message.getAuthor();
+            var mentioned = message.getMentionedUsers().get(0);
+            var avatarUrl = mentioned.getAvatarUrl();
+            Color color;
             try {
-                var description = LanguageHandler.get(lang, "avatar_description");
-                var usage = String.format(LanguageHandler.get(lang, "avatar_usage"), p, name);
-                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, null).getEmbed());
+                color = new User(author.getIdLong()).getColor();
             } catch (SQLException e) {
                 new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
+                return;
             }
-            return;
-        }
 
-        // Check mentioned user.
-        if (!Parser.hasMentionedUser(event.getMessage())) {
-            event.reply(LanguageHandler.get(lang, "invalid_mention"));
-            return;
-        }
+            new MessageHandler().sendEmbed(
+                    channel,
+                    color,
+                    "Avatar", null, null,
+                    null,
+                    null,
+                    String.format(LanguageHandler.get(lang, "avatar_stolen"), author.getAsMention(), mentioned.getAsMention()),
+                    null,
+                    avatarUrl,
+                    null,
+                    null
+            );
 
-        var message = event.getMessage();
-        var channel = message.getChannel();
-        var author = message.getAuthor();
-        var mentioned = message.getMentionedUsers().get(0);
-        var avatarUrl = mentioned.getAvatarUrl();
-        Color color;
-        try {
-            color = new User(author.getIdLong()).getColor();
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-            return;
-        }
-
-        new MessageHandler().sendEmbed(
-                channel,
-                color,
-                "Avatar", null, null,
-                null,
-                null,
-                String.format(LanguageHandler.get(lang, "avatar_stolen"), author.getAsMention(), mentioned.getAsMention()),
-                null,
-                avatarUrl,
-                null,
-                null
-        );
-
-        // Statistics.
-        try {
-            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-        }
+            // Statistics.
+            try {
+                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
+                if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
+            } catch (SQLException e) {
+                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
+            }
+        });
     }
 }

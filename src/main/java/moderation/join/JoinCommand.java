@@ -7,6 +7,7 @@ import moderation.toggle.Toggle;
 import moderation.user.User;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.MessageChannel;
+import owner.blacklist.Blacklist;
 import servant.Log;
 import utilities.Constants;
 import utilities.UsageEmbed;
@@ -14,6 +15,7 @@ import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.sql.SQLException;
+import java.util.concurrent.CompletableFuture;
 
 public class JoinCommand extends Command {
     public JoinCommand() {
@@ -33,83 +35,86 @@ public class JoinCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        if (!Toggle.isEnabled(event, name)) return;
+        CompletableFuture.runAsync(() -> {
+            if (!Toggle.isEnabled(event, name)) return;
+            if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
 
-        var lang = LanguageHandler.getLanguage(event, name);
-        var p = GuildHandler.getPrefix(event, name);
+            var lang = LanguageHandler.getLanguage(event, name);
+            var p = GuildHandler.getPrefix(event, name);
 
-        var guild = event.getGuild();
-        var internalGuild = new moderation.guild.Guild(guild.getIdLong());
-        if (event.getArgs().isEmpty()) {
-            try {
-                var description = LanguageHandler.get(lang, "join_description");
-                var usage = String.format(LanguageHandler.get(lang, "join_usage"), p, name, p, name, p, name, p, name);
-                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, null).getEmbed());
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
+            var guild = event.getGuild();
+            var internalGuild = new moderation.guild.Guild(guild.getIdLong());
+            if (event.getArgs().isEmpty()) {
+                try {
+                    var description = LanguageHandler.get(lang, "join_description");
+                    var usage = String.format(LanguageHandler.get(lang, "join_usage"), p, name, p, name, p, name, p, name);
+                    event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, null).getEmbed());
+                } catch (SQLException e) {
+                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
+                }
+                return;
             }
-            return;
-        }
 
-        var args = event.getArgs().split(" ");
-        MessageChannel channel;
+            var args = event.getArgs().split(" ");
+            MessageChannel channel;
 
-        switch (args[0].toLowerCase()) {
-            case "set":
-            case "s":
-                if (args.length < 2 || event.getMessage().getMentionedChannels().isEmpty()) {
-                    event.reply(LanguageHandler.get(lang, "joinleave_nochannel_mention"));
-                    return;
-                }
+            switch (args[0].toLowerCase()) {
+                case "set":
+                case "s":
+                    if (args.length < 2 || event.getMessage().getMentionedChannels().isEmpty()) {
+                        event.reply(LanguageHandler.get(lang, "joinleave_nochannel_mention"));
+                        return;
+                    }
 
-                channel = event.getMessage().getMentionedChannels().get(0);
+                    channel = event.getMessage().getMentionedChannels().get(0);
 
-                try {
-                    internalGuild.setJoinNotifierChannel(channel);
-                } catch (SQLException e) {
-                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                    return;
-                }
-                event.reactSuccess();
-                break;
+                    try {
+                        internalGuild.setJoinNotifierChannel(channel);
+                    } catch (SQLException e) {
+                        new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
+                        return;
+                    }
+                    event.reactSuccess();
+                    break;
 
-            case "unset":
-            case "u":
-                boolean wasUnset;
-                try {
-                    wasUnset = internalGuild.unsetJoinNotifierChannel();
-                } catch (SQLException e) {
-                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                    return;
-                }
-                if (wasUnset) event.reactSuccess();
-                else event.reply(LanguageHandler.get(lang, "joinleave_unset_fail"));
-                break;
+                case "unset":
+                case "u":
+                    boolean wasUnset;
+                    try {
+                        wasUnset = internalGuild.unsetJoinNotifierChannel();
+                    } catch (SQLException e) {
+                        new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
+                        return;
+                    }
+                    if (wasUnset) event.reactSuccess();
+                    else event.reply(LanguageHandler.get(lang, "joinleave_unset_fail"));
+                    break;
 
-            case "show":
-            case "sh":
-                try {
-                    channel = internalGuild.getJoinNotifierChannel();
-                } catch (SQLException e) {
-                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                    return;
-                }
-                if (channel == null) event.reply(LanguageHandler.get(lang, "joinleave_nochannel_set"));
-                else event.reply(String.format(LanguageHandler.get(lang, "joinleave_current"), channel.getName()));
-                break;
+                case "show":
+                case "sh":
+                    try {
+                        channel = internalGuild.getJoinNotifierChannel();
+                    } catch (SQLException e) {
+                        new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
+                        return;
+                    }
+                    if (channel == null) event.reply(LanguageHandler.get(lang, "joinleave_nochannel_set"));
+                    else event.reply(String.format(LanguageHandler.get(lang, "joinleave_current"), channel.getName()));
+                    break;
 
-            default:
-                event.reply(LanguageHandler.get(lang, "joinleave_firstarg"));
-                event.reactError();
-                break;
-        }
+                default:
+                    event.reply(LanguageHandler.get(lang, "joinleave_firstarg"));
+                    event.reactError();
+                    break;
+            }
 
-        // Statistics.
-        try {
-            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            if (event.getGuild() != null) new moderation.guild.Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-        }
+            // Statistics.
+            try {
+                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
+                if (event.getGuild() != null) new moderation.guild.Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
+            } catch (SQLException e) {
+                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
+            }
+        });
     }
 }

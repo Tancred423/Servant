@@ -1,7 +1,6 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package owner;
 
-import jdk.jshell.execution.Util;
 import moderation.guild.Guild;
 import moderation.user.User;
 import net.dv8tion.jda.core.Permission;
@@ -15,6 +14,7 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class RefreshCommand extends Command {
     public RefreshCommand() {
@@ -34,19 +34,21 @@ public class RefreshCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        var success = assignLevelAchievement(event);
-        success = clearLevelAchievements(event);
+        CompletableFuture.runAsync(() -> {
+            var success = assignLevelAchievement(event);
+            success = clearLevelAchievements(event);
 
-        if (success) event.reactSuccess();
-        else event.reactWarning();
+            if (success) event.reactSuccess();
+            else event.reactWarning();
 
-        // Statistics.
-        try {
-            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-        }
+            // Statistics.
+            try {
+                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
+                if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
+            } catch (SQLException e) {
+                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
+            }
+        });
     }
 
     private boolean assignLevelAchievement(CommandEvent event) {

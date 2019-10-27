@@ -67,17 +67,10 @@
             <version>2.5.8</version>
             <type>pom</type>
         </dependency>
-        <!-- EA Async -->
-        <dependency>
-            <groupId>com.ea.async</groupId>
-            <artifactId>ea-async</artifactId>
-            <version>1.2.3</version>
-        </dependency>
     </dependencies>
 
     <build>
         <plugins>
-            <!-- idk -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -89,20 +82,6 @@
                         </manifest>
                     </archive>
                 </configuration>
-            </plugin>
-            <!-- EA Async -->
-            <plugin>
-                <groupId>com.ea.async</groupId>
-                <artifactId>ea-async-maven-plugin</artifactId>
-                <version>1.2.3</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>instrument</goal>
-                            <goal>instrument-test</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

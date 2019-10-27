@@ -16,67 +16,74 @@ import utilities.Parser;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class MediaOnlyChannelListener extends ListenerAdapter {
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
-        var author = event.getAuthor();
-        if (author.isBot()) return;
+        CompletableFuture.runAsync(() -> {
+            if (!Toggle.isEnabled(event, "mediaononlychannel")) return;
 
-        if (!Toggle.isEnabled(event, "mediaononlychannel")) return;
+            var author = event.getAuthor();
+            if (author.isBot()) return;
 
-        // Is message in mo-channel?
-        var channel = event.getChannel();
-        var guild = event.getGuild();
-        var internalGuild = new moderation.guild.Guild(guild.getIdLong());
-        try {
-            var lang = internalGuild.getLanguage();
-            if (internalGuild.mediaOnlyChannelHasEntry(channel)) {
-                // Has to have an attachment or a valid url.
-                var validMessage = true;
-                var message = event.getMessage();
+            // Is message in mo-channel?
+            var channel = event.getChannel();
+            var guild = event.getGuild();
+            var internalGuild = new moderation.guild.Guild(guild.getIdLong());
+            try {
+                var lang = internalGuild.getLanguage();
+                if (internalGuild.mediaOnlyChannelHasEntry(channel)) {
+                    // Has to have an attachment or a valid url.
+                    var validMessage = true;
+                    var message = event.getMessage();
 
-                List<Message.Attachment> attachments = message.getAttachments();
-                if (attachments.isEmpty()) {
-                    String url = null;
-                    var args = event.getMessage().getContentDisplay().split(" ");
-                    for (var arg : args)
-                        if (arg.startsWith("http")) url = arg;
-                        else if (arg.startsWith("||http") && arg.endsWith("||")) url = arg.substring(2, arg.length() - 2); // killing spoiler tags
+                    List<Message.Attachment> attachments = message.getAttachments();
+                    if (attachments.isEmpty()) {
+                        String url = null;
+                        var args = event.getMessage().getContentDisplay().split(" ");
+                        for (var arg : args)
+                            if (arg.startsWith("http")) url = arg;
+                            else if (arg.startsWith("||http") && arg.endsWith("||")) url = arg.substring(2, arg.length() - 2); // killing spoiler tags
 
-                    if (url == null) validMessage = false;
-                    else if (!Parser.isValidUrl(url)) validMessage = false;
+                        if (url == null) validMessage = false;
+                        else if (!Parser.isValidUrl(url)) validMessage = false;
+                    }
+
+                    if (!validMessage) {
+                        // No files nor valid url. -> Delete and inform about mo-channel.
+                        event.getMessage().delete().queue();
+                        var mb = new MessageBuilder();
+                        mb.setContent(String.format(LanguageHandler.get(lang, "mediaonlychannel_warning"), author.getAsMention()));
+                        new MessageHandler().sendAndExpire(channel, mb.build(), 30 * 1000); // 30 seconds.
+                    }
                 }
-
-                if (!validMessage) {
-                    // No files nor valid url. -> Delete and inform about mo-channel.
-                    event.getMessage().delete().queue();
-                    var mb = new MessageBuilder();
-                    mb.setContent(String.format(LanguageHandler.get(lang, "mediaonlychannel_warning"), author.getAsMention()));
-                    new MessageHandler().sendAndExpire(channel, mb.build(), 30 * 1000); // 30 seconds.
-                }
+            } catch (SQLException e) {
+                new Log(e, event.getGuild(), event.getAuthor(), "mediaonlychannel", null).sendLog(false);
             }
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), "mediaonlychannel", null).sendLog(false);
-        }
+        });
     }
 
     public void onTextChannelDelete(TextChannelDeleteEvent event) {
-        var guild = event.getGuild();
-        var internalGuild = new Guild(guild.getIdLong());
-        try {
-            internalGuild.unsetMediaOnlyChannel(event.getChannel());
-        } catch (SQLException e) {
-            new Log(e, guild, null, "mediaonlychannel", null).sendLog(false);
-        }
+        CompletableFuture.runAsync(() -> {
+            var guild = event.getGuild();
+            var internalGuild = new Guild(guild.getIdLong());
+            try {
+                internalGuild.unsetMediaOnlyChannel(event.getChannel());
+            } catch (SQLException e) {
+                new Log(e, guild, null, "mediaonlychannel", null).sendLog(false);
+            }
+        });
     }
 
     public void onGuildLeave(GuildLeaveEvent event) {
-        var guild = event.getGuild();
-        var internalGuild = new Guild(guild.getIdLong());
-        try {
-            internalGuild.unsetMediaOnlyChannels();
-        } catch (SQLException e) {
-            new Log(e, guild, null, "mediaonlychannel", null).sendLog(false);
-        }
+        CompletableFuture.runAsync(() -> {
+            var guild = event.getGuild();
+            var internalGuild = new Guild(guild.getIdLong());
+            try {
+                internalGuild.unsetMediaOnlyChannels();
+            } catch (SQLException e) {
+                new Log(e, guild, null, "mediaonlychannel", null).sendLog(false);
+            }
+        });
     }
 }

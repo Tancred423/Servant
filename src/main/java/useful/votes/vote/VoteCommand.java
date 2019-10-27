@@ -10,6 +10,7 @@ import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
+import owner.blacklist.Blacklist;
 import servant.Log;
 import servant.Servant;
 import useful.votes.VotesDatabase;
@@ -27,6 +28,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 public class VoteCommand extends Command {
@@ -53,61 +55,64 @@ public class VoteCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        if (!Toggle.isEnabled(event, name)) return;
+        CompletableFuture.runAsync(() -> {
+            if (!Toggle.isEnabled(event, name)) return;
+            if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
 
-        var lang = LanguageHandler.getLanguage(event, name);
-        var p = GuildHandler.getPrefix(event, name);
+            var lang = LanguageHandler.getLanguage(event, name);
+            var p = GuildHandler.getPrefix(event, name);
 
-        var author = event.getAuthor();
+            var author = event.getAuthor();
 
-        if (event.getArgs().isEmpty()) {
-            try {
-                var description = LanguageHandler.get(lang, "vote_description");
-                var usage = String.format(LanguageHandler.get(lang, "vote_usage"), p, name, p, name);
-                var hint = LanguageHandler.get(lang, "vote_hint");
-                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
+            if (event.getArgs().isEmpty()) {
+                try {
+                    var description = LanguageHandler.get(lang, "vote_description");
+                    var usage = String.format(LanguageHandler.get(lang, "vote_usage"), p, name, p, name);
+                    var hint = LanguageHandler.get(lang, "vote_hint");
+                    event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+                } catch (SQLException e) {
+                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
+                }
+                return;
             }
-            return;
-        }
 
-        var splitArgs = event.getArgs().split("/");
+            var splitArgs = event.getArgs().split("/");
 
-        if (splitArgs.length < 2 || splitArgs.length > 11) {
-            event.reply(LanguageHandler.get(lang, "vote_amount"));
-            event.reactWarning();
-            return;
-        }
+            if (splitArgs.length < 2 || splitArgs.length > 11) {
+                event.reply(LanguageHandler.get(lang, "vote_amount"));
+                event.reactWarning();
+                return;
+            }
 
-        var question = splitArgs[0];
-        List<String> answers = new ArrayList<>(Arrays.asList(splitArgs).subList(1, splitArgs.length));
+            var question = splitArgs[0];
+            List<String> answers = new ArrayList<>(Arrays.asList(splitArgs).subList(1, splitArgs.length));
 
 
-        event.getChannel().sendMessage("Allow multiple answers?").queue(message -> {
-            message.addReaction(accept).queue();
-            message.addReaction(decline).queue();
+            event.getChannel().sendMessage("Allow multiple answers?").queue(message -> {
+                message.addReaction(accept).queue();
+                message.addReaction(decline).queue();
 
-            waiter.waitForEvent(GuildMessageReactionAddEvent.class,
-                    e -> e.getUser().equals(author)
-                            && (e.getReactionEmote().getName().equals(accept)
-                            || e.getReactionEmote().getName().equals(decline)),
-                    e -> {
-                        if (e.getReactionEmote().getName().equals(accept)) processVote(event, question, answers, lang, true);
-                        else processVote(event, question, answers, lang, false);
+                waiter.waitForEvent(GuildMessageReactionAddEvent.class,
+                        e -> e.getUser().equals(author)
+                                && (e.getReactionEmote().getName().equals(accept)
+                                || e.getReactionEmote().getName().equals(decline)),
+                        e -> {
+                            if (e.getReactionEmote().getName().equals(accept)) processVote(event, question, answers, lang, true);
+                            else processVote(event, question, answers, lang, false);
 
-                        message.delete().queue();
-                        event.getMessage().delete().queue();
-                    }, 15, TimeUnit.MINUTES, () -> timeout(message, event, lang));
+                            message.delete().queue();
+                            event.getMessage().delete().queue();
+                        }, 15, TimeUnit.MINUTES, () -> timeout(message, event, lang));
+            });
+
+            // Statistics.
+            try {
+                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
+                new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
+            } catch (SQLException e) {
+                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
+            }
         });
-
-        // Statistics.
-        try {
-            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-        }
     }
 
     private void processVote(CommandEvent event, String question, List<String> answers, String lang, boolean allowsMultipleAnswers) {

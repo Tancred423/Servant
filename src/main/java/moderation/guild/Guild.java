@@ -22,6 +22,7 @@ public class Guild {
     }
 
     // Signup
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isSignupMessage(long messageId) throws SQLException {
         var connection = Database.getConnection();
         var select = connection.prepareStatement("SELECT message_id FROM signup WHERE message_id=?");

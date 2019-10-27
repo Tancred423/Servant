@@ -15,88 +15,91 @@ import servant.Servant;
 
 import java.awt.*;
 import java.sql.SQLException;
+import java.util.concurrent.CompletableFuture;
 
 public class LivestreamListener extends ListenerAdapter {
     public void onUserUpdateGame(UserUpdateGameEvent event) {
-        if (!Toggle.isEnabled(event, "livestream")) return;
+        CompletableFuture.runAsync(() -> {
+            if (!Toggle.isEnabled(event, "livestream")) return;
 
-        var guild = event.getGuild();
-        var author = event.getUser();
-        var oldGame = event.getOldGame();
-        var newGame = event.getNewGame();
+            var guild = event.getGuild();
+            var author = event.getUser();
+            var oldGame = event.getOldGame();
+            var newGame = event.getNewGame();
 
-        String lang;
-        try {
-            lang = new Guild(guild.getIdLong()).getLanguage();
-        } catch (SQLException e) {
-            lang = Servant.config.getDefaultLanguage();
-        }
-
-        if (author.isBot()) return;
-//        if (Blacklist.isBlacklisted(event.getUser(), event.getGuild())) return;
-
-        // Users can hide themselves from this feature.
-        try {
-            if (new moderation.user.User(author.getIdLong()).isStreamHidden(event.getGuild().getIdLong())) return;
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getUser(), "stream", null).sendLog(false);
-            return;
-        }
-
-        boolean isStreamerMode;
-        try {
-            isStreamerMode = new Guild(guild.getIdLong()).isStreamerMode();
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getUser(), "stream", null).sendLog(false);
-            return;
-        }
-
-        // Check if user is streamer if guild is in streamer mode.
-        if (isStreamerMode) {
+            String lang;
             try {
-                if (!new Guild(guild.getIdLong()).getStreamers().contains(author.getIdLong())) return;
+                lang = new Guild(guild.getIdLong()).getLanguage();
+            } catch (SQLException e) {
+                lang = Servant.config.getDefaultLanguage();
+            }
+
+            if (author.isBot()) return;
+            if (Blacklist.isBlacklisted(event.getUser(), event.getGuild())) return;
+
+            // Users can hide themselves from this feature.
+            try {
+                if (new moderation.user.User(author.getIdLong()).isStreamHidden(event.getGuild().getIdLong())) return;
             } catch (SQLException e) {
                 new Log(e, event.getGuild(), event.getUser(), "stream", null).sendLog(false);
                 return;
             }
-        }
 
-        // Check if guild owner started streaming.
-        if (oldGame != null && newGame != null) {
-            if (!oldGame.getType().toString().equalsIgnoreCase("streaming")
-                    && newGame.getType().toString().equalsIgnoreCase("streaming")) {
+            boolean isStreamerMode;
+            try {
+                isStreamerMode = new Guild(guild.getIdLong()).isStreamerMode();
+            } catch (SQLException e) {
+                new Log(e, event.getGuild(), event.getUser(), "stream", null).sendLog(false);
+                return;
+            }
+
+            // Check if user is streamer if guild is in streamer mode.
+            if (isStreamerMode) {
                 try {
-                    sendNotification(author, newGame, guild, new Guild(guild.getIdLong()), isStreamerMode, lang);
-                    addRole(guild, event.getMember(), guild.getRoleById(new Guild(guild.getIdLong()).getStreamingRoleId()));
+                    if (!new Guild(guild.getIdLong()).getStreamers().contains(author.getIdLong())) return;
                 } catch (SQLException e) {
                     new Log(e, event.getGuild(), event.getUser(), "stream", null).sendLog(false);
-                }
-            } else if (oldGame.getType().toString().equalsIgnoreCase("streaming") &&
-                    !newGame.getType().toString().equalsIgnoreCase("streaming")) {
-                try {
-                    removeRole(guild, event.getMember(), guild.getRoleById(new Guild(guild.getIdLong()).getStreamingRoleId()));
-                } catch (SQLException e) {
-                    new Log(e, event.getGuild(), event.getUser(), "stream", null).sendLog(false);
+                    return;
                 }
             }
-        } else if (oldGame == null && newGame != null) {
-            if (newGame.getType().toString().equalsIgnoreCase("streaming")) {
-                try {
-                    sendNotification(author, newGame, guild, new Guild(guild.getIdLong()), isStreamerMode, lang);
-                    addRole(guild, event.getMember(), guild.getRoleById(new Guild(guild.getIdLong()).getStreamingRoleId()));
-                } catch (SQLException e) {
-                    new Log(e, event.getGuild(), event.getUser(), "stream", null).sendLog(false);
+
+            // Check if guild owner started streaming.
+            if (oldGame != null && newGame != null) {
+                if (!oldGame.getType().toString().equalsIgnoreCase("streaming")
+                        && newGame.getType().toString().equalsIgnoreCase("streaming")) {
+                    try {
+                        sendNotification(author, newGame, guild, new Guild(guild.getIdLong()), isStreamerMode, lang);
+                        addRole(guild, event.getMember(), guild.getRoleById(new Guild(guild.getIdLong()).getStreamingRoleId()));
+                    } catch (SQLException e) {
+                        new Log(e, event.getGuild(), event.getUser(), "stream", null).sendLog(false);
+                    }
+                } else if (oldGame.getType().toString().equalsIgnoreCase("streaming") &&
+                        !newGame.getType().toString().equalsIgnoreCase("streaming")) {
+                    try {
+                        removeRole(guild, event.getMember(), guild.getRoleById(new Guild(guild.getIdLong()).getStreamingRoleId()));
+                    } catch (SQLException e) {
+                        new Log(e, event.getGuild(), event.getUser(), "stream", null).sendLog(false);
+                    }
+                }
+            } else if (oldGame == null && newGame != null) {
+                if (newGame.getType().toString().equalsIgnoreCase("streaming")) {
+                    try {
+                        sendNotification(author, newGame, guild, new Guild(guild.getIdLong()), isStreamerMode, lang);
+                        addRole(guild, event.getMember(), guild.getRoleById(new Guild(guild.getIdLong()).getStreamingRoleId()));
+                    } catch (SQLException e) {
+                        new Log(e, event.getGuild(), event.getUser(), "stream", null).sendLog(false);
+                    }
+                }
+            } else if (oldGame != null) {
+                if (oldGame.getType().toString().equalsIgnoreCase("streaming")) {
+                    try {
+                        removeRole(guild, event.getMember(), guild.getRoleById(new Guild(guild.getIdLong()).getStreamingRoleId()));
+                    } catch (SQLException e) {
+                        new Log(e, event.getGuild(), event.getUser(), "stream", null).sendLog(false);
+                    }
                 }
             }
-        } else if (oldGame != null) {
-            if (oldGame.getType().toString().equalsIgnoreCase("streaming")) {
-                try {
-                    removeRole(guild, event.getMember(), guild.getRoleById(new Guild(guild.getIdLong()).getStreamingRoleId()));
-                } catch (SQLException e) {
-                    new Log(e, event.getGuild(), event.getUser(), "stream", null).sendLog(false);
-                }
-            }
-        }
+        });
     }
 
     private static void addRole(net.dv8tion.jda.core.entities.Guild guild, Member member, Role role) {

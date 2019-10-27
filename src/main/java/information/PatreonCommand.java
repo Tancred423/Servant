@@ -6,6 +6,7 @@ import moderation.guild.Guild;
 import moderation.user.User;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
+import owner.blacklist.Blacklist;
 import servant.Log;
 import servant.Servant;
 import utilities.Constants;
@@ -16,6 +17,7 @@ import zJdaUtilsLib.com.jagrosh.jdautilities.examples.doc.Author;
 
 import java.awt.*;
 import java.sql.SQLException;
+import java.util.concurrent.CompletableFuture;
 
 @Author("John Grosh (jagrosh)")
 public class PatreonCommand extends Command {
@@ -36,35 +38,39 @@ public class PatreonCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        var lang = LanguageHandler.getLanguage(event, name);
-        var eb = new EmbedBuilder();
+        CompletableFuture.runAsync(() -> {
+            if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
 
-        try {
-            eb.setColor(new User(event.getAuthor().getIdLong()).getColor());
-        } catch (SQLException e) {
-            eb.setColor(Color.decode(Servant.config.getDefaultColorCode()));
-        }
-        eb.setAuthor(LanguageHandler.get(lang, "patreon_supportserver"), null, "https://i.imgur.com/rCnhGKA.jpg"); // Patreon Icon
-        eb.setDescription(LanguageHandler.get(lang, "patreon_description"));
-        eb.setThumbnail(Image.getImageUrl("love"));
-        eb.addField("1. " + LanguageHandler.get(lang, "patreon_patreontitle"), LanguageHandler.get(lang, "patreon_subscription"), false);
-        eb.addField("$1+/month", LanguageHandler.get(lang, "patreon_$1"), true);
-        eb.addField("$3+/month", LanguageHandler.get(lang, "patreon_$3"), true);
-        eb.addField("$5+/month", LanguageHandler.get(lang, "patreon_$5"), true);
-        eb.addField("$10+/month", LanguageHandler.get(lang, "patreon_$10"), true);
-        eb.addField("2. " + LanguageHandler.get(lang, "patreon_donationtitle"), LanguageHandler.get(lang, "patreon_donation"), false);
-        eb.addField("$5+ Donated In Lifetime", LanguageHandler.get(lang, "patreon_donation_$5"), true);
-        eb.addField("3. " + LanguageHandler.get(lang, "patreon_serverboosttitle"), LanguageHandler.get(lang, "patreon_serverboost"), false);
+            var lang = LanguageHandler.getLanguage(event, name);
+            var eb = new EmbedBuilder();
 
-        eb.setFooter(LanguageHandler.get(lang, "patreon_thanks"), event.getSelfUser().getAvatarUrl());
-        event.reply(eb.build());
+            try {
+                eb.setColor(new User(event.getAuthor().getIdLong()).getColor());
+            } catch (SQLException e) {
+                eb.setColor(Color.decode(Servant.config.getDefaultColorCode()));
+            }
+            eb.setAuthor(LanguageHandler.get(lang, "patreon_supportserver"), null, "https://i.imgur.com/rCnhGKA.jpg"); // Patreon Icon
+            eb.setDescription(LanguageHandler.get(lang, "patreon_description"));
+            eb.setThumbnail(Image.getImageUrl("love"));
+            eb.addField("1. " + LanguageHandler.get(lang, "patreon_patreontitle"), LanguageHandler.get(lang, "patreon_subscription"), false);
+            eb.addField("$1+/month", LanguageHandler.get(lang, "patreon_$1"), true);
+            eb.addField("$3+/month", LanguageHandler.get(lang, "patreon_$3"), true);
+            eb.addField("$5+/month", LanguageHandler.get(lang, "patreon_$5"), true);
+            eb.addField("$10+/month", LanguageHandler.get(lang, "patreon_$10"), true);
+            eb.addField("2. " + LanguageHandler.get(lang, "patreon_donationtitle"), LanguageHandler.get(lang, "patreon_donation"), false);
+            eb.addField("$5+ Donated In Lifetime", LanguageHandler.get(lang, "patreon_donation_$5"), true);
+            eb.addField("3. " + LanguageHandler.get(lang, "patreon_serverboosttitle"), LanguageHandler.get(lang, "patreon_serverboost"), false);
 
-        // Statistics.
-        try {
-            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-        }
+            eb.setFooter(LanguageHandler.get(lang, "patreon_thanks"), event.getSelfUser().getAvatarUrl());
+            event.reply(eb.build());
+
+            // Statistics.
+            try {
+                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
+                if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
+            } catch (SQLException e) {
+                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
+            }
+        });
     }
 }

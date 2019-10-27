@@ -29,17 +29,16 @@ public class StringFormat {
         for (int i=0; i< text.length(); i++) {
             letter = text.charAt(i);
             var a = normal.indexOf(letter);
-            flipped.append((a != -1) ? split.charAt(a) : letter);
+            flipped.append(a != -1 ? split.charAt(a) : letter);
         }
 
         return flipped.reverse().toString();
     }
 
-    public static <K extends Comparable,V extends Comparable> Map<K,V> sortByValues(Map<K,V> map){
-        List<Map.Entry<K,V>> entries = new LinkedList<>(map.entrySet());
-        entries.sort(Comparator.comparing(Map.Entry::getValue));
-        Map<K,V> sortedMap = new LinkedHashMap<K,V>();
-        for(Map.Entry<K,V> entry: entries) sortedMap.put(entry.getKey(), entry.getValue());
-        return sortedMap;
+    public static TreeMap<String, Integer> sortByKey(TreeMap<String, Integer> map) {
+        SortedSet<String> keys = new TreeSet<>(map.keySet());
+        var newMap = new TreeMap<String, Integer>();
+        for (var key : keys) newMap.put(key, map.get(key));
+        return newMap;
     }
 }

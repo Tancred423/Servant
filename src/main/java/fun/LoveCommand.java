@@ -9,7 +9,9 @@ import moderation.guild.Guild;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
+import owner.blacklist.Blacklist;
 import servant.Log;
+import servant.Servant;
 import utilities.Constants;
 import utilities.MessageHandler;
 import utilities.UsageEmbed;
@@ -18,6 +20,7 @@ import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class LoveCommand extends Command {
@@ -38,65 +41,93 @@ public class LoveCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        if (!Toggle.isEnabled(event, name)) return;
+        CompletableFuture.runAsync(() -> {
+            if (!Toggle.isEnabled(event, name)) return;
+            if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
 
-        var message = event.getMessage();
-        List<Member> mentioned = message.getMentionedMembers();
-        var lang = LanguageHandler.getLanguage(event, name);
-        var p = GuildHandler.getPrefix(event, name);
+            var message = event.getMessage();
+            List<Member> mentioned = message.getMentionedMembers();
+            var lang = LanguageHandler.getLanguage(event, name);
+            var p = GuildHandler.getPrefix(event, name);
 
-        if (mentioned.size() < 1) {
+            if (mentioned.size() < 1) {
+                try {
+                    var description = LanguageHandler.get(lang, "love_description");
+                    var usage = String.format(LanguageHandler.get(lang, "love_usage"), p, name, p, name);
+                    var hint = LanguageHandler.get(lang, "love_hint");
+                    event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+                } catch (SQLException e) {
+                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
+                }
+                return;
+            }
+
+            Member first;
+            Member second;
+            var isSelfLove = false;
+
+            if (mentioned.size() > 1) {
+                first = mentioned.get(0);
+                second = mentioned.get(1);
+            } else {
+                var splitContentRaw = event.getArgs().split(" ");
+
+                if (splitContentRaw.length > 1) {
+                    if (splitContentRaw[0].trim().equals(splitContentRaw[1].trim())) {
+                        first = mentioned.get(0);
+                        second = mentioned.get(0);
+                        isSelfLove = true;
+                    } else {
+                        first = event.getGuild().getMemberById(event.getAuthor().getIdLong());
+                        second = mentioned.get(0);
+                    }
+                } else {
+                    first = event.getGuild().getMemberById(event.getAuthor().getIdLong());
+                    second = mentioned.get(0);
+                }
+            }
+
+            var author = event.getAuthor();
+            var internalAuthor = new User(author.getIdLong());
+
+            var love = ThreadLocalRandom.current().nextInt(0, 101);
+            if ((first.getUser().getId().equals(Servant.config.getBotOwnerId()) && second.getUser() == event.getJDA().getSelfUser()
+                    || (first.getUser() == event.getJDA().getSelfUser() && second.getUser().getId().equals(Servant.config.getBotOwnerId()))))
+                love = 100;
+            var bar = getBar(love);
+            var quote = getQuote(love, isSelfLove, lang);
+            var shippingName = getShippingName(first, second);
+
             try {
-                var description = LanguageHandler.get(lang, "love_description");
-                var usage = String.format(LanguageHandler.get(lang, "love_usage"), p, name, p, name);
-                var hint = LanguageHandler.get(lang, "love_hint");
-                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+                checkLoveAchievements(internalAuthor, message, love);
+
+                new MessageHandler().sendEmbed(event.getChannel(),
+                        internalAuthor.getColor(),
+                        quote,
+                        null,
+                        event.getJDA().getSelfUser().getAvatarUrl(),
+                        null,
+                        "https://i.imgur.com/BaeIVWa.png", // :tancLove:
+                        first.getAsMention() + "♥" + second.getAsMention() + "\n" +
+                                "\n" +
+                                bar,
+                        null,
+                        null,
+                        shippingName,
+                        "https://i.imgur.com/JAKcV8F.png"
+                );
             } catch (SQLException e) {
                 new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
             }
-            return;
-        }
 
-        var first = mentioned.get(0);
-        var second = mentioned.size() == 1 ? mentioned.get(0) : mentioned.get(1);
-
-        var author = event.getAuthor();
-        var internalAuthor = new User(author.getIdLong());
-
-        var love = ThreadLocalRandom.current().nextInt(0, 101);
-        var bar = getBar(love);
-        var quote = getQuote(love, mentioned.size() == 1, lang);
-        var shippingName = getShippingName(first, second);
-
-        try {
-            checkLoveAchievements(internalAuthor, message, love);
-
-            new MessageHandler().sendEmbed(event.getChannel(),
-                    internalAuthor.getColor(),
-                    quote,
-                    null,
-                    event.getJDA().getSelfUser().getAvatarUrl(),
-                    null,
-                    "https://i.imgur.com/BaeIVWa.png", // :tancLove:
-                    first.getAsMention() + "♥" + second.getAsMention() + "\n" +
-                            "\n" +
-                            bar,
-                    null,
-                    null,
-                    shippingName,
-                    "https://i.imgur.com/JAKcV8F.png"
-            );
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-        }
-
-        // Statistics.
-        try {
-            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-        }
+            // Statistics.
+            try {
+                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
+                if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
+            } catch (SQLException e) {
+                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
+            }
+        });
     }
 
     private String getBar(int love) {

@@ -520,8 +520,6 @@ public class CommandClientImpl implements CommandClient, EventListener {
         }
 
         if (parts != null) { // Starts with valid prefix.
-//            if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
-
             if(useHelp && (parts[0].equalsIgnoreCase(helpWord) || parts[0].equalsIgnoreCase(helpWorldAlias))) {
                 CommandEvent cevent = new CommandEvent(event, parts[1]==null ? "" : parts[1], this);
                 if(listener!=null)

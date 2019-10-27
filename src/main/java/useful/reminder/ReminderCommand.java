@@ -7,6 +7,7 @@ import moderation.guild.GuildHandler;
 import moderation.toggle.Toggle;
 import moderation.user.User;
 import net.dv8tion.jda.core.Permission;
+import owner.blacklist.Blacklist;
 import servant.Log;
 import utilities.Constants;
 import utilities.Parser;
@@ -19,6 +20,7 @@ import java.sql.Timestamp;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeParseException;
+import java.util.concurrent.CompletableFuture;
 
 public class ReminderCommand extends Command {
     public ReminderCommand() {
@@ -38,76 +40,79 @@ public class ReminderCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        if (!Toggle.isEnabled(event, name)) return;
+        CompletableFuture.runAsync(() -> {
+            if (!Toggle.isEnabled(event, name)) return;
+            if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
 
-        var lang = LanguageHandler.getLanguage(event, name);
-        var p = GuildHandler.getPrefix(event, name);
+            var lang = LanguageHandler.getLanguage(event, name);
+            var p = GuildHandler.getPrefix(event, name);
 
-        if (event.getArgs().isEmpty()) {
+            if (event.getArgs().isEmpty()) {
+                try {
+                    var description = String.format(LanguageHandler.get(lang, "reminder_description"), p);
+                    var usage = String.format(LanguageHandler.get(lang, "reminder_usage"), p, name, p, name);
+                    var hint = LanguageHandler.get(lang, "reminder_hint");
+                    event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+                } catch (SQLException e) {
+                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
+                }
+                return;
+            }
+
+            if (event.getGuild() != null) event.getMessage().delete().queue();
+
+            var argsString = event.getArgs();
+            var args = argsString.split(" ");
+
+            if (args.length < 2) {
+                event.reply(LanguageHandler.get(lang, "reminder_missingargs"));
+                return;
+            }
+
             try {
-                var description = String.format(LanguageHandler.get(lang, "reminder_description"), p);
-                var usage = String.format(LanguageHandler.get(lang, "reminder_usage"), p, name, p, name);
-                var hint = LanguageHandler.get(lang, "reminder_hint");
-                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+                var date = args[0];
+                var time = args[1];
+                var offset = new User(event.getAuthor().getIdLong()).getOffset();
+                OffsetDateTime reminderDate;
+                try {
+                    reminderDate = OffsetDateTime.parse(date + "T" + time + offset);
+                } catch (DateTimeParseException e) {
+                    event.replyError(LanguageHandler.get(lang, "reminder_invalidinput"));
+                    return;
+                }
+
+                if (!reminderDate.isAfter(OffsetDateTime.now(ZoneId.of(offset)))) {
+                    event.replyError(LanguageHandler.get(lang, "reminder_past"));
+                    return;
+                }
+
+                var topic = new StringBuilder();
+                for (int i = 2; i < args.length; i++) topic.append(args[i]).append(" ");
+                if (topic.length() > 1000 || Parser.isSqlInjection(topic.toString())) {
+                    event.replyError(LanguageHandler.get(lang, "reminder_invalidtopic"));
+                    return;
+                }
+
+                var timestamp = Timestamp.from(reminderDate.toInstant());
+                var wasSet = Reminder.setReminder(event.getAuthor().getIdLong(), timestamp, topic.toString());
+                if (wasSet) event.replySuccess(LanguageHandler.get(lang, "reminder_success"));
+                else {
+                    event.replyError(LanguageHandler.get(lang, "reminder_fail"));
+                }
             } catch (SQLException e) {
                 new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
+            } catch (Exception e) {
+                event.reply(LanguageHandler.get(lang, "reminder_invalidinput"));
+                e.printStackTrace();
             }
-            return;
-        }
 
-        if (event.getGuild() != null) event.getMessage().delete().queue();
-
-        var argsString = event.getArgs();
-        var args = argsString.split(" ");
-
-        if (args.length < 2) {
-            event.reply(LanguageHandler.get(lang, "reminder_missingargs"));
-            return;
-        }
-
-        try {
-            var date = args[0];
-            var time = args[1];
-            var offset = new User(event.getAuthor().getIdLong()).getOffset();
-            OffsetDateTime reminderDate;
+            // Statistics.
             try {
-                reminderDate = OffsetDateTime.parse(date + "T" + time + offset);
-            } catch (DateTimeParseException e) {
-                event.replyError(LanguageHandler.get(lang, "reminder_invalidinput"));
-                return;
+                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
+                if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
+            } catch (SQLException e) {
+                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
             }
-
-            if (!reminderDate.isAfter(OffsetDateTime.now(ZoneId.of(offset)))) {
-                event.replyError(LanguageHandler.get(lang, "reminder_past"));
-                return;
-            }
-
-            var topic = new StringBuilder();
-            for (int i = 2; i < args.length; i++) topic.append(args[i]).append(" ");
-            if (topic.length() > 1000 || Parser.isSqlInjection(topic.toString())) {
-                event.replyError(LanguageHandler.get(lang, "reminder_invalidtopic"));
-                return;
-            }
-
-            var timestamp = Timestamp.from(reminderDate.toInstant());
-            var wasSet = Reminder.setReminder(event.getAuthor().getIdLong(), timestamp, topic.toString());
-            if (wasSet) event.replySuccess(LanguageHandler.get(lang, "reminder_success"));
-            else {
-                event.replyError(LanguageHandler.get(lang, "reminder_fail"));
-            }
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-        } catch (Exception e) {
-            event.reply(LanguageHandler.get(lang, "reminder_invalidinput"));
-            e.printStackTrace();
-        }
-
-        // Statistics.
-        try {
-            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-        }
+        });
     }
 }

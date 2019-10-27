@@ -25,6 +25,7 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 public class CreateEmbedCommand extends Command {
@@ -51,51 +52,53 @@ public class CreateEmbedCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        if (!Toggle.isEnabled(event, name)) return;
+        CompletableFuture.runAsync(() -> {
+            if (!Toggle.isEnabled(event, name)) return;
 
-        var author = event.getAuthor();
-        var internalAuthor = new moderation.user.User(author.getIdLong());
-        var eb = new EmbedBuilder();
+            var author = event.getAuthor();
+            var internalAuthor = new moderation.user.User(author.getIdLong());
+            var eb = new EmbedBuilder();
 
-        var lang = LanguageHandler.getLanguage(event, name);
+            var lang = LanguageHandler.getLanguage(event, name);
 
-        try {
-            eb.setColor(internalAuthor.getColor());
-        } catch (SQLException e) {
-            eb.setColor(Color.decode(Servant.config.getDefaultColorCode()));
-        }
-        eb.setAuthor(LanguageHandler.get(lang, "createembed_author_name"), "https://google.com/", author.getAvatarUrl());
-        eb.setThumbnail("https://i.imgur.com/wAcLhfY.png");
-        eb.setTitle(LanguageHandler.get(lang, "createembed_title"), "https://google.com/");
-        eb.setDescription(LanguageHandler.get(lang, "createembed_description"));
-        eb.addField(LanguageHandler.get(lang, "createembed_field_name_inline"), LanguageHandler.get(lang, "createembed_field_value1"), true);
-        eb.addField(LanguageHandler.get(lang, "createembed_field_name_inline"), LanguageHandler.get(lang, "createembed_field_value2"), true);
-        eb.addField(LanguageHandler.get(lang, "createembed_field_name_inline"), LanguageHandler.get(lang, "createembed_field_value3"), true);
-        eb.addField(LanguageHandler.get(lang, "createembed_field_name_noninline"), LanguageHandler.get(lang, "createembed_field_value_noninline"), false);
-        eb.setImage("https://i.imgur.com/9G46UQx.png");
-        eb.setFooter(LanguageHandler.get(lang, "createembed_footer"), event.getSelfUser().getAvatarUrl());
-        eb.setTimestamp(OffsetDateTime.now());
-
-
-        var channel = event.getChannel();
-        channel.sendMessage(eb.build()).queue(message -> {
-            EmbedUser embedUser;
             try {
-                embedUser = new EmbedUser(message, message.getEmbeds().get(0));
+                eb.setColor(internalAuthor.getColor());
             } catch (SQLException e) {
-                new Log(e, event.getGuild(), author, name, event).sendLog(true);
-                return;
+                eb.setColor(Color.decode(Servant.config.getDefaultColorCode()));
             }
-            processIntroduction(channel, author, embedUser, event, lang);
-        });
+            eb.setAuthor(LanguageHandler.get(lang, "createembed_author_name"), "https://google.com/", author.getAvatarUrl());
+            eb.setThumbnail("https://i.imgur.com/wAcLhfY.png");
+            eb.setTitle(LanguageHandler.get(lang, "createembed_title"), "https://google.com/");
+            eb.setDescription(LanguageHandler.get(lang, "createembed_description"));
+            eb.addField(LanguageHandler.get(lang, "createembed_field_name_inline"), LanguageHandler.get(lang, "createembed_field_value1"), true);
+            eb.addField(LanguageHandler.get(lang, "createembed_field_name_inline"), LanguageHandler.get(lang, "createembed_field_value2"), true);
+            eb.addField(LanguageHandler.get(lang, "createembed_field_name_inline"), LanguageHandler.get(lang, "createembed_field_value3"), true);
+            eb.addField(LanguageHandler.get(lang, "createembed_field_name_noninline"), LanguageHandler.get(lang, "createembed_field_value_noninline"), false);
+            eb.setImage("https://i.imgur.com/9G46UQx.png");
+            eb.setFooter(LanguageHandler.get(lang, "createembed_footer"), event.getSelfUser().getAvatarUrl());
+            eb.setTimestamp(OffsetDateTime.now());
 
-        // Statistics.
-        try {
-            new moderation.user.User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-        }
+
+            var channel = event.getChannel();
+            channel.sendMessage(eb.build()).queue(message -> {
+                EmbedUser embedUser;
+                try {
+                    embedUser = new EmbedUser(message, message.getEmbeds().get(0));
+                } catch (SQLException e) {
+                    new Log(e, event.getGuild(), author, name, event).sendLog(true);
+                    return;
+                }
+                processIntroduction(channel, author, embedUser, event, lang);
+            });
+
+            // Statistics.
+            try {
+                new moderation.user.User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
+                new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
+            } catch (SQLException e) {
+                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
+            }
+        });
     }
 
     // Timeout

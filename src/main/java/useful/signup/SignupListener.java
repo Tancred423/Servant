@@ -1,3 +1,4 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package useful.signup;
 
 import files.language.LanguageHandler;
@@ -15,37 +16,40 @@ import utilities.Emote;
 
 import java.awt.*;
 import java.sql.SQLException;
+import java.util.concurrent.CompletableFuture;
 
 public class SignupListener extends ListenerAdapter {
     public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {
-        if (event.getUser().isBot()) return;
-        if (!Toggle.isEnabled(event, "signup")) return;
+        CompletableFuture.runAsync(() -> {
+            if (event.getUser().isBot()) return;
+            if (!Toggle.isEnabled(event, "signup")) return;
 
-        var guild = event.getGuild();
-        var internalGuild = new Guild(guild.getIdLong());
-        var messageId = event.getMessageIdLong();
+            var guild = event.getGuild();
+            var internalGuild = new Guild(guild.getIdLong());
+            var messageId = event.getMessageIdLong();
 
-        try {
-            if (!internalGuild.isSignupMessage(messageId)) return;
-        } catch (SQLException e) {
-            new Log(e, guild, event.getUser(), "signup", null).sendLog(false);
-            return;
-        }
-
-        var forceEnd = false;
-        var endEmoji = Emote.getEmoji("end");
-        try {
-            if (!event.getReactionEmote().isEmote() && event.getReactionEmote().getName().equals(endEmoji)) {
-                if (event.getUser().getIdLong() != internalGuild.getSignupAuthorId(event.getMessageIdLong()))
-                    event.getReaction().removeReaction(event.getUser()).queue();
-                else forceEnd = true;
+            try {
+                if (!internalGuild.isSignupMessage(messageId)) return;
+            } catch (SQLException e) {
+                new Log(e, guild, event.getUser(), "signup", null).sendLog(false);
+                return;
             }
-        } catch (SQLException e) {
-            new Log(e, guild, event.getUser(), "signup", null).sendLog(false);
-            return;
-        }
-        var finalForceEnd = forceEnd;
-        event.getChannel().getMessageById(messageId).queue(message -> endSignup(internalGuild, messageId, message, guild, event.getUser(), finalForceEnd));
+
+            var forceEnd = false;
+            var endEmoji = Emote.getEmoji("end");
+            try {
+                if (!event.getReactionEmote().isEmote() && event.getReactionEmote().getName().equals(endEmoji)) {
+                    if (event.getUser().getIdLong() != internalGuild.getSignupAuthorId(event.getMessageIdLong()))
+                        event.getReaction().removeReaction(event.getUser()).queue();
+                    else forceEnd = true;
+                }
+            } catch (SQLException e) {
+                new Log(e, guild, event.getUser(), "signup", null).sendLog(false);
+                return;
+            }
+            var finalForceEnd = forceEnd;
+            event.getChannel().getMessageById(messageId).queue(message -> endSignup(internalGuild, messageId, message, guild, event.getUser(), finalForceEnd));
+        });
     }
 
     static void endSignup(Guild internalGuild, long messageId, Message message, net.dv8tion.jda.core.entities.Guild guild, net.dv8tion.jda.core.entities.User author, boolean forceEnd) {

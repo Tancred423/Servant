@@ -18,30 +18,34 @@ import java.awt.*;
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.concurrent.CompletableFuture;
 
 public class LeaveListener extends ListenerAdapter {
     public void onGuildMemberLeave(GuildMemberLeaveEvent event) {
-        if (!Toggle.isEnabled(event, "leave")) return;
-        String lang;
-        try {
-            lang = new Guild(event.getGuild().getIdLong()).getLanguage();
-        } catch (SQLException e) {
-            lang = Servant.config.getDefaultLanguage();
-        }
+        CompletableFuture.runAsync(() -> {
+            if (!Toggle.isEnabled(event, "leave")) return;
 
-        var leftUser = event.getUser();
-        var guild = event.getGuild();
-        var internalGuild = new moderation.guild.Guild(guild.getIdLong());
+            String lang;
+            try {
+                lang = new Guild(event.getGuild().getIdLong()).getLanguage();
+            } catch (SQLException e) {
+                lang = Servant.config.getDefaultLanguage();
+            }
 
-        MessageChannel channel;
-        try {
-            channel = internalGuild.getLeaveNotifierChannel();
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getUser(), "leave", null).sendLog(false);
-            return;
-        }
+            var leftUser = event.getUser();
+            var guild = event.getGuild();
+            var internalGuild = new moderation.guild.Guild(guild.getIdLong());
 
-        if (channel != null) channel.sendMessage(getEmbed(leftUser, guild, internalGuild, lang)).queue();
+            MessageChannel channel;
+            try {
+                channel = internalGuild.getLeaveNotifierChannel();
+            } catch (SQLException e) {
+                new Log(e, event.getGuild(), event.getUser(), "leave", null).sendLog(false);
+                return;
+            }
+
+            if (channel != null) channel.sendMessage(getEmbed(leftUser, guild, internalGuild, lang)).queue();
+        });
     }
 
     private MessageEmbed getEmbed(User leftUser, net.dv8tion.jda.core.entities.Guild guild, Guild internalGuild, String lang) {

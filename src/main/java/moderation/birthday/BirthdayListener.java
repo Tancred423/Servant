@@ -10,29 +10,34 @@ import servant.Log;
 import utilities.Time;
 
 import java.sql.SQLException;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class BirthdayListener extends ListenerAdapter {
     public void onGuildMessageDelete(GuildMessageDeleteEvent event) {
-        var guild = event.getGuild();
-        var internalGuild = new Guild(guild.getIdLong());
-        try {
-            if (internalGuild.getBirthdayMessageMessageId() == event.getMessageIdLong()) internalGuild.unsetBirthdayMessage();
-        } catch (SQLException e) {
-            new Log(e, guild, event.getJDA().getSelfUser(), "BirthdayListener - Message Delete", null).sendLog(false);
-        }
+        CompletableFuture.runAsync(() -> {
+            var guild = event.getGuild();
+            var internalGuild = new Guild(guild.getIdLong());
+            try {
+                if (internalGuild.getBirthdayMessageMessageId() == event.getMessageIdLong()) internalGuild.unsetBirthdayMessage();
+            } catch (SQLException e) {
+                new Log(e, guild, event.getJDA().getSelfUser(), "BirthdayListener - Message Delete", null).sendLog(false);
+            }
+        });
     }
 
     public void onGuildLeave(GuildLeaveEvent event) {
-        var guild = event.getGuild();
-        var internalGuild = new Guild(guild.getIdLong());
-        try {
-            internalGuild.purgeBirthday();
-        } catch (SQLException e) {
-            new Log(e, guild, event.getJDA().getSelfUser(), "BirthdayListener - Guild Leave", null).sendLog(false);
-        }
+        CompletableFuture.runAsync(() -> {
+            var guild = event.getGuild();
+            var internalGuild = new Guild(guild.getIdLong());
+            try {
+                internalGuild.purgeBirthday();
+            } catch (SQLException e) {
+                new Log(e, guild, event.getJDA().getSelfUser(), "BirthdayListener - Guild Leave", null).sendLog(false);
+            }
+        });
     }
 
     public void onReady(ReadyEvent event) {

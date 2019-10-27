@@ -1,40 +1,40 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package patreon;
 
-import moderation.toggle.Toggle;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberRoleAddEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
-import owner.blacklist.Blacklist;
-import servant.Log;
 
 import java.sql.SQLException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.concurrent.CompletableFuture;
 
 public class PatreonListener extends ListenerAdapter {
     public void onGuildMemberRoleAdd(GuildMemberRoleAddEvent event) {
-        if (event.getMember().getUser().isBot()) return;
-        if (event.getGuild().getIdLong() != 436925371577925642L) return;
+        CompletableFuture.runAsync(() -> {
+            if (event.getMember().getUser().isBot()) return;
+            if (event.getGuild().getIdLong() != 436925371577925642L) return;
 
-        switch (event.getRoles().get(0).getId()) {
-            case "489738762838867969": // Donation
-                sendPatreonNotification(event, "donation");
-                break;
-            case "502472440455233547": // $1
-                sendPatreonNotification(event, "$1");
-                break;
-            case "502472546600353796": // $3
-                sendPatreonNotification(event, "$3");
-                break;
-            case "502472823638458380": // $5
-                sendPatreonNotification(event, "$5");
-                break;
-            case "502472869234868224": // $10
-                sendPatreonNotification(event, "$10");
-                break;
-        }
+            switch (event.getRoles().get(0).getId()) {
+                case "489738762838867969": // Donation
+                    sendPatreonNotification(event, "donation");
+                    break;
+                case "502472440455233547": // $1
+                    sendPatreonNotification(event, "$1");
+                    break;
+                case "502472546600353796": // $3
+                    sendPatreonNotification(event, "$3");
+                    break;
+                case "502472823638458380": // $5
+                    sendPatreonNotification(event, "$5");
+                    break;
+                case "502472869234868224": // $10
+                    sendPatreonNotification(event, "$10");
+                    break;
+            }
+        });
     }
 
     private void sendPatreonNotification(GuildMemberRoleAddEvent event, String rank) {

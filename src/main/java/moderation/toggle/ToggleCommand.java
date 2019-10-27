@@ -6,6 +6,7 @@ import moderation.guild.GuildHandler;
 import moderation.user.User;
 import net.dv8tion.jda.core.Permission;
 import moderation.guild.Guild;
+import owner.blacklist.Blacklist;
 import servant.Log;
 import utilities.Constants;
 import utilities.UsageEmbed;
@@ -15,6 +16,7 @@ import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class ToggleCommand extends Command {
     public ToggleCommand() {
@@ -34,152 +36,156 @@ public class ToggleCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        var lang = LanguageHandler.getLanguage(event, name);
-        var p = GuildHandler.getPrefix(event, name);
+        CompletableFuture.runAsync(() -> {
+            if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
 
-        if (event.getArgs().isEmpty()) {
-            try {
-                var description = String.format(LanguageHandler.get(lang, "toggle_description"), p, name);
-                var usage = String.format(LanguageHandler.get(lang, "toggle_usage"), p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name);
-                var hint = LanguageHandler.get(lang, "toggle_hint");
+            var lang = LanguageHandler.getLanguage(event, name);
+            var p = GuildHandler.getPrefix(event, name);
 
-                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-            }
-            return;
-        }
-
-        List<String> validFeatures = new ArrayList<>(){{
-            // moderation
-            add("autorole");
-            add("birthday");
-            add("bestofimage");
-            add("bestofquote");
-            add("clear");
-            add("join");
-            add("leave");
-            add("levelrole");
-            add("livestream");
-            add("mediaonlychannel");
-            add("reactionrole");
-            add("role");
-            add("server");
-            add("setupwizard");
-            add("user");
-            add("voicelobby");
-
-            // information
-            add("botinfo");
-            add("ping");
-            add("serverinfo");
-
-            // useful
-            add("alarm");
-            add("giveaway");
-            add("quickvote");
-            add("reminder");
-            add("signup");
-            add("timezone");
-            add("vote");
-
-            // fun
-            add("avatar");
-            add("baguette");
-            add("bird");
-            add("cat");
-            add("coinflip");
-            add("createembed");
-            add("dog");
-            add("editembed");
-            add("flip");
-            add("level");
-            add("love");
-            add("profile");
-
-            // interaction
-            add("interaction");
-        }};
-
-        var args = event.getArgs().split(" ");
-        if (args.length < 2) {
-            event.reply(LanguageHandler.get(lang, "toggle_args"));
-            return;
-        }
-
-        var feature = getAlias(args[0]);
-        // Has to be improved. Redundant text.
-        if (feature == null) {
-            event.reply(LanguageHandler.get(lang, "toggle_invalid_feature"));
-            return;
-        } else if (!validFeatures.contains(feature) && !feature.equals("all")) {
-            event.reply(LanguageHandler.get(lang, "toggle_invalid_feature"));
-            return;
-        }
-
-        var arg1 = args[1].toLowerCase();
-        if (!arg1.equals("on") && !arg1.equals("off") && !arg1.equals("status") && !arg1.equals("show")) {
-            event.reply(LanguageHandler.get(lang, "toggle_invalid_argument"));
-            return;
-        }
-
-        var internalGuild = new Guild(event.getGuild().getIdLong());
-
-        if (arg1.equals("show") || arg1.equals("status")) {
-            if (feature.equals("all")) {
-                // Toggle Status All Features
-                var stringBuilder = new StringBuilder();
-                for (var validFeature : validFeatures) {
-                    try {
-                        var toggleStatus = internalGuild.getToggleStatus(validFeature);
-                        stringBuilder.append(validFeature).append(": ").append(toggleStatus ? "on" : "off").append("\n");
-                    } catch (SQLException e) {
-                        new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-                    }
-                }
-                event.reply(stringBuilder.toString());
-            } else {
-                // Toggle Status Single Feature
+            if (event.getArgs().isEmpty()) {
                 try {
-                    var toggleStatus = internalGuild.getToggleStatus(feature);
-                    event.reply(feature + "'s status: " + (toggleStatus ? "on" : "off"));
+                    var description = String.format(LanguageHandler.get(lang, "toggle_description"), p, name);
+                    var usage = String.format(LanguageHandler.get(lang, "toggle_usage"), p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name);
+                    var hint = LanguageHandler.get(lang, "toggle_hint");
+
+                    event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
                 } catch (SQLException e) {
                     new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                 }
+                return;
             }
-            return;
-        }
 
-        var statusBool = arg1.equals("on");
+            List<String> validFeatures = new ArrayList<>(){{
+                // moderation
+                add("autorole");
+                add("birthday");
+                add("bestofimage");
+                add("bestofquote");
+                add("clear");
+                add("join");
+                add("leave");
+                add("levelrole");
+                add("livestream");
+                add("mediaonlychannel");
+                add("reactionrole");
+                add("role");
+                add("server");
+                add("setupwizard");
+                add("user");
+                add("voicelobby");
 
-        if (feature.equals("all")) {
-            // Toggle all features.
-            for (var validFeature : validFeatures) {
+                // information
+                add("botinfo");
+                add("ping");
+                add("serverinfo");
+
+                // useful
+                add("alarm");
+                add("giveaway");
+                add("quickvote");
+                add("reminder");
+                add("signup");
+                add("timezone");
+                add("vote");
+
+                // fun
+                add("avatar");
+                add("baguette");
+                add("bird");
+                add("cat");
+                add("coinflip");
+                add("createembed");
+                add("dog");
+                add("editembed");
+                add("flip");
+                add("level");
+                add("love");
+                add("profile");
+
+                // interaction
+                add("interaction");
+            }};
+
+            var args = event.getArgs().split(" ");
+            if (args.length < 2) {
+                event.reply(LanguageHandler.get(lang, "toggle_args"));
+                return;
+            }
+
+            var feature = getAlias(args[0]);
+            // Has to be improved. Redundant text.
+            if (feature == null) {
+                event.reply(LanguageHandler.get(lang, "toggle_invalid_feature"));
+                return;
+            } else if (!validFeatures.contains(feature) && !feature.equals("all")) {
+                event.reply(LanguageHandler.get(lang, "toggle_invalid_feature"));
+                return;
+            }
+
+            var arg1 = args[1].toLowerCase();
+            if (!arg1.equals("on") && !arg1.equals("off") && !arg1.equals("status") && !arg1.equals("show")) {
+                event.reply(LanguageHandler.get(lang, "toggle_invalid_argument"));
+                return;
+            }
+
+            var internalGuild = new Guild(event.getGuild().getIdLong());
+
+            if (arg1.equals("show") || arg1.equals("status")) {
+                if (feature.equals("all")) {
+                    // Toggle Status All Features
+                    var stringBuilder = new StringBuilder();
+                    for (var validFeature : validFeatures) {
+                        try {
+                            var toggleStatus = internalGuild.getToggleStatus(validFeature);
+                            stringBuilder.append(validFeature).append(": ").append(toggleStatus ? "on" : "off").append("\n");
+                        } catch (SQLException e) {
+                            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
+                        }
+                    }
+                    event.reply(stringBuilder.toString());
+                } else {
+                    // Toggle Status Single Feature
+                    try {
+                        var toggleStatus = internalGuild.getToggleStatus(feature);
+                        event.reply(feature + "'s status: " + (toggleStatus ? "on" : "off"));
+                    } catch (SQLException e) {
+                        new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
+                    }
+                }
+                return;
+            }
+
+            var statusBool = arg1.equals("on");
+
+            if (feature.equals("all")) {
+                // Toggle all features.
+                for (var validFeature : validFeatures) {
+                    try {
+                        internalGuild.setToggleStatus(validFeature, statusBool);
+                    } catch (SQLException e) {
+                        new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
+                        return;
+                    }
+                }
+            } else {
+                // Toggle single feature.
                 try {
-                    internalGuild.setToggleStatus(validFeature, statusBool);
+                    internalGuild.setToggleStatus(feature, statusBool);
                 } catch (SQLException e) {
-                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
+                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                     return;
                 }
             }
-        } else {
-            // Toggle single feature.
-            try {
-                internalGuild.setToggleStatus(feature, statusBool);
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                return;
-            }
-        }
-        event.reactSuccess();
+            event.reactSuccess();
 
-        // Statistics.
-        try {
-            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-        }
+            // Statistics.
+            try {
+                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
+                if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
+            } catch (SQLException e) {
+                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
+            }
+        });
     }
 
     private String getAlias(String arg) {

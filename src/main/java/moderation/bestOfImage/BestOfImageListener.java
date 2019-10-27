@@ -18,6 +18,7 @@ import java.awt.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -25,135 +26,137 @@ public class BestOfImageListener extends ListenerAdapter {
     private static List<Long> temporaryBlacklist = new ArrayList<>();
 
     public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {
-        if (event.getUser().isBot()) return;
+        CompletableFuture.runAsync(() -> {
+            if (event.getUser().isBot()) return;
 
-        if (!Toggle.isEnabled(event, "bestOfImage")) return;
-//        if (Blacklist.isBlacklisted(event.getUser(), event.getGuild())) return;
+            if (!Toggle.isEnabled(event, "bestofimage")) return;
+            if (Blacklist.isBlacklisted(event.getUser(), event.getGuild())) return;
 
-        var messageId = event.getMessageIdLong();
+            var messageId = event.getMessageIdLong();
 
-        if (temporaryBlacklist.contains(messageId)) return;
-        temporaryBlacklist.add(messageId);
+            if (temporaryBlacklist.contains(messageId)) return;
+            temporaryBlacklist.add(messageId);
 
-        var internalGuild = new Guild(event.getGuild().getIdLong());
-        try {
-            if (internalGuild.bestOfImageIsBlacklisted(messageId)) {
-                temporaryBlacklist.remove(messageId);
-                return;
-            }
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getUser(), "bestOfImage", null).sendLog(false);
-            temporaryBlacklist.remove(messageId);
-            return;
-        }
-
-        event.getChannel().getMessageById(messageId).queue(message -> {
-            var attachments = message.getAttachments();
-            if (attachments.isEmpty()) {
-                temporaryBlacklist.remove(messageId);
-                return;
-            }
-            for (var attachment : attachments) if (!attachment.isImage()) {
-                temporaryBlacklist.remove(messageId);
-                return;
-            }
-
-            Emote voteEmote;
-            String voteEmoji;
+            var internalGuild = new Guild(event.getGuild().getIdLong());
             try {
-                voteEmote = internalGuild.getBestOfImageEmote();
-                voteEmoji = internalGuild.getBestOfImageEmoji();
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getUser(), "bestOfImage", null).sendLog(false);
-                temporaryBlacklist.remove(messageId);
-                return;
-            }
-
-            var reactionCount = 0;
-
-            var reactionEmote = event.getReactionEmote();
-            if (voteEmote != null) {
-                // Emote
-                if (reactionEmote.getEmote() == null) return;
-                if (!reactionEmote.getEmote().equals(voteEmote)) {
+                if (internalGuild.bestOfImageIsBlacklisted(messageId)) {
                     temporaryBlacklist.remove(messageId);
                     return;
                 }
-                var messageReactions = message.getReactions();
+            } catch (SQLException e) {
+                new Log(e, event.getGuild(), event.getUser(), "bestofimage", null).sendLog(false);
+                temporaryBlacklist.remove(messageId);
+                return;
+            }
 
-                for (var mr : messageReactions)
-                    if (mr.getReactionEmote().getEmote().equals(voteEmote)) {
-                        reactionCount = mr.getCount();
-                        break;
+            event.getChannel().getMessageById(messageId).queue(message -> {
+                var attachments = message.getAttachments();
+                if (attachments.isEmpty()) {
+                    temporaryBlacklist.remove(messageId);
+                    return;
+                }
+                for (var attachment : attachments) if (!attachment.isImage()) {
+                    temporaryBlacklist.remove(messageId);
+                    return;
+                }
+
+                Emote voteEmote;
+                String voteEmoji;
+                try {
+                    voteEmote = internalGuild.getBestOfImageEmote();
+                    voteEmoji = internalGuild.getBestOfImageEmoji();
+                } catch (SQLException e) {
+                    new Log(e, event.getGuild(), event.getUser(), "bestofimage", null).sendLog(false);
+                    temporaryBlacklist.remove(messageId);
+                    return;
+                }
+
+                var reactionCount = 0;
+
+                var reactionEmote = event.getReactionEmote();
+                if (voteEmote != null) {
+                    // Emote
+                    if (reactionEmote.getEmote() == null) return;
+                    if (!reactionEmote.getEmote().equals(voteEmote)) {
+                        temporaryBlacklist.remove(messageId);
+                        return;
                     }
-                if (reactionCount == 0) {
-                    temporaryBlacklist.remove(messageId);
-                    return;
-                }
-            } else if (voteEmoji != null) {
-                // Emoji
-                if (!reactionEmote.getName().equals(voteEmoji)) {
-                    temporaryBlacklist.remove(messageId);
-                    return;
-                }
-                var messageReactions = message.getReactions();
+                    var messageReactions = message.getReactions();
 
-                for (var mr : messageReactions)
-                    if (mr.getReactionEmote().getName().equals(voteEmoji)) {
-                        reactionCount = mr.getCount();
-                        break;
+                    for (var mr : messageReactions)
+                        if (mr.getReactionEmote().getEmote().equals(voteEmote)) {
+                            reactionCount = mr.getCount();
+                            break;
+                        }
+                    if (reactionCount == 0) {
+                        temporaryBlacklist.remove(messageId);
+                        return;
                     }
-                if (reactionCount == 0) {
+                } else if (voteEmoji != null) {
+                    // Emoji
+                    if (!reactionEmote.getName().equals(voteEmoji)) {
+                        temporaryBlacklist.remove(messageId);
+                        return;
+                    }
+                    var messageReactions = message.getReactions();
+
+                    for (var mr : messageReactions)
+                        if (mr.getReactionEmote().getName().equals(voteEmoji)) {
+                            reactionCount = mr.getCount();
+                            break;
+                        }
+                    if (reactionCount == 0) {
+                        temporaryBlacklist.remove(messageId);
+                        return;
+                    }
+                } else {
                     temporaryBlacklist.remove(messageId);
                     return;
                 }
-            } else {
+
+                int number;
+                int percentage;
+                try {
+                    number = internalGuild.getBestOfImageNumber();
+                    percentage = internalGuild.getBestOfImagePercentage();
+                } catch (SQLException e) {
+                    new Log(e, event.getGuild(), event.getUser(), "bestofimage", null).sendLog(false);
+                    temporaryBlacklist.remove(messageId);
+                    return;
+                }
+
+                var onlineMemberCount = 0;
+                var members = event.getGuild().getMembers();
+                for (var member : members) if (member.getOnlineStatus() == OnlineStatus.ONLINE) onlineMemberCount++;
+                var onlineMemberPercentage = (int) Math.ceil(onlineMemberCount * percentage / 100.0);
+
+                String lang;
+                try {
+                    lang = new Guild(event.getGuild().getIdLong()).getLanguage();
+                } catch (SQLException e) {
+                    lang = Servant.config.getDefaultLanguage();
+                }
+
+                if (number != 0 && percentage != 0) {
+                    if (reactionCount >= number && reactionCount >= onlineMemberPercentage)
+                        sendBestOf(event, reactionCount, attachments, lang);
+                    else temporaryBlacklist.remove(messageId);
+                } else if (number != 0) {
+                    if (reactionCount >= number)
+                        sendBestOf(event, reactionCount, attachments, lang);
+                    else temporaryBlacklist.remove(messageId);
+                } else if (percentage != 0) {
+                    if (reactionCount >= onlineMemberPercentage)
+                        sendBestOf(event, reactionCount, attachments, lang);
+                    else temporaryBlacklist.remove(messageId);
+                } else temporaryBlacklist.remove(messageId);
+            });
+
+            final var executor = new ScheduledThreadPoolExecutor(1);
+            executor.schedule(() -> {
                 temporaryBlacklist.remove(messageId);
-                return;
-            }
-
-            int number;
-            int percentage;
-            try {
-                number = internalGuild.getBestOfImageNumber();
-                percentage = internalGuild.getBestOfImagePercentage();
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getUser(), "bestOfImage", null).sendLog(false);
-                temporaryBlacklist.remove(messageId);
-                return;
-            }
-
-            var onlineMemberCount = 0;
-            var members = event.getGuild().getMembers();
-            for (var member : members) if (member.getOnlineStatus() == OnlineStatus.ONLINE) onlineMemberCount++;
-            var onlineMemberPercentage = (int) Math.ceil(onlineMemberCount * percentage / 100.0);
-
-            String lang;
-            try {
-                lang = new Guild(event.getGuild().getIdLong()).getLanguage();
-            } catch (SQLException e) {
-                lang = Servant.config.getDefaultLanguage();
-            }
-
-            if (number != 0 && percentage != 0) {
-                if (reactionCount >= number && reactionCount >= onlineMemberPercentage)
-                    sendBestOf(event, reactionCount, attachments, lang);
-                else temporaryBlacklist.remove(messageId);
-            } else if (number != 0) {
-                if (reactionCount >= number)
-                    sendBestOf(event, reactionCount, attachments, lang);
-                else temporaryBlacklist.remove(messageId);
-            } else if (percentage != 0) {
-                if (reactionCount >= onlineMemberPercentage)
-                    sendBestOf(event, reactionCount, attachments, lang);
-                else temporaryBlacklist.remove(messageId);
-            } else temporaryBlacklist.remove(messageId);
+            }, 10, TimeUnit.SECONDS);
         });
-
-        final var executor = new ScheduledThreadPoolExecutor(1);
-        executor.schedule(() -> {
-            temporaryBlacklist.remove(messageId);
-        }, 10, TimeUnit.SECONDS);
     }
 
     private static void sendBestOf(GuildMessageReactionAddEvent event, int reactionCount, List<Message.Attachment> attachmentList, String lang) {
@@ -183,7 +186,7 @@ public class BestOfImageListener extends ListenerAdapter {
                     internalGuild.addBestOfImageBlacklist(event.getMessageIdLong());
                 }
             } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getUser(), "bestOfImage", null).sendLog(false);
+                new Log(e, event.getGuild(), event.getUser(), "bestofimage", null).sendLog(false);
             }
         });
     }
