@@ -42,15 +42,9 @@ public class VoteEndListener extends ListenerAdapter {
             }
 
             var reactionEmote = event.getReactionEmote();
-            if (reactionEmote.isEmote()) {
-                try {
-                    if (!reactionEmote.getEmote().equals(Emote.getEmote("end"))) return; // Has to be the end emote ...
-                } catch (SQLException e) {
-                    return;
-                }
-            } else {
-                if (!reactionEmote.getName().equals(Emote.getEmoji("end"))) return; // ... or the end emoji.
-            }
+            if (!reactionEmote.isEmote()) {
+                if (!reactionEmote.getName().equals(Emote.getEmoji("end"))) return;
+            } else return;
 
             try {
                 if (user.getIdLong() != VotesDatabase.getAuthorId(messageId)) return; // Has to be done by author.

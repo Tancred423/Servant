@@ -2,7 +2,7 @@
 package utilities;
 
 public class Constants {
-    final public static String VERSION = "4.26.1";
+    final public static String VERSION = "4.26.2";
 
     // in seconds
     final public static int USER_COOLDOWN = 3;

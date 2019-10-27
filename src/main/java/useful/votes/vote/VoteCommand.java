@@ -37,8 +37,8 @@ public class VoteCommand extends Command {
     private String decline = "❌";
 
     public VoteCommand(EventWaiter waiter) {
-        this.name = "vote";
-        this.aliases = new String[]{"v"};
+        this.name = "poll";
+        this.aliases = new String[]{"vote"};
         this.help = "Host a voting.";
         this.category = new Category("Useful");
         this.arguments = null;
@@ -140,9 +140,7 @@ public class VoteCommand extends Command {
                     for (int i = 0; i < answers.size(); i++) message.addReaction(emoji[i]).queue();
                     net.dv8tion.jda.core.entities.Emote end;
 
-                    end = Emote.getEmote("end");
-                    if (end == null) message.addReaction(Emote.getEmoji("end")).queue();
-                    else message.addReaction(end).queue();
+                    message.addReaction(Emote.getEmoji("end")).queue();
                 } catch (SQLException e) {
                     new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                 }

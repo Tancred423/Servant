@@ -28,20 +28,10 @@ public class QuickvoteMultipleVoteListener extends ListenerAdapter {
 
             // Just react to Upvote, Shrug and Downvote.
             var reactionEmote = event.getReactionEmote();
-            if (reactionEmote.isEmote()) {
-                try {
-                    if (!reactionEmote.getEmote().equals(Emote.getEmote("upvote"))
-                            && !reactionEmote.getEmote().equals(Emote.getEmote("shrug"))
-                            && !reactionEmote.getEmote().equals(Emote.getEmote("downvote"))
-                    ) return;
-                } catch (SQLException e) {
-                    return;
-                }
-            } else {
-                if (!reactionEmote.getName().equals(Emote.getEmoji("upvote"))
-                        && !reactionEmote.getName().equals(Emote.getEmoji("shrug"))
-                        && !reactionEmote.getName().equals(Emote.getEmoji("downvote"))) return;
-            }
+            if (!reactionEmote.getName().equals(Emote.getEmoji("upvote"))
+                    && !reactionEmote.getName().equals(Emote.getEmoji("shrug"))
+                    && !reactionEmote.getName().equals(Emote.getEmoji("downvote"))) return;
+
 
             event.getChannel().getMessageById(messageId).queue(message -> {
                 var userId = user.getIdLong();
@@ -69,37 +59,18 @@ public class QuickvoteMultipleVoteListener extends ListenerAdapter {
 
             // Just react to Upvote, Shrug and Downvote.
             var reactionEmote = event.getReactionEmote();
-            if (reactionEmote.isEmote()) {
-                try {
-                    if (!reactionEmote.getEmote().equals(Emote.getEmote("upvote"))
-                            && !reactionEmote.getEmote().equals(Emote.getEmote("shrug"))
-                            && !reactionEmote.getEmote().equals(Emote.getEmote("downvote"))
-                    ) return;
-                } catch (SQLException e) {
-                    return;
-                }
-            } else {
-                if (!reactionEmote.getName().equals(Emote.getEmoji("upvote"))
-                        && !reactionEmote.getName().equals(Emote.getEmoji("shrug"))
-                        && !reactionEmote.getName().equals(Emote.getEmoji("downvote"))
-                ) return;
-            }
+            if (!reactionEmote.getName().equals(Emote.getEmoji("upvote"))
+                    && !reactionEmote.getName().equals(Emote.getEmoji("shrug"))
+                    && !reactionEmote.getName().equals(Emote.getEmoji("downvote")))
+                return;
+
 
             event.getChannel().getMessageById(messageId).queue(message -> {
-                if (reactionEmote.isEmote()) {
-                    try {
-                        if (reactionEmote.getEmote().getIdLong() == VotesDatabase.getVoteEmoteId(messageId, user.getIdLong()))
-                            unsetVote(messageId, user);
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    try {
-                        if (reactionEmote.getName().equals(VotesDatabase.getVoteEmoji(messageId, user.getIdLong())))
-                            unsetVote(messageId, user);
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
+                try {
+                    if (reactionEmote.getName().equals(VotesDatabase.getVoteEmoji(messageId, user.getIdLong())))
+                        unsetVote(messageId, user);
+                } catch (SQLException e) {
+                    e.printStackTrace();
                 }
             });
         });

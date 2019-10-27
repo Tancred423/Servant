@@ -24,9 +24,9 @@ import java.util.concurrent.CompletableFuture;
 
 public class QuickvoteCommand extends Command {
     public QuickvoteCommand() {
-        this.name = "quickvote";
-        this.aliases = new String[]{"qv"};
-        this.help = "Smol vote with yes/shrug/no.";
+        this.name = "quickpoll";
+        this.aliases = new String[]{"quickvote"};
+        this.help = "Smol poll with yes/no.";
         this.category = new Category("Useful");
         this.arguments = "[optional text]";
         this.hidden = false;
@@ -66,43 +66,10 @@ public class QuickvoteCommand extends Command {
             }
             message.getChannel().sendMessage(eb.build()).queue(sentMessage -> {
                 try {
-                    var upvoteEmote     = Emote.getEmote("upvote");
-                    var shrugEmote      = Emote.getEmote("shrug");
-                    var downvoteEmote   = Emote.getEmote("downvote");
-                    var endEmote        = Emote.getEmote("end");
-
-                    var upvoteEmoji     = Emote.getEmoji("upvote");
-                    var shrugEmoji      = Emote.getEmoji("shrug");
-                    var downvoteEmoji   = Emote.getEmoji("downvote");
-                    var endEmoji        = Emote.getEmoji("end");
-
-                    if (upvoteEmote != null && shrugEmote != null && downvoteEmote != null) {
-                        sentMessage.addReaction(upvoteEmote).queue();
-                        sentMessage.addReaction(shrugEmote).queue();
-                        sentMessage.addReaction(downvoteEmote).queue();
-                        sentMessage.addReaction(endEmote).queue();
-                        VotesDatabase.setVote(sentMessage.getIdLong(), author.getIdLong(), "quick");
-                    } else if (upvoteEmoji != null && shrugEmoji != null && downvoteEmoji != null) {
-                        sentMessage.addReaction(upvoteEmoji).queue();
-                        sentMessage.addReaction(shrugEmoji).queue();
-                        sentMessage.addReaction(downvoteEmoji).queue();
-                        sentMessage.addReaction(endEmoji).queue();
-                        VotesDatabase.setVote(sentMessage.getIdLong(), author.getIdLong(), "quick");
-                    } else {
-                        event.reactError();
-                        event.reply(LanguageHandler.get(lang, "votes_emote_fail"));
-                        event.getJDA().getUserById(Servant.config.getBotOwnerId()).openPrivateChannel().queue(privateChannel ->
-                                privateChannel.sendMessage(LanguageHandler.get(lang, "quickvote_emote_dm") + "\n" +
-                                        (upvoteEmote    == null ? "upvote (Emote)\n"    : "") +
-                                        (upvoteEmoji    == null ? "upvote (Emoji)\n"    : "") +
-                                        (shrugEmote     == null ? "shrug (Emote)\n"     : "") +
-                                        (shrugEmoji     == null ? "shrug (Emoji)\n"     : "") +
-                                        (downvoteEmote  == null ? "downvote (Emote)\n"  : "") +
-                                        (downvoteEmoji  == null ? "downvote (Emoji)\n"  : "") +
-                                        (endEmote       == null ? "end (Emote)\n"       : "") +
-                                        (endEmoji       == null ? "end (Emoji)\n"       : "")
-                                ).queue());
-                    }
+                    sentMessage.addReaction(Emote.getEmoji("upvote")).queue();
+                    sentMessage.addReaction(Emote.getEmoji("downvote")).queue();
+                    sentMessage.addReaction(Emote.getEmoji("end")).queue();
+                    VotesDatabase.setVote(sentMessage.getIdLong(), author.getIdLong(), "quick");
                 } catch (SQLException e) {
                     new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                 }

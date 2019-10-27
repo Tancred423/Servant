@@ -800,25 +800,23 @@ public class LanguageFile {
         en_gb.setProperty("timezone_invalid", "Invalid input. Check your formatting.");
 
         // Votes
-        en_gb.setProperty("votes_emote_fail", "It's not your fault, master! I cannot find the correct emotes. I'll let my mediator know...");
-        en_gb.setProperty("votes_active", "This vote is active.");
-        en_gb.setProperty("votes_inactive", "This vote has ended.");
+        en_gb.setProperty("votes_active", "This poll is active.");
+        en_gb.setProperty("votes_inactive", "This poll has ended.");
 
         /// Quickvote
-        en_gb.setProperty("quickvote_started", "%s started a quickvote!");
-        en_gb.setProperty("quickvote_ended", "%s has ended the quickvote!");
-        en_gb.setProperty("quickvote_emote_dm", "Greetings mediator! I was not able to pull of a quickvote as I am missing the following emotes:");
+        en_gb.setProperty("quickvote_started", "%s started a quickpoll!");
+        en_gb.setProperty("quickvote_ended", "%s has ended the quickpoll!");
         en_gb.setProperty("quickvote_missing_db", "Greetings mediator! I couldn't remove a succesful quickvote ending from the database.");
 
         /// Vote
-        en_gb.setProperty("vote_description", "Create a vote with up to 10 custom answers.");
+        en_gb.setProperty("vote_description", "Create a poll with up to 10 custom answers.");
         en_gb.setProperty("vote_usage", "Command: `%s%s [question]/[answer1]/(...)/[answer10]`\n" +
                 "Example: `%s%s When do you have time?/Mon/Tue/Wed/Thu/Fri/Sat/Sun`");
         en_gb.setProperty("vote_hint", "After executing this command, you will be asked if you want to allow multiple answers.");
         en_gb.setProperty("vote_amount", "Invalid amount of arguments. There has to be at least one answer to your question and a maximum of 10 answers.");
         en_gb.setProperty("vote_timeout", "Timeout! You didn't react on my question.");
-        en_gb.setProperty("vote_started", "%s started a vote!");
-        en_gb.setProperty("vote_ended", "%s has ended the vote!");
+        en_gb.setProperty("vote_started", "%s started a poll!");
+        en_gb.setProperty("vote_ended", "%s has ended the poll!");
         en_gb.setProperty("vote_missing_db", "Greetings mediator! I couldn't remove a succesful vote ending from the database.");
 
         // Fun
@@ -1788,25 +1786,23 @@ public class LanguageFile {
         de_de.setProperty("timezone_invalid", "Invalid input. Check your formatting.");
 
         // Votes
-        de_de.setProperty("votes_emote_fail", "It's not your fault, master! I cannot find the correct emotes. I'll let my mediator know...");
-        de_de.setProperty("votes_active", "This vote is active.");
-        de_de.setProperty("votes_inactive", "This vote has ended.");
+        de_de.setProperty("votes_active", "This poll is active.");
+        de_de.setProperty("votes_inactive", "This poll has ended.");
 
         /// Quickvote
-        de_de.setProperty("quickvote_started", "%s started a quickvote!");
-        de_de.setProperty("quickvote_ended", "%s has ended the quickvote!");
-        de_de.setProperty("quickvote_emote_dm", "Greetings mediator! I was not able to pull of a quickvote as I am missing the following emotes:");
+        de_de.setProperty("quickvote_started", "%s started a quickpoll!");
+        de_de.setProperty("quickvote_ended", "%s has ended the quickpoll!");
         de_de.setProperty("quickvote_missing_db", "Greetings mediator! I couldn't remove a succesful quickvote ending from the database.");
 
         /// Vote
-        de_de.setProperty("vote_description", "Create a vote with up to 10 custom answers.");
+        de_de.setProperty("vote_description", "Create a poll with up to 10 custom answers.");
         de_de.setProperty("vote_usage", "Command: `%s%s [question]/[answer1]/(...)/[answer10]`\n" +
                 "Example: `%s%s When do you have time?/Mon/Tue/Wed/Thu/Fri/Sat/Sun`");
         de_de.setProperty("vote_hint", "After executing this command, you will be asked if you want to allow multiple answers.");
         de_de.setProperty("vote_amount", "Invalid amount of arguments. There has to be at least one answer to your question and a maximum of 10 answers.");
         de_de.setProperty("vote_timeout", "Timeout! You didn't react on my question.");
-        de_de.setProperty("vote_started", "%s started a vote!");
-        de_de.setProperty("vote_ended", "%s has ended the vote!");
+        de_de.setProperty("vote_started", "%s started a poll!");
+        de_de.setProperty("vote_ended", "%s has ended the poll!");
         de_de.setProperty("vote_missing_db", "Greetings mediator! I couldn't remove a succesful vote ending from the database.");
 
         // Fun

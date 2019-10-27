@@ -60,37 +60,16 @@ public class QuickvoteEndListener extends ListenerAdapter {
             // The author has reacted with an ending emote on their quickvote.
             event.getChannel().getMessageById(messageId).queue(message -> {
                 var upvoteCount = 0;
-                var shrugCount = 0;
                 var downvoteCount = 0;
 
-                net.dv8tion.jda.core.entities.Emote upvoteEmote;
-                net.dv8tion.jda.core.entities.Emote shrugEmote;
-                net.dv8tion.jda.core.entities.Emote downvoteEmote;
-                try {
-                    upvoteEmote = Emote.getEmote("upvote");
-                    shrugEmote = Emote.getEmote("shrug");
-                    downvoteEmote = Emote.getEmote("downvote");
-                } catch (SQLException e) {
-                    return;
-                }
-
                 var upvoteEmoji = Emote.getEmoji("upvote");
-                var shrugEmoji = Emote.getEmoji("shrug");
                 var downvoteEmoji = Emote.getEmoji("downvote");
 
                 var reactions = message.getReactions();
                 for (var reaction : reactions) {
                     var emote = reaction.getReactionEmote();
-
-                    if (emote.isEmote()) {
-                        if (emote.getEmote().equals(upvoteEmote)) upvoteCount = reaction.getCount() - 1;
-                        if (emote.getEmote().equals(shrugEmote)) shrugCount = reaction.getCount() - 1;
-                        if (emote.getEmote().equals(downvoteEmote)) downvoteCount = reaction.getCount() - 1;
-                    } else {
-                        if (emote.getName().equals(upvoteEmoji)) upvoteCount = reaction.getCount() - 1;
-                        if (emote.getName().equals(shrugEmoji)) shrugCount = reaction.getCount() - 1;
-                        if (emote.getName().equals(downvoteEmoji)) downvoteCount = reaction.getCount() - 1;
-                    }
+                    if (emote.getName().equals(upvoteEmoji)) upvoteCount = reaction.getCount() - 1;
+                    if (emote.getName().equals(downvoteEmoji)) downvoteCount = reaction.getCount() - 1;
                 }
 
                 var messageEmbed = message.getEmbeds().get(0);
@@ -98,9 +77,8 @@ public class QuickvoteEndListener extends ListenerAdapter {
                 eb.setColor(messageEmbed.getColor());
                 eb.setAuthor(String.format(LanguageHandler.get(lang, "quickvote_ended"), user.getName()), null, messageEmbed.getAuthor().getIconUrl());
                 eb.setDescription(messageEmbed.getDescription());
-                eb.addField((upvoteEmote != null ? upvoteEmote.getAsMention() : upvoteEmoji), String.valueOf(upvoteCount), true);
-                eb.addField((shrugEmote != null ? shrugEmote.getAsMention() : shrugEmoji), String.valueOf(shrugCount), true);
-                eb.addField((downvoteEmote != null ? downvoteEmote.getAsMention() : downvoteEmoji), String.valueOf(downvoteCount), true);
+                eb.addField(upvoteEmoji, String.valueOf(upvoteCount), true);
+                eb.addField(downvoteEmoji, String.valueOf(downvoteCount), true);
                 eb.setFooter(LanguageHandler.get(lang, "votes_inactive"), event.getJDA().getSelfUser().getAvatarUrl());
                 try {
                     eb.setTimestamp(OffsetDateTime.now(ZoneId.of(new Guild(event.getGuild().getIdLong()).getOffset())));
