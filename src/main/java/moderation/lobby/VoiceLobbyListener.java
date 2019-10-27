@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 public class VoiceLobbyListener extends ListenerAdapter {
     private List<VoiceChannel> active = new ArrayList<>();
+
     private String getLobbyName(Member member, String lang) {
         return "⤷ " + member.getEffectiveName() +
                 (member.getEffectiveName().toLowerCase().endsWith("s") ?

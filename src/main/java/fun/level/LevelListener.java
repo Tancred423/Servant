@@ -157,14 +157,14 @@ public class LevelListener extends ListenerAdapter {
         var message = event.getMessage();
 
         if (level >= 10) {
-            if (!internalAuthor.hasAchievement("level10")) {
+            if (!internalAuthor.hasAchievement("level10") && !hasHigherLevelAchievement(internalAuthor, level)) {
                 internalAuthor.setAchievement("level10", 10);
                 new MessageHandler().reactAchievement(message);
             }
         }
 
         if (level >= 20) {
-            if (!internalAuthor.hasAchievement("level20")) {
+            if (!internalAuthor.hasAchievement("level20") && !hasHigherLevelAchievement(internalAuthor, level)) {
                 internalAuthor.setAchievement("level20", 20);
                 internalAuthor.unsetAchievement("level10");
                 new MessageHandler().reactAchievement(message);
@@ -172,7 +172,7 @@ public class LevelListener extends ListenerAdapter {
         }
 
         if (level >= 30) {
-            if (!internalAuthor.hasAchievement("level30")) {
+            if (!internalAuthor.hasAchievement("level30") && !hasHigherLevelAchievement(internalAuthor, level)) {
                 internalAuthor.setAchievement("level30", 30);
                 internalAuthor.unsetAchievement("level20");
                 new MessageHandler().reactAchievement(message);
@@ -180,7 +180,7 @@ public class LevelListener extends ListenerAdapter {
         }
 
         if (level >= 40) {
-            if (!internalAuthor.hasAchievement("level40")) {
+            if (!internalAuthor.hasAchievement("level40") && !hasHigherLevelAchievement(internalAuthor, level)) {
                 internalAuthor.setAchievement("level40", 40);
                 internalAuthor.unsetAchievement("level30");
                 new MessageHandler().reactAchievement(message);
@@ -188,7 +188,7 @@ public class LevelListener extends ListenerAdapter {
         }
 
         if (level >= 50) {
-            if (!internalAuthor.hasAchievement("level50")) {
+            if (!internalAuthor.hasAchievement("level50") && !hasHigherLevelAchievement(internalAuthor, level)) {
                 internalAuthor.setAchievement("level50", 50);
                 internalAuthor.unsetAchievement("level40");
                 new MessageHandler().reactAchievement(message);
@@ -196,7 +196,7 @@ public class LevelListener extends ListenerAdapter {
         }
 
         if (level >= 60) {
-            if (!internalAuthor.hasAchievement("level60")) {
+            if (!internalAuthor.hasAchievement("level60") && !hasHigherLevelAchievement(internalAuthor, level)) {
                 internalAuthor.setAchievement("level60", 60);
                 internalAuthor.unsetAchievement("level50");
                 new MessageHandler().reactAchievement(message);
@@ -204,7 +204,7 @@ public class LevelListener extends ListenerAdapter {
         }
 
         if (level >= 69) {
-            if (!internalAuthor.hasAchievement("level69")) {
+            if (!internalAuthor.hasAchievement("level69") && !hasHigherLevelAchievement(internalAuthor, level)) {
                 internalAuthor.setAchievement("level69", 69);
                 new MessageHandler().reactAchievement(message);
             }
@@ -241,5 +241,19 @@ public class LevelListener extends ListenerAdapter {
                 new MessageHandler().reactAchievement(message);
             }
         }
+    }
+
+    private boolean hasHigherLevelAchievement(moderation.user.User internalUser, int level) throws SQLException {
+        var achievements = internalUser.getLevelAchievements();
+        String highestLevelAchievement = null;
+        for (var achievement : achievements) {
+            highestLevelAchievement = achievement;
+            if (!highestLevelAchievement.equals("level69")) break;
+        }
+
+        if (highestLevelAchievement != null) {
+            int highestLevel = Integer.parseInt(highestLevelAchievement.substring(5));
+            return level > highestLevel;
+        } else return false;
     }
 }
