@@ -8,6 +8,7 @@ import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import useful.giveaway.Giveaway;
+import useful.signup.Signup;
 import utilities.Constants;
 
 import java.sql.Connection;
@@ -35,8 +36,14 @@ public class ReadyListener extends ListenerAdapter {
 
         setPresence();
         checkGiveaways(event.getJDA());
+        checkSignups(event.getJDA());
 
         System.out.println(event.getJDA().getSelfUser().getName() + " ready.");
+    }
+
+    private void checkSignups(JDA jda) {
+        var service = Executors.newSingleThreadScheduledExecutor();
+        service.scheduleAtFixedRate(() -> Signup.checkSignups(jda), 0, 6 * 60, TimeUnit.MINUTES); // 6h
     }
 
     private void checkGiveaways(JDA jda) {

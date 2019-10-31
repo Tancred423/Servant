@@ -16,6 +16,7 @@ import utilities.UsageEmbed;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
+import java.sql.Timestamp;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.concurrent.CompletableFuture;
@@ -90,26 +91,14 @@ public class SignupCommand extends Command {
             eb.setTitle(String.format(LanguageHandler.get(lang, "signup_embedtitle"), (title.isEmpty() ? "" : "for"), title));
             eb.setDescription(String.format(LanguageHandler.get(lang, "signup_embeddescription"), amount, Emote.getEmoji("upvote")));
             eb.setFooter(LanguageHandler.get(lang, "signup_timeout"), Image.getImageUrl("clock", guild, author));
-            var now = ZonedDateTime.now(ZoneOffset.of(new Guild(event.getGuild().getIdLong()).getOffset(guild, author)));
-            eb.setTimestamp(now.toInstant().plusMillis(Constants.SIGNUP_TIMEOUT));
+            var internalGuild = new Guild(event.getGuild().getIdLong());
+            var expiration = ZonedDateTime.now(ZoneOffset.of(internalGuild.getOffset(guild, author))).plusDays(7);
+            eb.setTimestamp(expiration.toInstant());
 
             event.getChannel().sendMessage(eb.build()).queue(sentMessage -> {
                 sentMessage.addReaction(Emote.getEmoji("upvote")).queue();
                 sentMessage.addReaction(Emote.getEmoji("end")).queue();
-                var internalGuild = new Guild(event.getGuild().getIdLong());
-
-                internalGuild.setSignup(sentMessage.getIdLong(), author.getIdLong(), amount, title, guild, author);
-
-                new java.util.Timer().schedule(
-                        new java.util.TimerTask() {
-                            @Override
-                            public void run() {
-                                var guild = event.getGuild();
-                                var internalGuild = new Guild(guild.getIdLong());
-                                SignupListener.endSignup(internalGuild, sentMessage.getIdLong(), sentMessage, guild, author, true);
-                            }
-                        }, Constants.SIGNUP_TIMEOUT
-                );
+                internalGuild.setSignup(sentMessage.getIdLong(), author.getIdLong(), amount, title, Timestamp.valueOf(expiration.toLocalDateTime()), sentMessage.getChannel().getIdLong(), guild, author);
             });
 
             // Statistics.

@@ -87,6 +87,11 @@ public class EditEmbedCommand extends Command {
                 return;
             }
 
+            if (!mentionedChannel.canTalk(event.getGuild().getMember(event.getAuthor()))) {
+                event.replyError(LanguageHandler.get(lang, "editembed_missingpermission"));
+                return;
+            }
+
             mentionedChannel.getMessageById(messageId).queue(embedMessage -> {
                 if (!embedMessage.getAuthor().equals(event.getSelfUser())) {
                     event.reactError();

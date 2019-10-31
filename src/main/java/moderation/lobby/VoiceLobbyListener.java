@@ -12,14 +12,11 @@ import net.dv8tion.jda.core.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceMoveEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedList;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 public class VoiceLobbyListener extends ListenerAdapter {
-    private List<VoiceChannel> active = new ArrayList<>();
-
     private String getLobbyName(Member member, String lang) {
         return "⤷ " + member.getEffectiveName() +
                 (member.getEffectiveName().toLowerCase().endsWith("s") ?
@@ -49,13 +46,21 @@ public class VoiceLobbyListener extends ListenerAdapter {
 
                 guild.getController().modifyVoiceChannelPositions().selectPosition(newChannel).moveTo(channel.getPosition() + 1).complete();
                 guild.getController().moveVoiceMember(member, newChannel).complete();
-                active.add(newChannel);
+                internalGuild.setActiveLobby(newChannel.getIdLong(), guild, user);
             }
 
             try {
-                TimeUnit.MILLISECONDS.sleep(2500);
+                TimeUnit.MILLISECONDS.sleep(2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
+            }
+
+            var activeIds = internalGuild.getActiveLobbies(guild, user);
+            var active = new LinkedList<VoiceChannel>();
+
+            for (var activeId : activeIds) {
+                if (event.getJDA().getVoiceChannelById(activeId) != null) active.add(event.getJDA().getVoiceChannelById(activeId));
+                else internalGuild.unsetActiveLobby(activeId, guild, user);
             }
 
             for (int i = 0; i < active.size(); i++) {
@@ -93,13 +98,21 @@ public class VoiceLobbyListener extends ListenerAdapter {
 
                 guild.getController().modifyVoiceChannelPositions().selectPosition(newChannel).moveTo(joinedChannel.getPosition() + 1).complete();
                 guild.getController().moveVoiceMember(member, newChannel).complete();
-                active.add(newChannel);
+                internalGuild.setActiveLobby(newChannel.getIdLong(), guild, user);
             }
 
             try {
-                TimeUnit.MILLISECONDS.sleep(2500);
+                TimeUnit.MILLISECONDS.sleep(2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
+            }
+
+            var activeIds = internalGuild.getActiveLobbies(guild, user);
+            var active = new LinkedList<VoiceChannel>();
+
+            for (var activeId : activeIds) {
+                if (event.getJDA().getVoiceChannelById(activeId) != null) active.add(event.getJDA().getVoiceChannelById(activeId));
+                else internalGuild.unsetActiveLobby(activeId, guild, user);
             }
 
             for (int i = 0; i < active.size(); i++) {
@@ -125,6 +138,17 @@ public class VoiceLobbyListener extends ListenerAdapter {
 
             var channel = event.getChannelLeft();
 
+            var user = event.getMember().getUser();
+            var guild = event.getGuild();
+            var internalGuild = new Guild(guild.getIdLong());
+            var activeIds = internalGuild.getActiveLobbies(guild, user);
+            var active = new LinkedList<VoiceChannel>();
+
+            for (var activeId : activeIds) {
+                if (event.getJDA().getVoiceChannelById(activeId) != null) active.add(event.getJDA().getVoiceChannelById(activeId));
+                else internalGuild.unsetActiveLobby(activeId, guild, user);
+            }
+
             if (active.contains(channel) && channel.getMembers().size() == 0) {
                 active.remove(channel);
                 channel.delete().complete();
@@ -135,6 +159,17 @@ public class VoiceLobbyListener extends ListenerAdapter {
 
     public void onVoiceChannelDelete(VoiceChannelDeleteEvent event) {
         CompletableFuture.runAsync(() -> {
+            var guild = event.getGuild();
+            var user = guild.getOwner().getUser();
+            var internalGuild = new Guild(guild.getIdLong());
+            var activeIds = internalGuild.getActiveLobbies(guild, user);
+            var active = new LinkedList<VoiceChannel>();
+
+            for (var activeId : activeIds) {
+                if (event.getJDA().getVoiceChannelById(activeId) != null) active.add(event.getJDA().getVoiceChannelById(activeId));
+                else internalGuild.unsetActiveLobby(activeId, guild, user);
+            }
+
             if (active.contains(event.getChannel())) {
                 active.remove(event.getChannel());
                 new Guild(event.getGuild().getIdLong()).unsetLobby(event.getChannel().getIdLong(), event.getGuild(), event.getGuild().getOwner().getUser());

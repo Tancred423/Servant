@@ -5,10 +5,7 @@ import net.dv8tion.jda.core.entities.*;
 import servant.Log;
 import servant.Servant;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.*;
 
 import static utilities.DatabaseConn.*;
@@ -98,16 +95,19 @@ public class Guild {
         return authorId;
     }
 
-    public void setSignup(long messageId, long authorId, int amount, String title, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void setSignup(long messageId, long authorId, int amount, String title, Timestamp time, long channelId, net.dv8tion.jda.core.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
             connection = Servant.db.getHikari().getConnection();
-            var insert = connection.prepareStatement("INSERT INTO signup (message_id,author_id,amount,title) VALUES (?,?,?,?)");
+            var insert = connection.prepareStatement("INSERT INTO signup (message_id,author_id,amount,title,time,guild_id,channel_id) VALUES (?,?,?,?,?,?,?)");
             insert.setLong(1, messageId);
             insert.setLong(2, authorId);
             insert.setInt(3, amount);
             insert.setString(4, title);
+            insert.setTimestamp(5, time);
+            insert.setLong(6, guildId);
+            insert.setLong(7, channelId);
             insert.executeUpdate();
         } catch (SQLException e) {
             new Log(e, guild, user, "signup", null).sendLog(false);
@@ -1278,7 +1278,57 @@ public class Guild {
         setLanguage(Servant.config.getDefaultLanguage(), guild, user);
     }
 
-    // Lobby.
+    // Lobby
+    public void setActiveLobby(long channelId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+        Connection connection = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var insert = connection.prepareStatement("INSERT INTO active_lobbies (channel_id) VALUES (?)");
+            insert.setLong(1, channelId);
+            insert.executeUpdate();
+        } catch (SQLException e) {
+            new Log(e, guild, user, "lobby", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+    }
+
+    public List<Long> getActiveLobbies(net.dv8tion.jda.core.entities.Guild guild, User user) {
+        Connection connection = null;
+        var activeLobbies = new LinkedList<Long>();
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement("SELECT * FROM active_lobbies");
+            var resultSet = select.executeQuery();
+            if (resultSet.first())
+                do activeLobbies.add(resultSet.getLong("channel_id"));
+                while (resultSet.next());
+        } catch (SQLException e) {
+            new Log(e, guild, user, "lobby", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return activeLobbies;
+    }
+
+    public void unsetActiveLobby(long channelId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+        Connection connection = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var delete = connection.prepareStatement("DELETE FROM active_lobbies WHERE channel_id=?");
+            delete.setLong(1, channelId);
+            delete.executeUpdate();
+        } catch (SQLException e) {
+            new Log(e, guild, user, "lobby", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+    }
+
     private boolean lobbyHasEntry(net.dv8tion.jda.core.entities.Guild guild, User user) {
         Connection connection = null;
         var hasEntry = false;

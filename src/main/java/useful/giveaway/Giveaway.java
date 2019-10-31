@@ -93,10 +93,8 @@ public class Giveaway {
 
                                 var remainingTimeMillis = zonedDateTimeDifference(now, giveaway);
 
-                                if (remainingTimeMillis <= 0)
-                                    announceWinners(message, amountWinners, prize, lang, author);
+                                if (remainingTimeMillis <= 0) announceWinners(message, amountWinners, prize, lang, author);
                                 else {
-                                    remainingTimeMillis = zonedDateTimeDifference(now, giveaway);
                                     var remainingTimeString = formatDifference(remainingTimeMillis, lang);
 
                                     var eb = new EmbedBuilder();
@@ -281,7 +279,7 @@ public class Giveaway {
         return currentGiveaways;
     }
 
-    private static long zonedDateTimeDifference(ZonedDateTime zonedDateTime1, ZonedDateTime zonedDateTime2) {
+    public static long zonedDateTimeDifference(ZonedDateTime zonedDateTime1, ZonedDateTime zonedDateTime2) {
         return ChronoUnit.MILLIS.between(zonedDateTime1, zonedDateTime2);
     }
 
@@ -389,13 +387,6 @@ public class Giveaway {
             insertGiveawayToDb(messageNew.getGuild().getIdLong(), messageNew.getChannel().getIdLong(),
                     messageNew.getIdLong(), message.getAuthor().getIdLong(), finalPrize1, Timestamp.valueOf(dateGiveaway.toLocalDateTime()), finalAmountWinners, guild, author);
             messageNew.addReaction(Emote.getEmoji("tada")).queue();
-
-//            var messageid = messageNew.getIdLong();
-//            var channelid = messageNew.getChannel().getIdLong();
-//            var guildid = messageNew.getGuild().getIdLong();
-//
-//            var service = Executors.newSingleThreadScheduledExecutor();
-//            service.scheduleAtFixedRate(() -> checkGiveaway(message, messageid, channelid, guildid, finalPrize, finalAmountWinners, dateGiveaway, service, lang), 1, 1, TimeUnit.MINUTES);
         }));
     }
 }

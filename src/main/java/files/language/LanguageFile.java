@@ -870,7 +870,7 @@ public class LanguageFile {
         en_gb.setProperty("embed_timestamp_i", "Please provide a timestamp.\nYou either can say `now` or provide a date and time like this: `yyyy-MM-dd HH:mm` (uses server timezone):");
         en_gb.setProperty("embed_timestamp_i_fail", "Your input is invalid.\nYou either can say `now` or provide a date and time like this: `yyyy-MM-dd HH:mm` (uses server timezone).\nTry again:");
 
-        //// Create Embed + Edit Embed
+        //// Create Embed
         en_gb.setProperty("createembed_introduction", "With this command, you can create your own embed.\n" +
                 "- You cannot create an empty embed.\n" +
                 "- The embed but not be longer than 6000 characters in total.\n" +
@@ -890,6 +890,7 @@ public class LanguageFile {
         en_gb.setProperty("createembed_field_value_noninline", "Non-inline fields take the while width of the embed.");
         en_gb.setProperty("createembed_footer", "Footer text");
         en_gb.setProperty("createembed_done", "We're done! Please mention a text channel to post this embed in (e.g. #channel):");
+        en_gb.setProperty("createembed_done_repeated", "Invalid input! You either didn't mention a channel (e.g. #channel) or you are not allowed to write in the given channel.\nTry again:");
 
         //// Edit Embed
         en_gb.setProperty("editembed_description", "Edit an embed that was made by %s.");
@@ -910,6 +911,7 @@ public class LanguageFile {
                 "Are you prepared?");
         en_gb.setProperty("editembed_confirm", "We're done! Please confirm you want to overwrite the old embed.");
         en_gb.setProperty("editembed_notfound", "I cannot find this message, master!");
+        en_gb.setProperty("editembed_missingpermission", "You need to be able to write in the given channel to access embeds.");
 
         /// Flip
         en_gb.setProperty("flip_description", "Flip a user.");
@@ -1856,7 +1858,7 @@ public class LanguageFile {
         de_de.setProperty("embed_timestamp_i", "Please provide a timestamp.\nYou either can say `now` or provide a date and time like this: `yyyy-MM-dd HH:mm` (uses guild timezone):");
         de_de.setProperty("embed_timestamp_i_fail", "Your input is invalid.\nYou either can say `now` or provide a date and time like this: `yyyy-MM-dd HH:mm` (uses guild timezone).\nTry again:");
 
-        //// Create Embed + Edit Embed
+        //// Create Embed
         de_de.setProperty("createembed_introduction", "With this command, you can create your own embed.\n" +
                 "- You cannot create an empty embed.\n" +
                 "- The embed but not be longer than 6000 characters in total.\n" +
@@ -1876,6 +1878,7 @@ public class LanguageFile {
         de_de.setProperty("createembed_field_value_noninline", "Non-inline fields take the while width of the embed.");
         de_de.setProperty("createembed_footer", "Footer text");
         de_de.setProperty("createembed_done", "We're done! Please mention a text channel to post this embed in (e.g. #channel):");
+        de_de.setProperty("createembed_done_repeated", "Invalid input, you have to **mention** a channel (e.g. #channel):");
 
         //// Edit Embed
         de_de.setProperty("editembed_description", "Edit an embed that was made by %s.");
@@ -1896,6 +1899,7 @@ public class LanguageFile {
                 "Are you prepared?");
         de_de.setProperty("editembed_confirm", "We're done! Please confirm you want to overwrite the old embed.");
         de_de.setProperty("editembed_notfound", "I cannot find this message, master!");
+        de_de.setProperty("editembed_missingpermission", "You need to be able to write in the given channel to access embeds.");
 
         /// Flip
         de_de.setProperty("flip_description", "Flip a user.");

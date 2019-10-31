@@ -1,15 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 4.7.0
+-- version 4.6.6deb4
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Erstellungszeit: 17. Okt 2019 um 16:39
--- Server-Version: 5.6.34-log
--- PHP-Version: 7.1.5
+-- Generation Time: Oct 31, 2019 at 10:56 PM
+-- Server version: 10.1.41-MariaDB-0+deb9u1
+-- PHP Version: 7.0.33-0+deb9u5
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET AUTOCOMMIT = 0;
-START TRANSACTION;
 SET time_zone = "+00:00";
 
 
@@ -19,36 +17,46 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Datenbank: `servant_structure`
+-- Database: `servant_structure`
 --
 
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `achievement`
+-- Table structure for table `achievement`
 --
 
 CREATE TABLE `achievement` (
   `user_id` bigint(18) NOT NULL,
-  `achievement` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `achievement` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
   `ap` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `alarm`
+-- Table structure for table `active_lobbies`
+--
+
+CREATE TABLE `active_lobbies` (
+  `channel_id` bigint(18) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `alarm`
 --
 
 CREATE TABLE `alarm` (
   `user_id` bigint(18) NOT NULL,
   `alarm_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `autorole`
+-- Table structure for table `autorole`
 --
 
 CREATE TABLE `autorole` (
@@ -60,19 +68,19 @@ CREATE TABLE `autorole` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `baguette_counter`
+-- Table structure for table `baguette_counter`
 --
 
 CREATE TABLE `baguette_counter` (
   `user_id` bigint(18) NOT NULL,
   `baguette_size` int(11) NOT NULL,
   `size_counter` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `best_of_image`
+-- Table structure for table `best_of_image`
 --
 
 CREATE TABLE `best_of_image` (
@@ -80,25 +88,25 @@ CREATE TABLE `best_of_image` (
   `channel_id` bigint(18) NOT NULL,
   `number` int(11) NOT NULL,
   `percentage` int(11) NOT NULL,
-  `emoji` varchar(2) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `emoji` varchar(2) COLLATE utf8mb4_unicode_ci NOT NULL,
   `emote_guild_id` bigint(18) NOT NULL,
   `emote_id` bigint(18) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `best_of_image_bl`
+-- Table structure for table `best_of_image_bl`
 --
 
 CREATE TABLE `best_of_image_bl` (
   `message_id` bigint(18) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `best_of_quote`
+-- Table structure for table `best_of_quote`
 --
 
 CREATE TABLE `best_of_quote` (
@@ -106,60 +114,60 @@ CREATE TABLE `best_of_quote` (
   `channel_id` bigint(18) NOT NULL,
   `number` int(11) NOT NULL,
   `percentage` int(11) NOT NULL,
-  `emoji` varchar(2) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `emoji` varchar(2) COLLATE utf8mb4_unicode_ci NOT NULL,
   `emote_guild_id` bigint(18) NOT NULL,
   `emote_id` bigint(18) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `best_of_quote_bl`
+-- Table structure for table `best_of_quote_bl`
 --
 
 CREATE TABLE `best_of_quote_bl` (
   `message_id` bigint(18) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `bio`
+-- Table structure for table `bio`
 --
 
 CREATE TABLE `bio` (
   `user_id` bigint(18) NOT NULL,
-  `text` varchar(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `text` varchar(2000) COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `birthdays`
+-- Table structure for table `birthdays`
 --
 
 CREATE TABLE `birthdays` (
   `guild_id` bigint(18) NOT NULL,
   `user_id` bigint(18) NOT NULL,
-  `birthday` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `birthday` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `birthday_gratulation`
+-- Table structure for table `birthday_gratulation`
 --
 
 CREATE TABLE `birthday_gratulation` (
   `guild_id` bigint(18) NOT NULL,
   `user_id` bigint(18) NOT NULL,
   `was_gratulated` tinyint(1) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `birthday_messages`
+-- Table structure for table `birthday_messages`
 --
 
 CREATE TABLE `birthday_messages` (
@@ -167,12 +175,22 @@ CREATE TABLE `birthday_messages` (
   `channel_id` bigint(18) NOT NULL,
   `message_id` bigint(18) NOT NULL,
   `user_id` bigint(18) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `emote`
+-- Table structure for table `blacklist`
+--
+
+CREATE TABLE `blacklist` (
+  `id` bigint(18) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `emote`
 --
 
 CREATE TABLE `emote` (
@@ -184,7 +202,7 @@ CREATE TABLE `emote` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `feature_count`
+-- Table structure for table `feature_count`
 --
 
 CREATE TABLE `feature_count` (
@@ -196,7 +214,7 @@ CREATE TABLE `feature_count` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `giveawaylist`
+-- Table structure for table `giveawaylist`
 --
 
 CREATE TABLE `giveawaylist` (
@@ -204,38 +222,40 @@ CREATE TABLE `giveawaylist` (
   `channel_id` bigint(18) NOT NULL,
   `message_id` bigint(18) NOT NULL,
   `host_id` bigint(18) NOT NULL,
-  `prize` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `prize` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `amount_winners` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `guild`
+-- Table structure for table `guild`
 --
 
 CREATE TABLE `guild` (
   `guild_id` bigint(18) NOT NULL,
-  `prefix` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `offset` varchar(6) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `language` varchar(5) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `prefix` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `offset` varchar(6) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `language` varchar(5) COLLATE utf8mb4_unicode_ci NOT NULL,
   `birthday_channel_id` bigint(18) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `image`
+-- Table structure for table `image`
 --
 
 CREATE TABLE `image` (
-  `image_name` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `image_url` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `image_name` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `image_url` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `interaction`
+-- Table structure for table `interaction`
 --
 
 CREATE TABLE `interaction` (
@@ -246,7 +266,7 @@ CREATE TABLE `interaction` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `interaction_count`
+-- Table structure for table `interaction_count`
 --
 
 CREATE TABLE `interaction_count` (
@@ -259,7 +279,7 @@ CREATE TABLE `interaction_count` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `join_notifier`
+-- Table structure for table `join_notifier`
 --
 
 CREATE TABLE `join_notifier` (
@@ -270,30 +290,30 @@ CREATE TABLE `join_notifier` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `leave_notifier`
+-- Table structure for table `leave_notifier`
 --
 
 CREATE TABLE `leave_notifier` (
   `guild_id` bigint(18) NOT NULL,
   `channel_id` bigint(18) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `level_role`
+-- Table structure for table `level_role`
 --
 
 CREATE TABLE `level_role` (
   `guild_id` bigint(18) NOT NULL,
   `level` int(11) NOT NULL,
   `role_id` bigint(18) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `lobby`
+-- Table structure for table `lobby`
 --
 
 CREATE TABLE `lobby` (
@@ -304,7 +324,7 @@ CREATE TABLE `lobby` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `mediaonlychannel`
+-- Table structure for table `mediaonlychannel`
 --
 
 CREATE TABLE `mediaonlychannel` (
@@ -315,7 +335,7 @@ CREATE TABLE `mediaonlychannel` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `reaction_role`
+-- Table structure for table `reaction_role`
 --
 
 CREATE TABLE `reaction_role` (
@@ -331,32 +351,35 @@ CREATE TABLE `reaction_role` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `reminder`
+-- Table structure for table `reminder`
 --
 
 CREATE TABLE `reminder` (
   `user_id` bigint(18) NOT NULL,
   `reminder_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `topic` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `topic` varchar(1000) COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `signup`
+-- Table structure for table `signup`
 --
 
 CREATE TABLE `signup` (
   `message_id` bigint(18) NOT NULL,
   `author_id` bigint(18) NOT NULL,
   `amount` int(11) NOT NULL,
-  `title` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `title` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `guild_id` bigint(18) NOT NULL,
+  `channel_id` bigint(18) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `streamers`
+-- Table structure for table `streamers`
 --
 
 CREATE TABLE `streamers` (
@@ -367,7 +390,7 @@ CREATE TABLE `streamers` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `streamer_mode`
+-- Table structure for table `streamer_mode`
 --
 
 CREATE TABLE `streamer_mode` (
@@ -378,18 +401,18 @@ CREATE TABLE `streamer_mode` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `streamhidden`
+-- Table structure for table `streamhidden`
 --
 
 CREATE TABLE `streamhidden` (
   `guild_id` bigint(18) NOT NULL,
   `user_id` bigint(18) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `streaming_role`
+-- Table structure for table `streaming_role`
 --
 
 CREATE TABLE `streaming_role` (
@@ -400,7 +423,7 @@ CREATE TABLE `streaming_role` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `stream_channel`
+-- Table structure for table `stream_channel`
 --
 
 CREATE TABLE `stream_channel` (
@@ -411,7 +434,7 @@ CREATE TABLE `stream_channel` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `toggle`
+-- Table structure for table `toggle`
 --
 
 CREATE TABLE `toggle` (
@@ -423,20 +446,20 @@ CREATE TABLE `toggle` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `user`
+-- Table structure for table `user`
 --
 
 CREATE TABLE `user` (
   `user_id` bigint(18) NOT NULL,
-  `offset` varchar(6) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `prefix` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `language` varchar(5) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `offset` varchar(6) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `prefix` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `language` varchar(5) COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `user_exp`
+-- Table structure for table `user_exp`
 --
 
 CREATE TABLE `user_exp` (
@@ -448,19 +471,19 @@ CREATE TABLE `user_exp` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `user_settings`
+-- Table structure for table `user_settings`
 --
 
 CREATE TABLE `user_settings` (
   `user_id` bigint(18) NOT NULL,
-  `setting` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `value` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
+  `setting` varchar(32) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `value` varchar(200) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `user_votes`
+-- Table structure for table `user_votes`
 --
 
 CREATE TABLE `user_votes` (
@@ -473,7 +496,7 @@ CREATE TABLE `user_votes` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `votes`
+-- Table structure for table `votes`
 --
 
 CREATE TABLE `votes` (
@@ -483,237 +506,236 @@ CREATE TABLE `votes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Indizes der exportierten Tabellen
+-- Indexes for dumped tables
 --
 
 --
--- Indizes für die Tabelle `achievement`
+-- Indexes for table `achievement`
 --
 ALTER TABLE `achievement`
   ADD PRIMARY KEY (`user_id`,`achievement`);
 
 --
--- Indizes für die Tabelle `alarm`
+-- Indexes for table `active_lobbies`
+--
+ALTER TABLE `active_lobbies`
+  ADD PRIMARY KEY (`channel_id`);
+
+--
+-- Indexes for table `alarm`
 --
 ALTER TABLE `alarm`
   ADD PRIMARY KEY (`user_id`,`alarm_time`);
 
 --
--- Indizes für die Tabelle `autorole`
+-- Indexes for table `autorole`
 --
 ALTER TABLE `autorole`
   ADD PRIMARY KEY (`guild_id`);
 
 --
--- Indizes für die Tabelle `baguette_counter`
+-- Indexes for table `baguette_counter`
 --
 ALTER TABLE `baguette_counter`
   ADD PRIMARY KEY (`user_id`);
 
 --
--- Indizes für die Tabelle `best_of_image`
+-- Indexes for table `best_of_image`
 --
 ALTER TABLE `best_of_image`
   ADD PRIMARY KEY (`guild_id`);
 
 --
--- Indizes für die Tabelle `best_of_image_bl`
+-- Indexes for table `best_of_image_bl`
 --
 ALTER TABLE `best_of_image_bl`
   ADD PRIMARY KEY (`message_id`);
 
 --
--- Indizes für die Tabelle `best_of_quote`
+-- Indexes for table `best_of_quote`
 --
 ALTER TABLE `best_of_quote`
   ADD PRIMARY KEY (`guild_id`);
 
 --
--- Indizes für die Tabelle `best_of_quote_bl`
+-- Indexes for table `best_of_quote_bl`
 --
 ALTER TABLE `best_of_quote_bl`
   ADD PRIMARY KEY (`message_id`);
 
 --
--- Indizes für die Tabelle `bio`
+-- Indexes for table `bio`
 --
 ALTER TABLE `bio`
   ADD PRIMARY KEY (`user_id`);
 
 --
--- Indizes für die Tabelle `birthdays`
---
-ALTER TABLE `birthdays`
-  ADD PRIMARY KEY (`guild_id`,`user_id`);
-
---
--- Indizes für die Tabelle `birthday_gratulation`
+-- Indexes for table `birthday_gratulation`
 --
 ALTER TABLE `birthday_gratulation`
   ADD PRIMARY KEY (`guild_id`,`user_id`);
 
 --
--- Indizes für die Tabelle `birthday_messages`
+-- Indexes for table `birthday_messages`
 --
 ALTER TABLE `birthday_messages`
   ADD PRIMARY KEY (`guild_id`);
 
 --
--- Indizes für die Tabelle `emote`
+-- Indexes for table `blacklist`
+--
+ALTER TABLE `blacklist`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `emote`
 --
 ALTER TABLE `emote`
   ADD PRIMARY KEY (`emote_name`);
 
 --
--- Indizes für die Tabelle `feature_count`
+-- Indexes for table `feature_count`
 --
 ALTER TABLE `feature_count`
   ADD PRIMARY KEY (`id`,`feature`);
 
 --
--- Indizes für die Tabelle `giveawaylist`
+-- Indexes for table `giveawaylist`
 --
 ALTER TABLE `giveawaylist`
   ADD PRIMARY KEY (`guild_id`,`channel_id`,`message_id`);
 
 --
--- Indizes für die Tabelle `guild`
+-- Indexes for table `guild`
 --
 ALTER TABLE `guild`
   ADD PRIMARY KEY (`guild_id`);
 
 --
--- Indizes für die Tabelle `image`
+-- Indexes for table `image`
 --
 ALTER TABLE `image`
   ADD PRIMARY KEY (`image_name`);
 
 --
--- Indizes für die Tabelle `interaction`
---
-ALTER TABLE `interaction`
-  ADD PRIMARY KEY (`interaction`);
-
---
--- Indizes für die Tabelle `interaction_count`
+-- Indexes for table `interaction_count`
 --
 ALTER TABLE `interaction_count`
   ADD PRIMARY KEY (`user_id`,`interaction`);
 
 --
--- Indizes für die Tabelle `join_notifier`
+-- Indexes for table `join_notifier`
 --
 ALTER TABLE `join_notifier`
   ADD PRIMARY KEY (`guild_id`);
 
 --
--- Indizes für die Tabelle `leave_notifier`
+-- Indexes for table `leave_notifier`
 --
 ALTER TABLE `leave_notifier`
   ADD PRIMARY KEY (`guild_id`);
 
 --
--- Indizes für die Tabelle `level_role`
+-- Indexes for table `level_role`
 --
 ALTER TABLE `level_role`
   ADD PRIMARY KEY (`guild_id`,`level`,`role_id`);
 
 --
--- Indizes für die Tabelle `lobby`
+-- Indexes for table `lobby`
 --
 ALTER TABLE `lobby`
   ADD PRIMARY KEY (`guild_id`,`channel_id`);
 
 --
--- Indizes für die Tabelle `mediaonlychannel`
+-- Indexes for table `mediaonlychannel`
 --
 ALTER TABLE `mediaonlychannel`
   ADD PRIMARY KEY (`guild_id`,`channel_id`);
 
 --
--- Indizes für die Tabelle `reaction_role`
+-- Indexes for table `reaction_role`
 --
 ALTER TABLE `reaction_role`
   ADD PRIMARY KEY (`guild_id`,`channel_id`,`message_id`,`emoji`,`emote_guild_id`,`emote_id`);
 
 --
--- Indizes für die Tabelle `reminder`
+-- Indexes for table `reminder`
 --
 ALTER TABLE `reminder`
   ADD PRIMARY KEY (`user_id`,`reminder_time`);
 
 --
--- Indizes für die Tabelle `signup`
+-- Indexes for table `signup`
 --
 ALTER TABLE `signup`
   ADD PRIMARY KEY (`message_id`);
 
 --
--- Indizes für die Tabelle `streamers`
+-- Indexes for table `streamers`
 --
 ALTER TABLE `streamers`
   ADD PRIMARY KEY (`guild_id`,`user_id`);
 
 --
--- Indizes für die Tabelle `streamer_mode`
+-- Indexes for table `streamer_mode`
 --
 ALTER TABLE `streamer_mode`
   ADD PRIMARY KEY (`guild_id`);
 
 --
--- Indizes für die Tabelle `streamhidden`
+-- Indexes for table `streamhidden`
 --
 ALTER TABLE `streamhidden`
   ADD PRIMARY KEY (`guild_id`,`user_id`);
 
 --
--- Indizes für die Tabelle `streaming_role`
+-- Indexes for table `streaming_role`
 --
 ALTER TABLE `streaming_role`
   ADD PRIMARY KEY (`guild_id`);
 
 --
--- Indizes für die Tabelle `stream_channel`
+-- Indexes for table `stream_channel`
 --
 ALTER TABLE `stream_channel`
   ADD PRIMARY KEY (`guild_id`);
 
 --
--- Indizes für die Tabelle `toggle`
+-- Indexes for table `toggle`
 --
 ALTER TABLE `toggle`
   ADD PRIMARY KEY (`guild_id`,`feature`);
 
 --
--- Indizes für die Tabelle `user`
+-- Indexes for table `user`
 --
 ALTER TABLE `user`
   ADD PRIMARY KEY (`user_id`);
 
 --
--- Indizes für die Tabelle `user_exp`
+-- Indexes for table `user_exp`
 --
 ALTER TABLE `user_exp`
   ADD PRIMARY KEY (`user_id`,`guild_id`);
 
 --
--- Indizes für die Tabelle `user_settings`
+-- Indexes for table `user_settings`
 --
 ALTER TABLE `user_settings`
   ADD PRIMARY KEY (`user_id`,`setting`);
 
 --
--- Indizes für die Tabelle `user_votes`
+-- Indexes for table `user_votes`
 --
 ALTER TABLE `user_votes`
   ADD PRIMARY KEY (`message_id`,`user_id`);
 
 --
--- Indizes für die Tabelle `votes`
+-- Indexes for table `votes`
 --
 ALTER TABLE `votes`
   ADD PRIMARY KEY (`message_id`);
-COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
