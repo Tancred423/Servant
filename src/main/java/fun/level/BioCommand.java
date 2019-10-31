@@ -5,13 +5,11 @@ import moderation.guild.Guild;
 import moderation.toggle.Toggle;
 import moderation.user.User;
 import net.dv8tion.jda.core.Permission;
-import servant.Log;
 import utilities.Constants;
 import utilities.Parser;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
-import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
 
 public class BioCommand extends Command {
@@ -36,23 +34,17 @@ public class BioCommand extends Command {
             if (!Toggle.isEnabled(event, "profile")) return;
             var args = event.getArgs();
 
+            var guild = event.getGuild();
+            var author = event.getAuthor();
+
             if (!Parser.isSqlInjection(args) && args.length() <= 2000) {
-                try {
-                    new User(event.getAuthor().getIdLong()).setBio(args);
-                    event.reactSuccess();
-                } catch (SQLException e) {
-                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                    event.reactWarning();
-                }
+                new User(event.getAuthor().getIdLong()).setBio(args, guild, author);
+                event.reactSuccess();
             } else event.reactError();
 
             // Statistics.
-            try {
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-                if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-            }
+            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
         });
     }
 }

@@ -13,8 +13,6 @@ import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
-import servant.Log;
-import servant.Servant;
 import utilities.Constants;
 import utilities.Parser;
 import utilities.UsageEmbed;
@@ -22,8 +20,6 @@ import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 import zJdaUtilsLib.com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
-import java.awt.*;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -60,18 +56,14 @@ public class EditEmbedCommand extends Command {
         CompletableFuture.runAsync(() -> {
             if (!Toggle.isEnabled(event, name)) return;
 
-            var lang = LanguageHandler.getLanguage(event, name);
-            var p = GuildHandler.getPrefix(event, name);
+            var lang = LanguageHandler.getLanguage(event);
+            var p = GuildHandler.getPrefix(event);
 
             if (event.getArgs().isEmpty()) {
-                try {
-                    var description = String.format(LanguageHandler.get(lang, "editembed_description"), event.getSelfUser().getName());
-                    var usage = String.format(LanguageHandler.get(lang, "editembed_usage"), p, name, p, name);
-                    var hint = LanguageHandler.get(lang, "editembed_hint");
-                    event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
-                } catch (SQLException e) {
-                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                }
+                var description = String.format(LanguageHandler.get(lang, "editembed_description"), event.getSelfUser().getName());
+                var usage = String.format(LanguageHandler.get(lang, "editembed_usage"), p, name, p, name);
+                var hint = LanguageHandler.get(lang, "editembed_hint");
+                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
                 return;
             }
 
@@ -110,18 +102,14 @@ public class EditEmbedCommand extends Command {
 
                 var messageEmbed = embedMessage.getEmbeds().get(0);
 
+                var guild = event.getGuild();
                 var author = event.getAuthor();
                 var internalAuthor = new moderation.user.User(author.getIdLong());
                 var eb = new EmbedBuilder();
 
-                try {
-                    eb.setColor(internalAuthor.getColor());
-                } catch (SQLException e) {
-                    eb.setColor(Color.decode(Servant.config.getDefaultColorCode()));
-                }
+                eb.setColor(internalAuthor.getColor(guild, author));
                 if (messageEmbed.getAuthor() == null) eb.setAuthor(null, null, null);
-                else
-                    eb.setAuthor(messageEmbed.getAuthor().getName(), messageEmbed.getAuthor().getUrl(), messageEmbed.getAuthor().getIconUrl());
+                else eb.setAuthor(messageEmbed.getAuthor().getName(), messageEmbed.getAuthor().getUrl(), messageEmbed.getAuthor().getIconUrl());
                 eb.setThumbnail(messageEmbed.getThumbnail() == null ? null : messageEmbed.getThumbnail().getUrl());
                 eb.setTitle(messageEmbed.getTitle(), messageEmbed.getUrl());
                 eb.setDescription(messageEmbed.getDescription());
@@ -135,13 +123,7 @@ public class EditEmbedCommand extends Command {
 
                 var channel = event.getChannel();
                 channel.sendMessage(eb.build()).queue(message -> {
-                    EmbedUser embedUser;
-                    try {
-                        embedUser = new EmbedUser(message, message.getEmbeds().get(0));
-                    } catch (SQLException e) {
-                        new Log(e, event.getGuild(), author, name, event).sendLog(true);
-                        return;
-                    }
+                    var embedUser = new EmbedUser(message, message.getEmbeds().get(0));
                     processIntroduction(channel, author, embedUser, event, embedMessage, lang);
                 });
             }, failure -> {
@@ -150,12 +132,8 @@ public class EditEmbedCommand extends Command {
             });
 
             // Statistics.
-            try {
-                new moderation.user.User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-                new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-            }
+            new moderation.user.User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), event.getGuild(), event.getAuthor());
+            new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), event.getGuild(), event.getAuthor());
         });
     }
 

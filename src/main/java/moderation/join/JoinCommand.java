@@ -8,13 +8,11 @@ import moderation.user.User;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import owner.blacklist.Blacklist;
-import servant.Log;
 import utilities.Constants;
 import utilities.UsageEmbed;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
-import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
 
 public class JoinCommand extends Command {
@@ -39,19 +37,16 @@ public class JoinCommand extends Command {
             if (!Toggle.isEnabled(event, name)) return;
             if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
 
-            var lang = LanguageHandler.getLanguage(event, name);
-            var p = GuildHandler.getPrefix(event, name);
+            var lang = LanguageHandler.getLanguage(event);
+            var p = GuildHandler.getPrefix(event);
 
+            var author = event.getAuthor();
             var guild = event.getGuild();
             var internalGuild = new moderation.guild.Guild(guild.getIdLong());
             if (event.getArgs().isEmpty()) {
-                try {
-                    var description = LanguageHandler.get(lang, "join_description");
-                    var usage = String.format(LanguageHandler.get(lang, "join_usage"), p, name, p, name, p, name, p, name);
-                    event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, null).getEmbed());
-                } catch (SQLException e) {
-                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                }
+                var description = LanguageHandler.get(lang, "join_description");
+                var usage = String.format(LanguageHandler.get(lang, "join_usage"), p, name, p, name, p, name, p, name);
+                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, null).getEmbed());
                 return;
             }
 
@@ -68,36 +63,21 @@ public class JoinCommand extends Command {
 
                     channel = event.getMessage().getMentionedChannels().get(0);
 
-                    try {
-                        internalGuild.setJoinNotifierChannel(channel);
-                    } catch (SQLException e) {
-                        new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                        return;
-                    }
+                    internalGuild.setJoinNotifierChannel(channel, guild, author);
                     event.reactSuccess();
                     break;
 
                 case "unset":
                 case "u":
                     boolean wasUnset;
-                    try {
-                        wasUnset = internalGuild.unsetJoinNotifierChannel();
-                    } catch (SQLException e) {
-                        new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                        return;
-                    }
+                    wasUnset = internalGuild.unsetJoinNotifierChannel(guild, author);
                     if (wasUnset) event.reactSuccess();
                     else event.reply(LanguageHandler.get(lang, "joinleave_unset_fail"));
                     break;
 
                 case "show":
                 case "sh":
-                    try {
-                        channel = internalGuild.getJoinNotifierChannel();
-                    } catch (SQLException e) {
-                        new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                        return;
-                    }
+                    channel = internalGuild.getJoinNotifierChannel(guild, author);
                     if (channel == null) event.reply(LanguageHandler.get(lang, "joinleave_nochannel_set"));
                     else event.reply(String.format(LanguageHandler.get(lang, "joinleave_current"), channel.getName()));
                     break;
@@ -109,12 +89,8 @@ public class JoinCommand extends Command {
             }
 
             // Statistics.
-            try {
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-                if (event.getGuild() != null) new moderation.guild.Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-            }
+            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+            if (event.getGuild() != null) new moderation.guild.Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
         });
     }
 }

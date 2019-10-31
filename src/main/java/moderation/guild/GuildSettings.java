@@ -5,15 +5,14 @@ import net.dv8tion.jda.core.entities.Guild;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.GuildSettingsProvider;
 
 import javax.annotation.Nullable;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 
 public class GuildSettings implements GuildSettingsProvider {
     private Collection<String> prefixes = new ArrayList<>();
 
-    GuildSettings(Guild guild) throws SQLException {
-        var prefix = new moderation.guild.Guild(guild.getIdLong()).getPrefix();
+    GuildSettings(Guild guild) {
+        var prefix = new moderation.guild.Guild(guild.getIdLong()).getPrefix(guild, guild.getOwner().getUser());
         if (prefix != null) addPrefixes(prefix);
     }
 

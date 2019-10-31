@@ -6,12 +6,10 @@ import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.User;
 
-import java.sql.SQLException;
-
 public class UsageEmbed {
     private MessageEmbed embed;
 
-    public UsageEmbed(String commandName, User author, String description, boolean ownerCommand, Permission[] permissions, String[] aliases, String usage, String hint) throws SQLException {
+    public UsageEmbed(String commandName, User author, String description, boolean ownerCommand, Permission[] permissions, String[] aliases, String usage, String hint) {
         var internalUser = new moderation.user.User(author.getIdLong());
 
         var stringBuilder = new StringBuilder();
@@ -23,7 +21,7 @@ public class UsageEmbed {
         var alias = stringBuilder.toString();
 
         var eb = new EmbedBuilder();
-        eb.setColor(internalUser.getColor());
+        eb.setColor(internalUser.getColor(null, author));
         eb.setAuthor(commandName.substring(0, 1).toUpperCase() + commandName.substring(1) + " Usage", null, null);
         eb.setDescription((description == null ? "No description available." : description));
         eb.addField(permissions.length > 1 ? "Permissions" : "Permission", ownerCommand ? "Bot Owner" : permission.isEmpty() ? "None" : permission, true);

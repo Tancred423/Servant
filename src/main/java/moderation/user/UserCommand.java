@@ -2,18 +2,16 @@
 package moderation.user;
 
 import files.language.LanguageHandler;
+import moderation.guild.Guild;
 import moderation.guild.GuildHandler;
 import moderation.toggle.Toggle;
 import net.dv8tion.jda.core.Permission;
 import owner.blacklist.Blacklist;
 import patreon.PatreonHandler;
-import moderation.guild.Guild;
-import servant.Log;
 import utilities.*;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,19 +39,15 @@ public class UserCommand extends Command {
             if (!Toggle.isEnabled(event, name)) return;
             if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
 
-            var lang = LanguageHandler.getLanguage(event, name);
-            var p = GuildHandler.getPrefix(event, name);
+            var lang = LanguageHandler.getLanguage(event);
+            var p = GuildHandler.getPrefix(event);
 
             if (event.getArgs().isEmpty()) {
-                try {
-                    var description = LanguageHandler.get(lang, "user_description");
-                    var usage = String.format(LanguageHandler.get(lang, "user_usage"),
-                            p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name);
-                    var hint = String.format(LanguageHandler.get(lang, "user_hint"), p);
-                    event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
-                } catch (SQLException e) {
-                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                }
+                var description = LanguageHandler.get(lang, "user_description");
+                var usage = String.format(LanguageHandler.get(lang, "user_usage"),
+                        p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name);
+                var hint = String.format(LanguageHandler.get(lang, "user_hint"), p);
+                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
                 return;
             }
 
@@ -61,7 +55,9 @@ public class UserCommand extends Command {
             var type = args[0].toLowerCase();
             String setting;
             var userId = event.getAuthor().getIdLong();
-            User internalUser = new User(userId);
+            var internalUser = new User(userId);
+            var guild = event.getGuild();
+            var author = event.getAuthor();
 
             // Stream Hide
             if (args.length < 3 && args[0].equalsIgnoreCase("streamhide")) {
@@ -72,13 +68,8 @@ public class UserCommand extends Command {
 
                 var guildId = event.getGuild() == null ? event.getJDA().getGuildById(args[1]).getIdLong() : event.getGuild().getIdLong();
 
-                try {
-                    if (internalUser.toggleStreamHidden(guildId)) event.reply(LanguageHandler.get(lang, "user_streamhide_hidden"));
-                    else event.reply(LanguageHandler.get(lang, "user_streamhide_visible"));
-                } catch (SQLException e) {
-                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                    return;
-                }
+                if (internalUser.toggleStreamHidden(guildId, guild, author)) event.reply(LanguageHandler.get(lang, "user_streamhide_hidden"));
+                else event.reply(LanguageHandler.get(lang, "user_streamhide_visible"));
                 event.reactSuccess();
                 return;
             }
@@ -108,13 +99,7 @@ public class UserCommand extends Command {
                                 event.reply(LanguageHandler.get(lang, "user_invalidcolor"));
                                 return;
                             }
-                            try {
-                                internalUser.setColor(value);
-                            } catch (SQLException e) {
-                                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                                return;
-                            }
-
+                            internalUser.setColor(value, guild, author);
                             event.reactSuccess();
                             break;
 
@@ -126,13 +111,7 @@ public class UserCommand extends Command {
                                 return;
                             }
 
-                            try {
-                                internalUser.setOffset(value);
-                            } catch (SQLException e) {
-                                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                                return;
-                            }
-
+                            internalUser.setOffset(value, guild, author);
                             event.reactSuccess();
                             break;
 
@@ -143,24 +122,12 @@ public class UserCommand extends Command {
                                 return;
                             }
 
-                            try {
-                                internalUser.setPrefix(value);
-                            } catch (SQLException e) {
-                                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                                return;
-                            }
-
+                            internalUser.setPrefix(value, guild, author);
                             event.reactSuccess();
                             break;
 
                         case "language":
-                            try {
-                                internalUser.setLanguage(value);
-                            } catch (SQLException e) {
-                                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                                return;
-                            }
-
+                            internalUser.setLanguage(value, guild, author);
                             event.reactSuccess();
                             break;
 
@@ -189,49 +156,23 @@ public class UserCommand extends Command {
                                 return;
                             }
 
-                            boolean wasUnset;
-                            try {
-                                wasUnset = internalUser.unsetColor();
-                            } catch (SQLException e) {
-                                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                                return;
-                            }
-
-                            if (wasUnset) event.reactSuccess();
+                            if (internalUser.unsetColor(guild, author)) event.reactSuccess();
                             else event.reply(LanguageHandler.get(lang, "user_unset_fail"));
                             break;
 
                         case "offset":
                         case "timezone":
-                            try {
-                                internalUser.unsetOffset();
-                            } catch (SQLException e) {
-                                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                                return;
-                            }
-
+                            internalUser.unsetOffset(guild, author);
                             event.reactSuccess();
                             break;
 
                         case "prefix":
-                            try {
-                                internalUser.unsetPrefix();
-                            } catch (SQLException e) {
-                                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                                return;
-                            }
-
+                            internalUser.unsetPrefix(guild, author);
                             event.reactSuccess();
                             break;
 
                         case "language":
-                            try {
-                                internalUser.unsetLanguage();
-                            } catch (SQLException e) {
-                                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                                return;
-                            }
-
+                            internalUser.unsetLanguage(guild, author);
                             event.reactSuccess();
                             break;
 
@@ -243,24 +184,18 @@ public class UserCommand extends Command {
 
                 case "show":
                 case "sh":
-                    var author = event.getAuthor();
                     String colorCode;
                     String prefix;
                     String offset;
                     String language;
                     List<Long> streamHiddenGuilds;
-                    try {
-                        internalUser = new User(author.getIdLong());
-                        colorCode = internalUser.getColorCode();
-                        prefix = internalUser.getPrefix();
-                        offset = internalUser.getOffset();
-                        if (offset.equals("Z")) offset = "00:00";
-                        language = internalUser.getLanguage();
-                        streamHiddenGuilds = internalUser.getStreamHiddenGuilds();
-                    } catch (SQLException e) {
-                        new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                        return;
-                    }
+                    internalUser = new User(author.getIdLong());
+                    colorCode = internalUser.getColorCode(guild, author);
+                    prefix = internalUser.getPrefix(guild, author);
+                    offset = internalUser.getOffset(guild, author);
+                    if (offset.equals("Z")) offset = "00:00";
+                    language = internalUser.getLanguage(guild, author);
+                    streamHiddenGuilds = internalUser.getStreamHiddenGuilds(guild, author);
 
                     Map<String, Map.Entry<String, Boolean>> fields = new HashMap<>();
                     fields.put(LanguageHandler.get(lang, "user_color_text"), new MyEntry<>(colorCode, true));
@@ -273,22 +208,18 @@ public class UserCommand extends Command {
                     else for (Long guildId : streamHiddenGuilds) sb.append(event.getJDA().getGuildById(guildId).getName()).append("\n");
                     fields.put(LanguageHandler.get(lang, "user_streamhideservers"), new MyEntry<>(sb.toString(), true));
 
-                    try {
-                        new MessageHandler().sendEmbed(event.getChannel(),
-                                internalUser.getColor(),
-                                LanguageHandler.get(lang, "user_settings"),
-                                null,
-                                author.getAvatarUrl(),
-                                null,
-                                null,
-                                null,
-                                fields,
-                                null,
-                                null,
-                                null);
-                    } catch (SQLException e) {
-                        new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                    }
+                    new MessageHandler().sendEmbed(event.getChannel(),
+                            internalUser.getColor(guild, author),
+                            LanguageHandler.get(lang, "user_settings"),
+                            null,
+                            author.getAvatarUrl(),
+                            null,
+                            null,
+                            null,
+                            fields,
+                            null,
+                            null,
+                            null);
                     break;
 
                 default:
@@ -296,12 +227,8 @@ public class UserCommand extends Command {
             }
 
             // Statistics.
-            try {
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-                if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-            }
+            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
         });
     }
 }

@@ -8,14 +8,12 @@ import moderation.toggle.Toggle;
 import moderation.user.User;
 import net.dv8tion.jda.core.Permission;
 import owner.blacklist.Blacklist;
-import servant.Log;
 import utilities.Constants;
 import utilities.Parser;
 import utilities.UsageEmbed;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -44,18 +42,14 @@ public class ReminderCommand extends Command {
             if (!Toggle.isEnabled(event, name)) return;
             if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
 
-            var lang = LanguageHandler.getLanguage(event, name);
-            var p = GuildHandler.getPrefix(event, name);
+            var lang = LanguageHandler.getLanguage(event);
+            var p = GuildHandler.getPrefix(event);
 
             if (event.getArgs().isEmpty()) {
-                try {
-                    var description = String.format(LanguageHandler.get(lang, "reminder_description"), p);
-                    var usage = String.format(LanguageHandler.get(lang, "reminder_usage"), p, name, p, name);
-                    var hint = LanguageHandler.get(lang, "reminder_hint");
-                    event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
-                } catch (SQLException e) {
-                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                }
+                var description = String.format(LanguageHandler.get(lang, "reminder_description"), p);
+                var usage = String.format(LanguageHandler.get(lang, "reminder_usage"), p, name, p, name);
+                var hint = LanguageHandler.get(lang, "reminder_hint");
+                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
                 return;
             }
 
@@ -69,10 +63,13 @@ public class ReminderCommand extends Command {
                 return;
             }
 
+            var guild = event.getGuild();
+            var author = event.getAuthor();
+
             try {
                 var date = args[0];
                 var time = args[1];
-                var offset = new User(event.getAuthor().getIdLong()).getOffset();
+                var offset = new User(event.getAuthor().getIdLong()).getOffset(guild, author);
                 OffsetDateTime reminderDate;
                 try {
                     reminderDate = OffsetDateTime.parse(date + "T" + time + offset);
@@ -94,25 +91,19 @@ public class ReminderCommand extends Command {
                 }
 
                 var timestamp = Timestamp.from(reminderDate.toInstant());
-                var wasSet = Reminder.setReminder(event.getAuthor().getIdLong(), timestamp, topic.toString());
+                var wasSet = Reminder.setReminder(event.getAuthor().getIdLong(), timestamp, topic.toString(), guild, author);
                 if (wasSet) event.replySuccess(LanguageHandler.get(lang, "reminder_success"));
                 else {
                     event.replyError(LanguageHandler.get(lang, "reminder_fail"));
                 }
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
             } catch (Exception e) {
                 event.reply(LanguageHandler.get(lang, "reminder_invalidinput"));
                 e.printStackTrace();
             }
 
             // Statistics.
-            try {
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-                if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-            }
+            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
         });
     }
 }

@@ -20,17 +20,19 @@ package zJdaUtilsLib.com.jagrosh.jdautilities.command.impl;
 
 import files.language.LanguageHandler;
 import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.*;
-import net.dv8tion.jda.core.events.Event;
-import net.dv8tion.jda.core.events.message.guild.GuildMessageDeleteEvent;
-import net.dv8tion.jda.core.hooks.EventListener;
 import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.entities.impl.JDAImpl;
+import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.ReadyEvent;
+import net.dv8tion.jda.core.events.ShutdownEvent;
 import net.dv8tion.jda.core.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.core.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.core.events.message.guild.GuildMessageDeleteEvent;
+import net.dv8tion.jda.core.hooks.EventListener;
 import net.dv8tion.jda.core.requests.Requester;
 import net.dv8tion.jda.core.utils.Checks;
 import okhttp3.*;
@@ -40,28 +42,22 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import servant.Servant;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.*;
+import zJdaUtilsLib.com.jagrosh.jdautilities.commons.utils.FixedSizeCache;
+import zJdaUtilsLib.com.jagrosh.jdautilities.commons.utils.SafeIdUtil;
 
-import java.awt.*;
 import java.io.IOException;
 import java.io.Reader;
-import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import net.dv8tion.jda.core.OnlineStatus;
-import net.dv8tion.jda.core.events.ShutdownEvent;
-import servant.Log;
-import servant.Servant;
-import zJdaUtilsLib.com.jagrosh.jdautilities.command.*;
-import zJdaUtilsLib.com.jagrosh.jdautilities.commons.utils.FixedSizeCache;
-import zJdaUtilsLib.com.jagrosh.jdautilities.commons.utils.SafeIdUtil;
 
 public class CommandClientImpl implements CommandClient, EventListener {
     private static final Logger LOG = LoggerFactory.getLogger(CommandClient.class);
@@ -146,11 +142,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
                     "User: " + event.getAuthor().getName() + "#" + event.getAuthor().getDiscriminator() + " (" + event.getAuthor().getIdLong() + ").");
 
             var eb = new EmbedBuilder();
-            try {
-                eb.setColor(new moderation.user.User(event.getAuthor().getIdLong()).getColor());
-            } catch (SQLException e) {
-                eb.setColor(Color.decode(Servant.config.getDefaultColorCode()));
-            }
+            eb.setColor(new moderation.user.User(event.getAuthor().getIdLong()).getColor(event.getGuild(), event.getAuthor()));
             eb.setThumbnail(Servant.jda.getGuildById(436925371577925642L).getIconUrl());
             eb.setAuthor(event.getSelfUser().getName() + " Commands\n", null, event.getSelfUser().getAvatarUrl());
             eb.setDescription("Type a command to get detailed help, e.g. `" + textPrefix + "avatar`");
@@ -171,14 +163,9 @@ public class CommandClientImpl implements CommandClient, EventListener {
                         }
                     }
 
-                    String userPrefix;
-                    try {
-                        userPrefix = event.getGuild() == null ?
-                                new moderation.user.User(event.getAuthor().getIdLong()).getPrefix() :
-                                new moderation.guild.Guild(event.getGuild().getIdLong()).getPrefix();
-                    } catch (SQLException e) {
-                        userPrefix = Servant.config.getDefaultPrefix();
-                    }
+                    var userPrefix = event.getGuild() == null ?
+                            new moderation.user.User(event.getAuthor().getIdLong()).getPrefix(event.getGuild(), event.getAuthor()) :
+                            new moderation.guild.Guild(event.getGuild().getIdLong()).getPrefix(event.getGuild(), event.getAuthor());
 
                     builder.append("\n`").append(userPrefix).append(prefix == null ? " " : "").append(command.getName())
                             .append(command.getArguments() == null ? "`" : " " + command.getArguments() + "`")
@@ -198,13 +185,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
 
             if (event.isFromType(ChannelType.TEXT)) event.reactSuccess();
             event.replyInDm(eb.build(), unused -> {
-            }, t -> {
-                try {
-                    event.replyWarning(LanguageHandler.get(new moderation.user.User(event.getAuthor().getIdLong()).getLanguage(), "blocking_dm"));
-                } catch (SQLException e) {
-                    new Log(e, event.getGuild(), event.getAuthor(), "CommandClientImpl", null).sendLog(false);
-                }
-            });
+            }, t -> event.replyWarning(LanguageHandler.get(new moderation.user.User(event.getAuthor().getIdLong()).getLanguage(event.getGuild(), event.getAuthor()), "blocking_dm")));
         } : helpConsumer;
 
         // Load commands
@@ -489,12 +470,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
         if (settings != null) if (settings.getPrefixes() != null && settings.getPrefixes().isEmpty()) settings = null;
 
         if (settings == null) {
-            String userPrefix;
-            try {
-                userPrefix = new moderation.user.User(event.getAuthor().getIdLong()).getPrefix();
-            } catch (SQLException e) {
-                userPrefix = Servant.config.getDefaultPrefix();
-            }
+            var userPrefix = new moderation.user.User(event.getAuthor().getIdLong()).getPrefix(event.getGuild(), event.getAuthor());
             // Check for default prefix.
             if(rawContent.toLowerCase().startsWith(userPrefix.toLowerCase()))
                 parts = splitOnPrefixLength(rawContent, userPrefix.length());

@@ -6,7 +6,6 @@ import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberRoleAddEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
-import java.sql.SQLException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.concurrent.CompletableFuture;
@@ -54,10 +53,8 @@ public class PatreonListener extends ListenerAdapter {
         }
 
         moderation.guild.Guild internalGuild;
-        try {
-            internalGuild = new moderation.guild.Guild(event.getGuild().getIdLong());
-            eb.setTimestamp(ZonedDateTime.now(ZoneId.of(internalGuild.getOffset())));
-        } catch (SQLException ignored) { }
+        internalGuild = new moderation.guild.Guild(event.getGuild().getIdLong());
+        eb.setTimestamp(ZonedDateTime.now(ZoneId.of(internalGuild.getOffset(event.getGuild(), event.getUser()))));
 
         event.getJDA().getGuildById(436925371577925642L).getTextChannelById(502477863757545472L).sendMessage(eb.build()).queue();
     }

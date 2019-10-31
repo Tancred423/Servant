@@ -2,19 +2,16 @@
 package interaction;
 
 import files.language.LanguageHandler;
+import moderation.guild.Guild;
 import moderation.guild.GuildHandler;
 import moderation.toggle.Toggle;
 import moderation.user.User;
-import net.dv8tion.jda.core.entities.Emote;
-import moderation.guild.Guild;
 import owner.blacklist.Blacklist;
-import servant.Log;
 import utilities.Parser;
 import utilities.UsageEmbed;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
-import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
 
 public abstract class InteractionCommand extends Command {
@@ -26,18 +23,14 @@ public abstract class InteractionCommand extends Command {
             if (!Toggle.isEnabled(event, name)) return;
             if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
 
-            var lang = LanguageHandler.getLanguage(event, name);
-            var p = GuildHandler.getPrefix(event, name);
+            var lang = LanguageHandler.getLanguage(event);
+            var p = GuildHandler.getPrefix(event);
             if (event.getArgs().isEmpty()) {
-                try {
-                    var description = LanguageHandler.get(lang, "interaction_description");
-                    var usage = name.equalsIgnoreCase("dab") ?
-                            String.format(LanguageHandler.get(lang, "interaction_usage_dab"), name.substring(0, 1).toUpperCase(), name.substring(1).toLowerCase(), p, name, p, name) :
-                            String.format(LanguageHandler.get(lang, "interaction_usage"), name.substring(0, 1).toUpperCase(), name.substring(1).toLowerCase(), p, name, p, name);
-                    event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, null).getEmbed());
-                } catch (SQLException e) {
-                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                }
+                var description = LanguageHandler.get(lang, "interaction_description");
+                var usage = name.equalsIgnoreCase("dab") ?
+                        String.format(LanguageHandler.get(lang, "interaction_usage_dab"), name.substring(0, 1).toUpperCase(), name.substring(1).toLowerCase(), p, name, p, name) :
+                        String.format(LanguageHandler.get(lang, "interaction_usage"), name.substring(0, 1).toUpperCase(), name.substring(1).toLowerCase(), p, name, p, name);
+                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, null).getEmbed());
                 return;
             }
 
@@ -49,65 +42,28 @@ public abstract class InteractionCommand extends Command {
 
             // Get users.
             var mentioned = event.getMessage().getMentionedMembers().get(0).getUser();
+            var guild = event.getGuild();
             var author = event.getAuthor();
             var internalAuthor = new User(author.getIdLong());
             var internalMentioned = new User(mentioned.getIdLong());
 
             // Get random gif.
-            String gif;
-            try {
-                gif = InteractionDatabase.getGifUrl(name.toLowerCase());
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                return;
-            }
+            var gif = InteractionDatabase.getGifUrl(name.toLowerCase(), guild, author);
 
             // Increment author and mentioned command count.
-            try {
-                internalAuthor.incrementInteractionCount(name, true);
-                internalMentioned.incrementInteractionCount(name, false);
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                return;
-            }
+            internalAuthor.incrementInteractionCount(name, true, guild, author);
+            internalMentioned.incrementInteractionCount(name, false, guild, author);
 
-            // Get author and mentioned command count.
-            int authorCount;
-            int mentionedCount;
-            try {
-                authorCount = internalAuthor.getInteractionCount(name, true);
-                mentionedCount = internalMentioned.getInteractionCount(name, false);
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                return;
-            }
-
-            // Get emote.
-            Emote emote;
-            try {
-                emote = utilities.Emote.getEmote(name);
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                return;
-            }
-
-            InteractionEmbed embed;
-            try {
-                embed = new InteractionEmbed(name, emote, emoji, gif, author, mentioned, authorCount, mentionedCount);
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                return;
-            }
+            var authorCount = internalAuthor.getInteractionCount(name, true, guild, author);
+            var mentionedCount = internalMentioned.getInteractionCount(name, false, guild, author);
+            var emote = utilities.Emote.getEmote(name, guild, author);
+            var embed = new InteractionEmbed(name, emote, emoji, gif, author, mentioned, authorCount, mentionedCount, guild);
 
             event.reply(embed.getEmbed());
 
             // Statistics.
-            try {
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-                new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-            }
+            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+            new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
         });
     }
 }

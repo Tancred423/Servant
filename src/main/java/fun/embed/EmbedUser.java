@@ -5,18 +5,16 @@ import moderation.guild.Guild;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 
-import java.sql.SQLException;
-
 public class EmbedUser {
     private Message message;
     private MessageEmbed embed;
     private String offset;
     private int fieldCounter;
 
-    EmbedUser(Message message, MessageEmbed embed) throws SQLException {
+    EmbedUser(Message message, MessageEmbed embed) {
         this.message = message;
         this.embed = embed;
-        this.offset = new Guild(message.getGuild().getIdLong()).getOffset();
+        this.offset = new Guild(message.getGuild().getIdLong()).getOffset(message.getGuild(), message.getAuthor());
         this.fieldCounter = 0;
     }
 

@@ -10,14 +10,11 @@ import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 import owner.blacklist.Blacklist;
 import servant.Log;
-import servant.Servant;
 import utilities.Constants;
 import utilities.UsageEmbed;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
-import java.awt.*;
-import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -46,18 +43,17 @@ public class TimezoneCommand extends Command {
             if (!Toggle.isEnabled(event, name)) return;
             if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
 
-            var lang = LanguageHandler.getLanguage(event, name);
-            var p = GuildHandler.getPrefix(event, name);
+            var guild = event.getGuild();
+            var author = event.getAuthor();
+
+            var lang = LanguageHandler.getLanguage(event);
+            var p = GuildHandler.getPrefix(event);
 
             if (event.getArgs().isEmpty()) {
-                try {
-                    var description = LanguageHandler.get(lang, "timezone_description");
-                    var usage = String.format(LanguageHandler.get(lang, "timezone_usage"), p, name, p, name);
-                    var hint = LanguageHandler.get(lang, "timezone_hint");
-                    event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
-                } catch (SQLException e) {
-                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                }
+                var description = LanguageHandler.get(lang, "timezone_description");
+                var usage = String.format(LanguageHandler.get(lang, "timezone_usage"), p, name, p, name);
+                var hint = LanguageHandler.get(lang, "timezone_hint");
+                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
                 return;
             }
 
@@ -98,11 +94,7 @@ public class TimezoneCommand extends Command {
                 formatTarget = formatTarget.replaceAll(Pattern.quote(offsetTarget), args[3].toUpperCase());
 
                 var eb = new EmbedBuilder();
-                try {
-                    eb.setColor(new User(event.getAuthor().getIdLong()).getColor());
-                } catch (SQLException e) {
-                    eb.setColor(Color.decode(Servant.config.getDefaultColorCode()));
-                }
+                eb.setColor(new User(event.getAuthor().getIdLong()).getColor(guild, author));
                 eb.setTitle(LanguageHandler.get(lang, "timezone_conversion"));
                 eb.addField(LanguageHandler.get(lang, "timezone_input"), formatStart, false);
                 eb.addField(LanguageHandler.get(lang, "timezone_output"), formatTarget, false);
@@ -114,12 +106,8 @@ public class TimezoneCommand extends Command {
             }
 
             // Statistics.
-            try {
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-                if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-            }
+            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
         });
     }
 }

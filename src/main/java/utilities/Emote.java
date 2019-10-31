@@ -1,36 +1,60 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package utilities;
 
-import servant.Database;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.User;
+import servant.Log;
 import servant.Servant;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
+
+import static utilities.DatabaseConn.closeQuietly;
 
 public class Emote {
-    public static String getEmoteMention(String emoteName) throws SQLException {
-        var connection = Database.getConnection();
-        var select = connection.prepareStatement("SELECT guild_id, emote_id FROM emote WHERE emote_name=?");
-        select.setString(1, emoteName);
-        var resultSet = select.executeQuery();
-        if (resultSet.first())
-            return Servant.jda
+    public static String getEmoteMention(String emoteName, Guild guild, User user) {
+        Connection connection = null;
+        var emoteMention = "";
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement("SELECT guild_id, emote_id FROM emote WHERE emote_name=?");
+            select.setString(1, emoteName);
+            var resultSet = select.executeQuery();
+            if (resultSet.first()) emoteMention = Servant.jda
                     .getGuildById(resultSet.getLong("guild_id"))
                     .getEmoteById(resultSet.getLong("emote_id")).getAsMention();
-        else return getEmoji(emoteName);
+            else emoteMention = getEmoji(emoteName);
+        } catch (SQLException e) {
+            new Log(e, guild, user, "emote", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return emoteMention;
     }
 
-    public static net.dv8tion.jda.core.entities.Emote getEmote(String emoteName) throws SQLException {
-        var connection = Database.getConnection();
-        var select = connection.prepareStatement("SELECT guild_id, emote_id FROM emote WHERE emote_name=?");
-        select.setString(1, emoteName);
-        var resultSet = select.executeQuery();
-        if (resultSet.first())
-            return Servant.jda
-                    .getGuildById(resultSet.getLong("guild_id"))
-                    .getEmoteById(resultSet.getLong("emote_id"));
-        else return null;
+    public static net.dv8tion.jda.core.entities.Emote getEmote(String emoteName, Guild guild, User user) {
+        Connection connection = null;
+        net.dv8tion.jda.core.entities.Emote emote = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement("SELECT guild_id, emote_id FROM emote WHERE emote_name=?");
+            select.setString(1, emoteName);
+            var resultSet = select.executeQuery();
+            if (resultSet.first())
+                emote = Servant.jda
+                        .getGuildById(resultSet.getLong("guild_id"))
+                        .getEmoteById(resultSet.getLong("emote_id"));
+        } catch (SQLException e) {
+            new Log(e, guild, user, "emote", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return emote;
     }
 
     public static String getEmoji(String emojiName) {
@@ -87,30 +111,38 @@ public class Emote {
         }
     }
 
-    public static String[] getVoteEmotes() throws SQLException {
-        var connection = Database.getConnection();
-        var select = connection.prepareStatement("SELECT * FROM emote");
-        var resultSet = select.executeQuery();
-        List<String> emotes = new ArrayList<>();
-        if (resultSet.first()) {
-            do {
-                if (resultSet.getString("emote_name").startsWith("vote"))
-                    emotes.add(Servant.jda.getGuildById(resultSet.getLong("guild_id")).getEmoteById(resultSet.getLong("emote_id")).getAsMention());
-            } while (resultSet.next());
-        }
+    public static String[] getVoteEmotes(Guild guild, User user) {
+        Connection connection = null;
+        var emotes = new ArrayList<String>();
 
-        if (emotes.size() != 10) {
-            emotes.clear();
-            emotes.add("1⃣");
-            emotes.add("2⃣");
-            emotes.add("3⃣");
-            emotes.add("4⃣");
-            emotes.add("5⃣");
-            emotes.add("6⃣");
-            emotes.add("7⃣");
-            emotes.add("8⃣");
-            emotes.add("9⃣");
-            emotes.add("\uD83D\uDD1F");
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement("SELECT * FROM emote");
+            var resultSet = select.executeQuery();
+            if (resultSet.first())
+                do {
+                    if (resultSet.getString("emote_name").startsWith("vote"))
+                        emotes.add(Servant.jda.getGuildById(resultSet.getLong("guild_id"))
+                                .getEmoteById(resultSet.getLong("emote_id")).getAsMention());
+                } while (resultSet.next());
+
+            if (emotes.size() != 10) {
+                emotes.clear();
+                emotes.add("1⃣");
+                emotes.add("2⃣");
+                emotes.add("3⃣");
+                emotes.add("4⃣");
+                emotes.add("5⃣");
+                emotes.add("6⃣");
+                emotes.add("7⃣");
+                emotes.add("8⃣");
+                emotes.add("9⃣");
+                emotes.add("\uD83D\uDD1F");
+            }
+        } catch (SQLException e) {
+            new Log(e, guild, user, "emote", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
         }
 
         return emotes.toArray(new String[0]);

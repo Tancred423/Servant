@@ -7,13 +7,11 @@ import moderation.guild.Guild;
 import net.dv8tion.jda.core.Permission;
 import owner.blacklist.Blacklist;
 import utilities.Emote;
-import servant.Log;
 import utilities.Constants;
 import moderation.toggle.Toggle;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
-import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -49,21 +47,15 @@ public class BaguetteCommand extends Command {
             else if (random > 5) random = ThreadLocalRandom.current().nextInt(31, 40 + 1); // 31-40 | 5% Chance (0,555% chance each)
             else random = ThreadLocalRandom.current().nextInt(41, 50 + 1); // 41-50 | 5% Chance (0,555% chance each)
 
-            String baguette1;
-            String baguette2;
-            String baguette3;
+            var guild = event.getGuild();
+            var author = event.getAuthor();
 
-            try {
-                baguette1 = Emote.getEmoteMention("baguette1");
-                baguette2 = Emote.getEmoteMention("baguette2");
-                baguette3 = Emote.getEmoteMention("baguette3");
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                return;
-            }
+            var baguette1 = Emote.getEmoteMention("baguette1", guild, author);
+            var baguette2 = Emote.getEmoteMention("baguette2", guild, author);
+            var baguette3 = Emote.getEmoteMention("baguette3", guild, author);
 
-            var lang = LanguageHandler.getLanguage(event, name);
-            String baguettes = baguette1 +
+            var lang = LanguageHandler.getLanguage(event);
+            var baguettes = baguette1 +
                     String.valueOf(baguette2).repeat(random) +
                     baguette3 +
                     "\n(" + random + (random == 50 ? " - " + LanguageHandler.get(lang, "baguette_50") : (random == 49 ? " - " + LanguageHandler.get(lang, "baguette_49") : "")) + ")";
@@ -71,27 +63,23 @@ public class BaguetteCommand extends Command {
             event.reply(baguettes);
 
 
-            try {
-                // Baguette Counter
-                var internalUser = new User(event.getAuthor().getIdLong());
-                var baguette = internalUser.getBaguette();
-                if (baguette.isEmpty()) {
-                    internalUser.setBaguette(random, 1);
-                } else {
-                    var currentBaguette = baguette.entrySet().iterator().next();
-                    if (random > currentBaguette.getKey()) {
-                        internalUser.setBaguette(random, 1);
-                    } else if (random == currentBaguette.getKey()) {
-                        internalUser.setBaguette(random, currentBaguette.getValue() + 1);
-                    }
+            // Baguette Counter
+            var internalUser = new User(event.getAuthor().getIdLong());
+            var baguette = internalUser.getBaguette(guild, author);
+            if (baguette.isEmpty()) {
+                internalUser.setBaguette(random, 1, guild, author);
+            } else {
+                var currentBaguette = baguette.entrySet().iterator().next();
+                if (random > currentBaguette.getKey()) {
+                    internalUser.setBaguette(random, 1, guild, author);
+                } else if (random == currentBaguette.getKey()) {
+                    internalUser.setBaguette(random, currentBaguette.getValue() + 1, guild, author);
                 }
-
-                // Statistics.
-                internalUser.incrementFeatureCount(name.toLowerCase());
-                if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
             }
+
+            // Statistics.
+            internalUser.incrementFeatureCount(name.toLowerCase(), guild, author);
+            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
         });
     }
 }

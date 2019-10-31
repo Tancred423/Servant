@@ -2,16 +2,20 @@
 package servant;
 
 import files.language.LanguageHandler;
+import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import useful.giveaway.Giveaway;
 import utilities.Constants;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import static utilities.DatabaseConn.closeQuietly;
 
 public class ReadyListener extends ListenerAdapter {
     private int counter = 0;
@@ -19,20 +23,29 @@ public class ReadyListener extends ListenerAdapter {
     public void onReady(ReadyEvent event) {
         Servant.jda = event.getJDA();
 
+        Connection connection = null;
         try {
-            Database.getConnection();
+            connection = Servant.db.getHikari().getConnection();
         } catch (SQLException e) {
             System.out.println("Couldn't reach database.");
             return;
+        } finally {
+            closeQuietly(connection);
         }
 
         setPresence();
+        checkGiveaways(event.getJDA());
 
         System.out.println(event.getJDA().getSelfUser().getName() + " ready.");
     }
 
+    private void checkGiveaways(JDA jda) {
+        var service = Executors.newSingleThreadScheduledExecutor();
+        service.scheduleAtFixedRate(() -> Giveaway.checkGiveaways(jda), 0, 1, TimeUnit.MINUTES);
+    }
+
     private void setPresence() {
-        ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
+        var service = Executors.newSingleThreadScheduledExecutor();
         service.scheduleAtFixedRate(this::settingPresence, 0, 5, TimeUnit.MINUTES);
     }
 

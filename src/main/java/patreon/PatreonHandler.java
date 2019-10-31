@@ -3,19 +3,23 @@ package patreon;
 
 import files.language.LanguageHandler;
 import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.User;
 import servant.Servant;
 
-import java.util.List;
-
 public class PatreonHandler {
     private static Guild g = Servant.jda.getGuildById(436925371577925642L);
 
+    public static boolean isServerBooster(User user) {
+        var members = g.getMembers();
+        for (var member : members)
+            if (member.getUser().equals(user))
+                return g.getMemberById(user.getIdLong()).getRoles().contains(g.getRoleById(639128857747652648L));
+        return false;
+    }
+
     public static boolean isDonator(User user) {
-        if (is$1Patron(user)) return true;
-        List<Member> members = g.getMembers();
+        var members = g.getMembers();
         for (var member : members)
             if (member.getUser().equals(user))
                 return g.getMemberById(user.getIdLong()).getRoles().contains(g.getRoleById(489738762838867969L));
@@ -25,7 +29,7 @@ public class PatreonHandler {
     // Example: $10 Patron is also a $1 Patron!
     public static boolean is$1Patron(User user) {
         if (is$3Patron(user)) return true;
-        List<Member> members = g.getMembers();
+        var members = g.getMembers();
         for (var member : members)
             if (member.getUser().equals(user))
                 return g.getMemberById(user.getIdLong()).getRoles().contains(g.getRoleById(502472440455233547L));
@@ -34,7 +38,7 @@ public class PatreonHandler {
 
     public static boolean is$3Patron(User user) {
         if (is$5Patron(user)) return true;
-        List<Member> members = g.getMembers();
+        var members = g.getMembers();
         for (var member : members)
             if (member.getUser().equals(user))
                 return g.getMemberById(user.getIdLong()).getRoles().contains(g.getRoleById(502472546600353796L));
@@ -43,7 +47,7 @@ public class PatreonHandler {
 
     public static boolean is$5Patron(User user) {
         if (is$10Patron(user)) return true;
-        List<Member> members = g.getMembers();
+        var members = g.getMembers();
         for (var member : members)
             if (member.getUser().equals(user))
                 return g.getMemberById(user.getIdLong()).getRoles().contains(g.getRoleById(502472823638458380L));
@@ -52,7 +56,7 @@ public class PatreonHandler {
 
     public static boolean is$10Patron(User user) {
         if (isVIP(user)) return true;
-        List<Member> members = g.getMembers();
+        var members = g.getMembers();
         for (var member : members)
             if (member.getUser().equals(user))
                 return g.getMemberById(user.getIdLong()).getRoles().contains(g.getRoleById(502472869234868224L));
@@ -60,7 +64,7 @@ public class PatreonHandler {
     }
 
     public static boolean isVIP(User user) {
-        List<Member> members = g.getMembers();
+        var members = g.getMembers();
         for (var member : members)
             if (member.getUser().equals(user))
                 return g.getMemberById(user.getIdLong()).getRoles().contains(g.getRoleById(510204269568458753L));

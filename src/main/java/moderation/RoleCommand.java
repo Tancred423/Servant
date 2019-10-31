@@ -7,13 +7,10 @@ import moderation.guild.GuildHandler;
 import moderation.toggle.Toggle;
 import moderation.user.User;
 import net.dv8tion.jda.core.Permission;
-import servant.Log;
 import utilities.Constants;
 import utilities.UsageEmbed;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
-
-import java.sql.SQLException;
 
 public class RoleCommand extends Command {
     public RoleCommand() {
@@ -35,20 +32,15 @@ public class RoleCommand extends Command {
     protected void execute(CommandEvent event) {
         if (!Toggle.isEnabled(event, name)) return;
 
-        var lang = LanguageHandler.getLanguage(event, name);
-        var p = GuildHandler.getPrefix(event, name);
+        var lang = LanguageHandler.getLanguage(event);
+        var p = GuildHandler.getPrefix(event);
         var message = event.getMessage();
 
-        try {
-            if (event.getArgs().isEmpty() || (message.getMentionedMembers().isEmpty())) {
-                var description = LanguageHandler.get(lang, "role_description");
-                var usage = String.format(LanguageHandler.get(lang, "role_usage"), p, name, p, name);
-                var hint = LanguageHandler.get(lang, "role_hint");
-                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
-                return;
-            }
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
+        if (event.getArgs().isEmpty() || (message.getMentionedMembers().isEmpty())) {
+            var description = LanguageHandler.get(lang, "role_description");
+            var usage = String.format(LanguageHandler.get(lang, "role_usage"), p, name, p, name);
+            var hint = LanguageHandler.get(lang, "role_hint");
+            event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
             return;
         }
 
@@ -76,17 +68,17 @@ public class RoleCommand extends Command {
 
         var role = roles.get(0);
 
-        if (mentioned.getRoles().contains(role)) event.getGuild().getController().removeSingleRoleFromMember(mentioned, role).queue();
-        else event.getGuild().getController().addSingleRoleToMember(mentioned, role).queue();
+        if (guild.getMemberById(event.getSelfUser().getIdLong()).canInteract(mentioned))
+            if (mentioned.getRoles().contains(role))
+                event.getGuild().getController().removeSingleRoleFromMember(mentioned, role).queue();
+            else event.getGuild().getController().addSingleRoleToMember(mentioned, role).queue();
+        else event.reactWarning();
 
         event.reactSuccess();
 
+        var author = event.getAuthor();
         // Statistics.
-        try {
-            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-        }
+        new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+        new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
     }
 }

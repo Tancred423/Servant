@@ -13,9 +13,6 @@ public class ConfigFile {
     private String defaultPrefix;
     private String expCdMillis;
     private String botOwnerId;
-    private String databaseUrl;
-    private String databaseUsername;
-    private String databasePassword;
     private String supportGuildId;
     private String supportGuildInv;
 
@@ -49,9 +46,6 @@ public class ConfigFile {
         config.setProperty("defaultPrefix", "!");
         config.setProperty("expCdMillis", "60000"); // 1 minute.
         config.setProperty("botOwnerId", "");
-        config.setProperty("databaseUrl", "");
-        config.setProperty("databaseUsername", "root");
-        config.setProperty("databasePassword", "");
         config.setProperty("supportGuildId", "");
         config.setProperty("supportGuildInv", "");
 
@@ -75,9 +69,6 @@ public class ConfigFile {
         this.defaultPrefix = config.getProperty("defaultPrefix");
         this.expCdMillis = config.getProperty("expCdMillis");
         this.botOwnerId = config.getProperty("botOwnerId");
-        this.databaseUrl = config.getProperty("databaseUrl");
-        this.databaseUsername = config.getProperty("databaseUsername");
-        this.databasePassword = config.getProperty("databasePassword");
         this.supportGuildId = config.getProperty("supportGuildId");
         this.supportGuildInv = config.getProperty("supportGuildInv");
     }
@@ -90,9 +81,6 @@ public class ConfigFile {
     public String getDefaultPrefix() { return defaultPrefix; }
     public String getExpCdMillis() { return expCdMillis; }
     public String getBotOwnerId() { return botOwnerId; }
-    public String getDatabaseUrl() { return databaseUrl; }
-    public String getDatabaseUsername() { return databaseUsername; }
-    public String getDatabasePassword() { return databasePassword; }
     public String getSupportGuildId() { return supportGuildId; }
     public String getSupportGuildInv() { return supportGuildInv; }
 
@@ -117,9 +105,6 @@ public class ConfigFile {
         if (getDefaultPrefix() == null) corrupted = true;
         if (getExpCdMillis() == null) corrupted = true;
         if (getBotOwnerId() == null) corrupted = true;
-        if (getDatabaseUrl() == null) corrupted = true;
-        if (getDatabaseUsername() == null) corrupted = true;
-        if (getDatabasePassword() == null) corrupted = true;
         if (getSupportGuildId() == null) corrupted = true;
         if (getSupportGuildInv() == null) corrupted = true;
 
@@ -157,21 +142,6 @@ public class ConfigFile {
 
             if (getBotOwnerId().isEmpty()) {
                 System.out.println(String.format(errorMessage, "bot owner (user) ID"));
-                missing = true;
-            }
-
-            if (getDatabaseUrl().isEmpty()) {
-                System.out.println(String.format(errorMessage, "database URL"));
-                missing = true;
-            }
-
-            if (getDatabaseUsername().isEmpty()) {
-                System.out.println(String.format(errorMessage, "database username"));
-                missing = true;
-            }
-
-            if (getDatabasePassword().isEmpty()) {
-                System.out.println(String.format(errorMessage, "database password"));
                 missing = true;
             }
 

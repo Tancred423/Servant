@@ -11,13 +11,10 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.exceptions.HierarchyException;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import owner.blacklist.Blacklist;
-import servant.Log;
 import servant.Servant;
 import utilities.MessageHandler;
 import utilities.Parser;
 
-import java.awt.*;
-import java.sql.SQLException;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -30,8 +27,8 @@ import java.util.concurrent.ThreadLocalRandom;
 public class LevelListener extends ListenerAdapter {
     private static Map<Guild, Map<User, ZonedDateTime>> guildCds = new HashMap<>();
 
-    private static int getLevel(long userId, long guildId) throws SQLException {
-        return Parser.getLevelFromExp(new moderation.user.User(userId).getExp(guildId));
+    private static int getLevel(long userId, long guildId, Guild guild, User user) {
+        return Parser.getLevelFromExp(new moderation.user.User(userId).getExp(guildId, guild, user));
     }
 
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
@@ -43,14 +40,9 @@ public class LevelListener extends ListenerAdapter {
             if (!Toggle.isEnabled(event, "level")) return;
             if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
 
-            String lang;
-            try {
-                lang = new moderation.guild.Guild(event.getGuild().getIdLong()).getLanguage();
-            } catch (SQLException e) {
-                lang = Servant.config.getDefaultLanguage();
-            }
+            var lang = new moderation.guild.Guild(event.getGuild().getIdLong()).getLanguage(guild, author);
 
-            Map<User, ZonedDateTime> userCd = guildCds.get(guild);
+            var userCd = guildCds.get(guild);
 
             if (userCd != null) {
                 var lastMessage = userCd.get(author);
@@ -70,75 +62,50 @@ public class LevelListener extends ListenerAdapter {
             var authorId = author.getIdLong();
             var guildId = guild.getIdLong();
 
-            int currentLevel;
-            try {
-                currentLevel = getLevel(authorId, guildId);
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), "level", null).sendLog(true);
-                return;
-            }
+            var currentLevel = getLevel(authorId, guildId, guild, author);
             var randomExp = ThreadLocalRandom.current().nextInt(15, 26); // Between 15 and 25 inclusively.
-            try {
-                new moderation.user.User(authorId).addExp(guildId, randomExp);
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), "level", null).sendLog(true);
-                return;
-            }
-            int updatedLevel;
-            try {
-                updatedLevel = getLevel(authorId, guildId);
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), "level", null).sendLog(true);
-                return;
-            }
+            new moderation.user.User(authorId).setExp(guildId, randomExp, guild, author);
+            var updatedLevel = getLevel(authorId, guildId, guild, author);
 
             if (updatedLevel > currentLevel) {
-                try {
-                    checkForAchievements(updatedLevel, event);
-                    var sb = new StringBuilder();
-                    List<String> roles = checkForNewRole(updatedLevel, event, lang);
-                    if (!roles.isEmpty()) for (var roleName : roles) sb.append(roleName).append("\n");
+                checkForAchievements(updatedLevel, event);
+                var sb = new StringBuilder();
+                var roles = checkForNewRole(updatedLevel, event, lang);
+                if (!roles.isEmpty()) for (var roleName : roles) sb.append(roleName).append("\n");
 
-                    if (event.getGuild().getMemberById(event.getJDA().getSelfUser().getIdLong()).hasPermission(Permission.MESSAGE_EMBED_LINKS)) {
-                        var eb = new EmbedBuilder();
-                        try {
-                            eb.setColor(new moderation.user.User(authorId).getColor());
-                        } catch (SQLException ex) {
-                            eb.setColor(Color.decode(Servant.config.getDefaultColorCode()));
-                        }
-                        eb.setAuthor(LanguageHandler.get(lang, "levelrole_levelup"), null, null);
-                        eb.setThumbnail(author.getEffectiveAvatarUrl());
-                        eb.setDescription(String.format(LanguageHandler.get(lang, "level_up"), author.getAsMention(), updatedLevel));
-                        if (!roles.isEmpty()) eb.addField(roles.size() == 1 ?
+                if (event.getGuild().getMemberById(event.getJDA().getSelfUser().getIdLong()).hasPermission(Permission.MESSAGE_EMBED_LINKS)) {
+                    var eb = new EmbedBuilder();
+                    eb.setColor(new moderation.user.User(authorId).getColor(guild, author));
+                    eb.setAuthor(LanguageHandler.get(lang, "levelrole_levelup"), null, null);
+                    eb.setThumbnail(author.getEffectiveAvatarUrl());
+                    eb.setDescription(String.format(LanguageHandler.get(lang, "level_up"), author.getAsMention(), updatedLevel));
+                    if (!roles.isEmpty()) eb.addField(roles.size() == 1 ?
+                            LanguageHandler.get(lang, "levelrole_role_singular") :
+                            LanguageHandler.get(lang, "levelrole_role_plural"), sb.toString(), false);
+                    event.getChannel().sendMessage(eb.build()).queue();
+                } else {
+                    var mb = new StringBuilder();
+                    mb.append("**").append(LanguageHandler.get(lang, "levelrole_levelup")).append("**\n");
+                    mb.append(String.format(LanguageHandler.get(lang, "level_up"), author.getAsMention(), updatedLevel)).append("**\n");
+                    if (!roles.isEmpty()) {
+                        mb.append(roles.size() == 1 ?
                                 LanguageHandler.get(lang, "levelrole_role_singular") :
-                                LanguageHandler.get(lang, "levelrole_role_plural"), sb.toString(), false);
-                        event.getChannel().sendMessage(eb.build()).queue();
-                    } else {
-                        var mb = new StringBuilder();
-                        mb.append("**").append(LanguageHandler.get(lang, "levelrole_levelup")).append("**\n");
-                        mb.append(String.format(LanguageHandler.get(lang, "level_up"), author.getAsMention(), updatedLevel)).append("**\n");
-                        if (!roles.isEmpty()) {
-                            mb.append(roles.size() == 1 ?
-                                    LanguageHandler.get(lang, "levelrole_role_singular") :
-                                    LanguageHandler.get(lang, "levelrole_role_plural")).append("\n");
-                            mb.append(sb.toString()).append("\n");
-                        }
-                        mb.append("_").append(LanguageHandler.get(lang, "level_missingpermission_embed")).append("_");
-                        event.getChannel().sendMessage(mb.toString()).queue();
+                                LanguageHandler.get(lang, "levelrole_role_plural")).append("\n");
+                        mb.append(sb.toString()).append("\n");
                     }
-                } catch (SQLException e) {
-                    new Log(e, guild, author, "level", null).sendLog(false);
+                    mb.append("_").append(LanguageHandler.get(lang, "level_missingpermission_embed")).append("_");
+                    event.getChannel().sendMessage(mb.toString()).queue();
                 }
             }
         });
     }
 
-    private List<String> checkForNewRole(int level, GuildMessageReceivedEvent event, String lang) throws SQLException {
+    private List<String> checkForNewRole(int level, GuildMessageReceivedEvent event, String lang) {
         var guild = event.getGuild();
         var internalGuild = new moderation.guild.Guild(guild.getIdLong());
-        var roleIds = internalGuild.getLevelRole(level);
-        List<String> roles = new ArrayList<>();
-        for (Long roleId : roleIds)
+        var roleIds = internalGuild.getLevelRole(level, event.getGuild(), event.getAuthor());
+        var roles = new ArrayList<String>();
+        for (var roleId : roleIds)
             if (guild.getRoleById(roleId) != null
                     && event.getGuild().getMemberById(event.getJDA().getSelfUser().getIdLong()).hasPermission(Permission.MANAGE_ROLES)) {
                 try {
@@ -151,100 +118,102 @@ public class LevelListener extends ListenerAdapter {
         return roles;
     }
 
-    private void checkForAchievements(int level, GuildMessageReceivedEvent event) throws SQLException {
+    private void checkForAchievements(int level, GuildMessageReceivedEvent event) {
+        var guild = event.getGuild();
         var author = event.getAuthor();
         var internalAuthor = new moderation.user.User(author.getIdLong());
         var message = event.getMessage();
 
         if (level >= 10) {
-            if (!internalAuthor.hasAchievement("level10") && !hasHigherLevelAchievement(internalAuthor, level)) {
-                internalAuthor.setAchievement("level10", 10);
+            if (!internalAuthor.hasAchievement("level10", guild, author) && !hasHigherLevelAchievement(internalAuthor, level, guild, author)) {
+                internalAuthor.setAchievement("level10", 10, guild, author);
                 new MessageHandler().reactAchievement(message);
             }
         }
 
         if (level >= 20) {
-            if (!internalAuthor.hasAchievement("level20") && !hasHigherLevelAchievement(internalAuthor, level)) {
-                internalAuthor.setAchievement("level20", 20);
-                internalAuthor.unsetAchievement("level10");
+            if (!internalAuthor.hasAchievement("level20", guild, author) && !hasHigherLevelAchievement(internalAuthor, level, guild, author)) {
+                internalAuthor.setAchievement("level20", 20, guild, author);
+                internalAuthor.unsetAchievement("level10", guild, author);
                 new MessageHandler().reactAchievement(message);
             }
         }
 
         if (level >= 30) {
-            if (!internalAuthor.hasAchievement("level30") && !hasHigherLevelAchievement(internalAuthor, level)) {
-                internalAuthor.setAchievement("level30", 30);
-                internalAuthor.unsetAchievement("level20");
+            if (!internalAuthor.hasAchievement("level30", guild, author) && !hasHigherLevelAchievement(internalAuthor, level, guild, author)) {
+                internalAuthor.setAchievement("level30", 30, guild, author);
+                internalAuthor.unsetAchievement("level20", guild, author);
                 new MessageHandler().reactAchievement(message);
             }
         }
 
         if (level >= 40) {
-            if (!internalAuthor.hasAchievement("level40") && !hasHigherLevelAchievement(internalAuthor, level)) {
-                internalAuthor.setAchievement("level40", 40);
-                internalAuthor.unsetAchievement("level30");
+            if (!internalAuthor.hasAchievement("level40", guild, author) && !hasHigherLevelAchievement(internalAuthor, level, guild, author)) {
+                internalAuthor.setAchievement("level40", 40, guild, author);
+                internalAuthor.unsetAchievement("level30", guild, author);
                 new MessageHandler().reactAchievement(message);
             }
         }
 
         if (level >= 50) {
-            if (!internalAuthor.hasAchievement("level50") && !hasHigherLevelAchievement(internalAuthor, level)) {
-                internalAuthor.setAchievement("level50", 50);
-                internalAuthor.unsetAchievement("level40");
+            if (!internalAuthor.hasAchievement("level50", guild, author) && !hasHigherLevelAchievement(internalAuthor, level, guild, author)) {
+                internalAuthor.setAchievement("level50", 50, guild, author);
+                internalAuthor.unsetAchievement("level40", guild, author);
                 new MessageHandler().reactAchievement(message);
             }
         }
 
         if (level >= 60) {
-            if (!internalAuthor.hasAchievement("level60") && !hasHigherLevelAchievement(internalAuthor, level)) {
-                internalAuthor.setAchievement("level60", 60);
-                internalAuthor.unsetAchievement("level50");
+            if (!internalAuthor.hasAchievement("level60", guild, author) && !hasHigherLevelAchievement(internalAuthor, level, guild, author)) {
+                internalAuthor.setAchievement("level60", 60, guild, author);
+                internalAuthor.unsetAchievement("level50", guild, author);
                 new MessageHandler().reactAchievement(message);
             }
         }
 
         if (level >= 69) {
-            if (!internalAuthor.hasAchievement("level69") && !hasHigherLevelAchievement(internalAuthor, level)) {
-                internalAuthor.setAchievement("level69", 69);
+            if (!internalAuthor.hasAchievement("level69", guild, author) && !hasHigherLevelAchievement(internalAuthor, level, guild, author)) {
+                internalAuthor.setAchievement("level69", 69, guild, author);
                 new MessageHandler().reactAchievement(message);
             }
         }
 
         if (level >= 70) {
-            if (!internalAuthor.hasAchievement("level70")) {
-                internalAuthor.setAchievement("level70", 70);
-                internalAuthor.unsetAchievement("level60");
+            if (!internalAuthor.hasAchievement("level70", guild, author) && !hasHigherLevelAchievement(internalAuthor, level, guild, author)) {
+                internalAuthor.setAchievement("level70", 70, guild, author);
+                internalAuthor.unsetAchievement("level60", guild, author);
                 new MessageHandler().reactAchievement(message);
             }
         }
 
         if (level >= 80) {
-            if (!internalAuthor.hasAchievement("level80")) {
-                internalAuthor.setAchievement("level80", 80);
-                internalAuthor.unsetAchievement("level70");
+            if (!internalAuthor.hasAchievement("level80", guild, author) && !hasHigherLevelAchievement(internalAuthor, level, guild, author)) {
+                internalAuthor.setAchievement("level80", 80, guild, author);
+                internalAuthor.unsetAchievement("level70", guild, author);
                 new MessageHandler().reactAchievement(message);
             }
         }
 
         if (level >= 90) {
-            if (!internalAuthor.hasAchievement("level90")) {
-                internalAuthor.setAchievement("level90", 90);
-                internalAuthor.unsetAchievement("level80");
+            if (!internalAuthor.hasAchievement("level90", guild, author) && !hasHigherLevelAchievement(internalAuthor, level, guild, author)) {
+                internalAuthor.setAchievement("level90", 90, guild, author);
+                internalAuthor.unsetAchievement("level80", guild, author);
                 new MessageHandler().reactAchievement(message);
             }
         }
 
         if (level >= 100) {
-            if (!internalAuthor.hasAchievement("level100")) {
-                internalAuthor.setAchievement("level100", 100);
-                internalAuthor.unsetAchievement("level90");
+            if (!internalAuthor.hasAchievement("level100", guild, author) && !hasHigherLevelAchievement(internalAuthor, level, guild, author)) {
+                internalAuthor.setAchievement("level100", 100, guild, author);
+                internalAuthor.unsetAchievement("level90", guild, author);
                 new MessageHandler().reactAchievement(message);
             }
         }
     }
 
-    private boolean hasHigherLevelAchievement(moderation.user.User internalUser, int level) throws SQLException {
-        var achievements = internalUser.getLevelAchievements();
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    private boolean hasHigherLevelAchievement(moderation.user.User internalUser, int level, Guild guild, User user) {
+        var achievements = internalUser.getLevelAchievements(guild, user);
         String highestLevelAchievement = null;
         for (var achievement : achievements) {
             highestLevelAchievement = achievement;

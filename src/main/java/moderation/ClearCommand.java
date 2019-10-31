@@ -2,6 +2,7 @@
 package moderation;
 
 import files.language.LanguageHandler;
+import moderation.guild.Guild;
 import moderation.guild.GuildHandler;
 import moderation.toggle.Toggle;
 import moderation.user.User;
@@ -9,16 +10,13 @@ import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageHistory;
-import moderation.guild.Guild;
 import owner.blacklist.Blacklist;
-import servant.Log;
 import utilities.Constants;
 import utilities.MessageHandler;
 import utilities.UsageEmbed;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -46,18 +44,14 @@ public class ClearCommand extends Command {
             if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
 
             var arg = event.getArgs();
-            var lang = LanguageHandler.getLanguage(event, name);
-            var p = GuildHandler.getPrefix(event, name);
+            var lang = LanguageHandler.getLanguage(event);
+            var p = GuildHandler.getPrefix(event);
 
             if (arg.isEmpty()) {
-                try {
-                    var description = LanguageHandler.get(lang, "clear_description");
-                    var usage = String.format(LanguageHandler.get(lang, "clear_usage"), p, name, p, name, p, name);
-                    var hint = LanguageHandler.get(lang, "clear_hint");
-                    event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
-                } catch (SQLException e) {
-                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                }
+                var description = LanguageHandler.get(lang, "clear_description");
+                var usage = String.format(LanguageHandler.get(lang, "clear_usage"), p, name, p, name, p, name);
+                var hint = LanguageHandler.get(lang, "clear_hint");
+                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
                 return;
             }
 
@@ -105,13 +99,12 @@ public class ClearCommand extends Command {
                 }));
             }
 
+            var guild = event.getGuild();
+            var author = event.getAuthor();
+
             // Statistics.
-            try {
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-                new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-            }
+            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+            new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
         });
     }
 }

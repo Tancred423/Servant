@@ -7,12 +7,9 @@ import moderation.toggle.Toggle;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
-import servant.Log;
 import useful.votes.VotesDatabase;
 import utilities.Emote;
-import servant.Servant;
 
-import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.concurrent.CompletableFuture;
@@ -22,40 +19,23 @@ public class QuickvoteEndListener extends ListenerAdapter {
         CompletableFuture.runAsync(() -> {
             if (!Toggle.isEnabled(event, "quickvote")) return;
 
-            String lang;
-            try {
-                lang = new Guild(event.getGuild().getIdLong()).getLanguage();
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getUser(), "quickvote", null).sendLog(false);
-                return;
-            }
-
+            var guild = event.getGuild();
             var user = event.getUser();
+            var lang = new Guild(event.getGuild().getIdLong()).getLanguage(guild, user);
+
             if (user.isBot()) return;
 
             var messageId = event.getMessageIdLong();
-            try {
-                if (!VotesDatabase.isQuickvote(messageId)) return; // Has to be a quickvote.
-            } catch (SQLException e) {
-                return;
-            }
+            if (!VotesDatabase.isQuickvote(messageId, guild, user)) return; // Has to be a quickvote.
 
             var reactionEmote = event.getReactionEmote();
             if (reactionEmote.isEmote()) {
-                try {
-                    if (!reactionEmote.getEmote().equals(Emote.getEmote("end"))) return; // Has to be the end emote ...
-                } catch (SQLException e) {
-                    return;
-                }
+                if (!reactionEmote.getEmote().equals(Emote.getEmote("end", guild, user))) return; // Has to be the end emote ...
             } else {
                 if (!reactionEmote.getName().equals(Emote.getEmoji("end"))) return; // ... or the end emoji.
             }
 
-            try {
-                if (user.getIdLong() != VotesDatabase.getAuthorId(messageId)) return; // Has to be done by author.
-            } catch (SQLException e) {
-                return;
-            }
+            if (user.getIdLong() != VotesDatabase.getAuthorId(messageId, guild, user)) return; // Has to be done by author.
 
             // The author has reacted with an ending emote on their quickvote.
             event.getChannel().getMessageById(messageId).queue(message -> {
@@ -80,22 +60,12 @@ public class QuickvoteEndListener extends ListenerAdapter {
                 eb.addField(upvoteEmoji, String.valueOf(upvoteCount), true);
                 eb.addField(downvoteEmoji, String.valueOf(downvoteCount), true);
                 eb.setFooter(LanguageHandler.get(lang, "votes_inactive"), event.getJDA().getSelfUser().getAvatarUrl());
-                try {
-                    eb.setTimestamp(OffsetDateTime.now(ZoneId.of(new Guild(event.getGuild().getIdLong()).getOffset())));
-                } catch (SQLException e) {
-                    eb.setTimestamp(OffsetDateTime.now(ZoneId.of(Servant.config.getDefaultOffset())).getOffset());
-                }
+                eb.setTimestamp(OffsetDateTime.now(ZoneId.of(new Guild(event.getGuild().getIdLong()).getOffset(guild, user))));
 
                 message.editMessage(eb.build()).queue();
                 message.clearReactions().queue();
-                try {
-                    VotesDatabase.unsetVote(message.getIdLong());
-                    VotesDatabase.unsetUserVotes(message.getIdLong());
-                } catch (SQLException e) {
-                    event.getJDA().getUserById(Servant.config.getBotOwnerId()).openPrivateChannel().queue(privateChannel ->
-                            privateChannel.sendMessage(LanguageHandler.get(lang, "quickvote_missing_db")
-                            ).queue());
-                }
+                VotesDatabase.unsetVote(message.getIdLong(), guild, user);
+                VotesDatabase.unsetUserVotes(message.getIdLong(), guild, user);
             });
         });
     }

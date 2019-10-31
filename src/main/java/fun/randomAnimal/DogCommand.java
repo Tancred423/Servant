@@ -14,7 +14,6 @@ import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
 
 public class DogCommand extends Command {
@@ -39,24 +38,23 @@ public class DogCommand extends Command {
             if (!Toggle.isEnabled(event, name)) return;
             event.getChannel().sendTyping().queue();
 
+            var guild = event.getGuild();
+            var author = event.getAuthor();
+
             JSONObject json;
             try {
                 json = JsonReader.readJsonFromUrl("https://dog.ceo/api/breeds/image/random");
                 var eb = new EmbedBuilder();
-                eb.setColor(new User(event.getAuthor().getIdLong()).getColor());
+                eb.setColor(new User(event.getAuthor().getIdLong()).getColor(guild, author));
                 eb.setImage(String.valueOf(json.get("message")));
                 event.reply(eb.build());
-            } catch (IOException | SQLException e) {
+            } catch (IOException e) {
                 new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
             }
 
             // Statistics.
-            try {
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-                if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-            }
+            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
         });
     }
 }

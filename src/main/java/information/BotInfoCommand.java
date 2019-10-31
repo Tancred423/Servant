@@ -4,21 +4,17 @@ package information;
 import files.language.LanguageHandler;
 import moderation.guild.Guild;
 import moderation.toggle.Toggle;
+import moderation.user.User;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDAInfo;
 import net.dv8tion.jda.core.Permission;
 import owner.blacklist.Blacklist;
-import servant.Log;
-import servant.Servant;
-import moderation.user.User;
 import utilities.Constants;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 import zJdaUtilsLib.com.jagrosh.jdautilities.commons.JDAUtilitiesInfo;
 import zJdaUtilsLib.com.jagrosh.jdautilities.examples.doc.Author;
 
-import java.awt.*;
-import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
 
 @Author("John Grosh (jagrosh)")
@@ -49,7 +45,10 @@ public class BotInfoCommand extends Command {
             if (!Toggle.isEnabled(event, name)) return;
             if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
 
-            var lang = LanguageHandler.getLanguage(event, name);
+            var lang = LanguageHandler.getLanguage(event);
+            var guild = event.getGuild();
+            var author = event.getAuthor();
+
             if (oauthLink == null) {
                 try {
                     var info = event.getJDA().asBot().getApplicationInfo().complete();
@@ -65,11 +64,7 @@ public class BotInfoCommand extends Command {
                     LanguageHandler.get(lang, "botinfo_funcommands")
             };
 
-            try {
-                eb.setColor(new User(event.getAuthor().getIdLong()).getColor());
-            } catch (SQLException e) {
-                eb.setColor(Color.decode(Servant.config.getDefaultColorCode()));
-            }
+            eb.setColor(new User(event.getAuthor().getIdLong()).getColor(guild, author));
             eb.setAuthor(String.format(LanguageHandler.get(lang, "botinfo_authorname"), event.getSelfUser().getName()), null, event.getSelfUser().getAvatarUrl());
 
             boolean inv = !oauthLink.isEmpty();
@@ -106,12 +101,8 @@ public class BotInfoCommand extends Command {
             event.reply(eb.build());
 
             // Statistics.
-            try {
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-                if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-            }
+            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
         });
     }
 }

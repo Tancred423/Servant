@@ -9,15 +9,12 @@ import moderation.user.User;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 import owner.blacklist.Blacklist;
-import servant.Log;
 import servant.Servant;
 import utilities.Constants;
 import utilities.UsageEmbed;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
-import java.awt.*;
-import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
 
 public class BestOfQuoteCommand extends Command {
@@ -42,22 +39,18 @@ public class BestOfQuoteCommand extends Command {
             if (!Toggle.isEnabled(event, name)) return;
             if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
 
-            var lang = LanguageHandler.getLanguage(event, name);
-            var p = GuildHandler.getPrefix(event, name);
+            var lang = LanguageHandler.getLanguage(event);
+            var p = GuildHandler.getPrefix(event);
             var usageEmote = event.getGuild().getEmotes().isEmpty() ?
                     event.getJDA().getGuildById(Servant.config.getSupportGuildId()).getEmotes().get(0) :
                     event.getGuild().getEmotes().get(0);
 
             if (event.getArgs().isEmpty()) {
-                try {
-                    var description = LanguageHandler.get(lang, "bestofquote_description");
-                    var usage = String.format(LanguageHandler.get(lang, "bestof_usage"),
-                            p, name, p, name, p, name, usageEmote.getAsMention(), p, name, p, name, p, name, p, name, "%", p, name, "%", p, name);
-                    var hint = LanguageHandler.get(lang, "bestof_hint");
-                    event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
-                } catch (SQLException e) {
-                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                }
+                var description = LanguageHandler.get(lang, "bestofquote_description");
+                var usage = String.format(LanguageHandler.get(lang, "bestof_usage"),
+                        p, name, p, name, p, name, usageEmote.getAsMention(), p, name, p, name, p, name, p, name, "%", p, name, "%", p, name);
+                var hint = LanguageHandler.get(lang, "bestof_hint");
+                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
                 return;
             }
 
@@ -68,127 +61,94 @@ public class BestOfQuoteCommand extends Command {
             var internalAuthor = new User(author.getIdLong());
 
             var eb = new EmbedBuilder();
-            try {
-                eb.setColor(internalAuthor.getColor());
-            } catch (SQLException e) {
-                eb.setColor(Color.decode(Servant.config.getDefaultColorCode()));
+            eb.setColor(internalAuthor.getColor(guild, author));
+
+            if (args[0].equalsIgnoreCase("show") || args[0].equalsIgnoreCase("sh")) {
+                var emote = internalGuild.getBestOfQuoteEmote(guild, author);
+                var emoji = internalGuild.getBestOfQuoteEmoji(guild, author);
+                var number = internalGuild.getBestOfQuoteNumber(guild, author);
+                var percentage = internalGuild.getBestOfQuotePercentage(guild, author);
+                var channel = internalGuild.getBestOfQuoteChannel(guild, author);
+
+                eb.setAuthor(LanguageHandler.get(lang, "bestofquote_setup"), null, null);
+                eb.addField(LanguageHandler.get(lang, "bestof_emote"), emote == null ? (emoji == null ? LanguageHandler.get(lang, "bestof_noemote") : emoji) : emote.getAsMention(), true);
+                eb.addField(LanguageHandler.get(lang, "bestof_number"), number == 0 ? LanguageHandler.get(lang, "bestof_nonumber") : String.valueOf(number), true);
+                eb.addField(LanguageHandler.get(lang, "bestof_percentage"), percentage == 0 ? LanguageHandler.get(lang, "bestof_nopercentage") : percentage + "%", true);
+                eb.addField(LanguageHandler.get(lang, "bestof_channel"), channel == null ? LanguageHandler.get(lang, "bestof_nochannel") : channel.getAsMention(), true);
+
+                event.reply(eb.build());
+                return;
             }
 
-            try {
-                if (args[0].equalsIgnoreCase("show") || args[0].equalsIgnoreCase("sh")) {
-                    var emote = internalGuild.getBestOfQuoteEmote();
-                    var emoji = internalGuild.getBestOfQuoteEmoji();
-                    var number = internalGuild.getBestOfQuoteNumber();
-                    var percentage = internalGuild.getBestOfQuotePercentage();
-                    var channel = internalGuild.getBestOfQuoteChannel();
+            // Channel
+            var message = event.getMessage();
+            if (!message.getMentionedChannels().isEmpty()) {
+                var mentionedChannel = message.getMentionedChannels().get(0);
+                internalGuild.setBestOfQuoteChannel(mentionedChannel.getIdLong(), guild, author);
+                event.reactSuccess();
+                return;
+            }
 
-                    eb.setAuthor(LanguageHandler.get(lang, "bestofquote_setup"), null, null);
-                    eb.addField(LanguageHandler.get(lang, "bestof_emote"), emote == null ? (emoji == null ? LanguageHandler.get(lang, "bestof_noemote") : emoji) : emote.getAsMention(), true);
-                    eb.addField(LanguageHandler.get(lang, "bestof_number"), number == 0 ? LanguageHandler.get(lang, "bestof_nonumber") : String.valueOf(number), true);
-                    eb.addField(LanguageHandler.get(lang, "bestof_percentage"), percentage == 0 ? LanguageHandler.get(lang, "bestof_nopercentage") : percentage + "%", true);
-                    eb.addField(LanguageHandler.get(lang, "bestof_channel"), channel == null ? LanguageHandler.get(lang, "bestof_nochannel") : channel.getAsMention(), true);
-
-                    event.reply(eb.build());
-                    return;
-                }
-
-                // Channel
-                var message = event.getMessage();
-                if (!message.getMentionedChannels().isEmpty()) {
-                    var mentionedChannel = message.getMentionedChannels().get(0);
-                    try {
-                        internalGuild.setBestOfQuoteChannel(mentionedChannel.getIdLong());
-                    } catch (SQLException e) {
-                        new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                        return;
-                    }
-                    event.reactSuccess();
-                    return;
-                }
-
-                // Number
-                if (args[0].matches("[0-9]+")) {
-                    try {
-                        var mentionedNumber = Integer.parseInt(args[0]);
-                        internalGuild.setBestOfQuoteNumber(mentionedNumber);
-                    } catch (SQLException e) {
-                        new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                        return;
-                    } catch (NumberFormatException ex) {
-                        event.reactError();
-                        event.reply(LanguageHandler.get(lang, "bestof_numbertoobig"));
-                        return;
-                    }
-                    event.reactSuccess();
-                    return;
-                }
-
-                // Percentage
-                if (args[0].contains("%")) {
-                    var arg = args[0].replaceAll("%", "");
-                    if (arg.matches("[0-9]+")) {
-                        var mentionedPercentage = Integer.parseInt(arg);
-                        if (mentionedPercentage > 100) {
-                            event.reply(LanguageHandler.get(lang, "bestof_numbertoobig"));
-                            event.reactError();
-                            return;
-                        }
-                        try {
-                            internalGuild.setBestOfQuotePercentage(mentionedPercentage);
-                        } catch (SQLException e) {
-                            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                            return;
-                        }
-                        event.reactSuccess();
-                    } else {
-                        event.reply(LanguageHandler.get(lang, "bestof_invalidpercentage"));
-                        event.reactError();
-                    }
-                    return;
-                }
-
-                // Emote
-                if (!message.getEmotes().isEmpty()) {
-                    var mentionedEmote = message.getEmotes().get(0);
-                    try {
-                        internalGuild.setBestOfQuoteEmote(mentionedEmote.getGuild().getIdLong(), mentionedEmote.getIdLong());
-                    } catch (SQLException e) {
-                        new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                        return;
-                    } catch (NullPointerException ex) {
-                        event.reply(LanguageHandler.get(lang, "bestof_invalidemote"));
-                        event.reactError();
-                        return;
-                    }
-                    event.reactSuccess();
-                    return;
-                }
-
-                // Emoji
-                message.addReaction(args[0]).queue(success -> {
-                    var mentionedEmoji = args[0];
-                    try {
-                        internalGuild.setBestOfQuoteEmoji(mentionedEmoji);
-                    } catch (SQLException e) {
-                        new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                        return;
-                    }
-                    event.reactSuccess();
-                }, failure -> {
-                    event.reply(LanguageHandler.get(lang, "bestof_invalidemoji"));
+            // Number
+            if (args[0].matches("[0-9]+")) {
+                try {
+                    var mentionedNumber = Integer.parseInt(args[0]);
+                    internalGuild.setBestOfQuoteNumber(mentionedNumber, guild, author);
+                } catch (NumberFormatException ex) {
                     event.reactError();
-                });
-            } catch (SQLException e) {
-                new Log(e, guild, author, name, event).sendLog(true);
+                    event.reply(LanguageHandler.get(lang, "bestof_numbertoobig"));
+                    return;
+                }
+                event.reactSuccess();
+                return;
             }
+
+            // Percentage
+            if (args[0].contains("%")) {
+                var arg = args[0].replaceAll("%", "");
+                if (arg.matches("[0-9]+")) {
+                    var mentionedPercentage = Integer.parseInt(arg);
+                    if (mentionedPercentage > 100) {
+                        event.reply(LanguageHandler.get(lang, "bestof_numbertoobig"));
+                        event.reactError();
+                        return;
+                    }
+                    internalGuild.setBestOfQuotePercentage(mentionedPercentage, guild, author);
+                    event.reactSuccess();
+                } else {
+                    event.reply(LanguageHandler.get(lang, "bestof_invalidpercentage"));
+                    event.reactError();
+                }
+                return;
+            }
+
+            // Emote
+            if (!message.getEmotes().isEmpty()) {
+                var mentionedEmote = message.getEmotes().get(0);
+                try {
+                    internalGuild.setBestOfQuoteEmote(mentionedEmote.getGuild().getIdLong(), mentionedEmote.getIdLong(), guild, author);
+                } catch (NullPointerException ex) {
+                    event.reply(LanguageHandler.get(lang, "bestof_invalidemote"));
+                    event.reactError();
+                    return;
+                }
+                event.reactSuccess();
+                return;
+            }
+
+            // Emoji
+            message.addReaction(args[0]).queue(success -> {
+                var mentionedEmoji = args[0];
+                internalGuild.setBestOfQuoteEmoji(mentionedEmoji, guild, author);
+                event.reactSuccess();
+            }, failure -> {
+                event.reply(LanguageHandler.get(lang, "bestof_invalidemoji"));
+                event.reactError();
+            });
 
             // Statistics.
-            try {
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-                new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-            }
+            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+            new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
         });
     }
 }

@@ -4,15 +4,14 @@ package moderation.lobby;
 import files.language.LanguageHandler;
 import moderation.guild.Guild;
 import moderation.toggle.Toggle;
-import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.VoiceChannel;
 import net.dv8tion.jda.core.events.channel.voice.VoiceChannelDeleteEvent;
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceMoveEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
-import servant.Log;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -33,34 +32,24 @@ public class VoiceLobbyListener extends ListenerAdapter {
 
             var guild = event.getGuild();
             moderation.guild.Guild internalGuild;
-            List<Long> channels;
-            try {
-                internalGuild = new moderation.guild.Guild(guild.getIdLong());
-                channels = internalGuild.getLobbies();
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getMember().getUser(), "voicelobby", null).sendLog(false);
-                return;
-            }
             var member = event.getMember();
+            var user = member.getUser();
             var channel = event.getChannelJoined();
+            internalGuild = new Guild(guild.getIdLong());
+            var channels = internalGuild.getLobbies(guild, user);
 
             if (channels.contains(channel.getIdLong())) {
                 VoiceChannel newChannel;
-                try {
-                    newChannel = (VoiceChannel) guild.getController().createVoiceChannel(getLobbyName(member, new Guild(event.getGuild().getIdLong()).getLanguage()))
-                            .setBitrate(Math.min(channel.getBitrate(), 96000))
-                            .setUserlimit(channel.getUserLimit())
-                            .complete();
+                newChannel = (VoiceChannel) guild.getController().createVoiceChannel(getLobbyName(member, new Guild(event.getGuild().getIdLong()).getLanguage(guild, user)))
+                        .setBitrate(Math.min(channel.getBitrate(), 96000))
+                        .setUserlimit(channel.getUserLimit())
+                        .complete();
 
-                    if (channel.getParent() != null) newChannel.getManager().setParent(channel.getParent()).complete();
+                if (channel.getParent() != null) newChannel.getManager().setParent(channel.getParent()).complete();
 
-                    guild.getController().modifyVoiceChannelPositions().selectPosition(newChannel).moveTo(channel.getPosition() + 1).complete();
-                    guild.getController().moveVoiceMember(member, newChannel).complete();
-                    active.add(newChannel);
-                } catch (SQLException e) {
-                    new Log(e, event.getGuild(), event.getMember().getUser(), "voicelobby", null).sendLog(false);
-                    return;
-                }
+                guild.getController().modifyVoiceChannelPositions().selectPosition(newChannel).moveTo(channel.getPosition() + 1).complete();
+                guild.getController().moveVoiceMember(member, newChannel).complete();
+                active.add(newChannel);
             }
 
             try {
@@ -85,35 +74,26 @@ public class VoiceLobbyListener extends ListenerAdapter {
             // Join
             var guild = event.getGuild();
             moderation.guild.Guild internalGuild;
-            List<Long> channels;
-            try {
-                internalGuild = new moderation.guild.Guild(guild.getIdLong());
-                channels = internalGuild.getLobbies();
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getMember().getUser(), "voicelobby", null).sendLog(false);
-                return;
-            }
             var member = event.getMember();
+            var user = member.getUser();
             var joinedChannel = event.getChannelJoined();
+            internalGuild = new Guild(guild.getIdLong());
+            var channels = internalGuild.getLobbies(guild, user);
+
 
             if (channels.contains(joinedChannel.getIdLong())) {
                 VoiceChannel newChannel;
-                try {
-                    newChannel = (VoiceChannel) guild.getController().createVoiceChannel(getLobbyName(member, new Guild(event.getGuild().getIdLong()).getLanguage()))
-                            .setBitrate(Math.min(joinedChannel.getBitrate(), 96000))
-                            .setUserlimit(joinedChannel.getUserLimit())
-                            .complete();
+                newChannel = (VoiceChannel) guild.getController().createVoiceChannel(getLobbyName(member, new Guild(event.getGuild().getIdLong()).getLanguage(guild, user)))
+                        .setBitrate(Math.min(joinedChannel.getBitrate(), 96000))
+                        .setUserlimit(joinedChannel.getUserLimit())
+                        .complete();
 
-                    if (joinedChannel.getParent() != null)
-                        newChannel.getManager().setParent(joinedChannel.getParent()).complete();
+                if (joinedChannel.getParent() != null)
+                    newChannel.getManager().setParent(joinedChannel.getParent()).complete();
 
-                    guild.getController().modifyVoiceChannelPositions().selectPosition(newChannel).moveTo(joinedChannel.getPosition() + 1).complete();
-                    guild.getController().moveVoiceMember(member, newChannel).complete();
-                    active.add(newChannel);
-                } catch (SQLException e) {
-                    new Log(e, event.getGuild(), event.getMember().getUser(), "voicelobby", null).sendLog(false);
-                    return;
-                }
+                guild.getController().modifyVoiceChannelPositions().selectPosition(newChannel).moveTo(joinedChannel.getPosition() + 1).complete();
+                guild.getController().moveVoiceMember(member, newChannel).complete();
+                active.add(newChannel);
             }
 
             try {
@@ -157,11 +137,7 @@ public class VoiceLobbyListener extends ListenerAdapter {
         CompletableFuture.runAsync(() -> {
             if (active.contains(event.getChannel())) {
                 active.remove(event.getChannel());
-                try {
-                    new moderation.guild.Guild(event.getGuild().getIdLong()).unsetLobby(event.getChannel().getIdLong());
-                } catch (SQLException e) {
-                    new Log(e, event.getGuild(), null, "voicelobby", null).sendLog(false);
-                }
+                new Guild(event.getGuild().getIdLong()).unsetLobby(event.getChannel().getIdLong(), event.getGuild(), event.getGuild().getOwner().getUser());
             }
         });
     }

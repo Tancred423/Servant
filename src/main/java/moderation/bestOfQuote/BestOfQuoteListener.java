@@ -7,15 +7,10 @@ import moderation.toggle.Toggle;
 import moderation.user.User;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.OnlineStatus;
-import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import owner.blacklist.Blacklist;
-import servant.Log;
-import servant.Servant;
 
-import java.awt.*;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -31,19 +26,15 @@ public class BestOfQuoteListener extends ListenerAdapter {
             if (!Toggle.isEnabled(event, "bestofquote")) return;
             if (Blacklist.isBlacklisted(event.getUser(), event.getGuild())) return;
 
+            var guild = event.getGuild();
+            var user = event.getUser();
             var messageId = event.getMessageIdLong();
 
             if (temporaryBlacklist.contains(messageId)) return;
             temporaryBlacklist.add(messageId);
 
             var internalGuild = new Guild(event.getGuild().getIdLong());
-            try {
-                if (internalGuild.bestOfQuoteIsBlacklisted(messageId)) {
-                    temporaryBlacklist.remove(messageId);
-                    return;
-                }
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getUser(), "bestofquote", null).sendLog(false);
+            if (internalGuild.bestOfQuoteIsBlacklisted(messageId, guild, user)) {
                 temporaryBlacklist.remove(messageId);
                 return;
             }
@@ -55,17 +46,8 @@ public class BestOfQuoteListener extends ListenerAdapter {
                     return;
                 }
 
-                Emote voteEmote;
-                String voteEmoji;
-                try {
-                    voteEmote = internalGuild.getBestOfQuoteEmote();
-                    voteEmoji = internalGuild.getBestOfQuoteEmoji();
-                } catch (SQLException e) {
-                    new Log(e, event.getGuild(), event.getUser(), "bestofquote", null).sendLog(false);
-                    temporaryBlacklist.remove(messageId);
-                    return;
-                }
-
+                var voteEmote = internalGuild.getBestOfQuoteEmote(guild, user);
+                var voteEmoji = internalGuild.getBestOfQuoteEmoji(guild, user);
                 var reactionCount = 0;
 
                 var reactionEmote = event.getReactionEmote();
@@ -109,28 +91,14 @@ public class BestOfQuoteListener extends ListenerAdapter {
                     return;
                 }
 
-                int number;
-                int percentage;
-                try {
-                    number = internalGuild.getBestOfQuoteNumber();
-                    percentage = internalGuild.getBestOfQuotePercentage();
-                } catch (SQLException e) {
-                    new Log(e, event.getGuild(), event.getUser(), "bestofquote", null).sendLog(false);
-                    temporaryBlacklist.remove(messageId);
-                    return;
-                }
+                var number = internalGuild.getBestOfQuoteNumber(guild, user);
+                var percentage = internalGuild.getBestOfQuotePercentage(guild, user);
 
                 var onlineMemberCount = 0;
                 var members = event.getGuild().getMembers();
                 for (var member : members) if (member.getOnlineStatus() == OnlineStatus.ONLINE) onlineMemberCount++;
                 var onlineMemberPercentage = (int) Math.ceil(onlineMemberCount * percentage / 100.0);
-
-                String lang;
-                try {
-                    lang = new Guild(event.getGuild().getIdLong()).getLanguage();
-                } catch (SQLException e) {
-                    lang = Servant.config.getDefaultLanguage();
-                }
+                var lang = new Guild(event.getGuild().getIdLong()).getLanguage(guild, user);
 
                 if (number != 0 && percentage != 0) {
                     if (reactionCount >= number && reactionCount >= onlineMemberPercentage)
@@ -155,31 +123,25 @@ public class BestOfQuoteListener extends ListenerAdapter {
     }
 
     private static void sendBestOf(GuildMessageReactionAddEvent event, int reactionCount, String lang) {
-        var internalGuild = new Guild(event.getGuild().getIdLong());
+        var user = event.getUser();
+        var guild = event.getGuild();
+        var internalGuild = new Guild(guild.getIdLong());
         event.getChannel().getMessageById(event.getMessageId()).queue(message -> {
-            try {
-                var channel = internalGuild.getBestOfQuoteChannel();
-                var author = message.getAuthor();
+            var channel = internalGuild.getBestOfQuoteChannel(guild, user);
+            var author = message.getAuthor();
 
-                var eb = new EmbedBuilder();
-                try {
-                    eb.setColor(new User(author.getIdLong()).getColor());
-                } catch (SQLException e) {
-                    eb.setColor(Color.decode(Servant.config.getDefaultColorCode()));
-                }
-                eb.setAuthor(author.getName() + "#" + author.getDiscriminator(), null, author.getEffectiveAvatarUrl());
-                eb.setTitle(!message.getContentDisplay().isEmpty() ? message.getContentDisplay() : null);
-                eb.setDescription("[" + LanguageHandler.get(lang, "bestof_jump") + "](" + message.getJumpUrl() + ")");
-                eb.setFooter(String.format(LanguageHandler.get(lang, "bestof_footer"), reactionCount, event.getChannel().getName()), null);
-                eb.setTimestamp(message.getCreationTime());
+            var eb = new EmbedBuilder();
+            eb.setColor(new User(author.getIdLong()).getColor(guild, user));
+            eb.setAuthor(author.getName() + "#" + author.getDiscriminator(), null, author.getEffectiveAvatarUrl());
+            eb.setTitle(!message.getContentDisplay().isEmpty() ? message.getContentDisplay() : null);
+            eb.setDescription("[" + LanguageHandler.get(lang, "bestof_jump") + "](" + message.getJumpUrl() + ")");
+            eb.setFooter(String.format(LanguageHandler.get(lang, "bestof_footer"), reactionCount, event.getChannel().getName()), null);
+            eb.setTimestamp(message.getCreationTime());
 
-                channel.sendMessage(eb.build()).queue();
+            channel.sendMessage(eb.build()).queue();
 
-                // Spam prevention. Every message just once.
-                internalGuild.addBestOfQuoteBlacklist(event.getMessageIdLong());
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getUser(), "bestofquote", null).sendLog(false);
-            }
+            // Spam prevention. Every message just once.
+            internalGuild.addBestOfQuoteBlacklist(event.getMessageIdLong(), guild, user);
         });
     }
 }

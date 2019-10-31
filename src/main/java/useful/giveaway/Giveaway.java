@@ -7,27 +7,27 @@ import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.User;
-import servant.Database;
 import servant.Log;
 import servant.Servant;
 import utilities.Emote;
 import utilities.Image;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
-import java.awt.*;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import static servant.Servant.jda;
+import static utilities.DatabaseConn.closeQuietly;
 
-class Giveaway {
+public class Giveaway {
     private static ZonedDateTime getDate(ZonedDateTime date, String timeString) throws NumberFormatException {
         var timeArray = timeString.split(" ");
         String days;
@@ -61,43 +61,74 @@ class Giveaway {
                 String.format(LanguageHandler.get(lang, "giveaway_minutes"), minutes);
     }
 
-    private static void checkGiveaway(Message message, long messageId, long channelId, long guildId, String prize, int amountWinners, ZonedDateTime giveaway, ScheduledExecutorService service, String lang) {
-        message.getJDA().getGuildById(guildId).getTextChannelById(channelId).getMessageById(messageId).queue(messageNew -> {
-            ZonedDateTime now;
-            try {
-                now = ZonedDateTime.now(ZoneOffset.of(new Guild(message.getGuild().getIdLong()).getOffset()));
-            } catch (SQLException e) {
-                now = ZonedDateTime.now(ZoneOffset.of(Servant.config.getDefaultOffset()));
+    public static void checkGiveaways(JDA jda) {
+        Connection connection = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement("SELECT * FROM giveawaylist");
+            var resultSet = select.executeQuery();
+            if (resultSet.first()) {
+                do {
+                    var guildId = resultSet.getLong("guild_id");
+                    if (jda.getGuildById(guildId) != null) {
+                        var channelId = resultSet.getLong("channel_id");
+                        var messageId = resultSet.getLong("message_id");
+                       var hostId = resultSet.getLong("host_id");
+                        var prize = resultSet.getString("prize");
+                        var giveaway = resultSet.getTimestamp("time").toLocalDateTime()
+                                .atZone(ZoneId.of(new Guild(jda.getGuildById(guildId).getIdLong())
+                                        .getOffset(jda.getGuildById(guildId), jda.getSelfUser())));
+                        var amountWinners = resultSet.getInt("amount_winners");
+
+                        if (jda.getGuildById(guildId) != null
+                                && jda.getGuildById(guildId).getTextChannelById(channelId) != null
+                                && jda.getGuildById(guildId).getTextChannelById(channelId).getMessageById(messageId) != null
+                                && jda.getUserById(hostId) != null) {
+                            jda.getGuildById(guildId).getTextChannelById(channelId).getMessageById(messageId).queue(message -> {
+                                var guild = message.getGuild();
+                                var author = jda.getUserById(hostId);
+                                var lang = new Guild(guild.getIdLong()).getLanguage(guild, jda.getSelfUser());
+                                var now = ZonedDateTime.now(ZoneOffset.of(new Guild(message.getGuild().getIdLong()).getOffset(guild, author)));
+
+                                var remainingTimeMillis = zonedDateTimeDifference(now, giveaway);
+
+                                if (remainingTimeMillis <= 0)
+                                    announceWinners(message, amountWinners, prize, lang, author);
+                                else {
+                                    remainingTimeMillis = zonedDateTimeDifference(now, giveaway);
+                                    var remainingTimeString = formatDifference(remainingTimeMillis, lang);
+
+                                    var eb = new EmbedBuilder();
+                                    eb.setColor(new moderation.user.User(message.getAuthor().getIdLong()).getColor(guild, author));
+                                    eb.setAuthor(String.format(LanguageHandler.get(lang, "giveaway_from"), author.getName()), null, author.getEffectiveAvatarUrl());
+                                    eb.setDescription(String.format(LanguageHandler.get(lang, "giveaway_description_running"), prize, amountWinners, remainingTimeString, Emote.getEmoji("tada")));
+                                    eb.setFooter(LanguageHandler.get(lang, "giveaway_endsat"), Image.getImageUrl("clock", guild, author));
+                                    eb.setTimestamp(giveaway);
+
+                                    message.editMessage(eb.build()).queue();
+                                }
+
+                            });
+                        } else
+                            deleteGiveawayFromDb(guildId, channelId, messageId, jda.getGuildById(guildId), jda.getSelfUser());
+                    }
+                } while (resultSet.next());
             }
-
-            var remainingTimeMillis = zonedDateTimeDifference(now, giveaway);
-
-            if (remainingTimeMillis <= 0) announceWinners(messageNew, amountWinners, prize, service, lang, message.getAuthor());
-            else {
-                remainingTimeMillis = zonedDateTimeDifference(now, giveaway);
-                var remainingTimeString = formatDifference(remainingTimeMillis, lang);
-
-                var eb = new EmbedBuilder();
-                try {
-                    eb.setColor(new moderation.user.User(message.getAuthor().getIdLong()).getColor());
-                } catch (SQLException e) {
-                    eb.setColor(Color.decode(Servant.config.getDefaultColorCode()));
-                }
-                eb.setAuthor(String.format(LanguageHandler.get(lang, "giveaway_from"), message.getAuthor().getName()), null, message.getAuthor().getEffectiveAvatarUrl());
-                eb.setDescription(String.format(LanguageHandler.get(lang, "giveaway_description_running"), prize, amountWinners, remainingTimeString, Emote.getEmoji("tada")));
-                eb.setFooter(LanguageHandler.get(lang, "giveaway_endsat"), Image.getImageUrl("clock"));
-                eb.setTimestamp(giveaway);
-
-                messageNew.editMessage(eb.build()).queue();
-            }
-        });
+        } catch (SQLException e) {
+            new Log(e, null, jda.getSelfUser(), "giveaway", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
     }
 
-    private static void announceWinners(Message message, int amountWinners, String prize, ScheduledExecutorService scheduledExecutorService, String lang, User author) {
+    private static void announceWinners(Message message, int amountWinners, String prize, String lang, User author) {
         if (message.getReactions().size() == 0) {
             message.getChannel().sendMessage(LanguageHandler.get(lang, "giveaway_noreactions")).queue();
             return;
         }
+
+        var guild = message.getGuild();
 
         for (int i = 0; i < message.getReactions().size(); i++) {
             if (message.getReactions().get(i).getReactionEmote().getName().equals(Emote.getEmoji("tada"))) {
@@ -105,24 +136,14 @@ class Giveaway {
                     participantsList.remove(message.getJDA().getSelfUser()); // Remove bot
                     var winners = new StringBuilder();
                     var amountParticipants = participantsList.size();
-
-                    ZonedDateTime now;
-                    try {
-                        now = ZonedDateTime.now(ZoneOffset.of(new Guild(message.getGuild().getIdLong()).getOffset()));
-                    } catch (SQLException e) {
-                        now = ZonedDateTime.now(ZoneOffset.of(Servant.config.getDefaultOffset()));
-                    }
+                    var now = ZonedDateTime.now(ZoneOffset.of(new Guild(message.getGuild().getIdLong()).getOffset(guild, author)));
 
                     if (amountParticipants == 0) {
                         var eb = new EmbedBuilder();
-                        try {
-                            eb.setColor(new moderation.user.User(message.getAuthor().getIdLong()).getColor());
-                        } catch (SQLException e) {
-                            eb.setColor(Color.decode(Servant.config.getDefaultColorCode()));
-                        }
+                        eb.setColor(new moderation.user.User(author.getIdLong()).getColor(guild, author));
                         eb.setAuthor(String.format(LanguageHandler.get(lang, "giveaway_from"), author.getName()), null, author.getEffectiveAvatarUrl());
                         eb.setDescription(String.format(LanguageHandler.get(lang, "giveaway_description_nowinner"), prize, amountWinners));
-                        eb.setFooter(LanguageHandler.get(lang, "giveaway_endedat"), Image.getImageUrl("clock"));
+                        eb.setFooter(LanguageHandler.get(lang, "giveaway_endedat"), Image.getImageUrl("clock", guild, author));
                         eb.setTimestamp(now);
                         message.editMessage(eb.build()).queue();
                     } else {
@@ -135,11 +156,7 @@ class Giveaway {
                         } else for (var participant : participantsList) winners.append(" - ").append(participant.getAsMention()).append("\n");
 
                         var eb = new EmbedBuilder();
-                        try {
-                            eb.setColor(new moderation.user.User(message.getAuthor().getIdLong()).getColor());
-                        } catch (SQLException e) {
-                            eb.setColor(Color.decode(Servant.config.getDefaultColorCode()));
-                        }
+                        eb.setColor(new moderation.user.User(message.getAuthor().getIdLong()).getColor(guild, author));
                         eb.setAuthor(String.format(LanguageHandler.get(lang, "giveaway_from"), author.getName()), null, author.getEffectiveAvatarUrl());
                         eb.setDescription(String.format(LanguageHandler.get(lang, "giveaway_description_end"), prize, amountWinners, winners));
                         eb.setFooter(LanguageHandler.get(lang, "giveaway_endedat"), null);
@@ -148,40 +165,81 @@ class Giveaway {
                     }
 
                     message.clearReactions().queue();
-                    scheduledExecutorService.shutdown();
-                    try {
-                        deleteGiveawayFromDb(message.getGuild().getIdLong(), message.getChannel().getIdLong(), message.getIdLong(), prize);
-                    } catch (SQLException e) {
-                        new Log(e, message.getGuild(), message.getAuthor(), "giveaway", null).sendLog(false);
-                    }
+                    deleteGiveawayFromDb(message.getGuild().getIdLong(), message.getChannel().getIdLong(), message.getIdLong(), guild, author);
                 });
             }
         }
     }
 
     // Inserts an entry for a new giveaway into the database table "giveawaylist".
-    private static void insertGiveawayToDb(long guildId, long channelId, long messageId, long hostId, String prize) throws SQLException {
-        var connection = Database.getConnection();
-        var preparedStatement = connection.prepareStatement("INSERT INTO giveawaylist(guild_id,channel_id,message_id,host_id,prize) VALUES(?,?,?,?,?)");
-        preparedStatement.setLong(1, guildId);
-        preparedStatement.setLong(2, channelId);
-        preparedStatement.setLong(3, messageId);
-        preparedStatement.setLong(4, hostId);
-        preparedStatement.setString(5, prize);
-        preparedStatement.executeUpdate();
-        connection.close();
+    private static void insertGiveawayToDb(long guildId, long channelId, long messageId, long hostId, String prize, Timestamp time, int amountWinners, net.dv8tion.jda.core.entities.Guild guild, User user) {
+        Connection connection = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var preparedStatement = connection.prepareStatement("INSERT INTO giveawaylist(guild_id,channel_id,message_id,host_id,prize,time,amount_winners) VALUES(?,?,?,?,?,?,?)");
+            preparedStatement.setLong(1, guildId);
+            preparedStatement.setLong(2, channelId);
+            preparedStatement.setLong(3, messageId);
+            preparedStatement.setLong(4, hostId);
+            preparedStatement.setString(5, prize);
+            preparedStatement.setTimestamp(6, time);
+            preparedStatement.setInt(7, amountWinners);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            new Log(e, guild, user, "giveaway", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
     }
 
     // Deletes the giveaway entry from the database table "giveawaylist".
-    private static void deleteGiveawayFromDb(long guildId, long channelId, long messageId, String prize) throws SQLException {
-        var connection = Database.getConnection();
-        var delete = connection.prepareStatement("DELETE FROM giveawaylist WHERE guild_id=? AND channel_id=? AND message_id=? AND prize=?");
-        delete.setLong(1, guildId);
-        delete.setLong(2, channelId);
-        delete.setLong(3, messageId);
-        delete.setString(4, prize);
-        delete.executeUpdate();
-        connection.close();
+    static void deleteGiveawayFromDb(long guildId, long channelId, long messageId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+        Connection connection = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var delete = connection.prepareStatement("DELETE FROM giveawaylist WHERE guild_id=? AND channel_id=? AND message_id=?");
+            delete.setLong(1, guildId);
+            delete.setLong(2, channelId);
+            delete.setLong(3, messageId);
+            delete.executeUpdate();
+        } catch (SQLException e) {
+            new Log(e, guild, user, "giveaway", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+    }
+
+    static void deleteGiveawayFromDb(long guildId, long channelId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+        Connection connection = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var delete = connection.prepareStatement("DELETE FROM giveawaylist WHERE guild_id=? AND channel_id=?");
+            delete.setLong(1, guildId);
+            delete.setLong(2, channelId);
+            delete.executeUpdate();
+        } catch (SQLException e) {
+            new Log(e, guild, user, "giveaway", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+    }
+
+    static void deleteGiveawayFromDb(long guildId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+        Connection connection = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var delete = connection.prepareStatement("DELETE FROM giveawaylist WHERE guild_id=?");
+            delete.setLong(1, guildId);
+            delete.executeUpdate();
+        } catch (SQLException e) {
+            new Log(e, guild, user, "giveaway", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
     }
 
     // Getter for all running giveaways on the current guild.
@@ -204,14 +262,22 @@ class Giveaway {
         message.getChannel().sendMessage(LanguageHandler.get(lang, "giveaway_wrongargument")).queue();
     }
 
-    static String getCurrentGiveaways(Message message, String lang) throws SQLException {
-        var connection = Database.getConnection();
-        var select = connection.prepareStatement("SELECT * FROM giveawaylist WHERE guild_id=?");
-        select.setLong(1, message.getGuild().getIdLong());
-        var resultSet = select.executeQuery();
+    static String getCurrentGiveaways(Message message, String lang, net.dv8tion.jda.core.entities.Guild guild, User user) {
+        Connection connection = null;
         var currentGiveaways = LanguageHandler.get(lang, "giveaway_nocurrent");
-        if (resultSet.first()) currentGiveaways = getRunningGiveaways(jda, resultSet, lang);
-        connection.close();
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement("SELECT * FROM giveawaylist WHERE guild_id=?");
+            select.setLong(1, message.getGuild().getIdLong());
+            var resultSet = select.executeQuery();
+            if (resultSet.first()) currentGiveaways = getRunningGiveaways(jda, resultSet, lang);
+        } catch (SQLException e) {
+            new Log(e, guild, user, "giveaway", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+
         return currentGiveaways;
     }
 
@@ -225,6 +291,9 @@ class Giveaway {
         var prize = "";
         var amountWinners = 0;
         var sb = new StringBuilder();
+
+        var guild = event.getGuild();
+        var author = event.getAuthor();
 
         for (int i = 0; i < args.length; i++) {
             argsString.append(args[i]).append(" ");
@@ -289,13 +358,7 @@ class Giveaway {
             }
         }
 
-        ZonedDateTime now;
-        try {
-            now = ZonedDateTime.now(ZoneOffset.of(new Guild(message.getGuild().getIdLong()).getOffset()));
-        } catch (SQLException e) {
-            now = ZonedDateTime.now(ZoneOffset.of(Servant.config.getDefaultOffset()));
-        }
-
+        var now = ZonedDateTime.now(ZoneOffset.of(new Guild(message.getGuild().getIdLong()).getOffset(guild, author)));
         ZonedDateTime dateGiveaway;
         try {
             dateGiveaway = getDate(now, sb.toString().trim());
@@ -313,35 +376,26 @@ class Giveaway {
         var remainingTimeString = formatDifference(remainingTimeMillis, lang);
 
         var eb = new EmbedBuilder();
-        try {
-            eb.setColor(new moderation.user.User(message.getAuthor().getIdLong()).getColor());
-        } catch (SQLException e) {
-            eb.setColor(Color.decode(Servant.config.getDefaultColorCode()));
-        }
+        eb.setColor(new moderation.user.User(message.getAuthor().getIdLong()).getColor(guild, author));
         eb.setAuthor(String.format(LanguageHandler.get(lang, "giveaway_from"), message.getAuthor().getName()), null, message.getAuthor().getEffectiveAvatarUrl());
         eb.setDescription(String.format(LanguageHandler.get(lang, "giveaway_description_running"), prize, amountWinners, remainingTimeString, Emote.getEmoji("tada")));
-        eb.setFooter(LanguageHandler.get(lang, "giveaway_endsat"), Image.getImageUrl("clock"));
+        eb.setFooter(LanguageHandler.get(lang, "giveaway_endsat"), Image.getImageUrl("clock", guild, author));
         eb.setTimestamp(dateGiveaway);
 
-        var finalPrize = prize;
-        var finalAmountWinners = amountWinners;
         var finalPrize1 = prize;
-
+        var finalAmountWinners = amountWinners;
         message.getTextChannel().sendMessage(eb.build()).queue((messageNew -> {
             message.delete().queue();
-            try {
-                insertGiveawayToDb(messageNew.getGuild().getIdLong(), messageNew.getChannel().getIdLong(), messageNew.getIdLong(), message.getAuthor().getIdLong(), finalPrize1);
-                messageNew.addReaction(Emote.getEmoji("tada")).queue();
+            insertGiveawayToDb(messageNew.getGuild().getIdLong(), messageNew.getChannel().getIdLong(),
+                    messageNew.getIdLong(), message.getAuthor().getIdLong(), finalPrize1, Timestamp.valueOf(dateGiveaway.toLocalDateTime()), finalAmountWinners, guild, author);
+            messageNew.addReaction(Emote.getEmoji("tada")).queue();
 
-                var messageid = messageNew.getIdLong();
-                var channelid = messageNew.getChannel().getIdLong();
-                var guildid = messageNew.getGuild().getIdLong();
-
-                var service = Executors.newSingleThreadScheduledExecutor();
-                service.scheduleAtFixedRate(() -> checkGiveaway(message, messageid, channelid, guildid, finalPrize, finalAmountWinners, dateGiveaway, service, lang), 1, 1, TimeUnit.MINUTES);
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), "giveaway", event).sendLog(false);
-            }
+//            var messageid = messageNew.getIdLong();
+//            var channelid = messageNew.getChannel().getIdLong();
+//            var guildid = messageNew.getGuild().getIdLong();
+//
+//            var service = Executors.newSingleThreadScheduledExecutor();
+//            service.scheduleAtFixedRate(() -> checkGiveaway(message, messageid, channelid, guildid, finalPrize, finalAmountWinners, dateGiveaway, service, lang), 1, 1, TimeUnit.MINUTES);
         }));
     }
 }

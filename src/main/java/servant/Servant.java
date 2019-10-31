@@ -46,6 +46,7 @@ import patreon.PatreonListener;
 import useful.alarm.AlarmCommand;
 import useful.alarm.AlarmListener;
 import useful.giveaway.GiveawayCommand;
+import useful.giveaway.GiveawayListener;
 import useful.reminder.ReminderCommand;
 import useful.reminder.ReminderListener;
 import useful.signup.SignupCommand;
@@ -74,6 +75,7 @@ public class Servant {
     public static JDA jda;
     public static ConfigFile config;
     public static ToggleFile toggle;
+    public static Database db;
 
     public static void main(String[] args) throws IOException, LoginException {
         config = new ConfigFile();
@@ -81,6 +83,9 @@ public class Servant {
             System.out.println("The bot was shut down.");
             return;
         }
+
+        db = new Database();
+        if (!db.connectToDatabase()) return;
 
         LanguageHandler.initialize();
 
@@ -171,31 +176,33 @@ public class Servant {
                 .setStatus(OnlineStatus.DO_NOT_DISTURB)
                 .setGame(Game.playing("loading..."))
 
-                .addEventListener(waiter)
                 .addEventListener(client.build())
+                .addEventListener(waiter)
+
+                .addEventListener(new AlarmListener())
                 .addEventListener(new AutoroleListener())
-                .addEventListener(new BirthdayListener())
-                .addEventListener(new InviteKickListener())
-                .addEventListener(new JoinListener())
-                .addEventListener(new LevelListener())
-                .addEventListener(new VoiceLobbyListener())
-                .addEventListener(new MediaOnlyChannelListener())
-                .addEventListener(new PatreonListener())
-                .addEventListener(new ReactionRoleListener())
-                .addEventListener(new ReadyListener())
-                .addEventListener(new LivestreamListener())
-                .addEventListener(new QuickvoteEndListener())
-                .addEventListener(new QuickvoteMultipleVoteListener())
-                .addEventListener(new VoteEndListener())
-                .addEventListener(new RadiovoteMultipleVoteListener())
-                .addEventListener(new LeaveListener())
-                .addEventListener(new EasterEggsListener())
                 .addEventListener(new BestOfImageListener())
                 .addEventListener(new BestOfQuoteListener())
-                .addEventListener(new ReminderListener())
-                .addEventListener(new AlarmListener())
+                .addEventListener(new BirthdayListener())
+                .addEventListener(new EasterEggsListener())
+                .addEventListener(new GiveawayListener())
+                .addEventListener(new InviteKickListener())
+                .addEventListener(new JoinListener())
+                .addEventListener(new LeaveListener())
+                .addEventListener(new LevelListener())
+                .addEventListener(new LivestreamListener())
+                .addEventListener(new MediaOnlyChannelListener())
+                .addEventListener(new PatreonListener())
                 .addEventListener(new PrefixListener())
+                .addEventListener(new QuickvoteEndListener())
+                .addEventListener(new QuickvoteMultipleVoteListener())
+                .addEventListener(new RadiovoteMultipleVoteListener())
+                .addEventListener(new ReactionRoleListener())
+                .addEventListener(new ReadyListener())
+                .addEventListener(new ReminderListener())
                 .addEventListener(new SignupListener())
+                .addEventListener(new VoiceLobbyListener())
+                .addEventListener(new VoteEndListener())
 
                 .build();
     }

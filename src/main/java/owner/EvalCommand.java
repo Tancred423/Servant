@@ -5,12 +5,10 @@ import groovy.lang.GroovyShell;
 import moderation.guild.Guild;
 import moderation.user.User;
 import net.dv8tion.jda.core.Permission;
-import servant.Log;
 import utilities.Constants;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
-import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
 
 public class EvalCommand extends Command {
@@ -70,13 +68,12 @@ public class EvalCommand extends Command {
                 event.reply(e.getMessage());
             }
 
+            var guild = event.getGuild();
+            var author = event.getAuthor();
+
             // Statistics.
-            try {
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-                if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-            }
+            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
         });
     }
 }

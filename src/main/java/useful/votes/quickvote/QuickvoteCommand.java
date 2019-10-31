@@ -4,19 +4,17 @@ package useful.votes.quickvote;
 import files.language.LanguageHandler;
 import moderation.guild.Guild;
 import moderation.toggle.Toggle;
+import moderation.user.User;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 import owner.blacklist.Blacklist;
-import useful.votes.VotesDatabase;
-import utilities.Emote;
-import servant.Log;
 import servant.Servant;
-import moderation.user.User;
+import useful.votes.VotesDatabase;
 import utilities.Constants;
+import utilities.Emote;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
-import java.sql.SQLException;
 import java.time.DateTimeException;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -44,46 +42,34 @@ public class QuickvoteCommand extends Command {
             if (!Toggle.isEnabled(event, name)) return;
             if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
 
-            var lang = LanguageHandler.getLanguage(event, name);
+            var lang = LanguageHandler.getLanguage(event);
             var message = event.getMessage();
+            var guild = event.getGuild();
             var author = message.getAuthor();
             var internalAuthor = new User(author.getIdLong());
             var eb = new EmbedBuilder();
 
-            try {
-                eb.setColor(internalAuthor.getColor());
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                return;
-            }
+            eb.setColor(internalAuthor.getColor(guild, author));
             eb.setAuthor(String.format(LanguageHandler.get(lang, "quickvote_started"), author.getName()), null, author.getEffectiveAvatarUrl());
             eb.setDescription(event.getArgs());
             eb.setFooter(LanguageHandler.get(lang, "votes_active"), event.getJDA().getSelfUser().getAvatarUrl());
             try {
-                eb.setTimestamp(OffsetDateTime.now(ZoneId.of(new Guild(event.getGuild().getIdLong()).getOffset())));
-            } catch (SQLException | DateTimeException e) {
+                eb.setTimestamp(OffsetDateTime.now(ZoneId.of(new Guild(event.getGuild().getIdLong()).getOffset(guild, author))));
+            } catch (DateTimeException e) {
                 eb.setTimestamp(OffsetDateTime.now(ZoneId.of(Servant.config.getDefaultOffset())).getOffset());
             }
             message.getChannel().sendMessage(eb.build()).queue(sentMessage -> {
-                try {
-                    sentMessage.addReaction(Emote.getEmoji("upvote")).queue();
-                    sentMessage.addReaction(Emote.getEmoji("downvote")).queue();
-                    sentMessage.addReaction(Emote.getEmoji("end")).queue();
-                    VotesDatabase.setVote(sentMessage.getIdLong(), author.getIdLong(), "quick");
-                } catch (SQLException e) {
-                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                }
+                sentMessage.addReaction(Emote.getEmoji("upvote")).queue();
+                sentMessage.addReaction(Emote.getEmoji("downvote")).queue();
+                sentMessage.addReaction(Emote.getEmoji("end")).queue();
+                VotesDatabase.setVote(sentMessage.getIdLong(), author.getIdLong(), "quick", guild, author);
             });
 
             message.delete().queue();
 
             // Statistics.
-            try {
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-                if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-            }
+            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
         });
     }
 }

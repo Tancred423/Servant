@@ -18,7 +18,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
 
 public class CatCommand extends Command {
@@ -43,22 +42,21 @@ public class CatCommand extends Command {
             if (!Toggle.isEnabled(event, name)) return;
             event.getChannel().sendTyping().queue();
 
+            var guild = event.getGuild();
+            var author = event.getAuthor();
+
             try {
                 var eb = new EmbedBuilder();
-                eb.setColor(new User(event.getAuthor().getIdLong()).getColor());
+                eb.setColor(new User(event.getAuthor().getIdLong()).getColor(guild, author));
                 eb.setImage(getImageUrl());
                 event.reply(eb.build());
-            } catch (IOException | IllegalArgumentException | SQLException e) {
+            } catch (IOException | IllegalArgumentException e) {
                 new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
             }
 
             // Statistics.
-            try {
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-                if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-            }
+            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
         });
     }
 

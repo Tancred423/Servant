@@ -7,14 +7,11 @@ import moderation.toggle.Toggle;
 import moderation.user.User;
 import net.dv8tion.jda.core.Permission;
 import owner.blacklist.Blacklist;
-import servant.Log;
 import utilities.*;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
-import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
@@ -40,22 +37,18 @@ public class VoiceLobbyCommand extends Command {
             if (!Toggle.isEnabled(event, name)) return;
             if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
 
-            var lang = LanguageHandler.getLanguage(event, name);
-            var p = GuildHandler.getPrefix(event, name);
+            var lang = LanguageHandler.getLanguage(event);
+            var p = GuildHandler.getPrefix(event);
 
             var guild = event.getGuild();
             var internalGuild = new moderation.guild.Guild(guild.getIdLong());
 
             if (event.getArgs().isEmpty()) {
-                try {
-                    var description = LanguageHandler.get(lang, "voicelobby_description");
-                    var usage = String.format(LanguageHandler.get(lang, "voicelobby_usage"),
-                            p, name, p, name, p, name, p, name, p, name);
-                    var hint = LanguageHandler.get(lang, "voicelobby_hint");
-                    event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
-                } catch (SQLException e) {
-                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                }
+                var description = LanguageHandler.get(lang, "voicelobby_description");
+                var usage = String.format(LanguageHandler.get(lang, "voicelobby_usage"),
+                        p, name, p, name, p, name, p, name, p, name);
+                var hint = LanguageHandler.get(lang, "voicelobby_hint");
+                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
                 return;
             }
 
@@ -78,13 +71,7 @@ public class VoiceLobbyCommand extends Command {
                         return;
                     }
 
-                    try {
-                        internalGuild.setLobby(Long.parseLong(args[1]));
-                    } catch (SQLException e) {
-                        new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                        return;
-                    }
-
+                    internalGuild.setLobby(Long.parseLong(args[1]), guild, author);
                     event.reactSuccess();
                     break;
 
@@ -102,16 +89,7 @@ public class VoiceLobbyCommand extends Command {
                         return;
                     }
 
-                    boolean wasUnset;
-
-                    try {
-                        wasUnset = internalGuild.unsetLobby(Long.parseLong(args[1]));
-                    } catch (SQLException e) {
-                        new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                        return;
-                    }
-
-                    if (wasUnset) event.reactSuccess();
+                    if (internalGuild.unsetLobby(Long.parseLong(args[1]), guild, author)) event.reactSuccess();
                     else {
                         event.reactError();
                         event.reply(LanguageHandler.get(lang, "voicelobby_unset_fail"));
@@ -120,13 +98,7 @@ public class VoiceLobbyCommand extends Command {
 
                 case "show":
                 case "sh":
-                    List<Long> lobbies;
-                    try {
-                        lobbies = internalGuild.getLobbies();
-                    } catch (SQLException e) {
-                        new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                        return;
-                    }
+                    var lobbies = internalGuild.getLobbies(guild, author);
 
                     if (lobbies.isEmpty()) {
                         event.reply(LanguageHandler.get(lang, "voicelobby_noneset"));
@@ -139,26 +111,21 @@ public class VoiceLobbyCommand extends Command {
                         builder.append(guild.getVoiceChannelById(lobby).getName()).append(" (").append(lobby).append(")\n");
                     builder.append("```");
 
-                    Map<String, Map.Entry<String, Boolean>> fields = new HashMap<>();
+                    var fields = new HashMap<String, Map.Entry<String, Boolean>>();
                     fields.put(LanguageHandler.get(lang, "voicelobby_current"), new MyEntry<>(builder.toString(), false));
 
-                    try {
-                        new MessageHandler().sendEmbed(event.getChannel(),
-                                internalAuthor.getColor(),
-                                guild.getName(),
-                                null,
-                                guild.getIconUrl(),
-                                null,
-                                guild.getSplashUrl(),
-                                null,
-                                fields,
-                                null,
-                                String.format(LanguageHandler.get(lang, "voicelobby_footer"), internalGuild.getPrefix()),
-                                null);
-                    } catch (SQLException e) {
-                        new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                        return;
-                    }
+                    new MessageHandler().sendEmbed(event.getChannel(),
+                            internalAuthor.getColor(guild, author),
+                            guild.getName(),
+                            null,
+                            guild.getIconUrl(),
+                            null,
+                            guild.getSplashUrl(),
+                            null,
+                            fields,
+                            null,
+                            String.format(LanguageHandler.get(lang, "voicelobby_footer"), internalGuild.getPrefix(guild, author)),
+                            null);
                     break;
 
                 default:
@@ -168,12 +135,8 @@ public class VoiceLobbyCommand extends Command {
             }
 
             // Statistics.
-            try {
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-                if (event.getGuild() != null) new moderation.guild.Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-            }
+            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+            if (event.getGuild() != null) new moderation.guild.Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
         });
     }
 }

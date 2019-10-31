@@ -9,9 +9,7 @@ import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionRemov
 import net.dv8tion.jda.core.exceptions.HierarchyException;
 import net.dv8tion.jda.core.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
-import servant.Log;
 
-import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
 
 public class ReactionRoleListener extends ListenerAdapter {
@@ -20,6 +18,8 @@ public class ReactionRoleListener extends ListenerAdapter {
             if (event.getUser().isBot()) return;
             if (!Toggle.isEnabled(event, "reactionrole")) return;
 
+            var guild = event.getGuild();
+            var user = event.getUser();
             var guildId = event.getGuild().getIdLong();
             var channelId = event.getChannel().getIdLong();
             var messageId = event.getMessageIdLong();
@@ -37,17 +37,13 @@ public class ReactionRoleListener extends ListenerAdapter {
                 emoji = reactionEmote.getName();
             }
 
-            try {
-                if (internalGuild.hasEntry(guildId, channelId, messageId, emoji, emoteGuildId, emoteId)) {
-                    long roleId = internalGuild.getRoleId(guildId, channelId, messageId, emoji, emoteGuildId, emoteId);
-                    try {
-                        event.getGuild().getController().addSingleRoleToMember(event.getMember(), event.getGuild().getRoleById(roleId)).queue();
-                    } catch (InsufficientPermissionException | HierarchyException e) {
-                        event.getChannel().sendMessage(LanguageHandler.get(new Guild(event.getGuild().getIdLong()).getLanguage(), "reactionrole_insufficient")).queue();
-                    }
+            if (internalGuild.reactionRoleHasEntry(guildId, channelId, messageId, emoji, emoteGuildId, emoteId, guild, user)) {
+                long roleId = internalGuild.getRoleId(guildId, channelId, messageId, emoji, emoteGuildId, emoteId, guild, user);
+                try {
+                    event.getGuild().getController().addSingleRoleToMember(event.getMember(), event.getGuild().getRoleById(roleId)).queue();
+                } catch (InsufficientPermissionException | HierarchyException e) {
+                    event.getChannel().sendMessage(LanguageHandler.get(new Guild(event.getGuild().getIdLong()).getLanguage(guild, user), "reactionrole_insufficient")).queue();
                 }
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getUser(), "reactionrole", null).sendLog(false);
             }
         });
     }
@@ -58,6 +54,8 @@ public class ReactionRoleListener extends ListenerAdapter {
 
             if (event.getUser().isBot()) return;
 
+            var guild = event.getGuild();
+            var user = event.getUser();
             var guildId = event.getGuild().getIdLong();
             var channelId = event.getChannel().getIdLong();
             var messageId = event.getMessageIdLong();
@@ -75,17 +73,13 @@ public class ReactionRoleListener extends ListenerAdapter {
                 emoji = reactionEmote.getName();
             }
 
-            try {
-                if (internalGuild.hasEntry(guildId, channelId, messageId, emoji, emoteGuildId, emoteId)) {
-                    long roleId = internalGuild.getRoleId(guildId, channelId, messageId, emoji, emoteGuildId, emoteId);
-                    try {
-                        event.getGuild().getController().removeSingleRoleFromMember(event.getMember(), event.getGuild().getRoleById(roleId)).queue();
-                    } catch (InsufficientPermissionException | HierarchyException e) {
-                        event.getChannel().sendMessage(LanguageHandler.get(new Guild(event.getGuild().getIdLong()).getLanguage(), "reactionrole_insufficient")).queue();
-                    }
+            if (internalGuild.reactionRoleHasEntry(guildId, channelId, messageId, emoji, emoteGuildId, emoteId, guild, user)) {
+                long roleId = internalGuild.getRoleId(guildId, channelId, messageId, emoji, emoteGuildId, emoteId, guild, user);
+                try {
+                    event.getGuild().getController().removeSingleRoleFromMember(event.getMember(), event.getGuild().getRoleById(roleId)).queue();
+                } catch (InsufficientPermissionException | HierarchyException e) {
+                    event.getChannel().sendMessage(LanguageHandler.get(new Guild(event.getGuild().getIdLong()).getLanguage(guild, user), "reactionrole_insufficient")).queue();
                 }
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getUser(), "reactionrole", null).sendLog(false);
             }
         });
     }

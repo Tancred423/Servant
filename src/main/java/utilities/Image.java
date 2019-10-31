@@ -1,23 +1,33 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package utilities;
 
-import servant.Database;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.User;
+import servant.Log;
+import servant.Servant;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 
+import static utilities.DatabaseConn.closeQuietly;
+
 public class Image {
-    public static String getImageUrl(String imageName) {
+    public static String getImageUrl(String imageName, Guild guild, User user) {
+        Connection connection = null;
+        String imageUrl = null;
+
         try {
-            var connection = Database.getConnection();
+            connection = Servant.db.getHikari().getConnection();
             var select = connection.prepareStatement("SELECT image_url FROM image WHERE image_name=?");
             select.setString(1, imageName);
             var resultSet = select.executeQuery();
-            String imageUrl = null;
             if (resultSet.first()) imageUrl = resultSet.getString("image_url");
-            connection.close();
-            return imageUrl;
         } catch (SQLException e) {
-            return null;
+            new Log(e, guild, user, "levelrole", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
         }
+
+        return imageUrl;
     }
 }

@@ -7,15 +7,15 @@ import moderation.toggle.Toggle;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
-import servant.Log;
-import servant.Servant;
 import useful.votes.VotesDatabase;
 import utilities.Emote;
 
-import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class VoteEndListener extends ListenerAdapter {
@@ -23,34 +23,21 @@ public class VoteEndListener extends ListenerAdapter {
         CompletableFuture.runAsync(() -> {
             if (!Toggle.isEnabled(event, "vote")) return;
 
-            String lang;
-            try {
-                lang = new Guild(event.getGuild().getIdLong()).getLanguage();
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getUser(), "vote", null).sendLog(false);
-                return;
-            }
-
+            var guild = event.getGuild();
             var user = event.getUser();
+            var lang = new Guild(event.getGuild().getIdLong()).getLanguage(guild, user);
+
             if (user.isBot()) return;
 
             var messageId = event.getMessageIdLong();
-            try {
-                if (!VotesDatabase.isVote(messageId) && !VotesDatabase.isRadioVote(messageId)) return; // Has to be a vote or radiovote.
-            } catch (SQLException e) {
-                return;
-            }
+            if (!VotesDatabase.isVote(messageId, guild, user) && !VotesDatabase.isRadioVote(messageId, guild, user)) return; // Has to be a vote or radiovote.
 
             var reactionEmote = event.getReactionEmote();
             if (!reactionEmote.isEmote()) {
                 if (!reactionEmote.getName().equals(Emote.getEmoji("end"))) return;
             } else return;
 
-            try {
-                if (user.getIdLong() != VotesDatabase.getAuthorId(messageId)) return; // Has to be done by author.
-            } catch (SQLException e) {
-                return;
-            }
+            if (user.getIdLong() != VotesDatabase.getAuthorId(messageId, guild, user)) return; // Has to be done by author.
 
             // The author has reacted with an ending emote on their quickvote.
             event.getChannel().getMessageById(messageId).queue(message -> {
@@ -68,20 +55,16 @@ public class VoteEndListener extends ListenerAdapter {
                 net.dv8tion.jda.core.entities.Emote nineEmote;
                 net.dv8tion.jda.core.entities.Emote tenEmote;
 
-                try {
-                    oneEmote = Emote.getEmote("one");
-                    twoEmote = Emote.getEmote("two");
-                    threeEmote = Emote.getEmote("three");
-                    fourEmote = Emote.getEmote("four");
-                    fiveEmote = Emote.getEmote("five");
-                    sixEmote = Emote.getEmote("six");
-                    sevenEmote = Emote.getEmote("seven");
-                    eightEmote = Emote.getEmote("eight");
-                    nineEmote = Emote.getEmote("nine");
-                    tenEmote = Emote.getEmote("ten");
-                } catch (SQLException e) {
-                    return;
-                }
+                oneEmote = Emote.getEmote("one", guild, user);
+                twoEmote = Emote.getEmote("two", guild, user);
+                threeEmote = Emote.getEmote("three", guild, user);
+                fourEmote = Emote.getEmote("four", guild, user);
+                fiveEmote = Emote.getEmote("five", guild, user);
+                sixEmote = Emote.getEmote("six", guild, user);
+                sevenEmote = Emote.getEmote("seven", guild, user);
+                eightEmote = Emote.getEmote("eight", guild, user);
+                nineEmote = Emote.getEmote("nine", guild, user);
+                tenEmote = Emote.getEmote("ten", guild, user);
 
                 var oneEmoji = Emote.getEmoji("one");
                 var twoEmoji = Emote.getEmoji("two");
@@ -132,22 +115,12 @@ public class VoteEndListener extends ListenerAdapter {
                 eb.setTitle(messageEmbed.getTitle());
                 for (int i = 0; i < lines.size(); i++) eb.addField(lines.get(i), String.valueOf(count.get(i + 1)), true);
                 eb.setFooter(LanguageHandler.get(lang, "votes_inactive"), event.getJDA().getSelfUser().getAvatarUrl());
-                try {
-                    eb.setTimestamp(OffsetDateTime.now(ZoneId.of(new Guild(event.getGuild().getIdLong()).getOffset())));
-                } catch (SQLException e) {
-                    eb.setTimestamp(OffsetDateTime.now(ZoneId.of(Servant.config.getDefaultOffset())).getOffset());
-                }
+                eb.setTimestamp(OffsetDateTime.now(ZoneId.of(new Guild(event.getGuild().getIdLong()).getOffset(guild, user))));
 
                 message.editMessage(eb.build()).queue();
                 message.clearReactions().queue();
-                try {
-                    VotesDatabase.unsetVote(message.getIdLong());
-                    VotesDatabase.unsetUserVotes(message.getIdLong());
-                } catch (SQLException e) {
-                    event.getJDA().getUserById(Servant.config.getBotOwnerId()).openPrivateChannel().queue(privateChannel ->
-                            privateChannel.sendMessage(LanguageHandler.get(lang, "vote_missing_db")
-                            ).queue());
-                }
+                VotesDatabase.unsetVote(message.getIdLong(), guild, user);
+                VotesDatabase.unsetUserVotes(message.getIdLong(), guild, user);
             });
         });
     }

@@ -12,8 +12,6 @@ import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.exceptions.HierarchyException;
 import owner.blacklist.Blacklist;
-import servant.Log;
-import servant.Servant;
 import utilities.Constants;
 import utilities.Parser;
 import utilities.StringFormat;
@@ -21,8 +19,6 @@ import utilities.UsageEmbed;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
-import java.awt.*;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -49,22 +45,19 @@ public class LevelRoleCommand extends Command {
             if (!Toggle.isEnabled(event, name)) return;
             if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
 
-            var lang = LanguageHandler.getLanguage(event, name);
-            var p = GuildHandler.getPrefix(event, name);
+            var lang = LanguageHandler.getLanguage(event);
+            var p = GuildHandler.getPrefix(event);
 
             if (event.getArgs().isEmpty()) {
-                try {
-                    var description = LanguageHandler.get(lang, "levelrole_description");
-                    var usage = String.format(LanguageHandler.get(lang, "levelrole_usage"),
-                            p, name, p, name, p, name, p, name, p, name, p, name);
-                    var hint = LanguageHandler.get(lang, "levelrole_hint");
-                    event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
-                } catch (SQLException e) {
-                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                }
+                var description = LanguageHandler.get(lang, "levelrole_description");
+                var usage = String.format(LanguageHandler.get(lang, "levelrole_usage"),
+                        p, name, p, name, p, name, p, name, p, name, p, name);
+                var hint = LanguageHandler.get(lang, "levelrole_hint");
+                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
                 return;
             }
 
+            var author = event.getAuthor();
             var guild = event.getGuild();
             var internalGuild = new Guild(guild.getIdLong());
             var args = event.getArgs().split(" ");
@@ -89,15 +82,11 @@ public class LevelRoleCommand extends Command {
                     }
 
                     role = message.getMentionedRoles().get(0);
-                    try {
-                        var wasSet = internalGuild.setLevelRole(level, role.getIdLong());
-                        if (wasSet) event.reactSuccess();
-                        else {
-                            event.reply(LanguageHandler.get(lang, "levelrole_alreadyset"));
-                            event.reactError();
-                        }
-                    } catch (SQLException e) {
-                        new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
+                    var wasSet = internalGuild.setLevelRole(level, role.getIdLong(), guild, author);
+                    if (wasSet) event.reactSuccess();
+                    else {
+                        event.reply(LanguageHandler.get(lang, "levelrole_alreadyset"));
+                        event.reactError();
                     }
                     break;
 
@@ -116,82 +105,62 @@ public class LevelRoleCommand extends Command {
                     }
 
                     role = message.getMentionedRoles().get(0);
-                    try {
-                        internalGuild.unsetLevelRole(level, role.getIdLong());
-                        event.reactSuccess();
-                    } catch (SQLException e) {
-                        new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                    }
+                    internalGuild.unsetLevelRole(level, role.getIdLong(), guild, author);
+                    event.reactSuccess();
                     break;
 
                 case "show":
                 case "sh":
-                    try {
-                        var sb = new StringBuilder().append("```c\n").append(LanguageHandler.get(lang, "levelrole_levelrole")).append("\n").append("----- ----------\n");
-                        Map<Integer, Long> levelRoles = internalGuild.getLevelRoles();
-                        var hasEntry = false;
-                        for (Map.Entry<Integer, Long> levelRole : levelRoles.entrySet()) {
-                            if (guild.getRoleById(levelRole.getValue()) == null)
-                                internalGuild.unsetLevelRole(levelRole.getKey(), levelRole.getValue());
-                            else {
-                                sb.append(StringFormat.pushWithWhitespace(String.valueOf(levelRole.getKey()), 5))
-                                        .append(" ")
-                                        .append(guild.getRoleById(levelRole.getValue()).getName()).append(" (ID: ")
-                                        .append(levelRole.getValue()).append(")\n");
-                                hasEntry = true;
-                            }
+                    var sb = new StringBuilder().append("```c\n").append(LanguageHandler.get(lang, "levelrole_levelrole")).append("\n").append("----- ----------\n");
+                    Map<Integer, Long> levelRoles = internalGuild.getLevelRoles(guild, author);
+                    var hasEntry = false;
+                    for (Map.Entry<Integer, Long> levelRole : levelRoles.entrySet()) {
+                        if (guild.getRoleById(levelRole.getValue()) == null)
+                            internalGuild.unsetLevelRole(levelRole.getKey(), levelRole.getValue(), guild, author);
+                        else {
+                            sb.append(StringFormat.pushWithWhitespace(String.valueOf(levelRole.getKey()), 5))
+                                    .append(" ")
+                                    .append(guild.getRoleById(levelRole.getValue()).getName()).append(" (ID: ")
+                                    .append(levelRole.getValue()).append(")\n");
+                            hasEntry = true;
                         }
-                        sb.append("```");
-
-                        if (!hasEntry) {
-                            event.reply(LanguageHandler.get(lang, "levelrole_empty"));
-                            return;
-                        }
-
-                        var eb = new EmbedBuilder();
-                        try {
-                            eb.setColor(new User(event.getAuthor().getIdLong()).getColor());
-                        } catch (SQLException e) {
-                            eb.setColor(Color.decode(Servant.config.getDefaultColorCode()));
-                        }
-                        eb.setAuthor(LanguageHandler.get(lang, "levelrole_current"), null, guild.getIconUrl());
-                        eb.setDescription(sb.toString());
-                        event.reply(eb.build());
-                    } catch (SQLException e) {
-                        new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                     }
+                    sb.append("```");
+
+                    if (!hasEntry) {
+                        event.reply(LanguageHandler.get(lang, "levelrole_empty"));
+                        return;
+                    }
+
+                    var eb = new EmbedBuilder();
+                    eb.setColor(new User(event.getAuthor().getIdLong()).getColor(guild, author));
+                    eb.setAuthor(LanguageHandler.get(lang, "levelrole_current"), null, guild.getIconUrl());
+                    eb.setDescription(sb.toString());
+                    event.reply(eb.build());
                     break;
 
                 case "refresh":
-                    try {
-                        List<Member> members = event.getGuild().getMembers();
-                        for (Member member : members) {
-                            var internalUser = new User(member.getUser().getIdLong());
-                            var currentExp = internalUser.getExp(guild.getIdLong());
-                            var currentLevel = Parser.getLevelFromExp(currentExp);
-                            List<Long> roleIds = internalGuild.getLevelRolesForLevel(currentLevel);
+                    List<Member> members = event.getGuild().getMembers();
+                    for (Member member : members) {
+                        var internalUser = new User(member.getUser().getIdLong());
+                        var currentExp = internalUser.getExp(guild.getIdLong(), guild, author);
+                        var currentLevel = Parser.getLevelFromExp(currentExp);
+                        List<Long> roleIds = internalGuild.getLevelRolesForLevel(currentLevel, guild, author);
 
-                            for (Long roleId : roleIds)
-                                if (guild.getRoleById(roleId) != null) {
-                                    try {
-                                        guild.getController().addSingleRoleToMember(member, guild.getRoleById(roleId)).queue();
-                                    } catch (HierarchyException ignored) { }
-                                }
-                        }
-                        event.reactSuccess();
-                    } catch (SQLException e) {
-                        new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
+                        for (Long roleId : roleIds)
+                            if (guild.getRoleById(roleId) != null) {
+                                try {
+                                    guild.getController().addSingleRoleToMember(member, guild.getRoleById(roleId)).queue();
+                                } catch (HierarchyException ignored) { }
+                            }
                     }
+                    event.reactSuccess();
                     break;
             }
 
             // Statistics.
-            try {
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-                new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-            }
+            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+            new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
         });
     }
 }

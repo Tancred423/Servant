@@ -2,22 +2,20 @@
 package moderation.reactionRole;
 
 import files.language.LanguageHandler;
+import moderation.guild.Guild;
 import moderation.guild.GuildHandler;
 import moderation.toggle.Toggle;
 import moderation.user.User;
-import moderation.guild.Guild;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Emote;
 import net.dv8tion.jda.core.entities.MessageChannel;
 import net.dv8tion.jda.core.entities.MessageReaction;
 import owner.blacklist.Blacklist;
-import servant.Log;
 import utilities.Constants;
 import utilities.UsageEmbed;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -43,24 +41,19 @@ public class ReactionRoleCommand extends Command {
             if (!Toggle.isEnabled(event, name)) return;
             if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
 
-            var lang = LanguageHandler.getLanguage(event, name);
-            var p = GuildHandler.getPrefix(event, name);
-            Emote tancWave = null;
-            try {
-                tancWave = utilities.Emote.getEmote("tancWave");
-            } catch (SQLException ignored) { }
+            var guild = event.getGuild();
+            var author = event.getAuthor();
+            var lang = LanguageHandler.getLanguage(event);
+            var p = GuildHandler.getPrefix(event);
+            var tancWave = utilities.Emote.getEmote("tancWave", guild, author);
             if (tancWave == null) tancWave = event.getJDA().getGuildById(436925371577925642L).getEmoteById(582852645765775360L); // Delete later
 
             if (event.getArgs().isEmpty()) {
-                try {
-                    var description = LanguageHandler.get(lang, "reactionrole_description");
-                    var usage = String.format(LanguageHandler.get(lang, "reactionrole_usage"), p, name, p, name, tancWave.getAsMention(), p, name, p, name, tancWave.getAsMention());
-                    var hint = LanguageHandler.get(lang, "reactionrole_hint");
+                var description = LanguageHandler.get(lang, "reactionrole_description");
+                var usage = String.format(LanguageHandler.get(lang, "reactionrole_usage"), p, name, p, name, tancWave.getAsMention(), p, name, p, name, tancWave.getAsMention());
+                var hint = LanguageHandler.get(lang, "reactionrole_hint");
 
-                    event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
-                } catch (SQLException e) {
-                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                }
+                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
                 return;
             }
 
@@ -69,7 +62,6 @@ public class ReactionRoleCommand extends Command {
             long channelId;
             MessageChannel reactionChannel;
             long messageId;
-            var guild = event.getGuild();
             var internalGuild = new Guild(guild.getIdLong());
 
             switch (args[0].toLowerCase()) {
@@ -110,22 +102,22 @@ public class ReactionRoleCommand extends Command {
                         else roleId = message.getMentionedRoles().get(0).getIdLong();
                         event.getGuild().getRoleById(roleId);
 
-                        int success;
-                        try {
-                            success = internalGuild.setReactionRole(
-                                    event.getGuild().getIdLong(),
-                                    channelId,
-                                    messageId,
-                                    emoji,
-                                    (emote == null ? 0 : emote.getGuild().getIdLong()),
-                                    (emote == null ? 0:  emote.getIdLong()),
-                                    roleId);
-                        } catch (SQLException e) {
-                            new Log(e, guild, event.getAuthor(), name, event).sendLog(true);
-                            return;
-                        }
+                        boolean success;
+                        success = internalGuild.setReactionRole(
+                                event.getGuild().getIdLong(),
+                                channelId,
+                                messageId,
+                                emoji,
+                                (emote == null ? 0 : emote.getGuild().getIdLong()),
+                                (emote == null ? 0:  emote.getIdLong()),
+                                roleId,
+                                guild,
+                                event.getAuthor());
 
-                        if (success == 0) {
+                        if (success) {
+                            event.reactError();
+                            event.reply(LanguageHandler.get(lang, "reactionrole_alreadyset"));
+                        } else {
                             event.reactSuccess();
                             var finalEmoji = emoji;
                             var finalEmote = emote;
@@ -134,12 +126,6 @@ public class ReactionRoleCommand extends Command {
                                 else msg.addReaction(finalEmoji).queue();
                             });
                         }
-                        else if (success == 1){
-                            event.reactError();
-                            event.reply(LanguageHandler.get(lang, "reactionrole_alreadyset"));
-                        }
-                        else event.reactWarning();
-
                     });
                     break;
 
@@ -168,21 +154,21 @@ public class ReactionRoleCommand extends Command {
                         if (emoji == null) message.addReaction(emote).queue();
                         else message.addReaction(emoji).queue();
 
-                        int success;
-                        try {
-                            success = internalGuild.unsetReactionRole(
-                                    event.getGuild().getIdLong(),
-                                    channelId,
-                                    messageId,
-                                    emoji,
-                                    (emote == null ? 0 : emote.getGuild().getIdLong()),
-                                    (emote == null ? 0:  emote.getIdLong()));
-                        } catch (SQLException e) {
-                            new Log(e, guild, event.getAuthor(), name, event).sendLog(true);
-                            return;
-                        }
+                        boolean success;
+                        success = internalGuild.unsetReactionRole(
+                                event.getGuild().getIdLong(),
+                                channelId,
+                                messageId,
+                                emoji,
+                                (emote == null ? 0 : emote.getGuild().getIdLong()),
+                                (emote == null ? 0:  emote.getIdLong()),
+                                guild,
+                                event.getAuthor());
 
-                        if (success == 0) {
+                        if (success) {
+                            event.reactError();
+                            event.reply(LanguageHandler.get(lang, "reactionrole_notset"));
+                        } else {
                             event.reactSuccess();
                             var finalEmoji = emoji;
                             var finalEmote = emote;
@@ -202,11 +188,6 @@ public class ReactionRoleCommand extends Command {
                                     }
                             });
                         }
-                        else if (success == 1){
-                            event.reactError();
-                            event.reply(LanguageHandler.get(lang, "reactionrole_notset"));
-                        }
-                        else event.reactWarning();
 
                     });
                     break;
@@ -218,12 +199,8 @@ public class ReactionRoleCommand extends Command {
             }
 
             // Statistics.
-            try {
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-                if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-            }
+            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
         });
     }
 }

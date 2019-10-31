@@ -2,14 +2,11 @@
 package files.language;
 
 import moderation.guild.Guild;
-import servant.Log;
 import moderation.user.User;
-import servant.Servant;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.SQLException;
 
 public class LanguageHandler {
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -53,14 +50,9 @@ public class LanguageHandler {
         }
     }
 
-    public static String getLanguage(CommandEvent event, String name) {
-        try {
-            return event.getGuild() == null ?
-                    new User(event.getAuthor().getIdLong()).getLanguage() :
-                    new Guild(event.getGuild().getIdLong()).getLanguage();
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-            return Servant.config.getDefaultLanguage();
-        }
+    public static String getLanguage(CommandEvent event) {
+        return event.getGuild() == null ?
+                new User(event.getAuthor().getIdLong()).getLanguage(event.getGuild(), event.getAuthor()) :
+                new Guild(event.getGuild().getIdLong()).getLanguage(event.getGuild(), event.getAuthor());
     }
 }

@@ -7,14 +7,12 @@ import moderation.guild.GuildHandler;
 import moderation.toggle.Toggle;
 import moderation.user.User;
 import net.dv8tion.jda.core.Permission;
-import servant.Log;
 import utilities.Constants;
 import utilities.StringFormat;
 import utilities.UsageEmbed;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
-import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
 
 public class UnflipCommand extends Command {
@@ -39,18 +37,14 @@ public class UnflipCommand extends Command {
             if (!Toggle.isEnabled(event, "flip")) return; // flip also toggles unflip
 
             var message = event.getMessage();
-            var lang = LanguageHandler.getLanguage(event, name);
-            var p = GuildHandler.getPrefix(event, name);
+            var lang = LanguageHandler.getLanguage(event);
+            var p = GuildHandler.getPrefix(event);
 
             if (message.getMentionedMembers().isEmpty()) {
-                try {
-                    var description = LanguageHandler.get(lang, "unflip_description");
-                    var usage = String.format(LanguageHandler.get(lang, "unflip_usage"), p, name);
-                    var hint = String.format(LanguageHandler.get(lang, "unflip_hint"), p);
-                    event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
-                } catch (SQLException e) {
-                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                }
+                var description = LanguageHandler.get(lang, "unflip_description");
+                var usage = String.format(LanguageHandler.get(lang, "unflip_usage"), p, name);
+                var hint = String.format(LanguageHandler.get(lang, "unflip_hint"), p);
+                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
                 return;
             }
 
@@ -62,12 +56,8 @@ public class UnflipCommand extends Command {
                 event.getGuild().getController().setNickname(mentioned, flipped).queue();
 
             // Statistics.
-            try {
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-                new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-            }
+            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), event.getGuild(), event.getAuthor());
+            new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), event.getGuild(), event.getAuthor());
         });
     }
 }

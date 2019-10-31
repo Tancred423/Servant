@@ -67,6 +67,12 @@
             <version>2.5.8</version>
             <type>pom</type>
         </dependency>
+        <!-- Hikari Connection Pools -->
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>3.4.1</version>
+        </dependency>
     </dependencies>
 
     <build>

@@ -9,8 +9,6 @@ import moderation.user.User;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 import owner.blacklist.Blacklist;
-import servant.Log;
-import servant.Servant;
 import utilities.Constants;
 import utilities.Emote;
 import utilities.Image;
@@ -18,8 +16,6 @@ import utilities.UsageEmbed;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
-import java.awt.*;
-import java.sql.SQLException;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.concurrent.CompletableFuture;
@@ -46,18 +42,14 @@ public class SignupCommand extends Command {
             if (!Toggle.isEnabled(event, name)) return;
             if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
 
-            var lang = LanguageHandler.getLanguage(event, name);
-            var p = GuildHandler.getPrefix(event, name);
+            var lang = LanguageHandler.getLanguage(event);
+            var p = GuildHandler.getPrefix(event);
 
             if (event.getArgs().isEmpty()) {
-                try {
-                    var description = LanguageHandler.get(lang, "signup_description");
-                    var usage = String.format(LanguageHandler.get(lang, "signup_usage"), p, name, p, name);
-                    var hint = LanguageHandler.get(lang, "signup_hint");
-                    event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
-                } catch (SQLException e) {
-                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                }
+                var description = LanguageHandler.get(lang, "signup_description");
+                var usage = String.format(LanguageHandler.get(lang, "signup_usage"), p, name, p, name);
+                var hint = LanguageHandler.get(lang, "signup_hint");
+                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
                 return;
             }
 
@@ -89,24 +81,16 @@ public class SignupCommand extends Command {
                 return;
             }
 
+            var guild = event.getGuild();
             var author = event.getAuthor();
             var internalAuthor = new User(author.getIdLong());
 
             var eb = new EmbedBuilder();
-            try {
-                eb.setColor(internalAuthor.getColor());
-            } catch (SQLException e) {
-                eb.setColor(Color.decode(Servant.config.getDefaultColorCode()));
-            }
+            eb.setColor(internalAuthor.getColor(guild, author));
             eb.setTitle(String.format(LanguageHandler.get(lang, "signup_embedtitle"), (title.isEmpty() ? "" : "for"), title));
             eb.setDescription(String.format(LanguageHandler.get(lang, "signup_embeddescription"), amount, Emote.getEmoji("upvote")));
-            eb.setFooter(LanguageHandler.get(lang, "signup_timeout"), Image.getImageUrl("clock"));
-            ZonedDateTime now;
-            try {
-                now = ZonedDateTime.now(ZoneOffset.of(new Guild(event.getGuild().getIdLong()).getOffset()));
-            } catch (SQLException e) {
-                now = ZonedDateTime.now(ZoneOffset.of(Servant.config.getDefaultOffset()));
-            }
+            eb.setFooter(LanguageHandler.get(lang, "signup_timeout"), Image.getImageUrl("clock", guild, author));
+            var now = ZonedDateTime.now(ZoneOffset.of(new Guild(event.getGuild().getIdLong()).getOffset(guild, author)));
             eb.setTimestamp(now.toInstant().plusMillis(Constants.SIGNUP_TIMEOUT));
 
             event.getChannel().sendMessage(eb.build()).queue(sentMessage -> {
@@ -114,12 +98,7 @@ public class SignupCommand extends Command {
                 sentMessage.addReaction(Emote.getEmoji("end")).queue();
                 var internalGuild = new Guild(event.getGuild().getIdLong());
 
-                try {
-                    internalGuild.setSignup(sentMessage.getIdLong(), author.getIdLong(), amount, title);
-                } catch (SQLException e) {
-                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                    return;
-                }
+                internalGuild.setSignup(sentMessage.getIdLong(), author.getIdLong(), amount, title, guild, author);
 
                 new java.util.Timer().schedule(
                         new java.util.TimerTask() {
@@ -134,12 +113,8 @@ public class SignupCommand extends Command {
             });
 
             // Statistics.
-            try {
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-                new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-            }
+            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+            new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
         });
     }
 }

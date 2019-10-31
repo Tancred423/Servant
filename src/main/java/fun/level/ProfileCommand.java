@@ -10,17 +10,14 @@ import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 import owner.blacklist.Blacklist;
 import servant.Log;
-import servant.Servant;
 import utilities.*;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.geom.NoninvertibleTransformException;
 import java.io.File;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.TreeMap;
@@ -48,8 +45,8 @@ public class ProfileCommand extends Command {
         CompletableFuture.runAsync(() -> {
             if (!Toggle.isEnabled(event, name)) return;
             if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
-            var lang = LanguageHandler.getLanguage(event, name);
-            var p = GuildHandler.getPrefix(event, name);
+            var lang = LanguageHandler.getLanguage(event);
+            var p = GuildHandler.getPrefix(event);
 
             event.getChannel().sendTyping().queue();
 
@@ -61,14 +58,14 @@ public class ProfileCommand extends Command {
 
             try {
                 // Achievements
-                var achievements = internalProfileUser.getAchievements();
+                var achievements = internalProfileUser.getAchievements(guild, author);
                 var achievementsWithName = new TreeMap<String, Integer>();
                 for (var achievement : achievements.entrySet())
                     achievementsWithName.put(Achievement.getFancyName(achievement.getKey(), lang), achievement.getValue());
                 achievementsWithName = StringFormat.sortByKey(achievementsWithName);
 
                 var achievementBuilder = new StringBuilder();
-                achievementBuilder.append("**AP: ").append(internalProfileUser.getTotelAP()).append("**\n")
+                achievementBuilder.append("**AP: ").append(internalProfileUser.getTotelAP(guild, author)).append("**\n")
                         .append("```c\n").append(StringFormat.fillWithWhitespace(LanguageHandler.get(lang, "profile_name"), 23))
                         .append(" ")
                         .append(StringFormat.pushWithWhitespace(LanguageHandler.get(lang, "profile_ap"), 3))
@@ -83,7 +80,7 @@ public class ProfileCommand extends Command {
                 if (achievementsWithName.isEmpty()) achievementBuilder = new StringBuilder().append(LanguageHandler.get(lang, "profile_noachievements"));
 
                 // Most used command
-                var features = internalProfileUser.getTop10MostUsedFeatures();
+                var features = internalProfileUser.getTop10MostUsedFeatures(guild, author);
                 var top10Features = new StringBuilder();
                 if (features.isEmpty()) top10Features.append(LanguageHandler.get(lang, "profile_nocommands"));
                 else {
@@ -100,10 +97,10 @@ public class ProfileCommand extends Command {
                 }
 
                 // Baguette
-                var baguette = internalProfileUser.getBaguette().entrySet().iterator().hasNext() ? internalProfileUser.getBaguette().entrySet().iterator().next() : null;
+                var baguette = internalProfileUser.getBaguette(guild, author).entrySet().iterator().hasNext() ? internalProfileUser.getBaguette(guild, author).entrySet().iterator().next() : null;
 
                 // Description
-                var bio = internalProfileUser.getBio();
+                var bio = internalProfileUser.getBio(guild, author);
 
                 // Level
                 // Create File.
@@ -112,17 +109,13 @@ public class ProfileCommand extends Command {
                 try {
                     var profile = new LevelImage(profileUser, event.getGuild(), lang);
                     ImageIO.write(profile.getImage(), "png", image);
-                } catch (IOException | SQLException | NoninvertibleTransformException e) {
+                } catch (IOException | NoninvertibleTransformException e) {
                     new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                     return;
                 }
 
                 var eb = new EmbedBuilder();
-                try {
-                    eb.setColor(internalAuthor.getColor());
-                } catch (SQLException e) {
-                    eb.setColor(Color.decode(Servant.config.getDefaultColorCode()));
-                }
+                eb.setColor(internalAuthor.getColor(guild, author));
                 eb.setAuthor(profileUser.getName() + "#" + profileUser.getDiscriminator(), null, guild.getIconUrl());
                 eb.setThumbnail(profileUser.getEffectiveAvatarUrl());
                 eb.setDescription(bio);
@@ -156,12 +149,8 @@ public class ProfileCommand extends Command {
             }
 
             // Statistics.
-            try {
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-                new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-            }
+            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+            new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
         });
     }
 }

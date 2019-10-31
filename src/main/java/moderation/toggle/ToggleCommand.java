@@ -2,18 +2,16 @@
 package moderation.toggle;
 
 import files.language.LanguageHandler;
+import moderation.guild.Guild;
 import moderation.guild.GuildHandler;
 import moderation.user.User;
 import net.dv8tion.jda.core.Permission;
-import moderation.guild.Guild;
 import owner.blacklist.Blacklist;
-import servant.Log;
 import utilities.Constants;
 import utilities.UsageEmbed;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -39,19 +37,15 @@ public class ToggleCommand extends Command {
         CompletableFuture.runAsync(() -> {
             if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
 
-            var lang = LanguageHandler.getLanguage(event, name);
-            var p = GuildHandler.getPrefix(event, name);
+            var lang = LanguageHandler.getLanguage(event);
+            var p = GuildHandler.getPrefix(event);
 
             if (event.getArgs().isEmpty()) {
-                try {
-                    var description = String.format(LanguageHandler.get(lang, "toggle_description"), p, name);
-                    var usage = String.format(LanguageHandler.get(lang, "toggle_usage"), p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name);
-                    var hint = LanguageHandler.get(lang, "toggle_hint");
+                var description = String.format(LanguageHandler.get(lang, "toggle_description"), p, name);
+                var usage = String.format(LanguageHandler.get(lang, "toggle_usage"), p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name);
+                var hint = LanguageHandler.get(lang, "toggle_hint");
 
-                    event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
-                } catch (SQLException e) {
-                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                }
+                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
                 return;
             }
 
@@ -128,63 +122,38 @@ public class ToggleCommand extends Command {
                 return;
             }
 
-            var internalGuild = new Guild(event.getGuild().getIdLong());
+            var author = event.getAuthor();
+            var guild = event.getGuild();
+            var internalGuild = new Guild(guild.getIdLong());
 
             if (arg1.equals("show") || arg1.equals("status")) {
                 if (feature.equals("all")) {
                     // Toggle Status All Features
                     var stringBuilder = new StringBuilder();
                     for (var validFeature : validFeatures) {
-                        try {
-                            var toggleStatus = internalGuild.getToggleStatus(validFeature);
-                            stringBuilder.append(validFeature).append(": ").append(toggleStatus ? "on" : "off").append("\n");
-                        } catch (SQLException e) {
-                            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-                        }
+                        var toggleStatus = internalGuild.getToggleStatus(validFeature, guild, author);
+                        stringBuilder.append(validFeature).append(": ").append(toggleStatus ? "on" : "off").append("\n");
                     }
                     event.reply(stringBuilder.toString());
                 } else {
                     // Toggle Status Single Feature
-                    try {
-                        var toggleStatus = internalGuild.getToggleStatus(feature);
-                        event.reply(feature + "'s status: " + (toggleStatus ? "on" : "off"));
-                    } catch (SQLException e) {
-                        new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                    }
+                    var toggleStatus = internalGuild.getToggleStatus(feature, guild, author);
+                    event.reply(feature + "'s status: " + (toggleStatus ? "on" : "off"));
                 }
                 return;
             }
 
             var statusBool = arg1.equals("on");
 
-            if (feature.equals("all")) {
-                // Toggle all features.
-                for (var validFeature : validFeatures) {
-                    try {
-                        internalGuild.setToggleStatus(validFeature, statusBool);
-                    } catch (SQLException e) {
-                        new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-                        return;
-                    }
-                }
-            } else {
-                // Toggle single feature.
-                try {
-                    internalGuild.setToggleStatus(feature, statusBool);
-                } catch (SQLException e) {
-                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                    return;
-                }
-            }
+            if (feature.equals("all"))
+                for (var validFeature : validFeatures)
+                    internalGuild.setToggleStatus(validFeature, statusBool, guild, author);
+            else internalGuild.setToggleStatus(feature, statusBool, guild, author);
             event.reactSuccess();
 
             // Statistics.
-            try {
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-                if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-            }
+            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
         });
     }
 

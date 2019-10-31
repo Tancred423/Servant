@@ -7,16 +7,12 @@ import moderation.user.User;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 import owner.blacklist.Blacklist;
-import servant.Log;
-import servant.Servant;
 import utilities.Constants;
 import utilities.Image;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 import zJdaUtilsLib.com.jagrosh.jdautilities.examples.doc.Author;
 
-import java.awt.*;
-import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
 
 @Author("John Grosh (jagrosh)")
@@ -41,17 +37,15 @@ public class PatreonCommand extends Command {
         CompletableFuture.runAsync(() -> {
             if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
 
-            var lang = LanguageHandler.getLanguage(event, name);
+            var lang = LanguageHandler.getLanguage(event);
+            var guild = event.getGuild();
+            var author = event.getAuthor();
             var eb = new EmbedBuilder();
 
-            try {
-                eb.setColor(new User(event.getAuthor().getIdLong()).getColor());
-            } catch (SQLException e) {
-                eb.setColor(Color.decode(Servant.config.getDefaultColorCode()));
-            }
+            eb.setColor(new User(event.getAuthor().getIdLong()).getColor(guild, author));
             eb.setAuthor(LanguageHandler.get(lang, "patreon_supportserver"), null, "https://i.imgur.com/rCnhGKA.jpg"); // Patreon Icon
             eb.setDescription(LanguageHandler.get(lang, "patreon_description"));
-            eb.setThumbnail(Image.getImageUrl("love"));
+            eb.setThumbnail(Image.getImageUrl("love", guild, author));
             eb.addField("1. " + LanguageHandler.get(lang, "patreon_patreontitle"), LanguageHandler.get(lang, "patreon_subscription"), false);
             eb.addField("$1+/month", LanguageHandler.get(lang, "patreon_$1"), true);
             eb.addField("$3+/month", LanguageHandler.get(lang, "patreon_$3"), true);
@@ -65,12 +59,8 @@ public class PatreonCommand extends Command {
             event.reply(eb.build());
 
             // Statistics.
-            try {
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-                if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-            }
+            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
         });
     }
 }

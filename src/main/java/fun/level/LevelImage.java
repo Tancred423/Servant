@@ -13,14 +13,13 @@ import java.awt.geom.NoninvertibleTransformException;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
-import java.sql.SQLException;
 
 public class LevelImage {
     private User user;
     private Guild guild;
     private BufferedImage image;
 
-    LevelImage(User user, Guild guild, String lang) throws SQLException, NoninvertibleTransformException {
+    LevelImage(User user, Guild guild, String lang) throws NoninvertibleTransformException {
         this.user = user;
         this.guild = guild;
         setProfilePicture(lang);
@@ -35,7 +34,7 @@ public class LevelImage {
     }
 
 
-    private void setProfilePicture(String lang) throws SQLException, NoninvertibleTransformException {
+    private void setProfilePicture(String lang) throws NoninvertibleTransformException {
         var internalUser = new moderation.user.User(user.getIdLong());
         var internalGuild = new moderation.guild.Guild(guild.getIdLong());
 
@@ -91,7 +90,7 @@ public class LevelImage {
         g2d.fillRect(550 + border, 220 + border, 1750 - border * 2, 120 - border * 2);
 
         // Level Percentage Bar
-        var currentExp = internalUser.getExp(guild.getIdLong());
+        var currentExp = internalUser.getExp(guild.getIdLong(), guild, user);
         var currentLevel = Parser.getLevelFromExp(currentExp);
         var neededExp = Parser.getLevelExp(currentLevel);
         var currentExpOnThisLevel = currentExp - Parser.getTotalLevelExp(currentLevel - 1);
@@ -118,7 +117,7 @@ public class LevelImage {
 
 
         // Guild Rank
-        text = LanguageHandler.get(lang, "level_rank") + " #" + internalGuild.getUserRank(user.getIdLong());
+        text = LanguageHandler.get(lang, "level_rank") + " #" + internalGuild.getUserRank(user.getIdLong(), guild, user);
         x = 555;
         y = 430;
         transform.invert();

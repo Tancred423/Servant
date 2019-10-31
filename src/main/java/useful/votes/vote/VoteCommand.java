@@ -11,7 +11,6 @@ import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
 import owner.blacklist.Blacklist;
-import servant.Log;
 import servant.Servant;
 import useful.votes.VotesDatabase;
 import utilities.Constants;
@@ -21,7 +20,6 @@ import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 import zJdaUtilsLib.com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
-import java.sql.SQLException;
 import java.time.DateTimeException;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -59,20 +57,19 @@ public class VoteCommand extends Command {
             if (!Toggle.isEnabled(event, name)) return;
             if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
 
-            var lang = LanguageHandler.getLanguage(event, name);
-            var p = GuildHandler.getPrefix(event, name);
+            var lang = LanguageHandler.getLanguage(event);
+            var p = GuildHandler.getPrefix(event);
+
+            var guild = event.getGuild();
+            var user = event.getAuthor();
 
             var author = event.getAuthor();
 
             if (event.getArgs().isEmpty()) {
-                try {
-                    var description = LanguageHandler.get(lang, "vote_description");
-                    var usage = String.format(LanguageHandler.get(lang, "vote_usage"), p, name, p, name);
-                    var hint = LanguageHandler.get(lang, "vote_hint");
-                    event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
-                } catch (SQLException e) {
-                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                }
+                var description = LanguageHandler.get(lang, "vote_description");
+                var usage = String.format(LanguageHandler.get(lang, "vote_usage"), p, name, p, name);
+                var hint = LanguageHandler.get(lang, "vote_hint");
+                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
                 return;
             }
 
@@ -106,48 +103,35 @@ public class VoteCommand extends Command {
             });
 
             // Statistics.
-            try {
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-                new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-            }
+            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, user);
+            new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, user);
         });
     }
 
     private void processVote(CommandEvent event, String question, List<String> answers, String lang, boolean allowsMultipleAnswers) {
+        var guild = event.getGuild();
+        var user = event.getAuthor();
+        var author = event.getAuthor();
+        var eb = new EmbedBuilder();
+        eb.setColor(new User(author.getIdLong()).getColor(guild, user));
+        eb.setAuthor(String.format(LanguageHandler.get(lang, "vote_started"), author.getName()), null, author.getEffectiveAvatarUrl());
+        eb.setTitle(question);
+        eb.setFooter(LanguageHandler.get(lang, "votes_active"), event.getSelfUser().getAvatarUrl());
         try {
-            var author = event.getAuthor();
-            var eb = new EmbedBuilder();
-            eb.setColor(new User(author.getIdLong()).getColor());
-            eb.setAuthor(String.format(LanguageHandler.get(lang, "vote_started"), author.getName()), null, author.getEffectiveAvatarUrl());
-            eb.setTitle(question);
-            eb.setFooter(LanguageHandler.get(lang, "votes_active"), event.getSelfUser().getAvatarUrl());
-            try {
-                eb.setTimestamp(OffsetDateTime.now(ZoneId.of(new Guild(event.getGuild().getIdLong()).getOffset())));
-            } catch (SQLException | DateTimeException e) {
-                eb.setTimestamp(OffsetDateTime.now(ZoneId.of(Servant.config.getDefaultOffset())).getOffset());
-            }
-
-            String[] emoji = Emote.getVoteEmotes();
-            for (int i = 0; i < answers.size(); i++) eb.appendDescription("\n" + emoji[i] + " " + answers.get(i));
-
-            event.getChannel().sendMessage(eb.build()).queue(message -> {
-                try {
-                    if (allowsMultipleAnswers) VotesDatabase.setVote(message.getIdLong(), author.getIdLong(), "vote");
-                    else  VotesDatabase.setVote(message.getIdLong(), author.getIdLong(), "radio");
-
-                    for (int i = 0; i < answers.size(); i++) message.addReaction(emoji[i]).queue();
-                    net.dv8tion.jda.core.entities.Emote end;
-
-                    message.addReaction(Emote.getEmoji("end")).queue();
-                } catch (SQLException e) {
-                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                }
-            });
-        } catch (SQLException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
+            eb.setTimestamp(OffsetDateTime.now(ZoneId.of(new Guild(event.getGuild().getIdLong()).getOffset(guild, user))));
+        } catch (DateTimeException e) {
+            eb.setTimestamp(OffsetDateTime.now(ZoneId.of(Servant.config.getDefaultOffset())).getOffset());
         }
+
+        String[] emoji = Emote.getVoteEmotes(guild, user);
+        for (int i = 0; i < answers.size(); i++) eb.appendDescription("\n" + emoji[i] + " " + answers.get(i));
+
+        event.getChannel().sendMessage(eb.build()).queue(message -> {
+            if (allowsMultipleAnswers) VotesDatabase.setVote(message.getIdLong(), author.getIdLong(), "vote", guild, user);
+            else  VotesDatabase.setVote(message.getIdLong(), author.getIdLong(), "radio", guild, user);
+            for (int i = 0; i < answers.size(); i++) message.addReaction(emoji[i]).queue();
+            message.addReaction(Emote.getEmoji("end")).queue();
+        });
     }
 
     private void timeout(Message botMessage, CommandEvent event, String lang) {

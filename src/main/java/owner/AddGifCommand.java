@@ -15,8 +15,11 @@ import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
+
+import static utilities.DatabaseConn.closeQuietly;
 
 public class AddGifCommand extends Command {
     public AddGifCommand() {
@@ -37,19 +40,15 @@ public class AddGifCommand extends Command {
     @Override
     protected void execute(CommandEvent event) {
         CompletableFuture.runAsync(() -> {
-            var lang = LanguageHandler.getLanguage(event, name);
-            var p = GuildHandler.getPrefix(event, name);
+            var lang = LanguageHandler.getLanguage(event);
+            var p = GuildHandler.getPrefix(event);
 
             if (event.getArgs().isEmpty()) {
-                try {
-                    var description = LanguageHandler.get(lang, "addgif_description");
-                    var usage = String.format(LanguageHandler.get(lang, "addgif_usage"), p, name, p, name);
-                    var hint = LanguageHandler.get(lang, "addgif_hint");
+                var description = LanguageHandler.get(lang, "addgif_description");
+                var usage = String.format(LanguageHandler.get(lang, "addgif_usage"), p, name, p, name);
+                var hint = LanguageHandler.get(lang, "addgif_hint");
 
-                    event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
-                } catch (SQLException e) {
-                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                }
+                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
                 return;
             }
 
@@ -84,27 +83,27 @@ public class AddGifCommand extends Command {
                 return;
             }
 
+            Connection connection = null;
+            var guild = event.getGuild();
+            var author = event.getAuthor();
+
             try {
-                var connection = Database.getConnection();
+                connection = Servant.db.getHikari().getConnection();
                 var insert = connection.prepareStatement("INSERT INTO interaction (interaction,gif) VALUES (?,?)");
                 insert.setString(1, interaction);
                 insert.setString(2, gifUrl);
                 insert.executeUpdate();
-                connection.close();
             } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                return;
+                new Log(e, guild, author, "addgif", null).sendLog(false);
+            } finally {
+                closeQuietly(connection);
             }
 
             event.reactSuccess();
 
             // Statistics.
-            try {
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-                if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-            }
+            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
         });
     }
 }

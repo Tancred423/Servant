@@ -1,21 +1,19 @@
 // Modified by: Tancred423 (https://github.com/Tancred423)
 package owner;
 
-import java.sql.SQLException;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-
 import files.language.LanguageHandler;
 import moderation.guild.Guild;
-import net.dv8tion.jda.core.Permission;
-import servant.Log;
 import moderation.user.User;
+import net.dv8tion.jda.core.Permission;
 import utilities.Constants;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 import zJdaUtilsLib.com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import zJdaUtilsLib.com.jagrosh.jdautilities.examples.doc.Author;
 import zJdaUtilsLib.com.jagrosh.jdautilities.menu.Paginator;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 @Author("John Grosh (jagrosh)")
 public class ServerlistCommand extends Command {
@@ -54,7 +52,7 @@ public class ServerlistCommand extends Command {
     protected void execute(CommandEvent event) {
         CompletableFuture.runAsync(() -> {
             int page = 1;
-            String lang = LanguageHandler.getLanguage(event, name);
+            String lang = LanguageHandler.getLanguage(event);
             if (lang.equals("invalid")) return;
 
             if (!event.getArgs().isEmpty()) {
@@ -71,27 +69,21 @@ public class ServerlistCommand extends Command {
                     .map(g -> "**" + g.getName() + "** (ID:" + g.getId() + ") ~ " + g.getMembers().size() + " " + LanguageHandler.get(lang, "guildlist_members"))
                     .forEach(pbuilder::addItems);
 
+            var guild = event.getGuild();
+            var author = event.getAuthor();
+
             Paginator p;
-            try {
-                p = pbuilder.setColor(new User(event.getAuthor().getIdLong()).getColor())
-                        .setText(String.format(LanguageHandler.get(lang, "guildlist_connected"), event.getSelfUser().getName()) +
-                                (event.getJDA().getShardInfo() == null ? ":" : "(Shard ID " + event.getJDA().getShardInfo().getShardId() + "):"))
-                        .setUsers(event.getAuthor())
-                        .build();
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                return;
-            }
+            p = pbuilder.setColor(new User(event.getAuthor().getIdLong()).getColor(guild, author))
+                    .setText(String.format(LanguageHandler.get(lang, "guildlist_connected"), event.getSelfUser().getName()) +
+                            (event.getJDA().getShardInfo() == null ? ":" : "(Shard ID " + event.getJDA().getShardInfo().getShardId() + "):"))
+                    .setUsers(event.getAuthor())
+                    .build();
 
             p.paginate(event.getChannel(), page);
 
             // Statistics.
-            try {
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-                if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-            }
+            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
         });
     }
 }

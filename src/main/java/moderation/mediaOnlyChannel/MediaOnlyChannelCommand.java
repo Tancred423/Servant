@@ -6,16 +6,13 @@ import moderation.guild.GuildHandler;
 import moderation.toggle.Toggle;
 import moderation.user.User;
 import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.core.entities.MessageChannel;
 import owner.blacklist.Blacklist;
-import servant.Log;
 import utilities.Constants;
 import utilities.UsageEmbed;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
-import java.sql.SQLException;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class MediaOnlyChannelCommand extends Command {
@@ -40,22 +37,19 @@ public class MediaOnlyChannelCommand extends Command {
             if (!Toggle.isEnabled(event, name)) return;
             if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
 
-            var lang = LanguageHandler.getLanguage(event, name);
-            var p = GuildHandler.getPrefix(event, name);
+            var lang = LanguageHandler.getLanguage(event);
+            var p = GuildHandler.getPrefix(event);
 
             var guild = event.getGuild();
             var internalGuild = new moderation.guild.Guild(guild.getIdLong());
+            var author = event.getAuthor();
 
             if (event.getArgs().isEmpty()) {
-                try {
-                    var description = LanguageHandler.get(lang, "mediaonlychannel_description");
-                    var usage = String.format(LanguageHandler.get(lang, "mediaonlychannel_usage"),
-                            p, name, p, name, p, name, p, name, p, name);
-                    var hint = LanguageHandler.get(lang, "mediaonlychannel_hint");
-                    event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
-                } catch (SQLException e) {
-                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                }
+                var description = LanguageHandler.get(lang, "mediaonlychannel_description");
+                var usage = String.format(LanguageHandler.get(lang, "mediaonlychannel_usage"),
+                        p, name, p, name, p, name, p, name, p, name);
+                var hint = LanguageHandler.get(lang, "mediaonlychannel_hint");
+                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
                 return;
             }
 
@@ -77,15 +71,7 @@ public class MediaOnlyChannelCommand extends Command {
                         return;
                     }
 
-                    boolean success;
-                    try {
-                        success = internalGuild.addMediaOnlyChannel(channel);
-                    } catch (SQLException e) {
-                        new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                        return;
-                    }
-
-                    if (success) event.reactSuccess();
+                    if (internalGuild.setMediaOnlyChannel(channel, guild, author)) event.reactSuccess();
                     else event.replyError(LanguageHandler.get(lang, "mediaonlychannel_alreadyset"));
                     break;
 
@@ -103,27 +89,13 @@ public class MediaOnlyChannelCommand extends Command {
                         return;
                     }
 
-                    boolean wasUnset;
-                    try {
-                        wasUnset = internalGuild.unsetMediaOnlyChannel(channel);
-                    } catch (SQLException e) {
-                        new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                        return;
-                    }
-
-                    if (wasUnset) event.reactSuccess();
+                    if (internalGuild.unsetMediaOnlyChannel(channel, guild, author)) event.reactSuccess();
                     else event.reply(LanguageHandler.get(lang, "mediaonlychannel_unset_fail"));
                     break;
 
                 case "show":
                 case "sh":
-                    List<MessageChannel> channels;
-                    try {
-                        channels = internalGuild.getMediaOnlyChannels();
-                    } catch (SQLException e) {
-                        new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                        return;
-                    }
+                    var channels = internalGuild.getMediaOnlyChannels(guild, author);
                     if (channels == null) event.reply(LanguageHandler.get(lang, "mediaonlychannel_nochannels"));
                     else {
                         var sb = new StringBuilder();
@@ -138,12 +110,8 @@ public class MediaOnlyChannelCommand extends Command {
             }
 
             // Statistics.
-            try {
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase());
-                new moderation.guild.Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase());
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
-            }
+            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+            new moderation.guild.Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
         });
     }
 }

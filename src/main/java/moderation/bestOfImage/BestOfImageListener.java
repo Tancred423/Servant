@@ -11,11 +11,7 @@ import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import owner.blacklist.Blacklist;
-import servant.Log;
-import servant.Servant;
 
-import java.awt.*;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -32,19 +28,15 @@ public class BestOfImageListener extends ListenerAdapter {
             if (!Toggle.isEnabled(event, "bestofimage")) return;
             if (Blacklist.isBlacklisted(event.getUser(), event.getGuild())) return;
 
+            var guild = event.getGuild();
+            var user = event.getUser();
             var messageId = event.getMessageIdLong();
 
             if (temporaryBlacklist.contains(messageId)) return;
             temporaryBlacklist.add(messageId);
 
             var internalGuild = new Guild(event.getGuild().getIdLong());
-            try {
-                if (internalGuild.bestOfImageIsBlacklisted(messageId)) {
-                    temporaryBlacklist.remove(messageId);
-                    return;
-                }
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getUser(), "bestofimage", null).sendLog(false);
+            if (internalGuild.bestOfImageIsBlacklisted(messageId, guild, user)) {
                 temporaryBlacklist.remove(messageId);
                 return;
             }
@@ -60,17 +52,8 @@ public class BestOfImageListener extends ListenerAdapter {
                     return;
                 }
 
-                Emote voteEmote;
-                String voteEmoji;
-                try {
-                    voteEmote = internalGuild.getBestOfImageEmote();
-                    voteEmoji = internalGuild.getBestOfImageEmoji();
-                } catch (SQLException e) {
-                    new Log(e, event.getGuild(), event.getUser(), "bestofimage", null).sendLog(false);
-                    temporaryBlacklist.remove(messageId);
-                    return;
-                }
-
+                var voteEmote = internalGuild.getBestOfImageEmote(guild, user);
+                var voteEmoji = internalGuild.getBestOfImageEmoji(guild, user);
                 var reactionCount = 0;
 
                 var reactionEmote = event.getReactionEmote();
@@ -114,28 +97,15 @@ public class BestOfImageListener extends ListenerAdapter {
                     return;
                 }
 
-                int number;
-                int percentage;
-                try {
-                    number = internalGuild.getBestOfImageNumber();
-                    percentage = internalGuild.getBestOfImagePercentage();
-                } catch (SQLException e) {
-                    new Log(e, event.getGuild(), event.getUser(), "bestofimage", null).sendLog(false);
-                    temporaryBlacklist.remove(messageId);
-                    return;
-                }
+                var number = internalGuild.getBestOfImageNumber(guild, user);
+                var percentage = internalGuild.getBestOfImagePercentage(guild, user);
 
                 var onlineMemberCount = 0;
                 var members = event.getGuild().getMembers();
                 for (var member : members) if (member.getOnlineStatus() == OnlineStatus.ONLINE) onlineMemberCount++;
                 var onlineMemberPercentage = (int) Math.ceil(onlineMemberCount * percentage / 100.0);
 
-                String lang;
-                try {
-                    lang = new Guild(event.getGuild().getIdLong()).getLanguage();
-                } catch (SQLException e) {
-                    lang = Servant.config.getDefaultLanguage();
-                }
+                var lang = new Guild(event.getGuild().getIdLong()).getLanguage(guild, user);
 
                 if (number != 0 && percentage != 0) {
                     if (reactionCount >= number && reactionCount >= onlineMemberPercentage)
@@ -160,33 +130,27 @@ public class BestOfImageListener extends ListenerAdapter {
     }
 
     private static void sendBestOf(GuildMessageReactionAddEvent event, int reactionCount, List<Message.Attachment> attachmentList, String lang) {
-        Guild internalGuild = new Guild(event.getGuild().getIdLong());
+        var user = event.getUser();
+        var guild = event.getGuild();
+        var internalGuild = new Guild(guild.getIdLong());
         event.getChannel().getMessageById(event.getMessageId()).queue(message -> {
-            try {
-                var channel = internalGuild.getBestOfImageChannel();
-                var author = message.getAuthor();
+            var channel = internalGuild.getBestOfImageChannel(guild, user);
+            var author = message.getAuthor();
 
-                for (var attachment : attachmentList) {
-                    var eb = new EmbedBuilder();
-                    try {
-                        eb.setColor(new User(author.getIdLong()).getColor());
-                    } catch (SQLException e) {
-                        eb.setColor(Color.decode(Servant.config.getDefaultColorCode()));
-                    }
-                    eb.setAuthor(author.getName() + "#" + author.getDiscriminator(), null, author.getEffectiveAvatarUrl());
-                    eb.setTitle(!message.getContentDisplay().isEmpty() ? message.getContentDisplay() : null);
-                    eb.setDescription("[" + LanguageHandler.get(lang, "bestof_jump") + "](" + message.getJumpUrl() + ")");
-                    eb.setImage(attachment.getUrl());
-                    eb.setFooter(String.format(LanguageHandler.get(lang, "bestof_footer"), reactionCount, event.getChannel().getName()), null);
-                    eb.setTimestamp(message.getCreationTime());
+            for (var attachment : attachmentList) {
+                var eb = new EmbedBuilder();
+                eb.setColor(new User(author.getIdLong()).getColor(guild, user));
+                eb.setAuthor(author.getName() + "#" + author.getDiscriminator(), null, author.getEffectiveAvatarUrl());
+                eb.setTitle(!message.getContentDisplay().isEmpty() ? message.getContentDisplay() : null);
+                eb.setDescription("[" + LanguageHandler.get(lang, "bestof_jump") + "](" + message.getJumpUrl() + ")");
+                eb.setImage(attachment.getUrl());
+                eb.setFooter(String.format(LanguageHandler.get(lang, "bestof_footer"), reactionCount, event.getChannel().getName()), null);
+                eb.setTimestamp(message.getCreationTime());
 
-                    channel.sendMessage(eb.build()).queue();
+                channel.sendMessage(eb.build()).queue();
 
-                    // Spam prevention. Every message just once.
-                    internalGuild.addBestOfImageBlacklist(event.getMessageIdLong());
-                }
-            } catch (SQLException e) {
-                new Log(e, event.getGuild(), event.getUser(), "bestofimage", null).sendLog(false);
+                // Spam prevention. Every message just once.
+                internalGuild.addBestOfImageBlacklist(event.getMessageIdLong(), guild, user);
             }
         });
     }
