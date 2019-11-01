@@ -1,6 +1,10 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package utilities;
 
+import files.language.LanguageHandler;
+import moderation.user.User;
+import net.dv8tion.jda.core.entities.Guild;
+
 import java.util.*;
 
 public class StringFormat {
@@ -35,9 +39,10 @@ public class StringFormat {
         return flipped.reverse().toString();
     }
 
-    public static TreeMap<String, Integer> sortByKey(TreeMap<String, Integer> map) {
+    public static LinkedHashMap<String, Integer> achievementSortByKey(LinkedHashMap<String, Integer> map, String lang, User internalUser, Guild guild, net.dv8tion.jda.core.entities.User user) {
         SortedSet<String> keys = new TreeSet<>(map.keySet());
-        var newMap = new TreeMap<String, Integer>();
+        var newMap = new LinkedHashMap<String, Integer>();
+        newMap.put(LanguageHandler.get(lang, "profile_total_ap"), internalUser.getTotelAP(guild, user));
         for (var key : keys) newMap.put(key, map.get(key));
         return newMap;
     }

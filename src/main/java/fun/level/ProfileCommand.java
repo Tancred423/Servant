@@ -2,15 +2,15 @@
 package fun.level;
 
 import files.language.LanguageHandler;
+import moderation.guild.Guild;
 import moderation.guild.GuildHandler;
 import moderation.toggle.Toggle;
 import moderation.user.User;
-import moderation.guild.Guild;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 import owner.blacklist.Blacklist;
 import servant.Log;
-import utilities.*;
+import utilities.Constants;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.TreeMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -54,56 +53,8 @@ public class ProfileCommand extends Command {
             var internalAuthor = new User(author.getIdLong());
             var guild = event.getGuild();
             var profileUser = (event.getMessage().getMentionedMembers().isEmpty() ? author : event.getMessage().getMentionedMembers().get(0).getUser());
-            var internalProfileUser = new User(profileUser.getIdLong());
 
             try {
-                // Achievements
-                var achievements = internalProfileUser.getAchievements(guild, author, lang);
-                var achievementsWithName = new TreeMap<String, Integer>();
-                for (var achievement : achievements.entrySet())
-                    achievementsWithName.put(Achievement.getFancyName(achievement.getKey(), lang), achievement.getValue());
-                achievementsWithName = StringFormat.sortByKey(achievementsWithName);
-
-                var achievementBuilder = new StringBuilder();
-                achievementBuilder.append("**AP: ").append(internalProfileUser.getTotelAP(guild, author)).append("**\n")
-                        .append("```c\n").append(StringFormat.fillWithWhitespace(LanguageHandler.get(lang, "profile_name"), 23))
-                        .append(" ")
-                        .append(StringFormat.pushWithWhitespace(LanguageHandler.get(lang, "profile_ap"), 3))
-                        .append("\n");
-                achievementBuilder.append("-".repeat(23)).append(" ").append("-".repeat(3)).append("\n");
-                for (var achievement : achievementsWithName.entrySet())
-                    achievementBuilder.append(StringFormat.fillWithWhitespace(Achievement.getFancyName(achievement.getKey(), lang), 23))
-                            .append(" ")
-                            .append(StringFormat.pushWithWhitespace(String.valueOf(achievement.getValue()), 3))
-                            .append("\n");
-                achievementBuilder.append("```");
-                if (achievementsWithName.isEmpty()) achievementBuilder = new StringBuilder().append(LanguageHandler.get(lang, "profile_noachievements"));
-
-                // Most used command
-                var features = internalProfileUser.getTop10MostUsedFeatures(guild, author, lang);
-                var top10Features = new StringBuilder();
-                if (features.isEmpty()) top10Features.append(LanguageHandler.get(lang, "profile_nocommands"));
-                else {
-                    top10Features.append("```c\n");
-                    top10Features.append(StringFormat.fillWithWhitespace(LanguageHandler.get(lang, "profile_name"), 16)).append(" ").append(StringFormat.pushWithWhitespace(LanguageHandler.get(lang, "profile_amount"), 10)).append("\n");
-                    top10Features.append("-".repeat(16)).append(" ").append("-".repeat(10)).append("\n");
-                    for (var feature : features.entrySet()) {
-                        top10Features.append(StringFormat.fillWithWhitespace(feature.getKey(), 16))
-                                .append(" ")
-                                .append(StringFormat.pushWithWhitespace(String.valueOf(feature.getValue()), 10))
-                                .append("\n");
-                    }
-                    top10Features.append("```");
-                }
-
-                // Baguette
-                var baguette = internalProfileUser.getBaguette(guild, author).entrySet().iterator().hasNext() ? internalProfileUser.getBaguette(guild, author).entrySet().iterator().next() : null;
-
-                // Description
-                var bio = internalProfileUser.getBio(guild, author);
-
-                // Level
-                // Create File.
                 var image = new File(OffsetDateTime.now(ZoneOffset.UTC).toEpochSecond() + ".png");
 
                 try {
@@ -116,14 +67,6 @@ public class ProfileCommand extends Command {
 
                 var eb = new EmbedBuilder();
                 eb.setColor(internalAuthor.getColor(guild, author));
-//                eb.setAuthor(profileUser.getName() + "#" + profileUser.getDiscriminator(), null, guild.getIconUrl());
-//                eb.setThumbnail(profileUser.getEffectiveAvatarUrl());
-//                eb.setDescription(bio);
-//                eb.addField(LanguageHandler.get(lang, "profile_baguettecounter"), baguette == null ?
-//                        LanguageHandler.get(lang, "profile_nobaguette") :
-//                        String.format(LanguageHandler.get(lang, "profile_baguette"), baguette.getKey(), baguette.getValue()), false);
-//                eb.addField(LanguageHandler.get(lang, "profile_mostused"), top10Features.toString(), false);
-//                eb.addField(LanguageHandler.get(lang, "profile_achievements"), achievementBuilder.toString(), false);
                 eb.setImage("attachment://" + image.getPath());
                 eb.setFooter(profileUser.equals(author) ?
                                 String.format(LanguageHandler.get(lang, "profile_footer1"), p, name) :

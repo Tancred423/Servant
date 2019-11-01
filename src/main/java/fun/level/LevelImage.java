@@ -18,7 +18,7 @@ import java.awt.geom.NoninvertibleTransformException;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
-import java.util.TreeMap;
+import java.util.LinkedHashMap;
 
 public class LevelImage {
     private User user;
@@ -246,10 +246,10 @@ public class LevelImage {
 
         // Achievement Content
         var achievements = internalUser.getAchievements(guild, user, lang);
-        var achievementsWithName = new TreeMap<String, Integer>();
+        var achievementsWithName = new LinkedHashMap<String, Integer>();
         for (var achievement : achievements.entrySet())
             achievementsWithName.put(Achievement.getFancyName(achievement.getKey(), lang), achievement.getValue());
-        achievementsWithName = StringFormat.sortByKey(achievementsWithName);
+        achievementsWithName = StringFormat.achievementSortByKey(achievementsWithName, lang, internalUser, guild, user);
 
         var achContentX = achTitleX;
         var achContentY = achTitleY;

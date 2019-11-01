@@ -179,7 +179,6 @@ public class User {
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) {
-                achievements.put(LanguageHandler.get(lang, "profile_total_ap"), getTotelAP(guild, user));
                 do achievements.put(resultSet.getString("achievement"), resultSet.getInt("ap"));
                 while (resultSet.next());
             }
