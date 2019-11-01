@@ -592,9 +592,10 @@ public class User {
         return colorCode;
     }
 
-    public Color getColor(Guild guild, net.dv8tion.jda.core.entities.User user) {
+    public Color getColor(Guild guild, net.dv8tion.jda.core.entities.User author) {
         Connection connection = null;
         var color = Color.decode(Servant.config.getDefaultColorCode());
+        var user = guild.getMemberById(userId).getUser();
 
         try {
             connection = Servant.db.getHikari().getConnection();
@@ -614,7 +615,7 @@ public class User {
                 else if (PatreonHandler.isServerBooster(user)) color = servantsKingdom.getRoleById(639128857747652648L).getColor();
             }
         } catch (SQLException e) {
-            new Log(e, guild, user, "color", null).sendLog(false);
+            new Log(e, guild, author, "color", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -871,7 +872,7 @@ public class User {
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
             var counter = 0;
-            if (resultSet.first())
+            if (resultSet.first()) {
                 // get total count
                 feature.put(LanguageHandler.get(lang, "profile_total_muc"), getTotalFeatureCount(guild, user));
                 do {
@@ -879,6 +880,7 @@ public class User {
                     if (counter < 9) counter++;
                     else break;
                 } while (resultSet.next());
+            }
         } catch (SQLException e) {
             new Log(e, guild, user, "featurecount", null).sendLog(false);
         } finally {

@@ -227,7 +227,16 @@ public class LevelImage {
 
         var counter = 0;
         if (features.isEmpty()) {
-            top10Features.append(LanguageHandler.get(lang, "profile_nocommands"));
+            g2d.translate(0, mucContentH);
+
+            text = LanguageHandler.get(lang, "profile_nocommands");
+            g2d.setColor(Color.BLACK);
+            layout = new TextLayout(text, myriad, frc);
+            shape = layout.getOutline(null);
+            g2d.setStroke(new BasicStroke(subOutline));
+            g2d.draw(shape);
+            g2d.setColor(Color.WHITE);
+            g2d.fill(shape);
         } else for (var feature : features.entrySet()) {
             g2d.translate(0, mucContentH);
 

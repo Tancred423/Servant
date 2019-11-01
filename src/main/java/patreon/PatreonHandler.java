@@ -21,10 +21,12 @@ public class PatreonHandler {
                 isServerBooster = g.getMemberById(user.getIdLong()).getRoles().contains(g.getRoleById(639128857747652648L));
 
         // Mistlock Sanctuary Booster
-        members = m.getMembers();
-        for (var member : members)
-            if (member.getUser().equals(user))
-                isServerBooster = m.getMemberById(user.getIdLong()).getRoles().contains(m.getRoleById(585536192691568681L));
+        if (m != null) {
+            members = m.getMembers();
+            for (var member : members)
+                if (member.getUser().equals(user))
+                    isServerBooster = m.getMemberById(user.getIdLong()).getRoles().contains(m.getRoleById(585536192691568681L));
+        }
 
         return isServerBooster;
     }
@@ -66,6 +68,7 @@ public class PatreonHandler {
     }
 
     public static boolean is$10Patron(User user) {
+        if (user.equals(Servant.jda.getSelfUser())) return true;
         if (isVIP(user)) return true;
         var members = g.getMembers();
         for (var member : members)
