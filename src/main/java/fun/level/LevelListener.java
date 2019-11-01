@@ -222,7 +222,7 @@ public class LevelListener extends ListenerAdapter {
 
         if (highestLevelAchievement != null) {
             int highestLevel = Integer.parseInt(highestLevelAchievement.substring(5));
-            return level > highestLevel;
+            return highestLevel > level;
         } else return false;
     }
 }

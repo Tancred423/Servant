@@ -58,7 +58,7 @@ public class ProfileCommand extends Command {
 
             try {
                 // Achievements
-                var achievements = internalProfileUser.getAchievements(guild, author);
+                var achievements = internalProfileUser.getAchievements(guild, author, lang);
                 var achievementsWithName = new TreeMap<String, Integer>();
                 for (var achievement : achievements.entrySet())
                     achievementsWithName.put(Achievement.getFancyName(achievement.getKey(), lang), achievement.getValue());
@@ -80,7 +80,7 @@ public class ProfileCommand extends Command {
                 if (achievementsWithName.isEmpty()) achievementBuilder = new StringBuilder().append(LanguageHandler.get(lang, "profile_noachievements"));
 
                 // Most used command
-                var features = internalProfileUser.getTop10MostUsedFeatures(guild, author);
+                var features = internalProfileUser.getTop10MostUsedFeatures(guild, author, lang);
                 var top10Features = new StringBuilder();
                 if (features.isEmpty()) top10Features.append(LanguageHandler.get(lang, "profile_nocommands"));
                 else {
@@ -116,14 +116,14 @@ public class ProfileCommand extends Command {
 
                 var eb = new EmbedBuilder();
                 eb.setColor(internalAuthor.getColor(guild, author));
-                eb.setAuthor(profileUser.getName() + "#" + profileUser.getDiscriminator(), null, guild.getIconUrl());
-                eb.setThumbnail(profileUser.getEffectiveAvatarUrl());
-                eb.setDescription(bio);
-                eb.addField(LanguageHandler.get(lang, "profile_baguettecounter"), baguette == null ?
-                        LanguageHandler.get(lang, "profile_nobaguette") :
-                        String.format(LanguageHandler.get(lang, "profile_baguette"), baguette.getKey(), baguette.getValue()), false);
-                eb.addField(LanguageHandler.get(lang, "profile_mostused"), top10Features.toString(), false);
-                eb.addField(LanguageHandler.get(lang, "profile_achievements"), achievementBuilder.toString(), false);
+//                eb.setAuthor(profileUser.getName() + "#" + profileUser.getDiscriminator(), null, guild.getIconUrl());
+//                eb.setThumbnail(profileUser.getEffectiveAvatarUrl());
+//                eb.setDescription(bio);
+//                eb.addField(LanguageHandler.get(lang, "profile_baguettecounter"), baguette == null ?
+//                        LanguageHandler.get(lang, "profile_nobaguette") :
+//                        String.format(LanguageHandler.get(lang, "profile_baguette"), baguette.getKey(), baguette.getValue()), false);
+//                eb.addField(LanguageHandler.get(lang, "profile_mostused"), top10Features.toString(), false);
+//                eb.addField(LanguageHandler.get(lang, "profile_achievements"), achievementBuilder.toString(), false);
                 eb.setImage("attachment://" + image.getPath());
                 eb.setFooter(profileUser.equals(author) ?
                                 String.format(LanguageHandler.get(lang, "profile_footer1"), p, name) :

@@ -975,6 +975,8 @@ public class LanguageFile {
         en_gb.setProperty("profile_baguettecounter", "Baguette Statistics");
         en_gb.setProperty("profile_nobaguette", "No baguette yet");
         en_gb.setProperty("profile_baguette", "Biggest baguette: %s (%s times)");
+        en_gb.setProperty("profile_total_muc", "Total commands used");
+        en_gb.setProperty("profile_total_ap", "Total AP");
 
         /// Unflip
         en_gb.setProperty("unflip_description", "Unlip a user.");
@@ -1965,6 +1967,8 @@ public class LanguageFile {
         de_de.setProperty("profile_baguettecounter", "Baguette Statistics");
         de_de.setProperty("profile_nobaguette", "No baguette yet");
         de_de.setProperty("profile_baguette", "Biggest baguette: %s (%s times)");
+        de_de.setProperty("profile_total_muc", "Total commands used");
+        de_de.setProperty("profile_total_ap", "Total AP");
 
         /// Unflip
         de_de.setProperty("unflip_description", "Unlip a user.");

@@ -1,6 +1,7 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package moderation.user;
 
+import files.language.LanguageHandler;
 import net.dv8tion.jda.core.entities.Guild;
 import patreon.PatreonHandler;
 import servant.Log;
@@ -168,7 +169,7 @@ public class User {
         return hasAchievement;
     }
 
-    public Map<String, Integer> getAchievements(Guild guild, net.dv8tion.jda.core.entities.User user) {
+    public Map<String, Integer> getAchievements(Guild guild, net.dv8tion.jda.core.entities.User user, String lang) {
         Connection connection = null;
         var achievements = new TreeMap<String, Integer>();
 
@@ -177,9 +178,11 @@ public class User {
             var select = connection.prepareStatement("SELECT * FROM achievement WHERE user_id=?");
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
-            if (resultSet.first())
+            if (resultSet.first()) {
+                achievements.put(LanguageHandler.get(lang, "profile_total_ap"), getTotelAP(guild, user));
                 do achievements.put(resultSet.getString("achievement"), resultSet.getInt("ap"));
                 while (resultSet.next());
+            }
         } catch (SQLException e) {
             new Log(e, guild, user, "achievement", null).sendLog(false);
         } finally {
@@ -837,7 +840,29 @@ public class User {
         }
     }
 
-    public Map<String, Integer> getTop10MostUsedFeatures(Guild guild, net.dv8tion.jda.core.entities.User user) {
+    // Feature Count
+    private int getTotalFeatureCount(Guild guild, net.dv8tion.jda.core.entities.User user) {
+        Connection connection = null;
+        var feature = 0;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement("SELECT * FROM feature_count WHERE id=? ORDER BY count DESC");
+            select.setLong(1, userId);
+            var resultSet = select.executeQuery();
+            if (resultSet.first())
+            do feature += resultSet.getInt("count"); while (resultSet.next());
+        } catch (SQLException e) {
+            new Log(e, guild, user, "featurecount", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return feature;
+    }
+
+
+    public Map<String, Integer> getTop10MostUsedFeatures(Guild guild, net.dv8tion.jda.core.entities.User user, String lang) {
         Connection connection = null;
         var feature = new LinkedHashMap<String, Integer>();
 
@@ -848,13 +873,15 @@ public class User {
             var resultSet = select.executeQuery();
             var counter = 0;
             if (resultSet.first())
+                // get total count
+                feature.put(LanguageHandler.get(lang, "profile_total_muc"), getTotalFeatureCount(guild, user));
                 do {
                     feature.put(resultSet.getString("feature"), resultSet.getInt("count"));
                     if (counter < 9) counter++;
                     else break;
                 } while (resultSet.next());
         } catch (SQLException e) {
-            new Log(e, guild, user, "level", null).sendLog(false);
+            new Log(e, guild, user, "featurecount", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
