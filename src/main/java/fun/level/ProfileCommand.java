@@ -50,9 +50,9 @@ public class ProfileCommand extends Command {
             event.getChannel().sendTyping().queue();
 
             var author = event.getAuthor();
-            var internalAuthor = new User(author.getIdLong());
             var guild = event.getGuild();
             var profileUser = (event.getMessage().getMentionedMembers().isEmpty() ? author : event.getMessage().getMentionedMembers().get(0).getUser());
+            var internalProfileUser = new User(profileUser.getIdLong());
 
             try {
                 var image = new File(OffsetDateTime.now(ZoneOffset.UTC).toEpochSecond() + ".png");
@@ -66,7 +66,7 @@ public class ProfileCommand extends Command {
                 }
 
                 var eb = new EmbedBuilder();
-                eb.setColor(internalAuthor.getColor(guild, author));
+                eb.setColor(internalProfileUser.getColor(guild, author));
                 eb.setImage("attachment://" + image.getPath());
                 eb.setFooter(profileUser.equals(author) ?
                                 String.format(LanguageHandler.get(lang, "profile_footer1"), p, name) :

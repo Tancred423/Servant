@@ -9,13 +9,24 @@ import servant.Servant;
 
 public class PatreonHandler {
     private static Guild g = Servant.jda.getGuildById(436925371577925642L);
+    private static Guild m = Servant.jda.getGuildById(237575963439923200L);
 
     public static boolean isServerBooster(User user) {
+        var isServerBooster = false;
+
+        // Servant's Kingdom Booster
         var members = g.getMembers();
         for (var member : members)
             if (member.getUser().equals(user))
-                return g.getMemberById(user.getIdLong()).getRoles().contains(g.getRoleById(639128857747652648L));
-        return false;
+                isServerBooster = g.getMemberById(user.getIdLong()).getRoles().contains(g.getRoleById(639128857747652648L));
+
+        // Mistlock Sanctuary Booster
+        members = m.getMembers();
+        for (var member : members)
+            if (member.getUser().equals(user))
+                isServerBooster = m.getMemberById(user.getIdLong()).getRoles().contains(m.getRoleById(585536192691568681L));
+
+        return isServerBooster;
     }
 
     public static boolean isDonator(User user) {
