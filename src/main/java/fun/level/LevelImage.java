@@ -258,11 +258,18 @@ public class LevelImage {
 
         counter = 0;
         if (achievementsWithName.isEmpty()) {
-            //
-        } else for (var achievement : achievements.entrySet()) {
             g2d.translate(0, achContentH);
-
-            text = Achievement.getFancyName(achievement.getKey(), lang) + ": " + achievement.getValue();
+            text = LanguageHandler.get(lang, "profile_noachievements");
+            g2d.setColor(Color.BLACK);
+            layout = new TextLayout(text, myriad, frc);
+            shape = layout.getOutline(null);
+            g2d.setStroke(new BasicStroke(subOutline));
+            g2d.draw(shape);
+            g2d.setColor(Color.WHITE);
+            g2d.fill(shape);
+        } else for (var achievement : achievementsWithName.entrySet()) {
+            g2d.translate(0, achContentH);
+            text = achievement.getKey() + ": " + achievement.getValue();
             g2d.setColor(Color.BLACK);
             layout = new TextLayout(text, myriad, frc);
             shape = layout.getOutline(null);

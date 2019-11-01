@@ -961,9 +961,6 @@ public class LanguageFile {
         en_gb.setProperty("love_fallback", "Urgh!");
 
         /// Profile
-        en_gb.setProperty("profile_name", "Name");
-        en_gb.setProperty("profile_ap", "AP");
-        en_gb.setProperty("profile_amount", "Amount");
         en_gb.setProperty("profile_noachievements", "No achievements");
         en_gb.setProperty("profile_nocommands", "No commands were used yet");
         en_gb.setProperty("profile_level", "Level");
@@ -1953,9 +1950,6 @@ public class LanguageFile {
         de_de.setProperty("love_fallback", "Urgh!");
 
         /// Profile
-        de_de.setProperty("profile_name", "Name");
-        de_de.setProperty("profile_ap", "AP");
-        de_de.setProperty("profile_amount", "Amount");
         de_de.setProperty("profile_noachievements", "No achievements");
         de_de.setProperty("profile_nocommands", "No commands were used yet");
         de_de.setProperty("profile_level", "Level");
