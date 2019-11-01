@@ -829,6 +829,9 @@ public class LanguageFile {
         en_gb.setProperty("baguette_49", "Unlucky");
         en_gb.setProperty("baguette_50", "JACKPOT! Now you're cool.");
 
+        /// Bio
+        en_gb.setProperty("bio_maxlength", "Bio max length is 50.");
+
         /// Coin Flip
         en_gb.setProperty("coinflip_head", "Head!");
         en_gb.setProperty("coinflip_tail", "Tail!");
@@ -1815,6 +1818,9 @@ public class LanguageFile {
         /// Baguette
         de_de.setProperty("baguette_49", "Unlucky");
         de_de.setProperty("baguette_50", "JACKPOT! Now you're cool.");
+
+        /// Bio
+        de_de.setProperty("bio_maxlength", "Bio max length is 50.");
 
         /// Coin Flip
         de_de.setProperty("coinflip_head", "Head!");

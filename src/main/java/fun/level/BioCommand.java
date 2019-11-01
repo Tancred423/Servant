@@ -1,6 +1,7 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package fun.level;
 
+import files.language.LanguageHandler;
 import moderation.guild.Guild;
 import moderation.toggle.Toggle;
 import moderation.user.User;
@@ -36,11 +37,20 @@ public class BioCommand extends Command {
 
             var guild = event.getGuild();
             var author = event.getAuthor();
+            var lang = LanguageHandler.getLanguage(event);
 
-            if (!Parser.isSqlInjection(args) && args.length() <= 2000) {
-                new User(event.getAuthor().getIdLong()).setBio(args, guild, author);
-                event.reactSuccess();
-            } else event.reactError();
+            if (Parser.isSqlInjection(args)) {
+                event.reactError();
+                return;
+            }
+
+            if (args.length() > 50) {
+                event.replyError(LanguageHandler.get(lang, "bio_maxlength"));
+                return;
+            }
+
+            new User(event.getAuthor().getIdLong()).setBio(args, guild, author);
+            event.reactSuccess();
 
             // Statistics.
             new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);

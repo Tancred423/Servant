@@ -157,6 +157,23 @@ public class LevelImage {
 
         g2d.translate(rankX * -1, rankY * -1); // Reset
 
+        // Guild Rank
+        text = internalUser.getBio(guild, user);
+        if (!text.isEmpty()) {
+            var bioX = rankX;
+            var bioY = rankY + 80;
+            g2d.translate(bioX, bioY);
+            g2d.setColor(Color.BLACK);
+            layout = new TextLayout(text, myriad, frc);
+            shape = layout.getOutline(null);
+            g2d.setStroke(new BasicStroke(outline));
+            g2d.draw(shape);
+            g2d.setColor(Color.WHITE);
+            g2d.fill(shape);
+
+            g2d.translate(bioX * -1, bioY * -1); // Reset
+        }
+
         /* Baguette */
         var baguetteX = avaX;
         var baguetteY = avaY * 2 + avaH;

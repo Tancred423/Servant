@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Nov 01, 2019 at 08:04 PM
+-- Generation Time: Nov 01, 2019 at 08:49 PM
 -- Server version: 10.1.41-MariaDB-0+deb9u1
 -- PHP Version: 7.0.33-0+deb9u5
 
@@ -137,7 +137,7 @@ CREATE TABLE `best_of_quote_bl` (
 
 CREATE TABLE `bio` (
   `user_id` bigint(18) NOT NULL,
-  `text` varchar(2000) COLLATE utf8mb4_unicode_ci NOT NULL
+  `text` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
