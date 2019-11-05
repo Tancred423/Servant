@@ -595,7 +595,7 @@ public class User {
     public Color getColor(Guild guild, net.dv8tion.jda.core.entities.User author) {
         Connection connection = null;
         var color = Color.decode(Servant.config.getDefaultColorCode());
-        var user = guild.getMemberById(userId).getUser();
+        var user = guild == null ? author : guild.getMemberById(userId).getUser();
 
         try {
             connection = Servant.db.getHikari().getConnection();

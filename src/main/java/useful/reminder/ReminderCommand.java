@@ -23,7 +23,7 @@ import java.util.concurrent.CompletableFuture;
 public class ReminderCommand extends Command {
     public ReminderCommand() {
         this.name = "reminder";
-        this.aliases = new String[0];
+        this.aliases = new String[]{"remindme"};
         this.help = "Set up a reminder.";
         this.category = new Category("Useful");
         this.arguments = null;
