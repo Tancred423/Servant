@@ -95,9 +95,8 @@ public class Parser {
         return !message.getMentionedUsers().isEmpty();
     }
 
-    // z1 should be the saved time; z2 should be the current time.
-    public static long getTimeDifferenceInMillis(ZonedDateTime z1, ZonedDateTime z2) {
-        return ChronoUnit.MILLIS.between(z1, z2);
+    public static long getTimeDifferenceInMillis(ZonedDateTime now, ZonedDateTime futureDate) {
+        return ChronoUnit.MILLIS.between(now, futureDate);
     }
 
     public static int getTotalLevelExp(int level) {

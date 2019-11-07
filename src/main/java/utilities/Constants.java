@@ -2,10 +2,13 @@
 package utilities;
 
 public class Constants {
-    final public static String VERSION = "4.27.6";
+    final public static String VERSION = "4.28.0";
 
     // in seconds
     final public static int USER_COOLDOWN = 3;
     final public static int MOD_COOLDOWN = 1;
     final public static int OWNER_COOLDOWN = 0;
+
+    // millis
+    final public static long WEEK_MILLIS = 7 * 24 * 60 * 60 * 1000;
 }

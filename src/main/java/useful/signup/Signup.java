@@ -11,6 +11,7 @@ import servant.Log;
 import servant.Servant;
 import useful.giveaway.Giveaway;
 import utilities.Emote;
+import utilities.Image;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -39,6 +40,8 @@ public class Signup {
                         var guild = jda.getGuildById(guildId);
                         var expiration = resultSet.getTimestamp("time").toLocalDateTime()
                                 .atZone(ZoneId.of(new Guild(guildId).getOffset(guild, jda.getSelfUser())));
+                        var isCustomDate = resultSet.getBoolean("is_custom_date");
+                        if (isCustomDate) expiration = expiration.minusMinutes(30);
                         var author = jda.getUserById(resultSet.getLong("author_id"));
                         var now = ZonedDateTime.now(ZoneOffset.of(new Guild(guildId).getOffset(guild, author)));
                         var remainingTimeMillis = Giveaway.zonedDateTimeDifference(now, expiration);
@@ -46,8 +49,9 @@ public class Signup {
                         if (remainingTimeMillis <= 0) {
                             var internalGuild = new Guild(guild.getIdLong());
                             var messageId = resultSet.getLong("message_id");
+                            ZonedDateTime finalExpiration = isCustomDate ? expiration.plusMinutes(30) : expiration;
                             guild.getTextChannelById(resultSet.getLong("channel_id")).getMessageById(messageId).queue(message ->
-                                    endSignup(internalGuild, messageId, message, guild, author, true));
+                                    endSignup(internalGuild, messageId, message, guild, author, true, finalExpiration));
                         }
                     }
                 } while (resultSet.next());
@@ -59,7 +63,8 @@ public class Signup {
         }
     }
 
-    static void endSignup(Guild internalGuild, long messageId, Message message, net.dv8tion.jda.core.entities.Guild guild, net.dv8tion.jda.core.entities.User author, boolean forceEnd) {
+    static void endSignup(Guild internalGuild, long messageId, Message message, net.dv8tion.jda.core.entities.Guild guild,
+                          net.dv8tion.jda.core.entities.User author, boolean forceEnd, ZonedDateTime expiration) {
         if (!internalGuild.isSignupMessage(messageId, guild, author)) return;
         var amount = internalGuild.getSignupAmount(messageId, guild, author);
         var reactionList = message.getReactions();
@@ -84,11 +89,16 @@ public class Signup {
                 var eb = new EmbedBuilder();
                 eb.setColor(new User(internalGuild.getSignupAuthorId(messageId, guild, author)).getColor(guild, author));
                 var title = internalGuild.getSignupTitle(messageId, guild, author);
-                eb.setTitle(String.format(LanguageHandler.get(lang, "signup_embedtitle"), (title.isEmpty() ? "" : "for "), title));
-
+                eb.setTitle(title.isEmpty() ? LanguageHandler.get(lang, "signup_embedtitle_empty") :
+                        String.format(LanguageHandler.get(lang, "signup_embedtitle_notempty"), title));
                 eb.setDescription(String.format(LanguageHandler.get(lang, "signup_embeddescriptionend"), amount) + "\n");
                 if (users.isEmpty()) eb.appendDescription(LanguageHandler.get(lang, "signup_nobody"));
                 else for (var user : users) eb.appendDescription(user.getAsMention() + "\n");
+                eb.setFooter(internalGuild.signupIsCustomDate(messageId, guild, author) ?
+                                LanguageHandler.get(lang, "signup_event") :
+                                LanguageHandler.get(lang, "signup_timeout_finish"),
+                        Image.getImageUrl("clock", guild, author));
+                eb.setTimestamp(expiration.toInstant());
                 message.editMessage(eb.build()).queue();
                 message.clearReactions().queue();
                 internalGuild.unsetSignup(messageId, guild, author);

@@ -6,6 +6,8 @@ import servant.Log;
 import servant.Servant;
 
 import java.sql.*;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 import static utilities.DatabaseConn.*;
@@ -95,12 +97,51 @@ public class Guild {
         return authorId;
     }
 
-    public void setSignup(long messageId, long authorId, int amount, String title, Timestamp time, long channelId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public ZonedDateTime getSignupTime(long messageId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+        Connection connection = null;
+        ZonedDateTime expiration = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement("SELECT time FROM signup WHERE message_id=?");
+            select.setLong(1, messageId);
+            var resultSet = select.executeQuery();
+            if (resultSet.first()) expiration = resultSet.getTimestamp("time").toLocalDateTime()
+                    .atZone(ZoneId.of(new Guild(guildId).getOffset(guild, guild.getOwner().getUser())));
+        } catch (SQLException e) {
+            new Log(e, guild, user, "signup", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return expiration;
+    }
+
+    public boolean signupIsCustomDate(long messageId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+        Connection connection = null;
+        var isCustomDate = false;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement("SELECT is_custom_date FROM signup WHERE message_id=?");
+            select.setLong(1, messageId);
+            var resultSet = select.executeQuery();
+            if (resultSet.first()) isCustomDate = resultSet.getBoolean("is_custom_date");
+        } catch (SQLException e) {
+            new Log(e, guild, user, "signup", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return isCustomDate;
+    }
+
+    public void setSignup(long messageId, long authorId, int amount, String title, Timestamp time, long channelId, boolean isCustomDate, net.dv8tion.jda.core.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
             connection = Servant.db.getHikari().getConnection();
-            var insert = connection.prepareStatement("INSERT INTO signup (message_id,author_id,amount,title,time,guild_id,channel_id) VALUES (?,?,?,?,?,?,?)");
+            var insert = connection.prepareStatement("INSERT INTO signup (message_id,author_id,amount,title,time,guild_id,channel_id,is_custom_date) VALUES (?,?,?,?,?,?,?,?)");
             insert.setLong(1, messageId);
             insert.setLong(2, authorId);
             insert.setInt(3, amount);
@@ -108,6 +149,7 @@ public class Guild {
             insert.setTimestamp(5, time);
             insert.setLong(6, guildId);
             insert.setLong(7, channelId);
+            insert.setBoolean(8, isCustomDate);
             insert.executeUpdate();
         } catch (SQLException e) {
             new Log(e, guild, user, "signup", null).sendLog(false);

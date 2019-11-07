@@ -769,22 +769,42 @@ public class LanguageFile {
         en_gb.setProperty("reminder_remind_topic", "Hi master, I should remind you at this time about:\n**%s**");
 
         /// Signup
-        en_gb.setProperty("signup_description", "Let people sign up for an event like a raid or something.");
-        en_gb.setProperty("signup_usage", "Command: `%s%s [amount of people] [optional title]`\n" +
-                "Example: `%s%s 10 Holy Grail War`");
-        en_gb.setProperty("signup_hint", "The title of your event is optional, but you have to provide the amount of people that are allowed to sign up.\n" +
-                "The mount of people that are allowed to sign up has to be within 1 and 100.");
-        en_gb.setProperty("signup_embedtitle", "Sign up %s %s");
+        en_gb.setProperty("signup_description", "Let people sign up for an event (e.g. a raid).\n" +
+                "The signup will be completed if either of the following happens:\n" +
+                "1. The given amount of people have signed up (reacted).\n" +
+                "2. The given expiring date (or the default one if not given) was reached (see last hint).\n" +
+                "3. The signup creator clicked the :x: reaction.");
+        en_gb.setProperty("signup_usage", "Command: `%s%s \"Title\" [amount of people] [event date and time]`\n" +
+                "Example 1: `%s%s \"Holy Grail War\" 10 2019-12-31 23:30`\n" +
+                "Example 2: `%s%s 10 2019-12-31 23:30`\n" +
+                "Example 3: `%s%s \"Holy Grail War\" 10`\n" +
+                "Example 4: `%s%s 10`");
+        en_gb.setProperty("signup_hint", "- The amount of people that are allowed to sign up has to be within 1 and 100.\n" +
+                "- The event date and time has to be within the next 4 weeks.\n" +
+                "- If you don't set the event date and time, the signup will expire in 4 weeks.\n" +
+                "- The event date and time will use the server's offset. You can check it via `!serverinfo` -> Servant Settings -> Offset\n" +
+                "- If you set an event date, the signup will expire 30 minutes earlier, so you have time to organize the group.");
+        en_gb.setProperty("signup_invalidtitle", "Invalid Title: No ending quotation mark.");
+        en_gb.setProperty("signup_titlelength", "Invalid Title Length: The title must not be longer than 256 characters.");
+        en_gb.setProperty("signup_invalidamount", "Invalid Amount: No amount of participants was found.");
+        en_gb.setProperty("signup_invalidamountrange", "Invalid Amount Size: The amount has to be within 1 and 100 participants.");
+        en_gb.setProperty("signup_invalidamountparse", "Invalid Amount Parse: %s");
+        en_gb.setProperty("signup_missingamount", "Missing Amount: You have to add an amount of allowed participants.");
+        en_gb.setProperty("signup_invaliddate", "Invalid Date and Time");
+        en_gb.setProperty("signup_invaliddatedistance", "Invalid Date and Time: The given date and time must not be farther away than 4 weeks and it must not be in the past.\n" +
+                "Keep in mind the custom event date will be processed 30 min earlier, so the next 30 minutes will be considered to be the \"past\".");
+        en_gb.setProperty("signup_invaliddateday", "Invalid Date and Time: The given date does not exist. (e.g. Feb 31)");
+        en_gb.setProperty("signup_embedtitle_empty", "Sign up");
+        en_gb.setProperty("signup_embedtitle_notempty", "Sign up for %s");
         en_gb.setProperty("signup_embeddescription", "%s people can participate!\n\n" +
                 "Click on %s to participate.\n" +
                 "Remove said reaction if you have changed your mind.");
-        en_gb.setProperty("signup_invalidamount", "Your given amount doesn't make sense.");
-        en_gb.setProperty("signup_amountrange", "Your given amount has be within 1 to 100 participants.");
-        en_gb.setProperty("signup_titlelength", "The title must not be longer than 256 characters.");
         en_gb.setProperty("signup_embeddescriptionend", "%s people could participate!\n\n" +
                 "These are the participants:");
-        en_gb.setProperty("signup_timeout", "Times out at");
         en_gb.setProperty("signup_nobody", "Nobody signed up");
+        en_gb.setProperty("signup_timeout", "Times out at");
+        en_gb.setProperty("signup_event", "Event at");
+        en_gb.setProperty("signup_timeout_finish", "Ended at");
 
         /// Timezone
         en_gb.setProperty("timezone_description", "Convert a date and time from one timezone to another");
@@ -1759,22 +1779,42 @@ public class LanguageFile {
         de_de.setProperty("reminder_remind_topic", "Hi master, I should remind you at this time about:\n**%s**");
 
         /// Signup
-        de_de.setProperty("signup_description", "Let people sign up for an event like a raid or something.");
-        de_de.setProperty("signup_usage", "Command: `%s%s [amount of people] [optional title]`\n" +
-                "Example: `%s%s 10 Holy Grail War`");
-        de_de.setProperty("signup_hint", "The title of your event is optional, but you have to provide the amount of people that are allowed to sign up.\n" +
-                "The mount of people that are allowed to sign up has to be within 1 and 100.");
-        de_de.setProperty("signup_embedtitle", "Sign up %s %s");
+        de_de.setProperty("signup_description", "Let people sign up for an event (e.g. a raid).\n" +
+                "The signup will be completed if either of the following happens:\n" +
+                "1. The given amount of people have signed up (reacted).\n" +
+                "2. The given expiring date (or the default one if not given) was reached (see last hint).\n" +
+                "3. The signup creator clicked the :x: reaction.");
+        de_de.setProperty("signup_usage", "Command: `%s%s \"Title\" [amount of people] [event date and time]`\n" +
+                "Example 1: `%s%s \"Holy Grail War\" 10 2019-12-31 23:30`\n" +
+                "Example 2: `%s%s 10 2019-12-31 23:30`\n" +
+                "Example 3: `%s%s \"Holy Grail War\" 10`\n" +
+                "Example 4: `%s%s 10`");
+        de_de.setProperty("signup_hint", "- The amount of people that are allowed to sign up has to be within 1 and 100.\n" +
+                "- The event date and time has to be within the next 4 weeks.\n" +
+                "- If you don't set the event date and time, the signup will expire in 4 weeks.\n" +
+                "- The event date and time will use the server's offset. You can check it via `!serverinfo` -> Servant Settings -> Offset\n" +
+                "- If you set an event date, the signup will expire 30 minutes earlier, so you have time to organize the group.");
+        de_de.setProperty("signup_invalidtitle", "Invalid Title: No ending quotation mark.");
+        de_de.setProperty("signup_titlelength", "Invalid Title Length: The title must not be longer than 256 characters.");
+        de_de.setProperty("signup_invalidamount", "Invalid Amount: No amount of participants was found.");
+        de_de.setProperty("signup_invalidamountrange", "Invalid Amount Size: The amount has to be within 1 and 100 participants.");
+        de_de.setProperty("signup_invalidamountparse", "Invalid Amount Parse: %s");
+        de_de.setProperty("signup_missingamount", "Missing Amount: You have to add an amount of allowed participants.");
+        de_de.setProperty("signup_invaliddate", "Invalid Date and Time");
+        de_de.setProperty("signup_invaliddatedistance", "Invalid Date and Time: The given date and time must not be farther away than 4 weeks and it must not be in the past.\n" +
+                "Keep in mind the custom event date will be processed 30 min earlier, so the next 30 minutes will be considered to be the \"past\".");
+        de_de.setProperty("signup_invaliddateday", "Invalid Date and Time: The given date does not exist. (e.g. Feb 31)");
+        de_de.setProperty("signup_embedtitle_empty", "Sign up");
+        de_de.setProperty("signup_embedtitle_notempty", "Sign up for %s");
         de_de.setProperty("signup_embeddescription", "%s people can participate!\n\n" +
                 "Click on %s to participate.\n" +
                 "Remove said reaction if you have changed your mind.");
-        de_de.setProperty("signup_invalidamount", "Your given amount doesn't make sense.");
-        de_de.setProperty("signup_amountrange", "Your given amount has be within 1 to 100 participants.");
-        de_de.setProperty("signup_titlelength", "The title must not be longer than 256 characters.");
         de_de.setProperty("signup_embeddescriptionend", "%s people could participate!\n\n" +
                 "These are the participants:");
-        de_de.setProperty("signup_timeout", "Times out at");
         de_de.setProperty("signup_nobody", "Nobody signed up");
+        de_de.setProperty("signup_timeout", "Times out at");
+        de_de.setProperty("signup_event", "Event at");
+        de_de.setProperty("signup_timeout_finish", "Ended at");
 
         /// Timezone
         de_de.setProperty("timezone_description", "Convert a date and time from one timezone to another");

@@ -44,3 +44,6 @@ hs_err_pid*
 
 # Easter Eggs Files
 /src/main/java/easteregg/*
+
+# Logs
+/logs/*

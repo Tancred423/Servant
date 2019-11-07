@@ -7,6 +7,8 @@ import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEv
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 import utilities.Emote;
 
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.concurrent.CompletableFuture;
 
 public class SignupListener extends ListenerAdapter {
@@ -15,6 +17,7 @@ public class SignupListener extends ListenerAdapter {
             if (event.getUser().isBot()) return;
             if (!Toggle.isEnabled(event, "signup")) return;
 
+            var user = event.getUser();
             var guild = event.getGuild();
             var internalGuild = new Guild(guild.getIdLong());
             var messageId = event.getMessageIdLong();
@@ -24,12 +27,18 @@ public class SignupListener extends ListenerAdapter {
             var forceEnd = false;
             var endEmoji = Emote.getEmoji("end");
             if (!event.getReactionEmote().isEmote() && event.getReactionEmote().getName().equals(endEmoji)) {
-                if (event.getUser().getIdLong() != internalGuild.getSignupAuthorId(event.getMessageIdLong(), guild, event.getUser()))
-                    event.getReaction().removeReaction(event.getUser()).queue();
+                if (event.getUser().getIdLong() != internalGuild.getSignupAuthorId(event.getMessageIdLong(), guild, user))
+                    event.getReaction().removeReaction(user).queue();
                 else forceEnd = true;
             }
+
+            var expiration = internalGuild.getSignupTime(messageId, guild, user);
+            var isCustomDate = internalGuild.signupIsCustomDate(messageId, guild, user);
+            if (!isCustomDate) expiration = ZonedDateTime.now(ZoneOffset.of(internalGuild.getOffset(guild, user)));
+
             var finalForceEnd = forceEnd;
-            event.getChannel().getMessageById(messageId).queue(message -> Signup.endSignup(internalGuild, messageId, message, guild, event.getUser(), finalForceEnd));
+            var finalExpiration = expiration;
+            event.getChannel().getMessageById(messageId).queue(message -> Signup.endSignup(internalGuild, messageId, message, guild, event.getUser(), finalForceEnd, finalExpiration));
         });
     }
 }

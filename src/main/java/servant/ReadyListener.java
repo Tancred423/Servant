@@ -43,7 +43,7 @@ public class ReadyListener extends ListenerAdapter {
 
     private void checkSignups(JDA jda) {
         var service = Executors.newSingleThreadScheduledExecutor();
-        service.scheduleAtFixedRate(() -> Signup.checkSignups(jda), 0, 6 * 60, TimeUnit.MINUTES); // 6h
+        service.scheduleAtFixedRate(() -> Signup.checkSignups(jda), 0, 1, TimeUnit.MINUTES);
     }
 
     private void checkGiveaways(JDA jda) {
