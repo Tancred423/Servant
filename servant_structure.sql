@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Nov 01, 2019 at 08:49 PM
+-- Generation Time: Nov 07, 2019 at 12:59 PM
 -- Server version: 10.1.41-MariaDB-0+deb9u1
 -- PHP Version: 7.0.33-0+deb9u5
 
@@ -373,7 +373,8 @@ CREATE TABLE `signup` (
   `title` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `guild_id` bigint(18) NOT NULL,
-  `channel_id` bigint(18) NOT NULL
+  `channel_id` bigint(18) NOT NULL,
+  `is_custom_date` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
