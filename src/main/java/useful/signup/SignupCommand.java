@@ -52,9 +52,11 @@ public class SignupCommand extends Command {
                 return;
             }
 
+            var contentSplit = event.getArgs().trim().replaceAll(" +", " ").replace("\\", "").split(" ");
+
             String title;
             try {
-                title = parseTitle(event);
+                title = parseTitle(event, contentSplit);
             } catch (InvalidTitleException e) {
                 event.replyError(e.getMessage());
                 return;
@@ -62,15 +64,15 @@ public class SignupCommand extends Command {
 
             int amount;
             try {
-                amount = parseAmount(event, title);
-            } catch (InvalidAmountException | NumberFormatException e) {
+                amount = parseAmount(event, contentSplit, title);
+            } catch (InvalidAmountException e) {
                 event.replyError(e.getMessage());
                 return;
             }
 
             ZonedDateTime eventDate;
             try {
-                eventDate = parseDate(event, amount);
+                eventDate = parseDate(event, contentSplit, amount);
             } catch (InvalidDateException e) {
                 event.replyError(e.getMessage());
                 return;
@@ -81,6 +83,7 @@ public class SignupCommand extends Command {
             var isCustomDate = false;
             if (eventDate != null) isCustomDate = true;
             else eventDate = ZonedDateTime.now(ZoneOffset.of(offset)).plusWeeks(4);
+            title = title == null ? "" : title;
 
             var guild = event.getGuild();
             var author = event.getAuthor();
@@ -88,22 +91,23 @@ public class SignupCommand extends Command {
 
             var eb = new EmbedBuilder();
             eb.setColor(internalAuthor.getColor(guild, author));
-        eb.setTitle(title.isEmpty() ? LanguageHandler.get(lang, "signup_embedtitle_empty") :
-                String.format(LanguageHandler.get(lang, "signup_embedtitle_notempty"), title));
+            eb.setTitle(title.isEmpty() ? LanguageHandler.get(lang, "signup_embedtitle_empty") :
+                    String.format(LanguageHandler.get(lang, "signup_embedtitle_notempty"), title));
             eb.setDescription(String.format(LanguageHandler.get(lang, "signup_embeddescription"),
 
-                    Emote.getEmoji("upvote"),amount,
+                    Emote.getEmoji("upvote"), amount,
                     (isCustomDate ? LanguageHandler.get(lang, "signup_embeddescription_custom") : "")));
             eb.setFooter(isCustomDate ? LanguageHandler.get(lang, "signup_event") : LanguageHandler.get(lang, "signup_timeout"),
                     Image.getImageUrl("clock", guild, author));
             eb.setTimestamp(eventDate.toInstant());
 
-        var finalEventDate = eventDate;
-        var finalIsCustomDate = isCustomDate;
-        event.getChannel().sendMessage(eb.build()).queue(sentMessage -> {
+            var finalEventDate = eventDate;
+            var finalIsCustomDate = isCustomDate;
+            var finalTitle = title;
+            event.getChannel().sendMessage(eb.build()).queue(sentMessage -> {
                 sentMessage.addReaction(Emote.getEmoji("upvote")).queue();
                 sentMessage.addReaction(Emote.getEmoji("end")).queue();
-                internalGuild.setSignup(sentMessage.getIdLong(), author.getIdLong(), amount, title, Timestamp.valueOf(finalEventDate.toLocalDateTime()), sentMessage.getChannel().getIdLong(), finalIsCustomDate, guild, author);
+                internalGuild.setSignup(sentMessage.getIdLong(), author.getIdLong(), amount, finalTitle, Timestamp.valueOf(finalEventDate.toLocalDateTime()), sentMessage.getChannel().getIdLong(), finalIsCustomDate, guild, author);
             });
 
             // Statistics.
@@ -112,32 +116,32 @@ public class SignupCommand extends Command {
         });
     }
 
-    private String parseTitle(CommandEvent event) throws InvalidTitleException {
+    private String parseTitle(CommandEvent event, String[] contentSplit) throws InvalidTitleException {
         var lang = LanguageHandler.getLanguage(event);
-        var contentSplit = event.getArgs().trim().split(" ");
         if (contentSplit[0].startsWith("\"")) {
-            if (contentSplit[0].endsWith("\"")) {
+            if (contentSplit[0].endsWith("\"") && !contentSplit[0].equals("\"")) {
                 // One Word Title
-                var title = contentSplit[0].replaceAll("\"", "");
+                var title = contentSplit[0].replace("\"", "");
                 if (title.length() > 256) throw new InvalidTitleException(LanguageHandler.get(lang, "signup_titlelength"));
                 else return title;
             } else {
                 // Multiple Word title
                 var title = new StringBuilder();
+                var counter = 0;
                 for (var content : contentSplit) {
                     title.append(content).append(" ");
-                    if (content.endsWith("\"")) return title.toString().replaceAll("\"", "");
+                    if (content.endsWith("\"") && counter != 0) return title.toString().replace("\"", "").trim();
+                    counter++;
                 }
             }
-        } else return "";
+        } else return null;
 
         throw new InvalidTitleException(LanguageHandler.get(lang, "signup_invalidtitle"));
     }
 
-    private int parseAmount(CommandEvent event, String title) throws InvalidAmountException, NumberFormatException {
+    private int parseAmount(CommandEvent event, String[] contentSplit, String title) throws InvalidAmountException {
         var lang = LanguageHandler.getLanguage(event);
-        var contentSplit = event.getArgs().trim().split(" ");
-        if (title.isEmpty()) {
+        if (title == null) {
             // No title
             int amount;
             try {
@@ -150,17 +154,25 @@ public class SignupCommand extends Command {
         } else {
             // Has a title
             if (contentSplit.length > 1) {
-                for (int i = 0; i < contentSplit.length; i++)
-                    if (contentSplit[i].endsWith("\"")) return Integer.parseInt(contentSplit[i + 1]);
+                var counter = 0;
+                for (int i = 0; i < contentSplit.length; i++) {
+                    if (contentSplit[i].endsWith("\"") && !(contentSplit[i].equals("\"") && counter == 0)) {
+                        try {
+                            return Integer.parseInt(contentSplit[i + 1]);
+                        } catch (IndexOutOfBoundsException e) {
+                            throw new InvalidAmountException(LanguageHandler.get(lang, "signup_missingamount"));
+                        }
+                    }
+                    counter++;
+                }
             } else throw new InvalidAmountException(LanguageHandler.get(lang, "signup_missingamount"));
         }
 
         throw new InvalidAmountException(LanguageHandler.get(lang, "signup_invalidamount"));
     }
 
-    private ZonedDateTime parseDate(CommandEvent event, int amount) throws InvalidDateException {
+    private ZonedDateTime parseDate(CommandEvent event, String[] contentSplit, int amount) throws InvalidDateException {
         var lang = LanguageHandler.getLanguage(event);
-        var contentSplit = event.getArgs().trim().split(" ");
 
         // Only amount was given
         if (contentSplit.length == 1) return null;
