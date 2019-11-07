@@ -796,9 +796,11 @@ public class LanguageFile {
         en_gb.setProperty("signup_invaliddateday", "Invalid Date and Time: The given date does not exist. (e.g. Feb 31)");
         en_gb.setProperty("signup_embedtitle_empty", "Sign up");
         en_gb.setProperty("signup_embedtitle_notempty", "Sign up for %s");
-        en_gb.setProperty("signup_embeddescription", "%s people can participate!\n\n" +
-                "Click on %s to participate.\n" +
-                "Remove said reaction if you have changed your mind.");
+        en_gb.setProperty("signup_embeddescription", "Click on %s to participate.\n" +
+                "Remove said reaction if you have changed your mind.\n\n" +
+                "%s people can participate!" +
+                "%s");
+        en_gb.setProperty("signup_embeddescription_custom", "\nThe signup will close 30 minutes prior to the scheduled event.");
         en_gb.setProperty("signup_embeddescriptionend", "%s people could participate!\n\n" +
                 "These are the participants:");
         en_gb.setProperty("signup_nobody", "Nobody signed up");
@@ -1806,9 +1808,12 @@ public class LanguageFile {
         de_de.setProperty("signup_invaliddateday", "Invalid Date and Time: The given date does not exist. (e.g. Feb 31)");
         de_de.setProperty("signup_embedtitle_empty", "Sign up");
         de_de.setProperty("signup_embedtitle_notempty", "Sign up for %s");
-        de_de.setProperty("signup_embeddescription", "%s people can participate!\n\n" +
+        de_de.setProperty("signup_embeddescription", "%s people can participate!\n" +
+                "%s" +
+                "\n" +
                 "Click on %s to participate.\n" +
                 "Remove said reaction if you have changed your mind.");
+        de_de.setProperty("signup_embeddescription_custom", "The signup will close 30 minutes prior to the scheduled event.\n");
         de_de.setProperty("signup_embeddescriptionend", "%s people could participate!\n\n" +
                 "These are the participants:");
         de_de.setProperty("signup_nobody", "Nobody signed up");
