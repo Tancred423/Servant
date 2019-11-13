@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Nov 07, 2019 at 12:59 PM
+-- Generation Time: Nov 13, 2019 at 12:42 PM
 -- Server version: 10.1.41-MariaDB-0+deb9u1
 -- PHP Version: 7.0.33-0+deb9u5
 
@@ -50,7 +50,8 @@ CREATE TABLE `active_lobbies` (
 
 CREATE TABLE `alarm` (
   `user_id` bigint(18) NOT NULL,
-  `alarm_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `alarm_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `title` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------

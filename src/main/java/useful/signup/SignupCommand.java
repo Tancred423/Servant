@@ -9,6 +9,7 @@ import moderation.user.User;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 import owner.blacklist.Blacklist;
+import useful.InvalidTitleException;
 import utilities.*;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
@@ -94,7 +95,6 @@ public class SignupCommand extends Command {
             eb.setTitle(title.isEmpty() ? LanguageHandler.get(lang, "signup_embedtitle_empty") :
                     String.format(LanguageHandler.get(lang, "signup_embedtitle_notempty"), title));
             eb.setDescription(String.format(LanguageHandler.get(lang, "signup_embeddescription"),
-
                     Emote.getEmoji("upvote"), amount,
                     (isCustomDate ? LanguageHandler.get(lang, "signup_embeddescription_custom") : "")));
             eb.setFooter(isCustomDate ? LanguageHandler.get(lang, "signup_event") : LanguageHandler.get(lang, "signup_timeout"),

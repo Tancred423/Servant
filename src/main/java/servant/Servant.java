@@ -44,11 +44,9 @@ import moderation.reactionRole.ReactionRoleListener;
 import owner.blacklist.BlacklistCommand;
 import patreon.PatreonListener;
 import useful.alarm.AlarmCommand;
-import useful.alarm.AlarmListener;
 import useful.giveaway.GiveawayCommand;
 import useful.giveaway.GiveawayListener;
 import useful.reminder.ReminderCommand;
-import useful.reminder.ReminderListener;
 import useful.signup.SignupCommand;
 import useful.signup.SignupListener;
 import useful.votes.quickvote.QuickvoteCommand;
@@ -162,6 +160,7 @@ public class Servant {
                 new BegCommand(),
                 new CookieCommand(),
                 new DabCommand(),
+                new FlexCommand(),
                 new HighfiveCommand(),
                 new HugCommand(),
                 new KissCommand(),
@@ -179,7 +178,6 @@ public class Servant {
                 .addEventListener(client.build())
                 .addEventListener(waiter)
 
-                .addEventListener(new AlarmListener())
                 .addEventListener(new AutoroleListener())
                 .addEventListener(new BestOfImageListener())
                 .addEventListener(new BestOfQuoteListener())
@@ -199,7 +197,6 @@ public class Servant {
                 .addEventListener(new RadiovoteMultipleVoteListener())
                 .addEventListener(new ReactionRoleListener())
                 .addEventListener(new ReadyListener())
-                .addEventListener(new ReminderListener())
                 .addEventListener(new SignupListener())
                 .addEventListener(new VoiceLobbyListener())
                 .addEventListener(new VoteEndListener())

@@ -10,6 +10,7 @@ import servant.Servant;
 import java.awt.*;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.*;
 import java.util.List;
 
@@ -20,6 +21,188 @@ public class User {
 
     public User(long userId) {
         this.userId = userId;
+    }
+
+    // Alarm
+    public boolean setAlarm(Timestamp alarmTime, String title, Guild guild, net.dv8tion.jda.core.entities.User user) {
+        var wasSet = false;
+
+        if (!alarmHasEntry(alarmTime, guild, user)) {
+            Connection connection = null;
+
+            try {
+                connection = Servant.db.getHikari().getConnection();
+                var insert = connection.prepareStatement("INSERT INTO alarm (user_id,alarm_time,title) VALUES (?,?,?)");
+                insert.setLong(1, userId);
+                insert.setTimestamp(2, alarmTime);
+                insert.setString(3, title);
+                insert.executeUpdate();
+                wasSet = true;
+            } catch (SQLException e) {
+                new Log(e, guild, user, "alarm", null).sendLog(false);
+            } finally {
+                closeQuietly(connection);
+            }
+        }
+
+        return wasSet;
+    }
+
+    public void unsetAlarm(Timestamp alarmTime, net.dv8tion.jda.core.entities.User user) {
+        Connection connection = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var insert = connection.prepareStatement("DELETE FROM alarm WHERE user_id=? AND alarm_time=?");
+            insert.setLong(1, userId);
+            insert.setTimestamp(2, alarmTime);
+            insert.executeUpdate();
+        } catch (SQLException e) {
+            new Log(e, null, user, "alarm", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+    }
+
+    public boolean alarmHasEntry(Timestamp alarmTime, Guild guild, net.dv8tion.jda.core.entities.User user) {
+        Connection connection = null;
+        var hasEntry = false;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement("SELECT * FROM alarm WHERE user_id=? AND alarm_time=?");
+            select.setLong(1, userId);
+            select.setTimestamp(2, alarmTime);
+            var resultSet = select.executeQuery();
+            hasEntry = resultSet.first();
+        } catch (SQLException e) {
+            new Log(e, guild, user, "alarm", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return hasEntry;
+    }
+
+    public String getAlarmTitle(net.dv8tion.jda.core.entities.User user) {
+        Connection connection = null;
+        String title = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement("SELECT title FROM alarm WHERE user_id=?");
+            select.setLong(1, userId);
+            var resultSet = select.executeQuery();
+            if (resultSet.first()) title = resultSet.getString("title");
+        } catch (SQLException e) {
+            new Log(e, null, user, "alarm", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return title;
+    }
+
+    public List<Timestamp> getAlarms(net.dv8tion.jda.core.entities.User user) {
+        Connection connection = null;
+        var alarms = new ArrayList<Timestamp>();
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement("SELECT * FROM alarm WHERE user_id=?");
+            select.setLong(1, userId);
+            var resultSet = select.executeQuery();
+            if (resultSet.first())
+                do alarms.add(resultSet.getTimestamp("alarm_time"));
+                while (resultSet.next());
+        } catch (SQLException e) {
+            new Log(e, null, user, "alarm", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return alarms;
+    }
+
+    // Reminder
+    public boolean setReminder(Timestamp reminderTime, String topic, Guild guild, net.dv8tion.jda.core.entities.User user) {
+        Connection connection = null;
+        var wasSet = false;
+
+        try {
+            if (!reminderHasEntry(reminderTime, guild, user)) {
+                connection = Servant.db.getHikari().getConnection();
+                var insert = connection.prepareStatement("INSERT INTO reminder (user_id,reminder_time,topic) VALUES (?,?,?)");
+                insert.setLong(1, userId);
+                insert.setTimestamp(2, reminderTime);
+                insert.setString(3, topic);
+                insert.executeUpdate();
+                wasSet = true;
+            }
+        } catch (SQLException e) {
+            new Log(e, guild, user, "levelrole", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return wasSet;
+    }
+
+    public void unsetReminder(Timestamp reminderTime, net.dv8tion.jda.core.entities.User user) {
+        Connection connection = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var insert = connection.prepareStatement("DELETE FROM reminder WHERE user_id=? AND reminder_time=?");
+            insert.setLong(1, userId);
+            insert.setTimestamp(2, reminderTime);
+            insert.executeUpdate();
+        } catch (SQLException e) {
+            new Log(e, null, user, "levelrole", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+    }
+
+    public boolean reminderHasEntry(Timestamp reminderTime, Guild guild, net.dv8tion.jda.core.entities.User user) {
+        Connection connection = null;
+        var hasEntry = false;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement("SELECT * FROM reminder WHERE user_id=? AND reminder_time=?");
+            select.setLong(1, userId);
+            select.setTimestamp(2, reminderTime);
+            var resultSet = select.executeQuery();
+            hasEntry = resultSet.first();
+        } catch (SQLException e) {
+            new Log(e, guild, user, "levelrole", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return hasEntry;
+    }
+
+    public Map<Timestamp, String> getReminders(net.dv8tion.jda.core.entities.User user) {
+        Connection connection = null;
+        var reminders = new HashMap<Timestamp, String>();
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement("SELECT * FROM reminder WHERE user_id=?");
+            select.setLong(1, userId);
+            var resultSet = select.executeQuery();
+            if (resultSet.first())
+                do reminders.put(resultSet.getTimestamp("reminder_time"), resultSet.getString("topic"));
+                while (resultSet.next());
+        } catch (SQLException e) {
+            new Log(e, null, user, "levelrole", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return reminders;
     }
 
     // Bio

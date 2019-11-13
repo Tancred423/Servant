@@ -66,7 +66,7 @@ public class RefreshCommand extends Command {
                 else if (level >= 10) internalUser.setAchievement("level10", 10, guild, member.getUser());
 
                 // Extra
-                if (level >= 69) internalUser.setAchievement("level69", 69, guild, member.getUser());
+                if (level >= 69) internalUser.setAchievement("nicelevel", 69, guild, member.getUser());
             }
         }
     }

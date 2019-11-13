@@ -27,8 +27,8 @@ public abstract class InteractionCommand extends Command {
             var p = GuildHandler.getPrefix(event);
             if (event.getArgs().isEmpty()) {
                 var description = LanguageHandler.get(lang, "interaction_description");
-                var usage = name.equalsIgnoreCase("dab") ?
-                        String.format(LanguageHandler.get(lang, "interaction_usage_dab"), name.substring(0, 1).toUpperCase(), name.substring(1).toLowerCase(), p, name, p, name) :
+                var usage = name.equalsIgnoreCase("dab") || name.equalsIgnoreCase("flex") ?
+                        String.format(LanguageHandler.get(lang, "interaction_usage_on"), name.substring(0, 1).toUpperCase(), name.substring(1).toLowerCase(), p, name, p, name) :
                         String.format(LanguageHandler.get(lang, "interaction_usage"), name.substring(0, 1).toUpperCase(), name.substring(1).toLowerCase(), p, name, p, name);
                 event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, null).getEmbed());
                 return;

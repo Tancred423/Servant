@@ -53,7 +53,9 @@ public class ReminderCommand extends Command {
                 return;
             }
 
-            if (event.getGuild() != null) event.getMessage().delete().queue();
+            if (event.getGuild() != null) event.getMessage().delete().queue(success -> {},
+                    failure -> System.out.println("Reminder message could not be deleted: " + event.getAuthor().getName()
+                            + "#" + event.getAuthor().getDiscriminator() + " (" + event.getAuthor().getIdLong() + ")"));
 
             var argsString = event.getArgs();
             var args = argsString.split(" ");
@@ -65,6 +67,7 @@ public class ReminderCommand extends Command {
 
             var guild = event.getGuild();
             var author = event.getAuthor();
+            var internalAuthor = new User(author.getIdLong());
 
             try {
                 var date = args[0];
@@ -91,9 +94,11 @@ public class ReminderCommand extends Command {
                 }
 
                 var timestamp = Timestamp.from(reminderDate.toInstant());
-                var wasSet = Reminder.setReminder(event.getAuthor().getIdLong(), timestamp, topic.toString(), guild, author);
-                if (wasSet) event.replySuccess(LanguageHandler.get(lang, "reminder_success"));
-                else {
+                var wasSet = internalAuthor.setReminder(timestamp, topic.toString(), guild, author);
+                if (wasSet){
+                    if (guild == null) event.replySuccess(LanguageHandler.get(lang, "reminder_success_dm"));
+                    else event.replySuccess(LanguageHandler.get(lang, "reminder_success"));
+                } else {
                     event.replyError(LanguageHandler.get(lang, "reminder_fail"));
                 }
             } catch (Exception e) {

@@ -42,10 +42,10 @@ Your Multifunctional Discord Bot
 * Alarm: Set up an alarm.
 * Giveaway: Host a giveaway.
 * QuickPoll: Smol poll with yes / no.
+* Poll: Host a voting with customizable answers.
 * Reminder: Set up a reminder.
 * Signup: Organise events by letting users sign up.
 * Timezone: Converter (e.g. PDT to CET).
-* Poll: Host a voting with customizable answers.
 
 ### Fun
 * Avatar: Steal someone's avatar.
@@ -66,6 +66,7 @@ Your Multifunctional Discord Bot
 * Beg: Beg someone.
 * Cookie: Give someone a cookie.
 * Dab: Dab on someone.
+* Flex: Flex on someone.
 * HighFive: Give someone a high five.
 * Hug: Hug someone.
 * Kiss: Kiss someone.
@@ -89,7 +90,7 @@ Your Multifunctional Discord Bot
 * [Tancred#9056](https://github.com/Tancred423)
 
 ## Shout-Outs
-* [NavuArt](https://twitter.com/navuart) - Art & Illustrations
+* [NavuArt](https://twitter.com/navuart) - Servant Emotes
 * [Maselkov](https://github.com/Maselkov) - Motivation & Support
 * fschill - Support
 * [MEE6](https://mee6.xyz/) - Inspiration

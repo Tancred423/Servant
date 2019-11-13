@@ -7,8 +7,8 @@ import java.io.*;
 
 public class LanguageFile {
     static void createDefaultEN_GB() throws IOException {
-        OrderedProperties en_gb = new OrderedProperties();
-        OutputStream os = new FileOutputStream(System.getProperty("user.dir") + "/resources/lang/en_gb.ini");
+        var en_gb = new OrderedProperties();
+        var os = new FileOutputStream(System.getProperty("user.dir") + "/resources/lang/en_gb.ini");
 
         // General
         en_gb.setProperty("permission", ":x: You must have the %s permission in this server to use that!");
@@ -27,7 +27,7 @@ public class LanguageFile {
         en_gb.setProperty("achievement_level40", "Level 40");
         en_gb.setProperty("achievement_level50", "Level 50");
         en_gb.setProperty("achievement_level60", "Level 60");
-        en_gb.setProperty("achievement_level69", "Nice Level");
+        en_gb.setProperty("achievement_nicelevel", "Nice Level");
         en_gb.setProperty("achievement_level70", "Level 70");
         en_gb.setProperty("achievement_level80", "Level 80");
         en_gb.setProperty("achievement_level90", "Level 90");
@@ -628,7 +628,9 @@ public class LanguageFile {
         en_gb.setProperty("patreon_donation_$5", "✓ Assassin Profile Image\n✓ Red Embeds");
         en_gb.setProperty("patreon_serverboosttitle", "Server Boost");
         en_gb.setProperty("patreon_serverboost", "You can boost Servant's Kingdom with Discord Nitro to unlock new Discord server perks.\n" +
-                "✓ Berserker Profile Image\n✓ Pink Embeds");
+                "[Click here to join Servant's Kingdom](https://discord.gg/4GpaH5V)\n" +
+                "✓ Berserker Profile Image\n" +
+                "✓ Pink Embeds");
         en_gb.setProperty("patreon_thanks", "Thanks to every supporter <3");
 
         /// Server Info
@@ -697,18 +699,24 @@ public class LanguageFile {
                 "The date and time will take your timezone into account.\n" +
                 "If you didn't set one up, it will use UTC.\n" +
                 "To set one up, use the `%suser` command.");
-        en_gb.setProperty("alarm_usage", "Command: `%s%s [time]`\n" +
-                "Example: `%s%s 3d`");
+        en_gb.setProperty("alarm_usage", "Command: `%s%s \"Optional Title\" [time]`\n" +
+                "Example 1: `%s%s \"Pat Servant\" 3d 2h 1m`\n" +
+                "Example 2: `%s%s 5m");
         en_gb.setProperty("alarm_hint", "- Time formats: d = days, h = hours, m = minutes\n" +
                 "   \u200B⤷ Also, you can use as many time-arguments as you want\n" +
-                "   \u200B⤷ Example: `%s%s 2d 12h 36m 1d`\n" +
+                "   \u200B⤷ Example: `%s%s \"Pat Servant\" 2d 12h 36m 1d`\n" +
                 "   \u200B⤷ Time result: `2d` + `12h` + `36m` + `1d` = 3 days, 12 hours, 36 minutes\n" +
-                "- Minutes are rounded. If you put in `1m`, you will be notifies on the **next** minute.");
+                "- Minutes are rounded. If you put in `1m`, you will be notifies on the **next** minute.\n" +
+                "- Seconds are not supported.");
         en_gb.setProperty("alarm_invalidtime", "Invalid Time.");
         en_gb.setProperty("alarm_wrongargument", "Wrong argument");
         en_gb.setProperty("alarm_messedupargs", "You messed up your arguments.");
         en_gb.setProperty("alarm_alreadyset", "You already have an alarm at that time!");
         en_gb.setProperty("alarm_remind", "Hi master, here is your requested alarm.");
+        en_gb.setProperty("alarm_invalidtitle", "Invalid Title: No ending quotation mark.");
+        en_gb.setProperty("alarm_titlelength", "Invalid Title Length: The title must not be longer than 256 characters.");
+        en_gb.setProperty("alarm_missingtime", "Missing Time: You have to add time arguments.");
+        en_gb.setProperty("alarm_toobig", "Invalid Time: The given value is too big.");
 
         /// Giveaway
         en_gb.setProperty("giveaway_description", "- Start a giveaway that draws a given amount of people as winners after a given time.\n" +
@@ -719,7 +727,8 @@ public class LanguageFile {
         en_gb.setProperty("giveaway_hint", "- Time formats: d = days, h = hours, m = minutes\n" +
                 "   \u200B⤷ Also, you can use as many time-arguments as you want\n" +
                 "   \u200B⤷ Example: `%sgiveaway \"100 cookies\" 1 2d 12h 36m 1d`\n" +
-                "   \u200B⤷ Time result: `2d` + `12h` + `36m` + `1d` = 3 days, 12 hours, 36 minutes");
+                "   \u200B⤷ Time result: `2d` + `12h` + `36m` + `1d` = 3 days, 12 hours, 36 minutes\n" +
+                "- Seconds are not supported.");
         en_gb.setProperty("giveaway_current", "Current giveaways on this server");
         en_gb.setProperty("giveaway_days", "%s days");
         en_gb.setProperty("giveaway_hours", "%s hours");
@@ -763,6 +772,7 @@ public class LanguageFile {
         en_gb.setProperty("reminder_past", "You cannot set up reminders in the past!");
         en_gb.setProperty("reminder_invalidtopic", "Unsuitable topic");
         en_gb.setProperty("reminder_success", "Added. Your message was removed for privacy.");
+        en_gb.setProperty("reminder_success_dm", "Added.");
         en_gb.setProperty("reminder_fail", "You already have a reminder at this time.");
         en_gb.setProperty("reminder_invalidinput", "Invalid input.");
         en_gb.setProperty("reminder_remind_notopic", "Hi master, I should remind you at this time.");
@@ -1011,7 +1021,7 @@ public class LanguageFile {
         en_gb.setProperty("interaction_usage", "**%s%s someone**\n" +
                 "Command: `%s%s [@user]`\n" +
                 "Example: `%s%s @Servant`");
-        en_gb.setProperty("interaction_usage_dab", "**%s%s on someone**\n" +
+        en_gb.setProperty("interaction_usage_on", "**%s%s on someone**\n" +
                 "Command: `%s%s [@user]`\n" +
                 "Example: `%s%s @Servant`");
 
@@ -1024,8 +1034,8 @@ public class LanguageFile {
     }
 
     static void createDefaultDE_DE() throws IOException {
-        OrderedProperties de_de = new OrderedProperties();
-        OutputStream os = new FileOutputStream(System.getProperty("user.dir") + "/resources/lang/de_de.ini");
+        var de_de = new OrderedProperties();
+        var os = new FileOutputStream(System.getProperty("user.dir") + "/resources/lang/de_de.ini");
 
         // General
         de_de.setProperty("permission", ":x: Du brauchst in diesem Server die Berechtigung %s, um dies zu tun!");
@@ -1044,7 +1054,7 @@ public class LanguageFile {
         de_de.setProperty("achievement_level40", "Level 40");
         de_de.setProperty("achievement_level50", "Level 50");
         de_de.setProperty("achievement_level60", "Level 60");
-        de_de.setProperty("achievement_level69", "Nice Level");
+        de_de.setProperty("achievement_nicelevel", "Nice Level");
         de_de.setProperty("achievement_level70", "Level 70");
         de_de.setProperty("achievement_level80", "Level 80");
         de_de.setProperty("achievement_level90", "Level 90");
@@ -1640,7 +1650,9 @@ public class LanguageFile {
         de_de.setProperty("patreon_donation_$5", "✓ Assassin Profile Image\n✓ Red Embeds");
         de_de.setProperty("patreon_serverboosttitle", "Server Boost");
         de_de.setProperty("patreon_serverboost", "You can boost Servant's Kingdom with Discord Nitro to unlock new Discord server perks.\n" +
-                "✓ Berserker Profile Image\n✓ Pink Embeds");
+                "[Click here to join Servant's Kingdom](https://discord.gg/4GpaH5V)\n" +
+                "✓ Berserker Profile Image\n" +
+                "✓ Pink Embeds");
         de_de.setProperty("patreon_thanks", "Thanks to every supporter <3");
 
         /// Server Info
@@ -1709,18 +1721,24 @@ public class LanguageFile {
                 "The date and time will take your timezone into account.\n" +
                 "If you didn't set one up, it will use UTC.\n" +
                 "To set one up, use the `%suser` command.");
-        de_de.setProperty("alarm_usage", "Command: `%s%s [time]`\n" +
-                "Example: `%s%s 3d`");
+        de_de.setProperty("alarm_usage", "Command: `%s%s \"Optional Title\" [time]`\n" +
+                "Example 1: `%s%s \"Pat Servant\" 3d 2h 1m`\n" +
+                "Example 2: `%s%s 5m");
         de_de.setProperty("alarm_hint", "- Time formats: d = days, h = hours, m = minutes\n" +
                 "   \u200B⤷ Also, you can use as many time-arguments as you want\n" +
-                "   \u200B⤷ Example: `%s%s 2d 12h 36m 1d`\n" +
+                "   \u200B⤷ Example: `%s%s \"Pat Servant\" 2d 12h 36m 1d`\n" +
                 "   \u200B⤷ Time result: `2d` + `12h` + `36m` + `1d` = 3 days, 12 hours, 36 minutes\n" +
-                "- Minutes are rounded. If you put in `1m`, you will be notifies on the **next** minute.");
+                "- Minutes are rounded. If you put in `1m`, you will be notifies on the **next** minute.\n" +
+                "- Seconds are not supported.");
         de_de.setProperty("alarm_invalidtime", "Invalid Time.");
         de_de.setProperty("alarm_wrongargument", "Wrong argument");
         de_de.setProperty("alarm_messedupargs", "You messed up your arguments.");
         de_de.setProperty("alarm_alreadyset", "You already have an alarm at that time!");
         de_de.setProperty("alarm_remind", "Hi master, here is your requested alarm.");
+        de_de.setProperty("alarm_invalidtitle", "Invalid Title: No ending quotation mark.");
+        de_de.setProperty("alarm_titlelength", "Invalid Title Length: The title must not be longer than 256 characters.");
+        de_de.setProperty("alarm_missingtime", "Missing Time: You have to add time arguments.");
+        de_de.setProperty("alarm_toobig", "Invalid Time: The given value is too big.");
 
         /// Giveaway
         de_de.setProperty("giveaway_description", "- Start a giveaway that draws a given amount of people as winners after a given time.\n" +
@@ -1731,7 +1749,8 @@ public class LanguageFile {
         de_de.setProperty("giveaway_hint", "- Time formats: d = days, h = hours, m = minutes\n" +
                 "   \u200B⤷ Also, you can use as many time-arguments as you want\n" +
                 "   \u200B⤷ Example: `%sgiveaway \"100 cookies\" 1 2d 12h 36m 1d`\n" +
-                "   \u200B⤷ Time result: `2d` + `12h` + `36m` + `1d` = 3 days, 12 hours, 36 minutes");
+                "   \u200B⤷ Time result: `2d` + `12h` + `36m` + `1d` = 3 days, 12 hours, 36 minutes\n" +
+                "- Seconds are not supported");
         de_de.setProperty("giveaway_current", "Current giveaways on this guild");
         de_de.setProperty("giveaway_days", "%s days");
         de_de.setProperty("giveaway_hours", "%s hours");
@@ -1775,6 +1794,7 @@ public class LanguageFile {
         de_de.setProperty("reminder_past", "You cannot set up reminders in the past!");
         de_de.setProperty("reminder_invalidtopic", "Unsuitable topic");
         de_de.setProperty("reminder_success", "Added. Your message was removed for privacy.");
+        de_de.setProperty("reminder_success_dm", "Added.");
         de_de.setProperty("reminder_fail", "You already have a reminder at this time.");
         de_de.setProperty("reminder_invalidinput", "Invalid input.");
         de_de.setProperty("reminder_remind_notopic", "Hi master, I should remind you at this time.");
@@ -2026,7 +2046,7 @@ public class LanguageFile {
         de_de.setProperty("interaction_usage", "**%s%s someone**\n" +
                 "Command: `%s%s [@user]`\n" +
                 "Example: `%s%s @Servant`");
-        de_de.setProperty("interaction_usage_dab", "**%s%s on someone**\n" +
+        de_de.setProperty("interaction_usage_on", "**%s%s on someone**\n" +
                 "Command: `%s%s [@user]`\n" +
                 "Example: `%s%s @Servant`");
 

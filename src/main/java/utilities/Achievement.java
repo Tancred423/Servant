@@ -20,7 +20,7 @@ public class Achievement {
             case "level40": return LanguageHandler.get(lang, "achievement_level40");
             case "level50": return LanguageHandler.get(lang, "achievement_level50");
             case "level60": return LanguageHandler.get(lang, "achievement_level60");
-            case "level69": return LanguageHandler.get(lang, "achievement_level69");
+            case "nicelevel": return LanguageHandler.get(lang, "achievement_nicelevel");
             case "level70": return LanguageHandler.get(lang, "achievement_level70");
             case "level80": return LanguageHandler.get(lang, "achievement_level80");
             case "level90": return LanguageHandler.get(lang, "achievement_level90");

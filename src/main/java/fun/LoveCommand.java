@@ -63,6 +63,7 @@ public class LoveCommand extends Command {
             if (mentioned.size() > 1) {
                 first = mentioned.get(0);
                 second = mentioned.get(1);
+                if (first == second) isSelfLove = true;
             } else {
                 var splitContentRaw = event.getArgs().split(" ");
 

@@ -7,12 +7,17 @@ import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import useful.alarm.Alarm;
 import useful.giveaway.Giveaway;
+import useful.reminder.Reminder;
 import useful.signup.Signup;
 import utilities.Constants;
+import utilities.Time;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -34,21 +39,23 @@ public class ReadyListener extends ListenerAdapter {
             closeQuietly(connection);
         }
 
+        var jda = event.getJDA();
+
         setPresence();
-        checkGiveaways(event.getJDA());
-        checkSignups(event.getJDA());
+        checkStuff(jda);
 
-        System.out.println(event.getJDA().getSelfUser().getName() + " ready.");
+        System.out.println(jda.getSelfUser().getName() + " ready.");
     }
 
-    private void checkSignups(JDA jda) {
+    private void checkStuff(JDA jda) {
         var service = Executors.newSingleThreadScheduledExecutor();
-        service.scheduleAtFixedRate(() -> Signup.checkSignups(jda), 0, 1, TimeUnit.MINUTES);
-    }
-
-    private void checkGiveaways(JDA jda) {
-        var service = Executors.newSingleThreadScheduledExecutor();
-        service.scheduleAtFixedRate(() -> Giveaway.checkGiveaways(jda), 0, 1, TimeUnit.MINUTES);
+        service.scheduleAtFixedRate(() -> {
+            System.out.println("[" + OffsetDateTime.now(ZoneId.of("+02:00")).toString().replaceAll("T", " ").substring(0, 19) + "] " + "Checking alarms, giveaways, reminders and signups.");
+            Alarm.check(jda);
+            Giveaway.checkGiveaways(jda);
+            Reminder.check(jda);
+            Signup.checkSignups(jda);
+        }, Time.getDelayToNextMinuteInMillis(), 60 * 1000, TimeUnit.MILLISECONDS); // 1 minute
     }
 
     private void setPresence() {
@@ -57,6 +64,7 @@ public class ReadyListener extends ListenerAdapter {
     }
 
     private void settingPresence() {
+        System.out.println("[" + OffsetDateTime.now(ZoneId.of("+02:00")).toString().replaceAll("T", " ").substring(0, 19) + "] " + "Changing Presence.");
         var lang = Servant.config.getDefaultLanguage();
 
         if (counter == 0)

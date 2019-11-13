@@ -7,6 +7,7 @@ import moderation.guild.GuildHandler;
 import moderation.toggle.Toggle;
 import moderation.user.User;
 import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.core.exceptions.HierarchyException;
 import utilities.Constants;
 import utilities.UsageEmbed;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
@@ -68,13 +69,17 @@ public class RoleCommand extends Command {
 
         var role = roles.get(0);
 
-        if (guild.getMemberById(event.getSelfUser().getIdLong()).canInteract(mentioned))
-            if (mentioned.getRoles().contains(role))
-                event.getGuild().getController().removeSingleRoleFromMember(mentioned, role).queue();
-            else event.getGuild().getController().addSingleRoleToMember(mentioned, role).queue();
-        else event.reactWarning();
+        try {
+            if (guild.getMemberById(event.getSelfUser().getIdLong()).canInteract(mentioned))
+                if (mentioned.getRoles().contains(role))
+                    event.getGuild().getController().removeSingleRoleFromMember(mentioned, role).queue();
+                else event.getGuild().getController().addSingleRoleToMember(mentioned, role).queue();
+            else event.reactWarning();
 
-        event.reactSuccess();
+            event.reactSuccess();
+        } catch (HierarchyException e) {
+            event.reactWarning();
+        }
 
         var author = event.getAuthor();
         // Statistics.
