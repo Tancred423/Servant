@@ -14,6 +14,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class SignupListener extends ListenerAdapter {
     public void onGuildMessageReactionAdd(@NotNull GuildMessageReactionAddEvent event) {
+        if (event.getGuild().getIdLong() == 264445053596991498L) return; // Discord Bot List
         CompletableFuture.runAsync(() -> {
             if (event.getUser().isBot()) return;
             if (!Toggle.isEnabled(event, "signup")) return;

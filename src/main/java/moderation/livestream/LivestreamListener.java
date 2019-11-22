@@ -19,6 +19,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class LivestreamListener extends ListenerAdapter {
     public void onUserActivityStart(@Nonnull UserActivityStartEvent event) {
+        if (event.getGuild().getIdLong() == 264445053596991498L) return; // Discord Bot List
         CompletableFuture.runAsync(() -> {
             if (!Toggle.isEnabled(event, "livestream")) return;
 
@@ -52,6 +53,7 @@ public class LivestreamListener extends ListenerAdapter {
     }
 
     public void onUserActivityEnd(@Nonnull UserActivityEndEvent event) {
+        if (event.getGuild().getIdLong() == 264445053596991498L) return; // Discord Bot List
         CompletableFuture.runAsync(() -> {
             if (!Toggle.isEnabled(event, "livestream")) return;
 

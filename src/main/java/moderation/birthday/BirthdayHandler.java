@@ -24,6 +24,7 @@ class BirthdayHandler {
     static void updateLists(JDA jda) {
         List<Guild> guilds = jda.getGuilds();
         for (var guild : guilds) {
+            if (guild.getIdLong() == 264445053596991498L) continue; // Discord Bot List
             var internalGuild = new moderation.guild.Guild(guild.getIdLong());
             var botOwner =  guild.getOwner();
             if (internalGuild.birthdayMessagesHasEntry(guild, botOwner == null ? null : botOwner.getUser())) {
@@ -66,6 +67,7 @@ class BirthdayHandler {
     static void checkBirthdays(JDA jda) {
         List<Guild> guilds = jda.getGuilds();
         for (var guild : guilds) {
+            if (guild.getIdLong() == 264445053596991498L) continue; // Discord Bot List
             var guildOwner = guild.getOwner();
             if (guildOwner == null) return; // todo: always null?
             var guildOwnerUser = guildOwner.getUser();

@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 public class AutoRoleListener extends ListenerAdapter {
     public void onGuildMemberJoin(@NotNull GuildMemberJoinEvent event) {
+        if (event.getGuild().getIdLong() == 264445053596991498L) return; // Discord Bot List
         CompletableFuture.runAsync(() -> {
             var guild = event.getGuild();
             var eventUser = event.getUser();

@@ -19,6 +19,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class MediaOnlyChannelListener extends ListenerAdapter {
     public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
+        if (event.getGuild().getIdLong() == 264445053596991498L) return; // Discord Bot List
         CompletableFuture.runAsync(() -> {
             if (!Toggle.isEnabled(event, "mediaononlychannel")) return;
 
@@ -59,6 +60,7 @@ public class MediaOnlyChannelListener extends ListenerAdapter {
     }
 
     public void onTextChannelDelete(@NotNull TextChannelDeleteEvent event) {
+        if (event.getGuild().getIdLong() == 264445053596991498L) return; // Discord Bot List
         CompletableFuture.runAsync(() -> {
             var guild = event.getGuild();
             var internalGuild = new Guild(guild.getIdLong());

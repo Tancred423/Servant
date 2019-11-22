@@ -15,6 +15,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class QuickvoteMultipleVoteListener extends ListenerAdapter {
     public void onGuildMessageReactionAdd(@NotNull GuildMessageReactionAddEvent event) {
+        if (event.getGuild().getIdLong() == 264445053596991498L) return; // Discord Bot List
         CompletableFuture.runAsync(() -> {
             if (!Toggle.isEnabled(event, "quickvote")) return;
             var guild = event.getGuild();
@@ -40,6 +41,7 @@ public class QuickvoteMultipleVoteListener extends ListenerAdapter {
     }
 
     public void onGuildMessageReactionRemove(@NotNull GuildMessageReactionRemoveEvent event) {
+        if (event.getGuild().getIdLong() == 264445053596991498L) return; // Discord Bot List
         CompletableFuture.runAsync(() -> {
             var guild = event.getGuild();
             var user = event.getUser();

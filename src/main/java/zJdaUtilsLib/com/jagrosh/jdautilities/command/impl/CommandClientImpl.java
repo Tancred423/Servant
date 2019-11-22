@@ -463,6 +463,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
     private void onMessageReceived(MessageReceivedEvent event) {
         // Return if it's a bot
         if (event.getAuthor().isBot()) return;
+        if (event.isFromGuild() && event.getGuild().getIdLong() == 264445053596991498L) return; // Discord Bot List
 
         String[] parts = null;
         String rawContent = event.getMessage().getContentRaw();
@@ -645,6 +646,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
     }
 
     private void onMessageDelete(GuildMessageDeleteEvent event) {
+        if (event.getGuild().getIdLong() == 264445053596991498L) return; // Discord Bot List
         // We don't need to cover whether or not this client usesLinkedDeletion() because
         // that is checked in onEvent(Event) before this is even called.
         synchronized(linkMap) {

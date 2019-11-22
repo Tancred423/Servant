@@ -17,6 +17,7 @@ import static utilities.DatabaseConn.closeQuietly;
 
 public class GiveawayListener extends ListenerAdapter {
     public void onGuildMessageDelete(GuildMessageDeleteEvent event) {
+        if (event.getGuild().getIdLong() == 264445053596991498L) return; // Discord Bot List
         var guild = event.getGuild();
         var owner = event.getGuild().getOwner();
 
@@ -25,6 +26,7 @@ public class GiveawayListener extends ListenerAdapter {
     }
 
     public void onTextChannelDelete(TextChannelDeleteEvent event) {
+        if (event.getGuild().getIdLong() == 264445053596991498L) return; // Discord Bot List
         var guild = event.getGuild();
         var owner = event.getGuild().getOwner();
 

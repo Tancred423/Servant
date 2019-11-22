@@ -31,6 +31,7 @@ public class LevelListener extends ListenerAdapter {
     }
 
     public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
+        if (event.getGuild().getIdLong() == 264445053596991498L) return; // Discord Bot List
         CompletableFuture.runAsync(() -> {
             var author = event.getAuthor();
             var guild = event.getGuild();

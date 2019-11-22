@@ -18,6 +18,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class JoinListener extends ListenerAdapter {
     public void onGuildMemberJoin(@NotNull GuildMemberJoinEvent event) {
+        if (event.getGuild().getIdLong() == 264445053596991498L) return; // Discord Bot List
         CompletableFuture.runAsync(() -> {
             if (!Toggle.isEnabled(event, "join")) return;
 

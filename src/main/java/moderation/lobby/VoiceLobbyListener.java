@@ -25,6 +25,7 @@ public class VoiceLobbyListener extends ListenerAdapter {
                         LanguageHandler.get(lang, "voicelobby_apostropge_s")) + " Lobby"; }
 
     public void onGuildVoiceJoin(@NotNull GuildVoiceJoinEvent event) {
+        if (event.getGuild().getIdLong() == 264445053596991498L) return; // Discord Bot List
         CompletableFuture.runAsync(() -> {
             if (!Toggle.isEnabled(event, "voicelobby")) return;
 

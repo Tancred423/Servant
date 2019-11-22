@@ -17,6 +17,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class QuickvoteEndListener extends ListenerAdapter {
     public void onGuildMessageReactionAdd(@NotNull GuildMessageReactionAddEvent event) {
+        if (event.getGuild().getIdLong() == 264445053596991498L) return; // Discord Bot List
         CompletableFuture.runAsync(() -> {
             if (!Toggle.isEnabled(event, "quickvote")) return;
 

@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 public class BirthdayListener extends ListenerAdapter {
     public void onGuildMessageDelete(@NotNull GuildMessageDeleteEvent event) {
+        if (event.getGuild().getIdLong() == 264445053596991498L) return; // Discord Bot List
         CompletableFuture.runAsync(() -> {
             var guild = event.getGuild();
             var internalGuild = new Guild(guild.getIdLong());

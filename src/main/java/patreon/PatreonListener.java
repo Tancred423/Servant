@@ -15,6 +15,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class PatreonListener extends ListenerAdapter {
     public void onGuildMemberRoleAdd(@NotNull GuildMemberRoleAddEvent event) {
+        if (event.getGuild().getIdLong() == 264445053596991498L) return; // Discord Bot List
         CompletableFuture.runAsync(() -> {
             if (event.getMember().getUser().isBot()) return;
             if (event.getGuild().getId().equals(Servant.config.getSupportGuildId())) return;
