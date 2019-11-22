@@ -1,7 +1,7 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package moderation.guild;
 
-import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.api.entities.Guild;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.GuildSettingsManager;
 
 import javax.annotation.Nullable;

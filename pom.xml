@@ -28,13 +28,13 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
-            <version>1.7.25</version>
+            <version>1.7.29</version>
         </dependency>
         <!-- JDA -->
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>3.8.3_460</version>
+            <version>4.0.0_61</version>
         </dependency>
         <!-- JSON-->
         <dependency>

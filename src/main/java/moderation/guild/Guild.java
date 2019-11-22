@@ -1,7 +1,8 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package moderation.guild;
 
-import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.*;
 import servant.Log;
 import servant.Servant;
 
@@ -21,7 +22,7 @@ public class Guild {
 
     // Signup
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    public boolean isSignupMessage(long messageId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public boolean isSignupMessage(long messageId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var isSignupMessage = false;
 
@@ -40,7 +41,7 @@ public class Guild {
         return isSignupMessage;
     }
 
-    public long getSignupAuthorId(long messageId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public long getSignupAuthorId(long messageId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var authorId = 0L;
 
@@ -59,7 +60,7 @@ public class Guild {
         return authorId;
     }
 
-    public int getSignupAmount(long messageId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public int getSignupAmount(long messageId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var amount = 0;
 
@@ -78,7 +79,7 @@ public class Guild {
         return amount;
     }
 
-    public String getSignupTitle(long messageId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public String getSignupTitle(long messageId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         String authorId = null;
 
@@ -97,9 +98,11 @@ public class Guild {
         return authorId;
     }
 
-    public ZonedDateTime getSignupTime(long messageId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public ZonedDateTime getSignupTime(long messageId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         ZonedDateTime expiration = null;
+
+        if (guild.getOwner() == null) return null; // todo: always null?
 
         try {
             connection = Servant.db.getHikari().getConnection();
@@ -117,7 +120,7 @@ public class Guild {
         return expiration;
     }
 
-    public boolean signupIsCustomDate(long messageId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public boolean signupIsCustomDate(long messageId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var isCustomDate = false;
 
@@ -136,7 +139,7 @@ public class Guild {
         return isCustomDate;
     }
 
-    public void setSignup(long messageId, long authorId, int amount, String title, Timestamp time, long channelId, boolean isCustomDate, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void setSignup(long messageId, long authorId, int amount, String title, Timestamp time, long channelId, boolean isCustomDate, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -158,7 +161,7 @@ public class Guild {
         }
     }
 
-    public void unsetSignup(long messageId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void unsetSignup(long messageId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -174,7 +177,7 @@ public class Guild {
     }
 
     // BestOfQuote
-    private boolean bestOfQuoteHasEntry(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    private boolean bestOfQuoteHasEntry(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var hasEntry = false;
 
@@ -193,9 +196,12 @@ public class Guild {
         return hasEntry;
     }
 
-    public Emote getBestOfQuoteEmote(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public Emote getBestOfQuoteEmote(JDA jda, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         Emote emote = null;
+
+        var thisGuild = jda.getGuildById(guildId);
+        if (thisGuild == null) return null; // todo: always null?
 
         try {
             connection = Servant.db.getHikari().getConnection();
@@ -205,7 +211,7 @@ public class Guild {
             if (resultSet.first()) {
                 var guildId = resultSet.getLong("emote_guild_id");
                 var emoteId = resultSet.getLong("emote_id");
-                if (guildId != 0 && emoteId != 0) emote = Servant.jda.getGuildById(guildId).getEmoteById(emoteId);
+                if (guildId != 0 && emoteId != 0) emote = thisGuild.getEmoteById(emoteId);
             }
         } catch (SQLException e) {
             new Log(e, guild, user, "bestofquote", null).sendLog(false);
@@ -216,7 +222,7 @@ public class Guild {
         return emote;
     }
 
-    public String getBestOfQuoteEmoji(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public String getBestOfQuoteEmoji(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var emoji = "";
 
@@ -236,16 +242,19 @@ public class Guild {
         return emoji;
     }
 
-    public TextChannel getBestOfQuoteChannel(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public TextChannel getBestOfQuoteChannel(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         TextChannel channel = null;
+
+        var thisGuild = guild.getJDA().getGuildById(guildId);
+        if (thisGuild == null) return null; // todo: always null?
 
         try {
             connection = Servant.db.getHikari().getConnection();
             var select = connection.prepareStatement("SELECT channel_id FROM best_of_quote WHERE guild_id=?");
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) channel = Servant.jda.getGuildById(guildId).getTextChannelById(resultSet.getLong("channel_id"));
+            if (resultSet.first()) channel = thisGuild.getTextChannelById(resultSet.getLong("channel_id"));
         } catch (SQLException e) {
             new Log(e, guild, user, "bestofquote", null).sendLog(false);
         } finally {
@@ -255,7 +264,7 @@ public class Guild {
         return channel;
     }
 
-    public int getBestOfQuoteNumber(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public int getBestOfQuoteNumber(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         int number = 0;
 
@@ -274,7 +283,7 @@ public class Guild {
         return number;
     }
 
-    public int getBestOfQuotePercentage(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public int getBestOfQuotePercentage(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         int percentage = 0;
 
@@ -293,7 +302,7 @@ public class Guild {
         return percentage;
     }
 
-    public void setBestOfQuoteChannel(long channelId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void setBestOfQuoteChannel(long channelId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -321,7 +330,7 @@ public class Guild {
         }
     }
 
-    public void setBestOfQuoteEmote(long emoteGuildId, long emoteId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void setBestOfQuoteEmote(long emoteGuildId, long emoteId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -351,7 +360,7 @@ public class Guild {
         }
     }
 
-    public void setBestOfQuoteEmoji(String emoji, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void setBestOfQuoteEmoji(String emoji, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -381,7 +390,7 @@ public class Guild {
         }
     }
 
-    public void setBestOfQuoteNumber(int number, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void setBestOfQuoteNumber(int number, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -409,7 +418,7 @@ public class Guild {
         }
     }
 
-    public void setBestOfQuotePercentage(int percentage, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void setBestOfQuotePercentage(int percentage, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -437,7 +446,7 @@ public class Guild {
         }
     }
 
-    public void addBestOfQuoteBlacklist(long messageId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void addBestOfQuoteBlacklist(long messageId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -454,7 +463,7 @@ public class Guild {
         }
     }
 
-    public boolean bestOfQuoteIsBlacklisted(long messageId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public boolean bestOfQuoteIsBlacklisted(long messageId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var isBlacklisted = false;
 
@@ -474,7 +483,7 @@ public class Guild {
     }
 
     // BestOfImage
-    private boolean bestOfImageHasEntry(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    private boolean bestOfImageHasEntry(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var hasEntry = false;
 
@@ -493,9 +502,12 @@ public class Guild {
         return hasEntry;
     }
 
-    public Emote getBestOfImageEmote(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public Emote getBestOfImageEmote(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         Emote emote = null;
+
+        var thisGuild = guild.getJDA().getGuildById(guildId);
+        if (thisGuild == null) return null; // todo: always null?
 
         try {
             connection = Servant.db.getHikari().getConnection();
@@ -505,7 +517,7 @@ public class Guild {
             if (resultSet.first()) {
                 var guildId = resultSet.getLong("emote_guild_id");
                 var emoteId = resultSet.getLong("emote_id");
-                if (guildId != 0 && emoteId != 0) emote = Servant.jda.getGuildById(guildId).getEmoteById(emoteId);
+                if (guildId != 0 && emoteId != 0) emote = thisGuild.getEmoteById(emoteId);
             }
         } catch (SQLException e) {
             new Log(e, guild, user, "bestofimage", null).sendLog(false);
@@ -516,7 +528,7 @@ public class Guild {
         return emote;
     }
 
-    public String getBestOfImageEmoji(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public String getBestOfImageEmoji(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var emoji = "";
 
@@ -536,16 +548,19 @@ public class Guild {
         return emoji;
     }
 
-    public TextChannel getBestOfImageChannel(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public TextChannel getBestOfImageChannel(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         TextChannel channel = null;
+
+        var thisGuild = guild.getJDA().getGuildById(guildId);
+        if (thisGuild == null) return null; // todo: always null?
 
         try {
             connection = Servant.db.getHikari().getConnection();
             var select = connection.prepareStatement("SELECT channel_id FROM best_of_image WHERE guild_id=?");
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) channel = Servant.jda.getGuildById(guildId).getTextChannelById(resultSet.getLong("channel_id"));
+            if (resultSet.first()) channel = thisGuild.getTextChannelById(resultSet.getLong("channel_id"));
         } catch (SQLException e) {
             new Log(e, guild, user, "bestofimage", null).sendLog(false);
         } finally {
@@ -555,7 +570,7 @@ public class Guild {
         return channel;
     }
 
-    public int getBestOfImageNumber(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public int getBestOfImageNumber(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         int number = 0;
 
@@ -574,7 +589,7 @@ public class Guild {
         return number;
     }
 
-    public int getBestOfImagePercentage(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public int getBestOfImagePercentage(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         int percentage = 0;
 
@@ -593,7 +608,7 @@ public class Guild {
         return percentage;
     }
 
-    public void setBestOfImageChannel(long channelId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void setBestOfImageChannel(long channelId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -621,7 +636,7 @@ public class Guild {
         }
     }
 
-    public void setBestOfImageEmote(long emoteGuildId, long emoteId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void setBestOfImageEmote(long emoteGuildId, long emoteId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -651,7 +666,7 @@ public class Guild {
         }
     }
 
-    public void setBestOfImageEmoji(String emoji, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void setBestOfImageEmoji(String emoji, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -681,7 +696,7 @@ public class Guild {
         }
     }
 
-    public void setBestOfImageNumber(int number, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void setBestOfImageNumber(int number, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -709,7 +724,7 @@ public class Guild {
         }
     }
 
-    public void setBestOfImagePercentage(int percentage, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void setBestOfImagePercentage(int percentage, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -737,7 +752,7 @@ public class Guild {
         }
     }
 
-    public void addBestOfImageBlacklist(long messageId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void addBestOfImageBlacklist(long messageId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -754,7 +769,7 @@ public class Guild {
         }
     }
 
-    public boolean bestOfImageIsBlacklisted(long messageId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public boolean bestOfImageIsBlacklisted(long messageId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var isBlacklisted = false;
 
@@ -774,7 +789,7 @@ public class Guild {
     }
 
     // Birthday
-    public boolean wasGratulated(long userId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public boolean wasGratulated(long userId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var wasGratulated = false;
 
@@ -794,7 +809,7 @@ public class Guild {
         return wasGratulated;
     }
 
-    private boolean birthdayGratulationHasEntry(long userId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    private boolean birthdayGratulationHasEntry(long userId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var hasEntry = false;
 
@@ -814,7 +829,7 @@ public class Guild {
         return hasEntry;
     }
 
-    public void setGratulated(long userId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void setGratulated(long userId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -833,7 +848,7 @@ public class Guild {
         }
     }
 
-    public void unsetGratulated(long userId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void unsetGratulated(long userId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -851,7 +866,7 @@ public class Guild {
         }
     }
 
-    private void unsetGratulateds(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    private void unsetGratulateds(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -866,7 +881,7 @@ public class Guild {
         }
     }
 
-    public long getBirthdayMessageChannelId(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public long getBirthdayMessageChannelId(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var channelId = 0L;
 
@@ -885,7 +900,7 @@ public class Guild {
         return channelId;
     }
 
-    public long getBirthdayMessageMessageId(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public long getBirthdayMessageMessageId(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var messageId = 0L;
 
@@ -904,7 +919,7 @@ public class Guild {
         return messageId;
     }
 
-    public long getBirthdayMessageAuthorId(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public long getBirthdayMessageAuthorId(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var messageId = 0L;
 
@@ -923,7 +938,7 @@ public class Guild {
         return messageId;
     }
 
-    public boolean birthdayMessagesHasEntry(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public boolean birthdayMessagesHasEntry(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var hasEntry = false;
 
@@ -942,7 +957,7 @@ public class Guild {
         return hasEntry;
     }
 
-    public void setBirthdayMessage(long channelId, long messageId, long userId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void setBirthdayMessage(long channelId, long messageId, long userId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -969,7 +984,7 @@ public class Guild {
         }
     }
 
-    public void unsetBirthdayMessage(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void unsetBirthdayMessage(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -986,14 +1001,14 @@ public class Guild {
         }
     }
 
-    public void purgeBirthday(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void purgeBirthday(net.dv8tion.jda.api.entities.Guild guild, User user) {
         unsetBirthdayMessage(guild, user);
         unsetBirthdayChannelId(guild, user);
         unsetBirthdays(guild, user);
         unsetGratulateds(guild, user);
     }
 
-    public Map<Long, String> getBirthdays(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public Map<Long, String> getBirthdays(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var birthdays = new HashMap<Long, String>();
 
@@ -1014,7 +1029,7 @@ public class Guild {
         return birthdays;
     }
 
-    private boolean birthdaysHasEntry(long userId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    private boolean birthdaysHasEntry(long userId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var hasEntry = false;
 
@@ -1034,7 +1049,7 @@ public class Guild {
         return hasEntry;
     }
 
-    public void setBirthday(long userId, String birthday, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void setBirthday(long userId, String birthday, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -1059,7 +1074,7 @@ public class Guild {
         }
     }
 
-    public boolean unsetBirthday(long userId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public boolean unsetBirthday(long userId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var wasUnset = false;
 
@@ -1081,7 +1096,7 @@ public class Guild {
         return wasUnset;
     }
 
-    private void unsetBirthdays(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    private void unsetBirthdays(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -1096,7 +1111,7 @@ public class Guild {
         }
     }
 
-    public long getBirthdayChannelId(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public long getBirthdayChannelId(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var birthdayChannelId = 0L;
 
@@ -1115,7 +1130,7 @@ public class Guild {
         return birthdayChannelId;
     }
 
-    public void setBirthdayChannelId(long birthdayChannelId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void setBirthdayChannelId(long birthdayChannelId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -1141,12 +1156,12 @@ public class Guild {
         }
     }
 
-    public void unsetBirthdayChannelId(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void unsetBirthdayChannelId(net.dv8tion.jda.api.entities.Guild guild, User user) {
         setBirthdayChannelId(0L, guild, user);
     }
 
     // Guild
-    private boolean guildHasEntry(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    private boolean guildHasEntry(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var hasEntry = false;
 
@@ -1166,7 +1181,7 @@ public class Guild {
     }
 
     // Level Role
-    public List<Long> getLevelRolesForLevel(int level, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public List<Long> getLevelRolesForLevel(int level, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         List<Long> roleId = new ArrayList<>();
 
@@ -1187,7 +1202,7 @@ public class Guild {
         return roleId;
     }
 
-    public List<Long> getLevelRole(int level, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public List<Long> getLevelRole(int level, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         List<Long> roleId = new ArrayList<>();
 
@@ -1207,7 +1222,7 @@ public class Guild {
         return roleId;
     }
 
-    public Map<Integer, Long> getLevelRoles(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public Map<Integer, Long> getLevelRoles(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         Map<Integer, Long> levelRoles = new HashMap<>();
 
@@ -1228,7 +1243,7 @@ public class Guild {
         return levelRoles;
     }
 
-    public boolean setLevelRole(int level, long roleId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public boolean setLevelRole(int level, long roleId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var wasSet = false;
 
@@ -1251,7 +1266,7 @@ public class Guild {
         return wasSet;
     }
 
-    public void unsetLevelRole(int level, long roleId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void unsetLevelRole(int level, long roleId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -1269,7 +1284,7 @@ public class Guild {
     }
 
     // Language
-    public String getLanguage(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public String getLanguage(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         String language = null;
 
@@ -1290,7 +1305,7 @@ public class Guild {
         return language;
     }
 
-    public void setLanguage(String language, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void setLanguage(String language, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -1316,12 +1331,12 @@ public class Guild {
         }
     }
 
-    void unsetLanguage(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    void unsetLanguage(net.dv8tion.jda.api.entities.Guild guild, User user) {
         setLanguage(Servant.config.getDefaultLanguage(), guild, user);
     }
 
     // Lobby
-    public void setActiveLobby(long channelId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void setActiveLobby(long channelId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -1336,7 +1351,7 @@ public class Guild {
         }
     }
 
-    public List<Long> getActiveLobbies(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public List<Long> getActiveLobbies(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var activeLobbies = new LinkedList<Long>();
 
@@ -1356,7 +1371,7 @@ public class Guild {
         return activeLobbies;
     }
 
-    public void unsetActiveLobby(long channelId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void unsetActiveLobby(long channelId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -1371,7 +1386,7 @@ public class Guild {
         }
     }
 
-    private boolean lobbyHasEntry(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    private boolean lobbyHasEntry(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var hasEntry = false;
 
@@ -1390,7 +1405,7 @@ public class Guild {
         return hasEntry;
     }
 
-    public List<Long> getLobbies(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public List<Long> getLobbies(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var lobbies = new ArrayList<Long>();
 
@@ -1409,7 +1424,7 @@ public class Guild {
         return lobbies;
     }
 
-    public void setLobby(long channelId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void setLobby(long channelId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -1425,7 +1440,7 @@ public class Guild {
         }
     }
 
-    public boolean unsetLobby(long channelId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public boolean unsetLobby(long channelId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var wasUnset = false;
 
@@ -1448,7 +1463,7 @@ public class Guild {
     }
 
     // Prefix.
-    public String getPrefix(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public String getPrefix(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var prefix = Servant.config.getDefaultPrefix();
 
@@ -1468,7 +1483,7 @@ public class Guild {
     }
 
 
-    public void setPrefix(String prefix, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void setPrefix(String prefix, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -1494,12 +1509,12 @@ public class Guild {
         }
     }
 
-    void unsetPrefix(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    void unsetPrefix(net.dv8tion.jda.api.entities.Guild guild, User user) {
         setPrefix(Servant.config.getDefaultPrefix(), guild, user);
     }
 
     // Offset
-    public String getOffset(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public String getOffset(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var offset = Servant.config.getDefaultOffset();
 
@@ -1519,7 +1534,7 @@ public class Guild {
         return offset;
     }
 
-    public void setOffset(String offset, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void setOffset(String offset, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -1545,12 +1560,12 @@ public class Guild {
         }
     }
 
-    void unsetOffset(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    void unsetOffset(net.dv8tion.jda.api.entities.Guild guild, User user) {
         setOffset(Servant.config.getDefaultOffset(), guild, user);
     }
 
     // Featurecount
-    private boolean featureCountHasEntry(String key, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    private boolean featureCountHasEntry(String key, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var hasEntry = false;
 
@@ -1570,7 +1585,7 @@ public class Guild {
         return hasEntry;
     }
 
-    private int getFeatureCount(String feature, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    private int getFeatureCount(String feature, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var featureCount = 0;
 
@@ -1590,7 +1605,7 @@ public class Guild {
         return featureCount;
     }
 
-    public void incrementFeatureCount(String feature, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void incrementFeatureCount(String feature, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -1617,7 +1632,7 @@ public class Guild {
     }
 
     // Level
-    public Map<Long, Integer> getLeaderboard(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public Map<Long, Integer> getLeaderboard(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var userExp = new LinkedHashMap<Long, Integer>();
 
@@ -1645,7 +1660,7 @@ public class Guild {
     }
 
     // Autorole
-    public boolean hasAutorole(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public boolean hasAutorole(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var hasAutorole = false;
 
@@ -1664,9 +1679,12 @@ public class Guild {
         return hasAutorole;
     }
 
-    public Map<Role, Integer> getAutorole(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public Map<Role, Integer> getAutorole(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var role = new HashMap<Role, Integer>();
+
+        var thisGuild = guild.getJDA().getGuildById(guildId);
+        if (thisGuild == null) return null; // todo: always null?
 
         try {
             connection = Servant.db.getHikari().getConnection();
@@ -1676,7 +1694,7 @@ public class Guild {
             if (resultSet.first()) {
                 var roleId = resultSet.getLong("role_id");
                 var delay = resultSet.getInt("delay");
-                role.put(Servant.jda.getGuildById(guildId).getRoleById(roleId), delay);
+                role.put(thisGuild.getRoleById(roleId), delay);
             }
         } catch (SQLException e) {
             new Log(e, guild, user, "autorole", null).sendLog(false);
@@ -1687,7 +1705,7 @@ public class Guild {
         return role;
     }
 
-    private boolean autoroleHasEntry(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    private boolean autoroleHasEntry(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var hasEntry = false;
 
@@ -1706,7 +1724,7 @@ public class Guild {
         return hasEntry;
     }
 
-    public void setAutorole(long roleId, int delay, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void setAutorole(long roleId, int delay, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -1731,7 +1749,7 @@ public class Guild {
         }
     }
 
-    public boolean unsetAutorole(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public boolean unsetAutorole(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var wasUnset = false;
 
@@ -1753,7 +1771,7 @@ public class Guild {
     }
 
     // MediaOnlyChannel
-    public boolean mediaOnlyChannelHasEntry(MessageChannel channel, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public boolean mediaOnlyChannelHasEntry(MessageChannel channel, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var hasEntry = false;
 
@@ -1773,7 +1791,7 @@ public class Guild {
         return hasEntry;
     }
 
-    public boolean setMediaOnlyChannel(MessageChannel channel, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public boolean setMediaOnlyChannel(MessageChannel channel, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var wasSet = false;
 
@@ -1795,7 +1813,7 @@ public class Guild {
         return wasSet;
     }
 
-    public boolean unsetMediaOnlyChannel(MessageChannel channel, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public boolean unsetMediaOnlyChannel(MessageChannel channel, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var wasUnset = false;
 
@@ -1817,7 +1835,7 @@ public class Guild {
         return wasUnset;
     }
 
-    public void unsetMediaOnlyChannels(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void unsetMediaOnlyChannels(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -1832,9 +1850,12 @@ public class Guild {
         }
     }
 
-    public List<MessageChannel> getMediaOnlyChannels(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public List<MessageChannel> getMediaOnlyChannels(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var channels = new ArrayList<MessageChannel>();
+
+        var thisGuild = guild.getJDA().getGuildById(guildId);
+        if (thisGuild == null) return null; // todo: always null?
 
         try {
             connection = Servant.db.getHikari().getConnection();
@@ -1842,7 +1863,7 @@ public class Guild {
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) {
-                do channels.add(Servant.jda.getGuildById(guildId).getTextChannelById(resultSet.getLong("channel_id")));
+                do channels.add(thisGuild.getTextChannelById(resultSet.getLong("channel_id")));
                 while (resultSet.next());
             }
             if (channels.isEmpty()) channels = null;
@@ -1856,7 +1877,7 @@ public class Guild {
     }
 
     // Toggle
-    private boolean toggleHasEntry(String feature, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    private boolean toggleHasEntry(String feature, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var hasEntry = false;
 
@@ -1876,7 +1897,7 @@ public class Guild {
         return hasEntry;
     }
 
-    public boolean getToggleStatus(String feature, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public boolean getToggleStatus(String feature, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var isEnabled = true;
 
@@ -1897,7 +1918,7 @@ public class Guild {
         return isEnabled;
     }
 
-    public void setToggleStatus(String feature, boolean status, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void setToggleStatus(String feature, boolean status, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -1923,7 +1944,7 @@ public class Guild {
     }
 
     // Join
-    private boolean joinNotifierHasEntry(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    private boolean joinNotifierHasEntry(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var hasEntry = false;
 
@@ -1942,16 +1963,19 @@ public class Guild {
         return hasEntry;
     }
 
-    public MessageChannel getJoinNotifierChannel(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public MessageChannel getJoinNotifierChannel(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         MessageChannel channel = null;
+
+        var thisGuild = guild.getJDA().getGuildById(guildId);
+        if (thisGuild == null) return null; // todo: always null?
 
         try {
             connection = Servant.db.getHikari().getConnection();
             var select = connection.prepareStatement("SELECT channel_id FROM join_notifier WHERE guild_id=?");
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) channel = Servant.jda.getGuildById(guildId).getTextChannelById(resultSet.getLong("channel_id"));
+            if (resultSet.first()) channel = thisGuild.getTextChannelById(resultSet.getLong("channel_id"));
         } catch (SQLException e) {
             new Log(e, guild, user, "join", null).sendLog(false);
         } finally {
@@ -1961,7 +1985,7 @@ public class Guild {
         return channel;
     }
 
-    public void setJoinNotifierChannel(MessageChannel channel, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void setJoinNotifierChannel(MessageChannel channel, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -1984,7 +2008,7 @@ public class Guild {
         }
     }
 
-    public boolean unsetJoinNotifierChannel(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public boolean unsetJoinNotifierChannel(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var wasUnset = false;
 
@@ -2006,7 +2030,7 @@ public class Guild {
     }
 
     // Leave
-    private boolean leaveNotifierHasEntry(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    private boolean leaveNotifierHasEntry(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var hasEntry = false;
 
@@ -2025,16 +2049,19 @@ public class Guild {
         return hasEntry;
     }
 
-    public MessageChannel getLeaveNotifierChannel(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public MessageChannel getLeaveNotifierChannel(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         MessageChannel channel = null;
+
+        var thisGuild = guild.getJDA().getGuildById(guildId);
+        if (thisGuild == null) return null; // todo: always null?
 
         try {
             connection = Servant.db.getHikari().getConnection();
             var select = connection.prepareStatement("SELECT channel_id FROM leave_notifier WHERE guild_id=?");
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) channel = Servant.jda.getGuildById(guildId).getTextChannelById(resultSet.getLong("channel_id"));
+            if (resultSet.first()) channel = thisGuild.getTextChannelById(resultSet.getLong("channel_id"));
         } catch (SQLException e) {
             new Log(e, guild, user, "leave", null).sendLog(false);
         } finally {
@@ -2044,7 +2071,7 @@ public class Guild {
         return channel;
     }
 
-    public void setLeaveNotifierChannel(MessageChannel channel, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void setLeaveNotifierChannel(MessageChannel channel, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -2067,7 +2094,7 @@ public class Guild {
         }
     }
 
-    public boolean unsetLeaveNotifierChannel(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public boolean unsetLeaveNotifierChannel(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var wasUnset = false;
 
@@ -2089,7 +2116,7 @@ public class Guild {
     }
 
     // Exp
-    public int getUserRank(long userId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public int getUserRank(long userId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         int rank = 0;
 
@@ -2115,7 +2142,7 @@ public class Guild {
     }
 
     // Livestream
-    private boolean streamerModeHasEntry(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    private boolean streamerModeHasEntry(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var hasEntry = false;
 
@@ -2134,7 +2161,7 @@ public class Guild {
         return hasEntry;
     }
 
-    public boolean isStreamerMode(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public boolean isStreamerMode(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var isStreamerMode = true;
 
@@ -2153,7 +2180,7 @@ public class Guild {
         return isStreamerMode;
     }
 
-    public void toggleStreamerMode(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void toggleStreamerMode(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -2176,7 +2203,7 @@ public class Guild {
         }
     }
 
-    private boolean streamChannelHasEntry(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    private boolean streamChannelHasEntry(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var hasEntry = false;
 
@@ -2195,7 +2222,7 @@ public class Guild {
         return hasEntry;
     }
 
-    public long getStreamChannelId(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public long getStreamChannelId(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var channelId = 0L;
 
@@ -2214,7 +2241,7 @@ public class Guild {
         return channelId;
     }
 
-    public void setStreamChannel(MessageChannel channel, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void setStreamChannel(MessageChannel channel, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -2237,7 +2264,7 @@ public class Guild {
         }
     }
 
-    public boolean unsetStreamChannel(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public boolean unsetStreamChannel(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var wasUnset = false;
 
@@ -2258,7 +2285,7 @@ public class Guild {
         return wasUnset;
     }
 
-    private boolean streamingRoleHasEntry(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    private boolean streamingRoleHasEntry(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var hasEntry = false;
 
@@ -2277,7 +2304,7 @@ public class Guild {
         return hasEntry;
     }
 
-    public long getStreamingRoleId(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public long getStreamingRoleId(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var role = 0L;
 
@@ -2296,7 +2323,7 @@ public class Guild {
         return role;
     }
 
-    public void setStreamingRole(long roleId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void setStreamingRole(long roleId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -2319,7 +2346,7 @@ public class Guild {
         }
     }
 
-    public boolean unsetStreamingRole(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public boolean unsetStreamingRole(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var wasUnset = false;
 
@@ -2340,7 +2367,7 @@ public class Guild {
         return wasUnset;
     }
 
-    private boolean isStreamer(long userId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    private boolean isStreamer(long userId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var isStreamer = false;
 
@@ -2360,7 +2387,7 @@ public class Guild {
         return isStreamer;
     }
 
-    public List<Long> getStreamers(net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public List<Long> getStreamers(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var streamers = new ArrayList<Long>();
 
@@ -2379,7 +2406,7 @@ public class Guild {
         return streamers;
     }
 
-    public void setStreamer(long userId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public void setStreamer(long userId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -2395,7 +2422,7 @@ public class Guild {
         }
     }
 
-    public boolean unsetStreamer(long userId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+    public boolean unsetStreamer(long userId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var wasUnset = false;
 
@@ -2419,7 +2446,7 @@ public class Guild {
 
     // Reaction Role
     public boolean setReactionRole(long guildId, long channelId, long messageId, String emoji, long emoteGuildId,
-                               long emoteId, long roleId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+                               long emoteId, long roleId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var wasSet = true;
 
@@ -2447,7 +2474,7 @@ public class Guild {
     }
 
     public boolean unsetReactionRole(long guildId, long channelId, long messageId, String emoji, long emoteGuildId,
-                                 long emoteId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+                                 long emoteId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var wasSet = true;
 
@@ -2474,7 +2501,7 @@ public class Guild {
     }
 
     public long getRoleId(long guildId, long channelId, long messageId, String emoji, long emoteGuildId,
-                          long emoteId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+                          long emoteId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var roleId = 0L;
 
@@ -2499,7 +2526,7 @@ public class Guild {
     }
 
     public boolean reactionRoleHasEntry(long guildId, long channelId, long messageId, String emoji, long emoteGuildId,
-                                        long emoteId, net.dv8tion.jda.core.entities.Guild guild, User user) {
+                                        long emoteId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var hasEntry = false;
 

@@ -1,8 +1,8 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package useful.votes;
 
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.User;
 import servant.Log;
 import servant.Servant;
 

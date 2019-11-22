@@ -2,10 +2,10 @@
 package utilities;
 
 import files.language.LanguageHandler;
-import servant.Servant;
+import net.dv8tion.jda.api.JDA;
 
 public class Achievement {
-    public static String getFancyName(String name, String lang) {
+    public static String getFancyName(JDA jda, String name, String lang) {
         switch (name.toLowerCase()) {
             case "excalibur": return LanguageHandler.get(lang, "achievement_excalibur");
             case "unlimited_blade_works": return LanguageHandler.get(lang, "achievement_unlimited_blade_works");
@@ -29,7 +29,7 @@ public class Achievement {
             case "love42": return LanguageHandler.get(lang, "achievement_love42");
             case "love69": return LanguageHandler.get(lang, "achievement_love69");
 
-            case "kind": return String.format(LanguageHandler.get(lang, "achievement_kind"), Servant.jda.getSelfUser().getName());
+            case "kind": return String.format(LanguageHandler.get(lang, "achievement_kind"), jda.getSelfUser().getName());
 
             default: return name;
         }

@@ -4,8 +4,8 @@ package fun.randomAnimal;
 import moderation.guild.Guild;
 import moderation.toggle.Toggle;
 import moderation.user.User;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import servant.Log;
 import utilities.Constants;
 import utilities.Parser;
@@ -23,7 +23,7 @@ import java.util.concurrent.CompletableFuture;
 public class CatCommand extends Command {
     public CatCommand() {
         this.name = "cat";
-        this.aliases = new String[]{"catto"};
+        this.aliases = new String[] { "catto" };
         this.help = "Random cat picture.";
         this.category = new Category("Fun");
         this.arguments = null;
@@ -33,30 +33,38 @@ public class CatCommand extends Command {
         this.cooldown = Constants.USER_COOLDOWN;
         this.cooldownScope = CooldownScope.USER;
         this.userPermissions = new Permission[0];
-        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.botPermissions = new Permission[] {
+                Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY,
+                Permission.MESSAGE_EMBED_LINKS
+        };
     }
 
     @Override
     protected void execute(CommandEvent event) {
         CompletableFuture.runAsync(() -> {
-            if (!Toggle.isEnabled(event, name)) return;
-            event.getChannel().sendTyping().queue();
-
-            var guild = event.getGuild();
-            var author = event.getAuthor();
-
             try {
-                var eb = new EmbedBuilder();
-                eb.setColor(new User(event.getAuthor().getIdLong()).getColor(guild, author));
-                eb.setImage(getImageUrl());
-                event.reply(eb.build());
-            } catch (IOException | IllegalArgumentException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-            }
+                if (!Toggle.isEnabled(event, name)) return;
+                event.getChannel().sendTyping().queue();
 
-            // Statistics.
-            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+                var guild = event.getGuild();
+                var author = event.getAuthor();
+
+                try {
+                    var eb = new EmbedBuilder();
+                    eb.setColor(new User(event.getAuthor().getIdLong()).getColor(guild, author));
+                    eb.setImage(getImageUrl());
+                    event.reply(eb.build());
+                } catch (IOException | IllegalArgumentException e) {
+                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
+                }
+
+                // Statistics.
+                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+                if (event.getGuild() != null)
+                    new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
     }
 

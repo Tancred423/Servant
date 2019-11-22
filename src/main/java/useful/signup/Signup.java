@@ -3,10 +3,10 @@ package useful.signup;
 import files.language.LanguageHandler;
 import moderation.guild.Guild;
 import moderation.user.User;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.MessageReaction;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageReaction;
 import servant.Log;
 import servant.Servant;
 import useful.giveaway.Giveaway;
@@ -47,10 +47,12 @@ public class Signup {
                         var remainingTimeMillis = Giveaway.zonedDateTimeDifference(now, expiration);
 
                         if (remainingTimeMillis <= 0) {
+                            if (guild == null) return; // todo: always null?
                             var internalGuild = new Guild(guild.getIdLong());
                             var messageId = resultSet.getLong("message_id");
-                            ZonedDateTime finalExpiration = isCustomDate ? expiration.plusMinutes(30) : expiration;
-                            guild.getTextChannelById(resultSet.getLong("channel_id")).getMessageById(messageId).queue(message ->
+                            var finalExpiration = isCustomDate ? expiration.plusMinutes(30) : expiration;
+                            var tc = guild.getTextChannelById(resultSet.getLong("channel_id"));
+                            if (tc != null) tc.retrieveMessageById(messageId).queue(message ->
                                     endSignup(internalGuild, messageId, message, guild, author, true, finalExpiration));
                         }
                     }
@@ -63,8 +65,8 @@ public class Signup {
         }
     }
 
-    static void endSignup(Guild internalGuild, long messageId, Message message, net.dv8tion.jda.core.entities.Guild guild,
-                          net.dv8tion.jda.core.entities.User author, boolean forceEnd, ZonedDateTime expiration) {
+    static void endSignup(Guild internalGuild, long messageId, Message message, net.dv8tion.jda.api.entities.Guild guild,
+                          net.dv8tion.jda.api.entities.User author, boolean forceEnd, ZonedDateTime expiration) {
         if (!internalGuild.isSignupMessage(messageId, guild, author)) return;
         var amount = internalGuild.getSignupAmount(messageId, guild, author);
         var reactionList = message.getReactions();
@@ -76,7 +78,7 @@ public class Signup {
 
         if (signupReaction == null) return;
 
-        signupReaction.getUsers().queue(users -> {
+        signupReaction.retrieveUsers().queue(users -> {
             for (int i = 0; i < users.size(); i++) {
                 var user = users.get(i);
                 if (user.isBot()) {

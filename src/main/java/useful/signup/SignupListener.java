@@ -3,8 +3,9 @@ package useful.signup;
 
 import moderation.guild.Guild;
 import moderation.toggle.Toggle;
-import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 import utilities.Emote;
 
 import java.time.ZoneOffset;
@@ -12,7 +13,7 @@ import java.time.ZonedDateTime;
 import java.util.concurrent.CompletableFuture;
 
 public class SignupListener extends ListenerAdapter {
-    public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {
+    public void onGuildMessageReactionAdd(@NotNull GuildMessageReactionAddEvent event) {
         CompletableFuture.runAsync(() -> {
             if (event.getUser().isBot()) return;
             if (!Toggle.isEnabled(event, "signup")) return;
@@ -38,7 +39,7 @@ public class SignupListener extends ListenerAdapter {
 
             var finalForceEnd = forceEnd;
             var finalExpiration = expiration;
-            event.getChannel().getMessageById(messageId).queue(message -> Signup.endSignup(internalGuild, messageId, message, guild, event.getUser(), finalForceEnd, finalExpiration));
+            event.getChannel().retrieveMessageById(messageId).queue(message -> Signup.endSignup(internalGuild, messageId, message, guild, event.getUser(), finalForceEnd, finalExpiration));
         });
     }
 }

@@ -4,9 +4,9 @@ package information;
 import files.language.LanguageHandler;
 import moderation.toggle.Toggle;
 import moderation.user.User;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.*;
 import owner.blacklist.Blacklist;
 import servant.Servant;
 import utilities.Constants;
@@ -33,26 +33,31 @@ public class ServerInfoCommand extends Command {
         this.cooldown = Constants.USER_COOLDOWN;
         this.cooldownScope = CooldownScope.USER;
         this.userPermissions = new Permission[0];
-        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.botPermissions = new Permission[] {
+                Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY,
+                Permission.MESSAGE_EMBED_LINKS
+        };
     }
 
     @Override
     protected void execute(CommandEvent event) {
         CompletableFuture.runAsync(() -> {
-            if (!Toggle.isEnabled(event, name)) return;
-            if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
+            try {
+                if (!Toggle.isEnabled(event, name)) return;
+                if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
 
-            var lang = LanguageHandler.getLanguage(event);
-            var guild = event.getGuild();
-            var author = event.getAuthor();
+                var lang = LanguageHandler.getLanguage(event);
+                var guild = event.getGuild();
+                var author = event.getAuthor();
 
-            if (guild.getFeatures().contains("VANITY_URL"))
-                guild.getVanityUrl().queue(vanityUrl -> processInfo(event, guild, vanityUrl, lang));
-            else processInfo(event, guild, null, lang);
+                processInfo(event, guild, guild.getVanityUrl(), lang);
 
-            // Statistics.
-            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-            new moderation.guild.Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+                // Statistics.
+                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+                new moderation.guild.Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
     }
 
@@ -65,6 +70,8 @@ public class ServerInfoCommand extends Command {
         var splash = guild.getSplashUrl();
 
         var owner = guild.getOwner();
+        // todo: always null?
+        if (owner == null) return;
 
         var textChannelCount = guild.getTextChannels().size();
         var voiceChannelCount = guild.getVoiceChannels().size();
@@ -107,7 +114,7 @@ public class ServerInfoCommand extends Command {
 
         // Misc
         eb.addField(LanguageHandler.get(lang, "serverinfo_afktimeout"), String.format(LanguageHandler.get(lang, "serverinfo_timeout"), afkTimeout), true);
-        eb.addField(LanguageHandler.get(lang, "serverinfo_afkchannel"), afkChannel == null ? LanguageHandler.get(lang, "serverinfo_noafkchannel") : guild.getAfkChannel().getName(), true);
+        eb.addField(LanguageHandler.get(lang, "serverinfo_afkchannel"), afkChannel == null ? LanguageHandler.get(lang, "serverinfo_noafkchannel") : afkChannel.getName(), true);
         eb.addField(LanguageHandler.get(lang, "serverinfo_systemchannel"), systemChannel == null ? LanguageHandler.get(lang, "serverinfo_nosystemchannel") : systemChannel.getAsMention(), true);
         eb.addField(LanguageHandler.get(lang, "serverinfo_vanity"), vanityUrl == null ? LanguageHandler.get(lang, "serverinfo_novanity") : vanityUrl, true);
 
@@ -123,42 +130,49 @@ public class ServerInfoCommand extends Command {
         eb.addField(LanguageHandler.get(lang, "serverinfo_prefix"), internalGuild.getPrefix(guild, author), true);
         eb.addField(LanguageHandler.get(lang, "serverinfo_offset"), internalGuild.getOffset(guild, author).equalsIgnoreCase("z") ? "UTC" : internalGuild.getOffset(guild, author), true);
         eb.addField(LanguageHandler.get(lang, "serverinfo_language"), internalGuild.getLanguage(guild, author), true);
-        eb.addField(LanguageHandler.get(lang, "serverinfo_bdaychannel"), internalGuild.getBirthdayChannelId(guild, author) == 0 ?
-                LanguageHandler.get(lang, "serverinfo_nobdaychannel") :
-                guild.getTextChannelById(internalGuild.getBirthdayChannelId(guild, author)).getAsMention(), true);
+        var birthdayChannel = guild.getTextChannelById(internalGuild.getBirthdayChannelId(guild, author));
+        eb.addField(LanguageHandler.get(lang, "serverinfo_bdaychannel"), birthdayChannel == null ?
+                LanguageHandler.get(lang, "serverinfo_nobdaychannel") : birthdayChannel.getAsMention(), true);
         var roleIntegerEntry = internalGuild.getAutorole(guild, author).isEmpty() ? null : internalGuild.getAutorole(guild, author).entrySet().iterator().next();
         eb.addField(LanguageHandler.get(lang, "serverinfo_autorole"), roleIntegerEntry == null ?
                 LanguageHandler.get(lang, "serverinfo_noautorole") :
                 String.format(LanguageHandler.get(lang, "serverinfo_autorole_value"), roleIntegerEntry.getKey().getAsMention(), roleIntegerEntry.getValue()), true);
+        var streamChannel = guild.getTextChannelById(internalGuild.getStreamChannelId(guild, author));
+        var streamRole = guild.getRoleById(internalGuild.getStreamingRoleId(guild, author));
         eb.addField(LanguageHandler.get(lang, "serverinfo_livestream"),
-                (internalGuild.getStreamChannelId(guild, author) == 0 ? LanguageHandler.get(lang, "serverinfo_nolivestream_channel") : guild.getTextChannelById(internalGuild.getStreamChannelId(guild, author)).getAsMention()) + "\n" +
-                        (internalGuild.getStreamingRoleId(guild, author) == 0 ? LanguageHandler.get(lang, "serverinfo_nolivestream_role") : guild.getRoleById(internalGuild.getStreamingRoleId(guild, author)).getAsMention()) + "\n" +
-                        (internalGuild.isStreamerMode(guild, author) ? LanguageHandler.get(lang, "serverinfo_streamermode") :
-                                LanguageHandler.get(lang, "serverinfo_publicmode")), true);
+                (streamChannel == null ? LanguageHandler.get(lang, "serverinfo_nolivestream_channel") : streamChannel.getAsMention()) + "\n" +
+                        (streamRole == null ? LanguageHandler.get(lang, "serverinfo_nolivestream_role") : streamRole.getAsMention()) + "\n" +
+                        (internalGuild.isStreamerMode(guild, author) ? LanguageHandler.get(lang, "serverinfo_streamermode") : LanguageHandler.get(lang, "serverinfo_publicmode")), true);
 
         var lobbies = internalGuild.getLobbies(guild, author);
         var sb = new StringBuilder();
         if (!lobbies.isEmpty())
-            for (Long lobbyId : lobbies)
-                sb.append(guild.getVoiceChannelById(lobbyId).getName()).append("\n");
+            for (Long lobbyId : lobbies) {
+                var lobbyChannel = guild.getVoiceChannelById(lobbyId);
+                if (lobbyChannel != null) sb.append(lobbyChannel.getName()).append("\n");
+            }
         eb.addField(LanguageHandler.get(lang, "serverinfo_voicelobbies"), sb.toString().isEmpty() ?
                 LanguageHandler.get(lang, "serverinfo_novoicelobbies") : sb.toString(), true);
 
-        var mediaonlychannels = internalGuild.getMediaOnlyChannels(guild, author);
+        var mediaOnlyChannels = internalGuild.getMediaOnlyChannels(guild, author);
         sb = new StringBuilder();
-        if (mediaonlychannels != null)
-            for (var mediaChannel : mediaonlychannels)
-                sb.append(guild.getTextChannelById(mediaChannel.getIdLong()).getAsMention()).append("\n");
+        if (mediaOnlyChannels != null)
+            for (var mediaChannel : mediaOnlyChannels) {
+                var mediaTextChannel = guild.getTextChannelById(mediaChannel.getIdLong());
+                if (mediaTextChannel != null) sb.append(mediaTextChannel.getAsMention()).append("\n");
+            }
         eb.addField(LanguageHandler.get(lang, "serverinfo_mediaonlychannels"), sb.toString().isEmpty() ?
                 LanguageHandler.get(lang, "serverinfo_nomediaonlychannels") : sb.toString(), true);
 
-        eb.addField(LanguageHandler.get(lang, "serverinfo_join"), internalGuild.getJoinNotifierChannel(guild, author) == null ?
+        var joinNotifierChannel = guild.getTextChannelById(internalGuild.getJoinNotifierChannel(guild, author).getIdLong());
+        eb.addField(LanguageHandler.get(lang, "serverinfo_join"), joinNotifierChannel == null ?
                 LanguageHandler.get(lang, "serverinfo_nojoin") :
-                guild.getTextChannelById(internalGuild.getJoinNotifierChannel(guild, author).getIdLong()).getAsMention(), true);
+                joinNotifierChannel.getAsMention(), true);
 
-        eb.addField(LanguageHandler.get(lang, "serverinfo_leave"), internalGuild.getLeaveNotifierChannel(guild, author) == null ?
+        var leaveNotifierChannel = guild.getTextChannelById(internalGuild.getLeaveNotifierChannel(guild, author).getIdLong());
+        eb.addField(LanguageHandler.get(lang, "serverinfo_leave"), leaveNotifierChannel == null ?
                 LanguageHandler.get(lang, "serverinfo_noleave") :
-                guild.getTextChannelById(internalGuild.getLeaveNotifierChannel(guild, author).getIdLong()).getAsMention(), true);
+                leaveNotifierChannel.getAsMention(), true);
 
         event.reply(eb.build());
     }

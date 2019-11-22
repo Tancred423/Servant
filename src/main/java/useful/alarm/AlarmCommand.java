@@ -6,7 +6,7 @@ import moderation.guild.Guild;
 import moderation.guild.GuildHandler;
 import moderation.toggle.Toggle;
 import moderation.user.User;
-import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.api.Permission;
 import owner.blacklist.Blacklist;
 import useful.InvalidTitleException;
 import utilities.Constants;
@@ -32,58 +32,66 @@ public class AlarmCommand extends Command {
         this.cooldown = Constants.USER_COOLDOWN;
         this.cooldownScope = CooldownScope.USER;
         this.userPermissions = new Permission[0];
-        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.botPermissions = new Permission[] {
+                Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY,
+                Permission.MESSAGE_EMBED_LINKS
+        };
     }
 
     @Override
     protected void execute(CommandEvent event) {
         CompletableFuture.runAsync(() -> {
-            if (!Toggle.isEnabled(event, name)) return;
-            if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
-
-            var lang = LanguageHandler.getLanguage(event);
-            var p = GuildHandler.getPrefix(event);
-
-            if (event.getArgs().isEmpty()) {
-                var description = String.format(LanguageHandler.get(lang, "alarm_description"), p);
-                var usage = String.format(LanguageHandler.get(lang, "alarm_usage"), p, name, p, name, p, name);
-                var hint = String.format(LanguageHandler.get(lang, "alarm_hint"), p, name);
-                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
-                return;
-            }
-
-            var contentSplit = event.getArgs().trim().replaceAll(" +", " ").replace("\\", "").split(" ");
-
-            String title;
             try {
-                title = parseTitle(event, contentSplit);
-            } catch (InvalidTitleException e) {
-                event.replyError(e.getMessage());
-                return;
+                if (!Toggle.isEnabled(event, name)) return;
+                if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
+
+                var lang = LanguageHandler.getLanguage(event);
+                var p = GuildHandler.getPrefix(event);
+
+                if (event.getArgs().isEmpty()) {
+                    var description = String.format(LanguageHandler.get(lang, "alarm_description"), p);
+                    var usage = String.format(LanguageHandler.get(lang, "alarm_usage"), p, name, p, name, p, name);
+                    var hint = String.format(LanguageHandler.get(lang, "alarm_hint"), p, name);
+                    event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+                    return;
+                }
+
+                var contentSplit = event.getArgs().trim().replaceAll(" +", " ").replace("\\", "").split(" ");
+
+                String title;
+                try {
+                    title = parseTitle(event, contentSplit);
+                } catch (InvalidTitleException e) {
+                    event.replyError(e.getMessage());
+                    return;
+                }
+
+                ZonedDateTime alarmDate;
+                try {
+                    alarmDate = parseTime(event, contentSplit, title);
+                } catch (InvalidTimeException e) {
+                    event.replyError(e.getMessage());
+                    return;
+                }
+
+                var guild = event.getGuild();
+                var author = event.getAuthor();
+                var internalAuthor = new User(author.getIdLong());
+
+                var timestamp = Timestamp.valueOf(alarmDate.toLocalDateTime());
+                if (internalAuthor.setAlarm(timestamp, title == null ? "" : title, guild, author)) event.reactSuccess();
+                else {
+                    event.replyError(LanguageHandler.get(lang, "alarm_alreadyset"));
+                    event.reactError();
+                }
+
+                // Statistics.
+                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+                if (event.getGuild() != null)
+                    new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
-            ZonedDateTime alarmDate;
-            try {
-                alarmDate = parseTime(event, contentSplit, title);
-            } catch (InvalidTimeException e) {
-                event.replyError(e.getMessage());
-                return;
-            }
-
-            var guild = event.getGuild();
-            var author = event.getAuthor();
-            var internalAuthor = new User(author.getIdLong());
-
-            var timestamp = Timestamp.from(alarmDate.toInstant());
-            if (internalAuthor.setAlarm(timestamp, title == null ? "" : title, guild, author)) event.reactSuccess();
-            else {
-                event.replyError(LanguageHandler.get(lang, "alarm_alreadyset"));
-                event.reactError();
-            }
-
-            // Statistics.
-            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
         });
     }
 
@@ -123,21 +131,21 @@ public class AlarmCommand extends Command {
                 try {
                     if (arg.toLowerCase().endsWith("d")) {
                         days = arg.replaceAll("d", "");
-                        if (days.matches("[0-9]+")) alarm.plusDays(Integer.parseInt(days));
+                        if (days.matches("[0-9]+")) alarm = alarm.plusDays(Integer.parseInt(days));
                         else {
                             event.reactError();
                             throw new InvalidTimeException(LanguageHandler.get(lang, "alarm_invalidtime"));
                         }
                     } else if (arg.toLowerCase().endsWith("h")) {
                         hours = arg.replaceAll("h", "");
-                        if (hours.matches("[0-9]+")) alarm.plusHours(Integer.parseInt(hours));
+                        if (hours.matches("[0-9]+")) alarm = alarm.plusHours(Integer.parseInt(hours));
                         else {
                             event.reactError();
                             throw new InvalidTimeException(LanguageHandler.get(lang, "alarm_invalidtime"));
                         }
                     } else if (arg.toLowerCase().endsWith("m")) {
                         minutes = arg.replaceAll("m", "");
-                        if (minutes.matches("[0-9]+")) alarm.plusMinutes(Integer.parseInt(minutes));
+                        if (minutes.matches("[0-9]+")) alarm = alarm.plusMinutes(Integer.parseInt(minutes));
                         else {
                             event.reactError();
                             throw new InvalidTimeException(LanguageHandler.get(lang, "alarm_invalidtime"));
@@ -162,21 +170,21 @@ public class AlarmCommand extends Command {
                             var arg = contentSplit[j];
                             if (arg.toLowerCase().endsWith("d")) {
                                 days = arg.replaceAll("d", "");
-                                if (days.matches("[0-9]+")) alarm.plusDays(Integer.parseInt(days));
+                                if (days.matches("[0-9]+")) alarm = alarm.plusDays(Integer.parseInt(days));
                                 else {
                                     event.reactError();
                                     throw new InvalidTimeException(LanguageHandler.get(lang, "alarm_invalidtime"));
                                 }
                             } else if (arg.toLowerCase().endsWith("h")) {
                                 hours = arg.replaceAll("h", "");
-                                if (hours.matches("[0-9]+")) alarm.plusHours(Integer.parseInt(hours));
+                                if (hours.matches("[0-9]+")) alarm = alarm.plusHours(Integer.parseInt(hours));
                                 else {
                                     event.reactError();
                                     throw new InvalidTimeException(LanguageHandler.get(lang, "alarm_invalidtime"));
                                 }
                             } else if (arg.toLowerCase().endsWith("m")) {
                                 minutes = arg.replaceAll("m", "");
-                                if (minutes.matches("[0-9]+")) alarm.plusMinutes(Integer.parseInt(minutes));
+                                if (minutes.matches("[0-9]+")) alarm = alarm.plusMinutes(Integer.parseInt(minutes));
                                 else {
                                     event.reactError();
                                     throw new InvalidTimeException(LanguageHandler.get(lang, "alarm_invalidtime"));

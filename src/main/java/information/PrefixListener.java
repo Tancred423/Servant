@@ -4,36 +4,41 @@ package information;
 import files.language.LanguageHandler;
 import moderation.guild.Guild;
 import moderation.user.User;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 import owner.blacklist.Blacklist;
 
 import java.util.concurrent.CompletableFuture;
 
 public class PrefixListener extends ListenerAdapter {
-    public void onMessageReceived(MessageReceivedEvent event) {
+    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         CompletableFuture.runAsync(() -> {
-            if (event.getAuthor().isBot()) return;
+            try {
+                if (event.getAuthor().isBot()) return;
 
-            if (event.getMessage().getContentRaw().equals("<@!" + event.getJDA().getSelfUser().getIdLong() + ">")
-                    || event.getMessage().getContentRaw().equals("<@" + event.getJDA().getSelfUser().getIdLong() + ">")) {
-                if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
-                var guild = event.getGuild();
-                var author = event.getAuthor();
-                String prefix;
-                String lang;
+                if (event.getMessage().getContentRaw().equals("<@!" + event.getJDA().getSelfUser().getIdLong() + ">")
+                        || event.getMessage().getContentRaw().equals("<@" + event.getJDA().getSelfUser().getIdLong() + ">")) {
+                    if (Blacklist.isBlacklisted(event.getAuthor(), event.isFromGuild() ? event.getGuild() : null)) return;
+                    var author = event.getAuthor();
+                    String prefix;
+                    String lang;
 
-                if (guild == null) {
-                    var internalUser = new User(event.getAuthor().getIdLong());
-                    prefix = internalUser.getPrefix(null, author);
-                    lang = internalUser.getLanguage(null, author);
-                } else {
-                    var internalGuild = new Guild(event.getGuild().getIdLong());
-                    prefix = internalGuild.getPrefix(guild, author);
-                    lang = internalGuild.getLanguage(guild, author);
+                    if (event.isFromGuild()) {
+                        var internalGuild = new Guild(event.getGuild().getIdLong());
+                        var guild = event.getGuild();
+                        prefix = internalGuild.getPrefix(guild, author);
+                        lang = internalGuild.getLanguage(guild, author);
+                    } else {
+                        var internalAuthor = new User(author.getIdLong());
+                        prefix = internalAuthor.getPrefix(null, author);
+                        lang = internalAuthor.getLanguage(null, author);
+                    }
+
+                    event.getChannel().sendMessage(String.format(LanguageHandler.get(lang, "current_prefix"), prefix)).queue();
                 }
-
-                event.getChannel().sendMessage(String.format(LanguageHandler.get(lang, "current_prefix"), prefix)).queue();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
     }

@@ -4,22 +4,20 @@ package useful.votes.vote;
 import files.language.LanguageHandler;
 import moderation.guild.Guild;
 import moderation.toggle.Toggle;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 import useful.votes.VotesDatabase;
 import utilities.Emote;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public class VoteEndListener extends ListenerAdapter {
-    public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {
+    public void onGuildMessageReactionAdd(@NotNull GuildMessageReactionAddEvent event) {
         CompletableFuture.runAsync(() -> {
             if (!Toggle.isEnabled(event, "vote")) return;
 
@@ -40,20 +38,20 @@ public class VoteEndListener extends ListenerAdapter {
             if (user.getIdLong() != VotesDatabase.getAuthorId(messageId, guild, user)) return; // Has to be done by author.
 
             // The author has reacted with an ending emote on their quickvote.
-            event.getChannel().getMessageById(messageId).queue(message -> {
+            event.getChannel().retrieveMessageById(messageId).queue(message -> {
                 Map<Integer, Integer> count = new HashMap<>();
                 for (int i = 0; i < 10; i++) count.put(i + 1, 0);
 
-                net.dv8tion.jda.core.entities.Emote oneEmote;
-                net.dv8tion.jda.core.entities.Emote twoEmote;
-                net.dv8tion.jda.core.entities.Emote threeEmote;
-                net.dv8tion.jda.core.entities.Emote fourEmote;
-                net.dv8tion.jda.core.entities.Emote fiveEmote;
-                net.dv8tion.jda.core.entities.Emote sixEmote;
-                net.dv8tion.jda.core.entities.Emote sevenEmote;
-                net.dv8tion.jda.core.entities.Emote eightEmote;
-                net.dv8tion.jda.core.entities.Emote nineEmote;
-                net.dv8tion.jda.core.entities.Emote tenEmote;
+                net.dv8tion.jda.api.entities.Emote oneEmote;
+                net.dv8tion.jda.api.entities.Emote twoEmote;
+                net.dv8tion.jda.api.entities.Emote threeEmote;
+                net.dv8tion.jda.api.entities.Emote fourEmote;
+                net.dv8tion.jda.api.entities.Emote fiveEmote;
+                net.dv8tion.jda.api.entities.Emote sixEmote;
+                net.dv8tion.jda.api.entities.Emote sevenEmote;
+                net.dv8tion.jda.api.entities.Emote eightEmote;
+                net.dv8tion.jda.api.entities.Emote nineEmote;
+                net.dv8tion.jda.api.entities.Emote tenEmote;
 
                 oneEmote = Emote.getEmote("one", guild, user);
                 twoEmote = Emote.getEmote("two", guild, user);
@@ -108,10 +106,15 @@ public class VoteEndListener extends ListenerAdapter {
 
                 var messageEmbed = message.getEmbeds().get(0);
                 var eb = new EmbedBuilder();
-                List<String> lines = Arrays.asList(messageEmbed.getDescription().split("\\r?\\n"));
+                var description = messageEmbed.getDescription();
+                List<String> lines = new ArrayList<>();
+                if (description != null) lines = Arrays.asList(description.split("\\r?\\n"));
+
+                var author = messageEmbed.getAuthor();
+                if (author == null) return; // todo: always null?
 
                 eb.setColor(messageEmbed.getColor());
-                eb.setAuthor(String.format(LanguageHandler.get(lang, "vote_ended"), user.getName()), null, messageEmbed.getAuthor().getIconUrl());
+                eb.setAuthor(String.format(LanguageHandler.get(lang, "vote_ended"), user.getName()), null, author.getIconUrl());
                 eb.setTitle(messageEmbed.getTitle());
                 for (int i = 0; i < lines.size(); i++) eb.addField(lines.get(i), String.valueOf(count.get(i + 1)), true);
                 eb.setFooter(LanguageHandler.get(lang, "votes_inactive"), event.getJDA().getSelfUser().getAvatarUrl());

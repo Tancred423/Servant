@@ -19,22 +19,22 @@
 package zJdaUtilsLib.com.jagrosh.jdautilities.command.impl;
 
 import files.language.LanguageHandler;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.OnlineStatus;
-import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.*;
-import net.dv8tion.jda.core.entities.impl.JDAImpl;
-import net.dv8tion.jda.core.events.Event;
-import net.dv8tion.jda.core.events.ReadyEvent;
-import net.dv8tion.jda.core.events.ShutdownEvent;
-import net.dv8tion.jda.core.events.guild.GuildJoinEvent;
-import net.dv8tion.jda.core.events.guild.GuildLeaveEvent;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.core.events.message.guild.GuildMessageDeleteEvent;
-import net.dv8tion.jda.core.hooks.EventListener;
-import net.dv8tion.jda.core.requests.Requester;
-import net.dv8tion.jda.core.utils.Checks;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.GenericEvent;
+import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.events.ShutdownEvent;
+import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
+import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageDeleteEvent;
+import net.dv8tion.jda.api.hooks.EventListener;
+import net.dv8tion.jda.internal.JDAImpl;
+import net.dv8tion.jda.internal.requests.Requester;
+import net.dv8tion.jda.internal.utils.Checks;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -42,7 +42,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import servant.Servant;
+import utilities.Constants;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.*;
 import zJdaUtilsLib.com.jagrosh.jdautilities.commons.utils.FixedSizeCache;
 import zJdaUtilsLib.com.jagrosh.jdautilities.commons.utils.SafeIdUtil;
@@ -65,7 +65,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
     private static final String DEFAULT_PREFIX = "@mention";
 
     private final OffsetDateTime start;
-    private final Game game;
+    private final Activity activity;
     private final OnlineStatus status;
     private final String ownerId;
     private final String[] coOwnerIds;
@@ -95,7 +95,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
     private CommandListener listener = null;
     private int totalGuilds;
 
-    public CommandClientImpl(String ownerId, String[] coOwnerIds, String prefix, String altprefix, Game game, OnlineStatus status, String serverInvite,
+    public CommandClientImpl(String ownerId, String[] coOwnerIds, String prefix, String altprefix, Activity activity, OnlineStatus status, String serverInvite,
                              String success, String warning, String error, String carbonKey, String botsKey, String botsOrgKey, ArrayList<Command> commands,
                              boolean useHelp, Consumer<CommandEvent> helpConsumer, String helpWord, ScheduledExecutorService executor, int linkedCacheSize,
                              AnnotatedModuleCompiler compiler, GuildSettingsManager manager) {
@@ -115,7 +115,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
         this.prefix = prefix==null || prefix.isEmpty() ? DEFAULT_PREFIX : prefix;
         this.altprefix = altprefix==null || altprefix.isEmpty() ? null : altprefix;
         this.textPrefix = prefix;
-        this.game = game;
+        this.activity = activity;
         this.status = status;
         this.serverInvite = serverInvite;
         this.success = success==null ? "": success;
@@ -136,14 +136,15 @@ public class CommandClientImpl implements CommandClient, EventListener {
         this.compiler = compiler;
         this.manager = manager;
         this.helpConsumer = helpConsumer==null ? (event) -> {
-            System.out.println("[" + OffsetDateTime.now(ZoneId.of("+02:00")).toString().replaceAll("T", " ").substring(0, 19) + "] " +
+            System.out.println("[" + OffsetDateTime.now(ZoneId.of(Constants.LOG_OFFSET)).toString().replaceAll("T", " ").substring(0, 19) + "] " +
                     "Command executed: " + event.getMessage().getContentDisplay() + ". " +
                     "Guild: " + (event.getGuild() == null ? "DM" : event.getGuild().getName() + " (" + event.getGuild().getIdLong() + ")") + ". " +
                     "User: " + event.getAuthor().getName() + "#" + event.getAuthor().getDiscriminator() + " (" + event.getAuthor().getIdLong() + ").");
 
             var eb = new EmbedBuilder();
             eb.setColor(new moderation.user.User(event.getAuthor().getIdLong()).getColor(event.getGuild(), event.getAuthor()));
-            eb.setThumbnail(Servant.jda.getGuildById(436925371577925642L).getIconUrl());
+            var g = event.getJDA().getGuildById(436925371577925642L);
+            eb.setThumbnail(g == null ? null : g.getIconUrl());
             eb.setAuthor(event.getSelfUser().getName() + " Commands\n", null, event.getSelfUser().getAvatarUrl());
             eb.setDescription("Type a command to get detailed help, e.g. `" + textPrefix + "avatar`");
 
@@ -422,13 +423,13 @@ public class CommandClientImpl implements CommandClient, EventListener {
     }
 
     @Override
-    public void onEvent(Event event) {
+    public void onEvent(GenericEvent event) {
         if(event instanceof MessageReceivedEvent) onMessageReceived((MessageReceivedEvent)event);
 
         else if(event instanceof GuildMessageDeleteEvent && usesLinkedDeletion()) onMessageDelete((GuildMessageDeleteEvent) event);
 
         else if(event instanceof GuildJoinEvent) {
-            if(((GuildJoinEvent)event).getGuild().getSelfMember().getJoinDate()
+            if(((GuildJoinEvent)event).getGuild().getSelfMember().getTimeJoined()
                     .plusMinutes(10).isAfter(OffsetDateTime.now()))
                 sendStats(event.getJDA());
         }
@@ -450,7 +451,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
         }
         textPrefix = prefix.equals(DEFAULT_PREFIX) ? "@"+event.getJDA().getSelfUser().getName()+" " : prefix;
         event.getJDA().getPresence().setPresence(status==null ? OnlineStatus.ONLINE : status, 
-                game==null ? null : "default".equals(game.getName()) ? Game.playing("Type "+textPrefix+helpWord) : game);
+                activity ==null ? null : "default".equals(activity.getName()) ? Activity.playing("Type "+textPrefix+helpWord) : activity);
 
         // Start SettingsManager if necessary
         GuildSettingsManager<?> manager = getSettingsManager();
@@ -470,7 +471,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
         if (settings != null) if (settings.getPrefixes() != null && settings.getPrefixes().isEmpty()) settings = null;
 
         if (settings == null) {
-            var userPrefix = new moderation.user.User(event.getAuthor().getIdLong()).getPrefix(event.getGuild(), event.getAuthor());
+            var userPrefix = new moderation.user.User(event.getAuthor().getIdLong()).getPrefix(event.isFromGuild() ? event.getGuild() : null, event.getAuthor());
             // Check for default prefix.
             if(rawContent.toLowerCase().startsWith(userPrefix.toLowerCase()))
                 parts = splitOnPrefixLength(rawContent, userPrefix.length());
@@ -518,9 +519,9 @@ public class CommandClientImpl implements CommandClient, EventListener {
                 }
 
                 if (command != null) {
-                    System.out.println("[" + OffsetDateTime.now(ZoneId.of("+02:00")).toString().replaceAll("T", " ").substring(0, 19) + "] " +
+                    System.out.println("[" + OffsetDateTime.now(ZoneId.of(Constants.LOG_OFFSET)).toString().replaceAll("T", " ").substring(0, 19) + "] " +
                             "Command executed: " + event.getMessage().getContentDisplay() + ". " +
-                            "Guild: " + (event.getGuild() == null ? "DM" : event.getGuild().getName() + " (" + event.getGuild().getIdLong() + ")") + ". " +
+                            "Guild: " + (event.isFromGuild() ? event.getGuild().getName() + " (" + event.getGuild().getIdLong() + ")" : "DM") + "."  +
                             "User: " + event.getAuthor().getName() + "#" + event.getAuthor().getDiscriminator() + " (" + event.getAuthor().getIdLong() + ").");
                     CommandEvent cevent = new CommandEvent(event, args, this);
                     if (listener != null)
@@ -616,34 +617,30 @@ public class CommandClientImpl implements CommandClient, EventListener {
                 }
             });
 
-            if(jda.getShardInfo()==null) {
-                this.totalGuilds = jda.getGuilds().size();
-            } else {
-                Request.Builder b = new Request.Builder()
+            Request.Builder b = new Request.Builder()
                     .get().url("https://bots.discord.pw/api/bots/" + jda.getSelfUser().getId() + "/stats")
                     .header("Authorization", botsKey)
                     .header("Content-Type", "application/json");
 
-                client.newCall(b.build()).enqueue(new Callback() {
-                    @Override
-                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                        assert response.body() != null;
-                        try (response; Reader reader = response.body().charStream()) {
-                            JSONArray array = new JSONObject(new JSONTokener(reader)).getJSONArray("stats");
-                            int total = 0;
-                            for (int i = 0; i < array.length(); i++)
-                                total += array.getJSONObject(i).getInt("server_count");
-                            totalGuilds = total;
-                        }
-                        // Close the response
+            client.newCall(b.build()).enqueue(new Callback() {
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    assert response.body() != null;
+                    try (response; Reader reader = response.body().charStream()) {
+                        JSONArray array = new JSONObject(new JSONTokener(reader)).getJSONArray("stats");
+                        int total = 0;
+                        for (int i = 0; i < array.length(); i++)
+                            total += array.getJSONObject(i).getInt("server_count");
+                        totalGuilds = total;
                     }
+                    // Close the response
+                }
 
-                    @Override
-                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                        LOG.error("Failed to retrieve bot shard information from bots.discord.pw ", e);
-                    }
-                });
-            }
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    LOG.error("Failed to retrieve bot shard information from bots.discord.pw ", e);
+                }
+            });
         }
     }
 

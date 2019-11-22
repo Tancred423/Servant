@@ -3,8 +3,8 @@ package useful.alarm;
 
 import files.language.LanguageHandler;
 import moderation.user.User;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
 
 import java.sql.Timestamp;
 import java.util.Date;

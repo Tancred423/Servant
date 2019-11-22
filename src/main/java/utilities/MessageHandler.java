@@ -1,9 +1,9 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package utilities;
 
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.MessageChannel;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageChannel;
 
 import java.awt.*;
 import java.util.Map;
@@ -42,6 +42,9 @@ public class MessageHandler {
     public void reactAchievement(Message message) {
         var emote = Emote.getEmoji("achievement");
         if (emote != null) message.addReaction(emote).queue();
-        else message.addReaction(Emote.getEmoji("achievement")).queue();
+        else {
+            var emoji = Emote.getEmoji("achievement");
+            if (emoji != null) message.addReaction(emoji).queue();
+        }
     }
 }

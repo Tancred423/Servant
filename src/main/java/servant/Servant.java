@@ -30,9 +30,9 @@ import moderation.toggle.ToggleCommand;
 import moderation.user.UserCommand;
 import owner.*;
 import moderation.*;
-import moderation.autorole.AutoroleCommand;
-import moderation.autorole.AutoroleListener;
-import moderation.guild.ServerCommand;
+import moderation.autorole.AutoRoleCommand;
+import moderation.autorole.AutoRoleListener;
+import moderation.guild.GuildCommand;
 import moderation.guild.GuildManager;
 import moderation.join.JoinCommand;
 import moderation.lobby.VoiceLobbyCommand;
@@ -57,8 +57,8 @@ import moderation.join.JoinListener;
 import fun.level.LevelListener;
 import files.ConfigFile;
 import interaction.*;
-import net.dv8tion.jda.core.*;
-import net.dv8tion.jda.core.entities.Game;
+import net.dv8tion.jda.api.*;
+import net.dv8tion.jda.api.entities.Activity;
 import useful.timezone.TimezoneCommand;
 import useful.votes.vote.RadiovoteMultipleVoteListener;
 import useful.votes.vote.VoteCommand;
@@ -70,7 +70,6 @@ import javax.security.auth.login.LoginException;
 import java.io.IOException;
 
 public class Servant {
-    public static JDA jda;
     public static ConfigFile config;
     public static ToggleFile toggle;
     public static Database db;
@@ -107,7 +106,7 @@ public class Servant {
                 new ShutdownCommand(),
 
                 // Moderation
-                new AutoroleCommand(),
+                new AutoRoleCommand(),
                 new BirthdayCommand(),
                 new BestOfImageCommand(),
                 new BestOfQuoteCommand(),
@@ -119,7 +118,7 @@ public class Servant {
                 new MediaOnlyChannelCommand(),
                 new ReactionRoleCommand(),
                 new RoleCommand(),
-                new ServerCommand(),
+                new GuildCommand(),
                 new ServerSetupCommand(waiter),
                 new ToggleCommand(),
                 new UserCommand(),
@@ -173,33 +172,33 @@ public class Servant {
 
                 // While loading.
                 .setStatus(OnlineStatus.DO_NOT_DISTURB)
-                .setGame(Game.playing("loading..."))
+                .setActivity(Activity.playing("loading..."))
 
-                .addEventListener(client.build())
-                .addEventListener(waiter)
+                .addEventListeners(client.build())
+                .addEventListeners(waiter)
 
-                .addEventListener(new AutoroleListener())
-                .addEventListener(new BestOfImageListener())
-                .addEventListener(new BestOfQuoteListener())
-                .addEventListener(new BirthdayListener())
-                .addEventListener(new EasterEggsListener())
-                .addEventListener(new GiveawayListener())
-                .addEventListener(new InviteKickListener())
-                .addEventListener(new JoinListener())
-                .addEventListener(new LeaveListener())
-                .addEventListener(new LevelListener())
-                .addEventListener(new LivestreamListener())
-                .addEventListener(new MediaOnlyChannelListener())
-                .addEventListener(new PatreonListener())
-                .addEventListener(new PrefixListener())
-                .addEventListener(new QuickvoteEndListener())
-                .addEventListener(new QuickvoteMultipleVoteListener())
-                .addEventListener(new RadiovoteMultipleVoteListener())
-                .addEventListener(new ReactionRoleListener())
-                .addEventListener(new ReadyListener())
-                .addEventListener(new SignupListener())
-                .addEventListener(new VoiceLobbyListener())
-                .addEventListener(new VoteEndListener())
+                .addEventListeners(new AutoRoleListener())
+                .addEventListeners(new BestOfImageListener())
+                .addEventListeners(new BestOfQuoteListener())
+                .addEventListeners(new BirthdayListener())
+                .addEventListeners(new EasterEggsListener())
+                .addEventListeners(new GiveawayListener())
+                .addEventListeners(new InviteKickListener())
+                .addEventListeners(new JoinListener())
+                .addEventListeners(new LeaveListener())
+                .addEventListeners(new LevelListener())
+                .addEventListeners(new LivestreamListener())
+                .addEventListeners(new MediaOnlyChannelListener())
+                .addEventListeners(new PatreonListener())
+                .addEventListeners(new PrefixListener())
+                .addEventListeners(new QuickvoteEndListener())
+                .addEventListeners(new QuickvoteMultipleVoteListener())
+                .addEventListeners(new RadiovoteMultipleVoteListener())
+                .addEventListeners(new ReactionRoleListener())
+                .addEventListeners(new ReadyListener())
+                .addEventListeners(new SignupListener())
+                .addEventListeners(new VoiceLobbyListener())
+                .addEventListeners(new VoteEndListener())
 
                 .build();
     }

@@ -2,11 +2,12 @@
 package servant;
 
 import files.language.LanguageHandler;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.OnlineStatus;
-import net.dv8tion.jda.core.entities.Game;
-import net.dv8tion.jda.core.events.ReadyEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 import useful.alarm.Alarm;
 import useful.giveaway.Giveaway;
 import useful.reminder.Reminder;
@@ -26,9 +27,7 @@ import static utilities.DatabaseConn.closeQuietly;
 public class ReadyListener extends ListenerAdapter {
     private int counter = 0;
 
-    public void onReady(ReadyEvent event) {
-        Servant.jda = event.getJDA();
-
+    public void onReady(@NotNull ReadyEvent event) {
         Connection connection = null;
         try {
             connection = Servant.db.getHikari().getConnection();
@@ -41,7 +40,7 @@ public class ReadyListener extends ListenerAdapter {
 
         var jda = event.getJDA();
 
-        setPresence();
+        setPresence(jda);
         checkStuff(jda);
 
         System.out.println(jda.getSelfUser().getName() + " ready.");
@@ -50,7 +49,7 @@ public class ReadyListener extends ListenerAdapter {
     private void checkStuff(JDA jda) {
         var service = Executors.newSingleThreadScheduledExecutor();
         service.scheduleAtFixedRate(() -> {
-            System.out.println("[" + OffsetDateTime.now(ZoneId.of("+02:00")).toString().replaceAll("T", " ").substring(0, 19) + "] " + "Checking alarms, giveaways, reminders and signups.");
+            System.out.println("[" + OffsetDateTime.now(ZoneId.of(Constants.LOG_OFFSET)).toString().replaceAll("T", " ").substring(0, 19) + "] " + "Checking alarms, giveaways, reminders and signups.");
             Alarm.check(jda);
             Giveaway.checkGiveaways(jda);
             Reminder.check(jda);
@@ -58,23 +57,23 @@ public class ReadyListener extends ListenerAdapter {
         }, Time.getDelayToNextMinuteInMillis(), 60 * 1000, TimeUnit.MILLISECONDS); // 1 minute
     }
 
-    private void setPresence() {
+    private void setPresence(JDA jda) {
         var service = Executors.newSingleThreadScheduledExecutor();
-        service.scheduleAtFixedRate(this::settingPresence, 0, 5, TimeUnit.MINUTES);
+        service.scheduleAtFixedRate(() -> settingPresence(jda), 0, 5, TimeUnit.MINUTES);
     }
 
-    private void settingPresence() {
-        System.out.println("[" + OffsetDateTime.now(ZoneId.of("+02:00")).toString().replaceAll("T", " ").substring(0, 19) + "] " + "Changing Presence.");
+    private void settingPresence(JDA jda) {
+        System.out.println("[" + OffsetDateTime.now(ZoneId.of(Constants.LOG_OFFSET)).toString().replaceAll("T", " ").substring(0, 19) + "] " + "Changing Presence.");
         var lang = Servant.config.getDefaultLanguage();
 
         if (counter == 0)
-            Servant.jda.getPresence().setPresence(OnlineStatus.ONLINE, Game.playing(String.format(LanguageHandler.get(lang, "presence_0"), Constants.VERSION, Servant.config.getDefaultPrefix())));
+            jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing(String.format(LanguageHandler.get(lang, "presence_0"), Constants.VERSION, Servant.config.getDefaultPrefix())));
         else if (counter == 1)
-            Servant.jda.getPresence().setPresence(OnlineStatus.ONLINE, Game.watching(String.format(LanguageHandler.get(lang, "presence_1"), Servant.jda.getUsers().size(), Servant.config.getDefaultPrefix())));
+            jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.watching(String.format(LanguageHandler.get(lang, "presence_1"), jda.getUsers().size(), Servant.config.getDefaultPrefix())));
         else if (counter == 2)
-            Servant.jda.getPresence().setPresence(OnlineStatus.ONLINE, Game.watching(String.format(LanguageHandler.get(lang, "presence_2"), Servant.jda.getGuilds().size(), Servant.config.getDefaultPrefix())));
+            jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.watching(String.format(LanguageHandler.get(lang, "presence_2"), jda.getGuilds().size(), Servant.config.getDefaultPrefix())));
         else if (counter == 3)
-            Servant.jda.getPresence().setPresence(OnlineStatus.ONLINE, Game.playing(String.format(LanguageHandler.get(lang, "presence_3"), Servant.config.getDefaultPrefix(), Servant.config.getDefaultPrefix())));
+            jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing(String.format(LanguageHandler.get(lang, "presence_3"), Servant.config.getDefaultPrefix(), Servant.config.getDefaultPrefix())));
 
         counter++;
         if (counter == 4) counter = 0;

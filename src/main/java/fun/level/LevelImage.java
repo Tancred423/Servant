@@ -2,33 +2,38 @@
 package fun.level;
 
 import files.language.LanguageHandler;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.User;
 import patreon.PatreonHandler;
 import utilities.Achievement;
 import utilities.Parser;
 import utilities.StringFormat;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
-import java.awt.geom.NoninvertibleTransformException;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
+import java.text.NumberFormat;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 
 public class LevelImage {
     private User user;
     private Guild guild;
     private BufferedImage image;
+    private CommandEvent event;
 
-    LevelImage(User user, Guild guild, String lang) throws NoninvertibleTransformException {
+    LevelImage(CommandEvent event, User user, Guild guild, String lang) {
         this.user = user;
         this.guild = guild;
-        setProfilePicture(lang);
+        this.event = event;
+        setProfilePicture(user.getJDA(), lang);
     }
 
     public User getUser() {
@@ -40,7 +45,14 @@ public class LevelImage {
     }
 
 
-    private void setProfilePicture(String lang) throws NoninvertibleTransformException {
+    private void setProfilePicture(JDA jda, String lang) {
+        // Currently useless, but made for future language support.
+        var locale = Locale.UK;
+        switch (lang) {
+            case "de_de":
+                locale = Locale.GERMANY;
+        }
+
         var internalUser = new moderation.user.User(user.getIdLong());
         var internalGuild = new moderation.guild.Guild(guild.getIdLong());
 
@@ -128,7 +140,8 @@ public class LevelImage {
         g2d.fillRect(levelX + border, levelY + border, Math.round(percent * (levelW - border * 2)), levelH - border * 2);
 
         // Level Text
-        text = LanguageHandler.get(lang, "level_level") + " " + currentLevel + " (" + currentExpOnThisLevel + "/" + neededExp + ")";
+        text = LanguageHandler.get(lang, "level_level") + " " + currentLevel +
+                " (" + formatDecimal(locale, currentExpOnThisLevel) + "/" + formatDecimal(locale, neededExp) + ")";
         var levelTextX = levelX + border + textBorder;
         var levelTextY = levelY + levelH * 0.75;
         g2d.translate(levelTextX, levelTextY);
@@ -218,7 +231,6 @@ public class LevelImage {
 
         // MUC Content
         var features = internalUser.getTop10MostUsedFeatures(guild, user, lang);
-        var top10Features = new StringBuilder();
 
         var mucContentX = mucTitleX;
         var mucContentY = mucTitleY;
@@ -237,20 +249,22 @@ public class LevelImage {
             g2d.draw(shape);
             g2d.setColor(Color.WHITE);
             g2d.fill(shape);
-        } else for (var feature : features.entrySet()) {
-            g2d.translate(0, mucContentH);
+        } else {
+            for (var feature : features.entrySet()) {
+                g2d.translate(0, mucContentH);
 
-            text = feature.getKey() + ": " + feature.getValue();
-            g2d.setColor(Color.BLACK);
-            layout = new TextLayout(text, myriad, frc);
-            shape = layout.getOutline(null);
-            g2d.setStroke(new BasicStroke(subOutline));
-            g2d.draw(shape);
-            if (counter == 0) g2d.setColor(Color.decode(internalUser.getColorCode(guild, user)));
-            else g2d.setColor(Color.WHITE);
-            g2d.fill(shape);
+                text = feature.getKey() + ": " + formatDecimal(locale, feature.getValue());
+                g2d.setColor(Color.BLACK);
+                layout = new TextLayout(text, myriad, frc);
+                shape = layout.getOutline(null);
+                g2d.setStroke(new BasicStroke(subOutline));
+                g2d.draw(shape);
+                if (counter == 0) g2d.setColor(Color.decode(internalUser.getColorCode(guild, user)));
+                else g2d.setColor(Color.WHITE);
+                g2d.fill(shape);
 
-            counter++;
+                counter++;
+            }
         }
 
         g2d.translate(mucContentX * -1, (mucContentY * -1) + (counter * mucContentH * -1)); // Reset
@@ -271,11 +285,11 @@ public class LevelImage {
         g2d.translate(achTitleX * -1, achTitleY * -1); // Reset
 
         // Achievement Content
-        var achievements = internalUser.getAchievements(guild, user, lang);
-        var achievementsWithName = new LinkedHashMap<String, Integer>();
+        var achievements = internalUser.getAchievements(guild, user);
+        var achievementsWithName = new LinkedHashMap<String, String>();
         for (var achievement : achievements.entrySet())
-            achievementsWithName.put(Achievement.getFancyName(achievement.getKey(), lang), achievement.getValue());
-        achievementsWithName = StringFormat.achievementSortByKey(achievementsWithName, lang, internalUser, guild, user);
+            achievementsWithName.put(Achievement.getFancyName(jda, achievement.getKey(), lang), String.valueOf(achievement.getValue()));
+        achievementsWithName = StringFormat.achievementSortByKey(achievementsWithName, lang, internalUser, guild, user, locale);
 
         var achContentX = achTitleX;
         var achContentY = achTitleY;
@@ -293,19 +307,21 @@ public class LevelImage {
             g2d.draw(shape);
             g2d.setColor(Color.WHITE);
             g2d.fill(shape);
-        } else for (var achievement : achievementsWithName.entrySet()) {
-            g2d.translate(0, achContentH);
-            text = achievement.getKey() + ": " + achievement.getValue();
-            g2d.setColor(Color.BLACK);
-            layout = new TextLayout(text, myriad, frc);
-            shape = layout.getOutline(null);
-            g2d.setStroke(new BasicStroke(subOutline));
-            g2d.draw(shape);
-            if (counter == 0) g2d.setColor(Color.decode(internalUser.getColorCode(guild, user)));
-            else g2d.setColor(Color.WHITE);
-            g2d.fill(shape);
+        } else {
+            for (var achievement : achievementsWithName.entrySet()) {
+                g2d.translate(0, achContentH);
+                text = achievement.getKey() + ": " + achievement.getValue();
+                g2d.setColor(Color.BLACK);
+                layout = new TextLayout(text, myriad, frc);
+                shape = layout.getOutline(null);
+                g2d.setStroke(new BasicStroke(subOutline));
+                g2d.draw(shape);
+                if (counter == 0) g2d.setColor(Color.decode(internalUser.getColorCode(guild, user)));
+                else g2d.setColor(Color.WHITE);
+                g2d.fill(shape);
 
-            counter++;
+                counter++;
+            }
         }
 
         g2d.translate(achContentX * -1, (achContentY * -1) + (counter * achContentH * -1)); // Reset
@@ -394,5 +410,9 @@ public class LevelImage {
         } catch (IOException e) {
             return null;
         }
+    }
+
+    public static String formatDecimal(Locale locale, int i) {
+        return NumberFormat.getInstance(locale).format(i);
     }
 }

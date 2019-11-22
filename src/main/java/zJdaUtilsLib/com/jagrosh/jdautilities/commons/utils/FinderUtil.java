@@ -15,10 +15,10 @@
  */
 package zJdaUtilsLib.com.jagrosh.jdautilities.commons.utils;
 
-import net.dv8tion.jda.bot.sharding.ShardManager;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.entities.*;
-import net.dv8tion.jda.core.utils.cache.SnowflakeCacheView;
+import net.dv8tion.jda.api.sharding.ShardManager;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.utils.cache.SnowflakeCacheView;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -48,7 +48,7 @@ public final class FinderUtil {
         Matcher userMention = USER_MENTION.matcher(query);
         Matcher fullRefMatch = FULL_USER_REF.matcher(query);
 
-        ShardManager manager = useShardManager? jda.asBot().getShardManager() : null;
+        ShardManager manager = useShardManager? jda.getShardManager() : null;
 
         if(userMention.matches()) {
             User user = manager != null? manager.getUserById(userMention.group(1)) : jda.getUserById(userMention.group(1));
@@ -91,7 +91,7 @@ public final class FinderUtil {
     public static List<User> findBannedUsers(String query, Guild guild) {
         List<User> bans;
         try {
-            bans = guild.getBanList().complete().stream()
+            bans = guild.retrieveBanList().complete().stream()
                 .map(Guild.Ban::getUser)
                 .collect(Collectors.toList());
         } catch(Exception e) {
@@ -208,7 +208,7 @@ public final class FinderUtil {
     private static List<TextChannel> jdaTextChannelSearch(String query, JDA jda, boolean useShardManager) {
         Matcher channelMention = CHANNEL_MENTION.matcher(query);
 
-        ShardManager manager = useShardManager ? jda.asBot().getShardManager() : null;
+        ShardManager manager = useShardManager ? jda.getShardManager() : null;
 
         if (channelMention.matches()) {
             TextChannel tc = manager != null ? manager.getTextChannelById(channelMention.group(1)) : jda.getTextChannelById(channelMention.group(1));
@@ -264,7 +264,7 @@ public final class FinderUtil {
     }
 
     private static List<VoiceChannel> jdaVoiceChannelSearch(String query, JDA jda, boolean useShardManager) {
-        ShardManager manager = useShardManager? jda.asBot().getShardManager() : null;
+        ShardManager manager = useShardManager? jda.getShardManager() : null;
 
         if(DISCORD_ID.matcher(query).matches()) {
             VoiceChannel vc = manager != null? manager.getVoiceChannelById(query) : jda.getVoiceChannelById(query);
@@ -319,7 +319,7 @@ public final class FinderUtil {
     }
 
     private static List<Category> jdaCategorySearch(String query, JDA jda, boolean useShardManager) {
-        ShardManager manager = useShardManager? jda.asBot().getShardManager() : null;
+        ShardManager manager = useShardManager? jda.getShardManager() : null;
 
         if(DISCORD_ID.matcher(query).matches()) {
             Category cat = manager != null? manager.getCategoryById(query) : jda.getCategoryById(query);
@@ -417,7 +417,7 @@ public final class FinderUtil {
     private static List<Emote> jdaFindEmotes(String query, JDA jda, boolean useShardManager) {
         Matcher mentionMatcher = EMOTE_MENTION.matcher(query);
 
-        ShardManager manager = useShardManager? jda.asBot().getShardManager() : null;
+        ShardManager manager = useShardManager? jda.getShardManager() : null;
 
         if(DISCORD_ID.matcher(query).matches()) {
             Emote emote = manager != null? manager.getEmoteById(query) : jda.getEmoteById(query);

@@ -2,18 +2,21 @@
 package moderation.autorole;
 
 import moderation.toggle.Toggle;
-import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
-import net.dv8tion.jda.core.exceptions.HierarchyException;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
+import net.dv8tion.jda.api.exceptions.HierarchyException;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import moderation.guild.Guild;
+import org.jetbrains.annotations.NotNull;
 import owner.blacklist.Blacklist;
 import servant.Log;
 
+import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-public class AutoroleListener extends ListenerAdapter {
-    public void onGuildMemberJoin(GuildMemberJoinEvent event) {
+public class AutoRoleListener extends ListenerAdapter {
+    public void onGuildMemberJoin(@NotNull GuildMemberJoinEvent event) {
         CompletableFuture.runAsync(() -> {
             var guild = event.getGuild();
             var eventUser = event.getUser();
@@ -28,7 +31,9 @@ public class AutoroleListener extends ListenerAdapter {
                         var roleAndDelay = internalGuild.getAutorole(guild, eventUser);
                         TimeUnit.MINUTES.sleep(roleAndDelay.entrySet().iterator().next().getValue());
                         var member = event.getMember();
-                        guild.getController().addSingleRoleToMember(member, internalGuild.getAutorole(guild, eventUser).entrySet().iterator().next().getKey()).queue();
+                        var rolesToAdd = new ArrayList<Role>();
+                        rolesToAdd.add(internalGuild.getAutorole(guild, eventUser).entrySet().iterator().next().getKey());
+                        guild.modifyMemberRoles(member, rolesToAdd, null).queue();
                     } catch (InterruptedException e) {
                         new Log(e, event.getGuild(), eventUser, "Autorole Listener", null).sendLog(false);
                     } catch (HierarchyException ignored) { }

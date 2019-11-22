@@ -3,11 +3,11 @@ package moderation.birthday;
 
 import files.language.LanguageHandler;
 import moderation.user.User;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.MessageChannel;
-import net.dv8tion.jda.core.entities.MessageEmbed;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import servant.Log;
 import utilities.Image;
 import utilities.StringFormat;
@@ -25,16 +25,23 @@ class BirthdayHandler {
         List<Guild> guilds = jda.getGuilds();
         for (var guild : guilds) {
             var internalGuild = new moderation.guild.Guild(guild.getIdLong());
-            if (internalGuild.birthdayMessagesHasEntry(guild, guild.getOwner().getUser())) {
+            var botOwner =  guild.getOwner();
+            if (internalGuild.birthdayMessagesHasEntry(guild, botOwner == null ? null : botOwner.getUser())) {
                 var guildOwner = guild.getOwner().getUser();
                 var channelId = internalGuild.getBirthdayMessageChannelId(guild, guildOwner);
                 var messageId = internalGuild.getBirthdayMessageMessageId(guild, guildOwner);
                 var authorId = internalGuild.getBirthdayMessageAuthorId(guild, guildOwner);
-                guild.getTextChannelById(channelId).getMessageById(messageId).queue(message -> {
+                var tc = guild.getTextChannelById(channelId);
+                // todo: always null?
+                if (tc == null) return;
+                var authorMember = guild.getMemberById(authorId);
+                if (authorMember == null) return; // todo: always null?
+                tc.retrieveMessageById(messageId).queue(message -> {
                     try {
-                        message.editMessage(createList(guild, guild.getMemberById(authorId).getUser(), guild.getTextChannelById(channelId))).queue();
+                        var list = createList(guild, authorMember.getUser(), tc);
+                        message.editMessage(list == null ? new EmbedBuilder().build() : list).queue();
                     } catch (ParseException e) {
-                        new Log(e, guild, guild.getMemberById(authorId).getUser(), "BirthdayHandler - Update Lists", null).sendLog(false);
+                        new Log(e, guild, authorMember.getUser(), "BirthdayHandler - Update Lists", null).sendLog(false);
                     }
                 });
             }
@@ -59,35 +66,44 @@ class BirthdayHandler {
     static void checkBirthdays(JDA jda) {
         List<Guild> guilds = jda.getGuilds();
         for (var guild : guilds) {
-            var guildOwner = guild.getOwner().getUser();
+            var guildOwner = guild.getOwner();
+            if (guildOwner == null) return; // todo: always null?
+            var guildOwnerUser = guildOwner.getUser();
             var internalGuild = new moderation.guild.Guild(guild.getIdLong());
 
-            var now = OffsetDateTime.now(ZoneOffset.of(internalGuild.getOffset(guild, guildOwner)));
+            var now = OffsetDateTime.now(ZoneOffset.of(internalGuild.getOffset(guild, guildOwnerUser)));
             var nowString = now.toString().substring(4, 10);
 
-            Map<Long, String> birthdays = internalGuild.getBirthdays(guild, guildOwner);
+            Map<Long, String> birthdays = internalGuild.getBirthdays(guild, guildOwnerUser);
 
             for (Map.Entry<Long, String> birthday : birthdays.entrySet()) {
                 var userId = birthday.getKey();
                 if (nowString.equals(birthday.getValue().substring(4))) {
-                    if (!internalGuild.wasGratulated(userId, guild, guildOwner)) {
+                    if (!internalGuild.wasGratulated(userId, guild, guildOwnerUser)) {
                         gratulate(guild, userId);
-                        internalGuild.setGratulated(userId, guild, guildOwner);
+                        internalGuild.setGratulated(userId, guild, guildOwnerUser);
                     }
-                } else internalGuild.unsetGratulated(userId, guild, guildOwner);
+                } else internalGuild.unsetGratulated(userId, guild, guildOwnerUser);
             }
         }
     }
 
     private static void gratulate(Guild guild, long userId) {
-        var guildOwner = guild.getOwner().getUser();
+        var guildOwner = guild.getOwner();
+        // todo: always null?
+        if (guildOwner == null) return;
+        var guildOwnerUser = guildOwner.getUser();
         var internalGuild = new moderation.guild.Guild(guild.getIdLong());
-        guild.getTextChannelById(internalGuild.getBirthdayChannelId(guild, guildOwner)).sendMessage(
-                String.format(LanguageHandler.get(internalGuild.getLanguage(guild, guildOwner), "birthday_gratulation"), guild.getMemberById(userId).getAsMention())
+        var birthdayChannel = guild.getTextChannelById(internalGuild.getBirthdayChannelId(guild, guildOwnerUser));
+        var birthdayMember = guild.getMemberById(userId);
+        // todo: always null?
+        if (birthdayChannel != null && birthdayMember != null)
+        birthdayChannel.sendMessage(
+                String.format(LanguageHandler.get(internalGuild.getLanguage(guild, guildOwnerUser), "birthday_gratulation"), birthdayMember.getAsMention())
         ).queue();
     }
     
-    private static MessageEmbed createList(Guild guild, net.dv8tion.jda.core.entities.User author, MessageChannel channel) throws ParseException {
+    private static MessageEmbed createList(Guild guild, net.dv8tion.jda.api.entities.User author, MessageChannel channel) throws ParseException {
         var internalGuild = new moderation.guild.Guild(guild.getIdLong());
         var internalAuthor = new User(author.getIdLong());
 
@@ -101,8 +117,9 @@ class BirthdayHandler {
 
         Map<Long, String> birthdays2 = new HashMap<>();
         for (Map.Entry<Long, String> entry : birthdays.entrySet()) {
+            var birthdayMember = guild.getMemberById(entry.getKey()); // todo: always null?
             if (guild.getMemberById(entry.getKey()) == null) internalGuild.unsetBirthday(entry.getKey(), guild, author);
-            else birthdays2.put(getCooldown(entry.getValue()), entry.getValue() + " " + guild.getMemberById(entry.getKey()).getUser().getName());
+            else if (birthdayMember != null) birthdays2.put(getCooldown(entry.getValue()), entry.getValue() + " " + birthdayMember.getUser().getName());
         }
 
         Map<Long, String> birthdaysSorted = new TreeMap<>(birthdays2);
@@ -122,7 +139,7 @@ class BirthdayHandler {
             channel.sendMessage(LanguageHandler.get(lang, "birthday_missing")).queue();
             return null;
         } else {
-            EmbedBuilder eb = new EmbedBuilder();
+            var eb = new EmbedBuilder();
             eb.setColor(internalAuthor.getColor(guild, author));
             eb.setAuthor(String.format(LanguageHandler.get(lang, "birthday_guild"), guild.getName() + (guild.getName().toLowerCase().endsWith("s") ? "'" : "'s")), null, guild.getIconUrl());
             eb.setDescription(sb.toString());

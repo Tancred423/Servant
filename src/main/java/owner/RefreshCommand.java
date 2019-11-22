@@ -3,7 +3,7 @@ package owner;
 
 import moderation.guild.Guild;
 import moderation.user.User;
-import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.api.Permission;
 import utilities.Constants;
 import utilities.Parser;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
@@ -27,21 +27,28 @@ public class RefreshCommand extends Command {
         this.cooldown = Constants.OWNER_COOLDOWN;
         this.cooldownScope = CooldownScope.USER;
         this.userPermissions = new Permission[0];
-        this.botPermissions = new Permission[0];
+        this.botPermissions = new Permission[] {
+                Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY
+        };
     }
 
     @Override
     protected void execute(CommandEvent event) {
         CompletableFuture.runAsync(() -> {
-            assignLevelAchievement(event);
-            clearLevelAchievements(event);
-            event.reactSuccess();
+            try {
+                assignLevelAchievement(event);
+                clearLevelAchievements(event);
+                event.reactSuccess();
 
-            var guild = event.getGuild();
-            var author = event.getAuthor();
-            // Statistics.
-            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+                var guild = event.getGuild();
+                var author = event.getAuthor();
+                // Statistics.
+                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+                if (event.getGuild() != null)
+                    new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
     }
 

@@ -1,8 +1,8 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package servant;
 
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.User;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 public class Log {
@@ -25,7 +25,10 @@ public class Log {
         if (commandEvent != null) commandEvent.reactWarning();
         if (notifyUser && commandEvent != null) commandEvent.reply("Something went wrong, master!\n" + "A report was sent to the bot owner.");
         if (e != null) e.printStackTrace();
-        Servant.jda.getUserById(Servant.config.getBotOwnerId()).openPrivateChannel().queue(privateChannel ->
+        var botOwner = user.getJDA().getUserById(Servant.config.getBotOwnerId());
+        // todo: always null?
+        if (botOwner == null) return;
+        botOwner.openPrivateChannel().queue(privateChannel ->
                 privateChannel.sendMessage("```c\n" +
                         "Error\n" +
                         "-----\n" +

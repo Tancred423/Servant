@@ -15,12 +15,13 @@
  */
 package zJdaUtilsLib.com.jagrosh.jdautilities.commons.waiter;
 
-import net.dv8tion.jda.core.events.Event;
-import net.dv8tion.jda.core.events.ShutdownEvent;
-import net.dv8tion.jda.core.hooks.EventListener;
-import net.dv8tion.jda.core.hooks.SubscribeEvent;
-import net.dv8tion.jda.core.utils.Checks;
+import net.dv8tion.jda.api.events.Event;
+import net.dv8tion.jda.api.events.GenericEvent;
+import net.dv8tion.jda.api.events.ShutdownEvent;
+import net.dv8tion.jda.api.hooks.EventListener;
+import net.dv8tion.jda.internal.utils.Checks;
 
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -76,11 +77,14 @@ public class EventWaiter implements EventListener {
             }, timeout, unit);
         }
     }
-    
+
+    public void shutdown() {
+        if(shutdownAutomatically) throw new UnsupportedOperationException("Shutting down EventWaiters that are set to automatically close is unsupported!");
+        threadpool.shutdown();
+    }
+
     @Override
-    @SubscribeEvent
-    @SuppressWarnings("unchecked")
-    public final void onEvent(Event event) {
+    public void onEvent(@Nonnull GenericEvent event) {
         Class c = event.getClass();
 
         while(c != null) {
@@ -100,12 +104,7 @@ public class EventWaiter implements EventListener {
         }
     }
 
-    public void shutdown() {
-        if(shutdownAutomatically) throw new UnsupportedOperationException("Shutting down EventWaiters that are set to automatically close is unsupported!");
-        threadpool.shutdown();
-    }
-    
-    private class WaitingEvent<T extends Event> {
+    private class WaitingEvent<T extends GenericEvent> {
         final Predicate<T> condition;
         final Consumer<T> action;
         

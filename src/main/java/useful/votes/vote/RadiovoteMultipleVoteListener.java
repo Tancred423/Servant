@@ -2,18 +2,19 @@
 package useful.votes.vote;
 
 import moderation.toggle.Toggle;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.User;
-import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
-import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionRemoveEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
+import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionRemoveEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 import useful.votes.VotesDatabase;
 import utilities.Emote;
 
 import java.util.concurrent.CompletableFuture;
 
 public class RadiovoteMultipleVoteListener extends ListenerAdapter {
-    public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {
+    public void onGuildMessageReactionAdd(@NotNull GuildMessageReactionAddEvent event) {
         CompletableFuture.runAsync(() -> {
             if (!Toggle.isEnabled(event, "radiovote")) return;
             var guild = event.getGuild();
@@ -51,7 +52,7 @@ public class RadiovoteMultipleVoteListener extends ListenerAdapter {
                 ) return;
             }
 
-            event.getChannel().getMessageById(messageId).queue(message -> {
+            event.getChannel().retrieveMessageById(messageId).queue(message -> {
                 var userId = user.getIdLong();
                 if (VotesDatabase.hasVoted(messageId, userId, guild, user)) event.getReaction().removeReaction(user).queue();
                 else VotesDatabase.setUserVote(messageId, userId, (reactionEmote.isEmote() ? reactionEmote.getEmote().getIdLong() : 0), (reactionEmote.isEmote() ? "" : reactionEmote.getName()), guild, user);
@@ -59,7 +60,7 @@ public class RadiovoteMultipleVoteListener extends ListenerAdapter {
         });
     }
 
-    public void onGuildMessageReactionRemove(GuildMessageReactionRemoveEvent event) {
+    public void onGuildMessageReactionRemove(@NotNull GuildMessageReactionRemoveEvent event) {
         CompletableFuture.runAsync(() -> {
             var guild = event.getGuild();
             var user = event.getUser();
@@ -96,7 +97,7 @@ public class RadiovoteMultipleVoteListener extends ListenerAdapter {
                 ) return;
             }
 
-            event.getChannel().getMessageById(messageId).queue(message -> {
+            event.getChannel().retrieveMessageById(messageId).queue(message -> {
                 if (reactionEmote.isEmote()) {
                     if (reactionEmote.getEmote().getIdLong() == VotesDatabase.getVoteEmoteId(messageId, user.getIdLong(), guild, user))
                         unsetVote(messageId, user, guild);

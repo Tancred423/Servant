@@ -15,7 +15,19 @@
  */
 package zJdaUtilsLib.com.jagrosh.jdautilities.menu;
 
-import java.awt.Color;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.MessageBuilder;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.exceptions.PermissionException;
+import net.dv8tion.jda.api.requests.RestAction;
+import net.dv8tion.jda.internal.utils.Checks;
+import zJdaUtilsLib.com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+
+import java.awt.*;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,18 +36,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.MessageBuilder;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.MessageChannel;
-import net.dv8tion.jda.core.entities.Role;
-import net.dv8tion.jda.core.entities.User;
-import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent;
-import net.dv8tion.jda.core.exceptions.PermissionException;
-import net.dv8tion.jda.core.requests.RestAction;
-import net.dv8tion.jda.core.utils.Checks;
-import zJdaUtilsLib.com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
 public class SelectionDialog extends Menu {
     private final List<String> choices;

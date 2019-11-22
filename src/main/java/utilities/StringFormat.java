@@ -2,8 +2,9 @@
 package utilities;
 
 import files.language.LanguageHandler;
+import fun.level.LevelImage;
 import moderation.user.User;
-import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.api.entities.Guild;
 
 import java.util.*;
 
@@ -20,29 +21,29 @@ public class StringFormat {
 
     public static String flipString(String text) {
         var normal = "abcdefghijklmnopqrstuvwxyz_,;.?!/\\'ɐqɔpǝɟbɥıظʞןɯuodbɹsʇnʌʍxʎz‾'؛˙¿¡/\\,";
-        var split  = "ɐqɔpǝɟbɥıظʞןɯuodbɹsʇnʌʍxʎz‾'؛˙¿¡/\\,abcdefghijklmnopqrstuvwxyz_,;.?!/\\'";
+        var flip  = "ɐqɔpǝɟbɥıظʞןɯuodbɹsʇnʌʍxʎz‾'؛˙¿¡/\\,abcdefghijklmnopqrstuvwxyz_,;.?!/\\'";
         //maj
         normal += "ABCDEFGHIJKLMNOPQRSTUVWXYZ∀ꓭϽᗡƎℲƃHIſʞ˥WNOԀὉᴚS⊥∩ΛMXʎZ";
-        split  += "∀ꓭϽᗡƎℲƃHIſʞ˥WNOԀὉᴚS⊥∩ΛMXʎZABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        flip  += "∀ꓭϽᗡƎℲƃHIſʞ˥WNOԀὉᴚS⊥∩ΛMXʎZABCDEFGHIJKLMNOPQRSTUVWXYZ";
         //number
         normal += "01234567890ƖᄅƐㄣϛ9ㄥ86";
-        split  += "0ƖᄅƐㄣϛ9ㄥ860123456789";
+        flip  += "0ƖᄅƐㄣϛ9ㄥ860123456789";
 
         var flipped = new StringBuilder();
         char letter;
         for (int i=0; i< text.length(); i++) {
             letter = text.charAt(i);
             var a = normal.indexOf(letter);
-            flipped.append(a != -1 ? split.charAt(a) : letter);
+            flipped.append(a != -1 ? flip.charAt(a) : letter);
         }
 
         return flipped.reverse().toString();
     }
 
-    public static LinkedHashMap<String, Integer> achievementSortByKey(LinkedHashMap<String, Integer> map, String lang, User internalUser, Guild guild, net.dv8tion.jda.core.entities.User user) {
+    public static LinkedHashMap<String, String> achievementSortByKey(LinkedHashMap<String, String> map, String lang, User internalUser, Guild guild, net.dv8tion.jda.api.entities.User user, Locale locale) {
         SortedSet<String> keys = new TreeSet<>(map.keySet());
-        var newMap = new LinkedHashMap<String, Integer>();
-        newMap.put(LanguageHandler.get(lang, "profile_total_ap"), internalUser.getTotelAP(guild, user));
+        var newMap = new LinkedHashMap<String, String>();
+        newMap.put(LanguageHandler.get(lang, "profile_total_ap"), LevelImage.formatDecimal(locale, internalUser.getTotelAP(guild, user)));
         for (var key : keys) newMap.put(key, map.get(key));
         return newMap;
     }

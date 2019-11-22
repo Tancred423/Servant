@@ -15,15 +15,16 @@
  */
 package zJdaUtilsLib.com.jagrosh.jdautilities.menu;
 
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
+import zJdaUtilsLib.com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-
-import net.dv8tion.jda.core.entities.*;
-import zJdaUtilsLib.com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-
-import javax.annotation.Nullable;
 
 public abstract class Menu {
     protected final EventWaiter waiter;

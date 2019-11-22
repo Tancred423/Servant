@@ -1,12 +1,12 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package useful.giveaway;
 
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.User;
-import net.dv8tion.jda.core.events.channel.text.TextChannelDeleteEvent;
-import net.dv8tion.jda.core.events.guild.GuildLeaveEvent;
-import net.dv8tion.jda.core.events.message.guild.GuildMessageDeleteEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
+import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageDeleteEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import servant.Log;
 import servant.Servant;
 
@@ -18,26 +18,26 @@ import static utilities.DatabaseConn.closeQuietly;
 public class GiveawayListener extends ListenerAdapter {
     public void onGuildMessageDelete(GuildMessageDeleteEvent event) {
         var guild = event.getGuild();
-        var user = event.getGuild().getOwner().getUser();
+        var owner = event.getGuild().getOwner();
 
-        if (isGiveaway(guild.getIdLong(), event.getChannel().getIdLong(), event.getMessageIdLong(), guild, user))
-            Giveaway.deleteGiveawayFromDb(event.getGuild().getIdLong(), event.getChannel().getIdLong(), event.getMessageIdLong(), event.getGuild(), event.getGuild().getOwner().getUser());
+        if (isGiveaway(guild.getIdLong(), event.getChannel().getIdLong(), event.getMessageIdLong(), guild, owner == null ? null : owner.getUser()))
+            Giveaway.deleteGiveawayFromDb(event.getGuild().getIdLong(), event.getChannel().getIdLong(), event.getMessageIdLong(), event.getGuild(), owner == null ? null : owner.getUser());
     }
 
     public void onTextChannelDelete(TextChannelDeleteEvent event) {
         var guild = event.getGuild();
-        var user = event.getGuild().getOwner().getUser();
+        var owner = event.getGuild().getOwner();
 
-        if (isGiveaway(guild.getIdLong(), event.getChannel().getIdLong(), guild, user))
-            Giveaway.deleteGiveawayFromDb(event.getGuild().getIdLong(), event.getChannel().getIdLong(), event.getGuild(), event.getGuild().getOwner().getUser());
+        if (isGiveaway(guild.getIdLong(), event.getChannel().getIdLong(), guild, owner == null ? null : owner.getUser()))
+            Giveaway.deleteGiveawayFromDb(event.getGuild().getIdLong(), event.getChannel().getIdLong(), event.getGuild(), owner == null ? null : owner.getUser());
     }
 
     public void onGuildLeave(GuildLeaveEvent event) {
         var guild = event.getGuild();
-        var user = event.getGuild().getOwner().getUser();
+        var owner = event.getGuild().getOwner();
 
-        if (isGiveaway(guild.getIdLong(), guild, user))
-            Giveaway.deleteGiveawayFromDb(event.getGuild().getIdLong(), event.getGuild(), event.getGuild().getOwner().getUser());
+        if (isGiveaway(guild.getIdLong(), guild, owner == null ? null : owner.getUser()))
+            Giveaway.deleteGiveawayFromDb(event.getGuild().getIdLong(), event.getGuild(), owner == null ? null : owner.getUser());
     }
 
     private boolean isGiveaway(long guildId, long channelId, long messageId, Guild guild, User user) {

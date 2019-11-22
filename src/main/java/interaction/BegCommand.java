@@ -2,13 +2,13 @@
 package interaction;
 
 
-import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.api.Permission;
 import utilities.Constants;
 
 public class BegCommand extends InteractionCommand {
     public BegCommand() {
         this.name = "beg";
-        this.aliases = new String[0];
+        this.aliases = new String[] { "please", "pls", "plz" };
         this.help = "Beg someone.";
         this.category = new Category("Interaction");
         this.arguments = "@user";
@@ -18,7 +18,10 @@ public class BegCommand extends InteractionCommand {
         this.cooldown = Constants.USER_COOLDOWN;
         this.cooldownScope = CooldownScope.USER;
         this.userPermissions = new Permission[0];
-        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.botPermissions = new Permission[] {
+                Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY,
+                Permission.MESSAGE_EMBED_LINKS
+        };
 
         this.emoji = "\uD83D\uDE4C"; // 🙌.
     }

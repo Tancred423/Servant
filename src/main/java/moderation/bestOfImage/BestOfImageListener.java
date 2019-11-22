@@ -5,11 +5,12 @@ import files.language.LanguageHandler;
 import moderation.guild.Guild;
 import moderation.toggle.Toggle;
 import moderation.user.User;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.OnlineStatus;
-import net.dv8tion.jda.core.entities.*;
-import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 import owner.blacklist.Blacklist;
 
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 public class BestOfImageListener extends ListenerAdapter {
     private static List<Long> temporaryBlacklist = new ArrayList<>();
 
-    public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {
+    public void onGuildMessageReactionAdd(@NotNull GuildMessageReactionAddEvent event) {
         CompletableFuture.runAsync(() -> {
             if (event.getUser().isBot()) return;
 
@@ -41,7 +42,7 @@ public class BestOfImageListener extends ListenerAdapter {
                 return;
             }
 
-            event.getChannel().getMessageById(messageId).queue(message -> {
+            event.getChannel().retrieveMessageById(messageId).queue(message -> {
                 var attachments = message.getAttachments();
                 if (attachments.isEmpty()) {
                     temporaryBlacklist.remove(messageId);
@@ -59,7 +60,7 @@ public class BestOfImageListener extends ListenerAdapter {
                 var reactionEmote = event.getReactionEmote();
                 if (voteEmote != null) {
                     // Emote
-                    if (reactionEmote.getEmote() == null) return;
+                    // todo: never null?
                     if (!reactionEmote.getEmote().equals(voteEmote)) {
                         temporaryBlacklist.remove(messageId);
                         return;
@@ -120,7 +121,7 @@ public class BestOfImageListener extends ListenerAdapter {
                         sendBestOf(event, reactionCount, attachments, lang);
                     else temporaryBlacklist.remove(messageId);
                 } else temporaryBlacklist.remove(messageId);
-            });
+            }, failure -> {});
 
             final var executor = new ScheduledThreadPoolExecutor(1);
             executor.schedule(() -> {
@@ -133,7 +134,7 @@ public class BestOfImageListener extends ListenerAdapter {
         var user = event.getUser();
         var guild = event.getGuild();
         var internalGuild = new Guild(guild.getIdLong());
-        event.getChannel().getMessageById(event.getMessageId()).queue(message -> {
+        event.getChannel().retrieveMessageById(event.getMessageId()).queue(message -> {
             var channel = internalGuild.getBestOfImageChannel(guild, user);
             var author = message.getAuthor();
 
@@ -145,7 +146,7 @@ public class BestOfImageListener extends ListenerAdapter {
                 eb.setDescription("[" + LanguageHandler.get(lang, "bestof_jump") + "](" + message.getJumpUrl() + ")");
                 eb.setImage(attachment.getUrl());
                 eb.setFooter(String.format(LanguageHandler.get(lang, "bestof_footer"), reactionCount, event.getChannel().getName()), null);
-                eb.setTimestamp(message.getCreationTime());
+                eb.setTimestamp(message.getTimeCreated());
 
                 channel.sendMessage(eb.build()).queue();
 

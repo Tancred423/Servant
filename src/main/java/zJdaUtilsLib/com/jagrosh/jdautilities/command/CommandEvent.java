@@ -15,19 +15,18 @@
  */
 package zJdaUtilsLib.com.jagrosh.jdautilities.command;
 
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.MessageBuilder;
+import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.exceptions.PermissionException;
+import net.dv8tion.jda.internal.utils.Checks;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.impl.CommandClientImpl;
+import zJdaUtilsLib.com.jagrosh.jdautilities.commons.utils.SafeIdUtil;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.function.Consumer;
-
-import net.dv8tion.jda.client.entities.Group;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.MessageBuilder;
-import net.dv8tion.jda.core.entities.*;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.core.exceptions.PermissionException;
-import net.dv8tion.jda.core.utils.Checks;
-import zJdaUtilsLib.com.jagrosh.jdautilities.command.impl.CommandClientImpl;
-import zJdaUtilsLib.com.jagrosh.jdautilities.commons.utils.SafeIdUtil;
 
 public class CommandEvent {
     public static int MAX_MESSAGES = 2;
@@ -122,11 +121,11 @@ public class CommandEvent {
     }
     public void reply(File file, String filename)
     {
-        event.getChannel().sendFile(file, filename, null).queue();
+        event.getChannel().sendMessage("").addFile(file, filename).queue();
     }
     public void reply(String message, File file, String filename) {
-        Message msg = message==null ? null : new MessageBuilder().append(splitMessage(message).get(0)).build();
-        event.getChannel().sendFile(file, filename, msg).queue();
+        Message msg = message==null ? new MessageBuilder().build() : new MessageBuilder().append(splitMessage(message).get(0)).build();
+        event.getChannel().sendMessage(msg).addFile(file, filename).queue();
     }
 
     public void replyFormatted(String format, Object... args) {
@@ -142,9 +141,9 @@ public class CommandEvent {
     }
 
     public void replyOrAlternate(String message, File file, String filename, String alternateMessage) {
-        Message msg = message==null ? null : new MessageBuilder().append(splitMessage(message).get(0)).build();
+        Message msg = message==null ? new MessageBuilder().build() : new MessageBuilder().append(splitMessage(message).get(0)).build();
         try {
-            event.getChannel().sendFile(file, filename, msg).queue();
+            event.getChannel().sendMessage(msg).addFile(file, filename).queue();
         } catch(Exception e) {
             reply(alternateMessage);
         }
@@ -199,8 +198,8 @@ public class CommandEvent {
     public void replyInDm(String message, File file, String filename) {
         if(event.isFromType(ChannelType.PRIVATE)) reply(message, file, filename);
         else {
-            Message msg = message==null ? null : new MessageBuilder().append(splitMessage(message).get(0)).build();
-            event.getAuthor().openPrivateChannel().queue(pc -> pc.sendFile(file, filename, msg).queue());
+            Message msg = message==null ? new MessageBuilder().build() : new MessageBuilder().append(splitMessage(message).get(0)).build();
+            event.getAuthor().openPrivateChannel().queue(pc -> pc.sendMessage(msg).addFile(file, filename).queue());
         }
     }
 
@@ -350,13 +349,12 @@ public class CommandEvent {
     {
         return event.getChannelType();
     }
-    public Group getGroup()
-    {
-        return event.getGroup();
-    }
-    public Guild getGuild()
-    {
-        return event.getGuild();
+//    public Invite.Group getGroup()
+//    {
+//        return event.getGroup();
+//    }
+    public Guild getGuild() {
+        return event.isFromGuild() ? event.getGuild() : null;
     }
     public JDA getJDA()
     {

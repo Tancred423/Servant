@@ -8,6 +8,8 @@ public class DatabaseConn {
     public static void closeQuietly(Connection connection) {
         try {
             if (connection != null) connection.close();
-        } catch (SQLException ignored) { }
+        } catch (SQLException e) {
+            System.out.println("Closing DB connection failed.");
+        }
     }
 }

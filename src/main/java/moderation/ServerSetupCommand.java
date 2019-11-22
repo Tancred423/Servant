@@ -5,12 +5,12 @@ import files.language.LanguageHandler;
 import moderation.guild.Guild;
 import moderation.guild.GuildHandler;
 import moderation.toggle.Toggle;
-import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.MessageChannel;
-import net.dv8tion.jda.core.entities.User;
-import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import owner.blacklist.Blacklist;
 import utilities.Constants;
 import utilities.Parser;
@@ -28,7 +28,7 @@ public class ServerSetupCommand extends Command {
 
     public ServerSetupCommand(EventWaiter waiter) {
         this.name = "serversetup";
-        this.aliases = new String[]{"setup"};
+        this.aliases = new String[] { "setup" };
         this.help = "Initial server setup wizard.";
         this.category = new Category("Moderation");
         this.arguments = null;
@@ -37,8 +37,11 @@ public class ServerSetupCommand extends Command {
         this.ownerCommand = false;
         this.cooldown = Constants.MOD_COOLDOWN;
         this.cooldownScope = CooldownScope.GUILD;
-        this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
-        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.userPermissions = new Permission[] { Permission.MANAGE_SERVER };
+        this.botPermissions = new Permission[] {
+                Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY,
+                Permission.MESSAGE_EMBED_LINKS
+        };
 
         this.waiter = waiter;
     }
@@ -46,37 +49,41 @@ public class ServerSetupCommand extends Command {
     @Override
     protected void execute(CommandEvent event) {
         CompletableFuture.runAsync(() -> {
-            if (!Toggle.isEnabled(event, name)) return;
-            if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
+            try {
+                if (!Toggle.isEnabled(event, name)) return;
+                if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
 
-            var lang = LanguageHandler.getLanguage(event);
-            var p = GuildHandler.getPrefix(event);
+                var lang = LanguageHandler.getLanguage(event);
+                var p = GuildHandler.getPrefix(event);
 
-            var guild = event.getGuild();
-            var author = event.getAuthor();
-            var channel = event.getChannel();
-            channel.sendMessage(LanguageHandler.get(lang, "setupwizard_introduction")).queue(message -> {
-                message.addReaction(accept).queue();
-                message.addReaction(decline).queue();
+                var guild = event.getGuild();
+                var author = event.getAuthor();
+                var channel = event.getChannel();
+                channel.sendMessage(LanguageHandler.get(lang, "setupwizard_introduction")).queue(message -> {
+                    message.addReaction(accept).queue();
+                    message.addReaction(decline).queue();
 
-                waiter.waitForEvent(GuildMessageReactionAddEvent.class,
-                        e -> e.getUser().equals(author)
-                                && (e.getReactionEmote().getName().equals(accept)
-                                || e.getReactionEmote().getName().equals(decline)),
-                        e -> {
-                            if (e.getReactionEmote().getName().equals(accept)) {
-                                message.clearReactions().queue();
-                                processLanguage(channel, author, message, event, lang, p, false, new Guild(event.getGuild().getIdLong()), guild);
-                            } else {
-                                message.delete().queue();
-                                event.reactWarning();
-                            }
-                        }, 15, TimeUnit.MINUTES, () -> timeout(event, message, lang));
-            });
+                    waiter.waitForEvent(GuildMessageReactionAddEvent.class,
+                            e -> e.getUser().equals(author)
+                                    && (e.getReactionEmote().getName().equals(accept)
+                                    || e.getReactionEmote().getName().equals(decline)),
+                            e -> {
+                                if (e.getReactionEmote().getName().equals(accept)) {
+                                    message.clearReactions().queue();
+                                    processLanguage(channel, author, message, event, lang, p, false, new Guild(event.getGuild().getIdLong()), guild);
+                                } else {
+                                    message.delete().queue();
+                                    event.reactWarning();
+                                }
+                            }, 15, TimeUnit.MINUTES, () -> timeout(event, message, lang));
+                });
 
-            // Statistics.
-            new moderation.user.User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-            new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+                // Statistics.
+                new moderation.user.User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+                new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
     }
 
@@ -88,7 +95,7 @@ public class ServerSetupCommand extends Command {
     }
 
     // Language
-    private void processLanguage(MessageChannel channel, User author, Message previous, CommandEvent event, String lang, String p, boolean repeated, Guild internalGuild, net.dv8tion.jda.core.entities.Guild guild) {
+    private void processLanguage(MessageChannel channel, User author, Message previous, CommandEvent event, String lang, String p, boolean repeated, Guild internalGuild, net.dv8tion.jda.api.entities.Guild guild) {
         previous.editMessage(repeated ? LanguageHandler.get(lang, "setupwizard_language_repeated") :
                 LanguageHandler.get(lang, "setupwizard_language")).queue(
                 message -> waiter.waitForEvent(GuildMessageReceivedEvent.class,
@@ -106,7 +113,7 @@ public class ServerSetupCommand extends Command {
     }
 
     // Prefix
-    private void processPrefix(MessageChannel channel, User author, Message previous, CommandEvent event, String lang, String p, boolean repeated, Guild internalGuild, net.dv8tion.jda.core.entities.Guild guild) {
+    private void processPrefix(MessageChannel channel, User author, Message previous, CommandEvent event, String lang, String p, boolean repeated, Guild internalGuild, net.dv8tion.jda.api.entities.Guild guild) {
         previous.editMessage(repeated ? String.format(LanguageHandler.get(lang, "setupwizard_prefix_repeated"), p) :
                 String.format(LanguageHandler.get(lang, "setupwizard_prefix"), accept, p)).queue(
                 message -> waiter.waitForEvent(GuildMessageReceivedEvent.class,
@@ -124,7 +131,7 @@ public class ServerSetupCommand extends Command {
     }
 
     // Offset
-    private void processOffset(MessageChannel channel, User author, Message previous, CommandEvent event, String lang, boolean repeated, Guild internalGuild, net.dv8tion.jda.core.entities.Guild guild) {
+    private void processOffset(MessageChannel channel, User author, Message previous, CommandEvent event, String lang, boolean repeated, Guild internalGuild, net.dv8tion.jda.api.entities.Guild guild) {
         previous.editMessage(repeated ? LanguageHandler.get(lang, "setupwizard_offset_repeated") :
                 String.format(LanguageHandler.get(lang, "setupwizard_offset"), accept)).queue(
                 message -> waiter.waitForEvent(GuildMessageReceivedEvent.class,

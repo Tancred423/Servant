@@ -1,20 +1,23 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package patreon;
 
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.events.guild.member.GuildMemberRoleAddEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
+import servant.Servant;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.concurrent.CompletableFuture;
 
 public class PatreonListener extends ListenerAdapter {
-    public void onGuildMemberRoleAdd(GuildMemberRoleAddEvent event) {
+    public void onGuildMemberRoleAdd(@NotNull GuildMemberRoleAddEvent event) {
         CompletableFuture.runAsync(() -> {
             if (event.getMember().getUser().isBot()) return;
-            if (event.getGuild().getIdLong() != 436925371577925642L) return;
+            if (event.getGuild().getId().equals(Servant.config.getSupportGuildId())) return;
 
             switch (event.getRoles().get(0).getId()) {
                 case "489738762838867969": // Donation
@@ -56,24 +59,36 @@ public class PatreonListener extends ListenerAdapter {
         internalGuild = new moderation.guild.Guild(event.getGuild().getIdLong());
         eb.setTimestamp(ZonedDateTime.now(ZoneId.of(internalGuild.getOffset(event.getGuild(), event.getUser()))));
 
-        event.getJDA().getGuildById(436925371577925642L).getTextChannelById(502477863757545472L).sendMessage(eb.build()).queue();
+        var guild = event.getJDA().getGuildById(436925371577925642L);
+        if (guild != null) {
+            var tc = guild.getTextChannelById(502477863757545472L);
+            if (tc != null) tc.sendMessage(eb.build()).queue();
+        }
     }
 
     private String getPatreonRoleMention(String rank, JDA jda) {
+        var roleMention = "Supporter";
+        Role role;
         var guild = jda.getGuildById(436925371577925642L);
-        switch (rank) {
-            case "donation":
-                return guild.getRoleById(489738762838867969L).getAsMention();
-            case "$1":
-                return guild.getRoleById(502472440455233547L).getAsMention();
-            case "$3":
-                return guild.getRoleById(502472546600353796L).getAsMention();
-            case "$5":
-                return guild.getRoleById(502472823638458380L).getAsMention();
-            case "$10":
-                return guild.getRoleById(502472869234868224L).getAsMention();
-            default:
-                return "Supporter";
-        }
+        if (guild != null)
+            switch (rank) {
+                case "donation":
+                    role = guild.getRoleById(489738762838867969L);
+                    if (role != null) roleMention = role.getAsMention();
+                case "$1":
+                    role = guild.getRoleById(502472440455233547L);
+                    if (role != null) roleMention = role.getAsMention();
+                case "$3":
+                    role = guild.getRoleById(502472546600353796L);
+                    if (role != null) roleMention = role.getAsMention();
+                case "$5":
+                    role = guild.getRoleById(502472823638458380L);
+                    if (role != null) roleMention = role.getAsMention();
+                case "$10":
+                    role = guild.getRoleById(502472869234868224L);
+                    if (role != null) roleMention = role.getAsMention();
+            }
+
+        return roleMention;
     }
 }

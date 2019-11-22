@@ -4,14 +4,14 @@ package fun.embed;
 import files.language.LanguageHandler;
 import moderation.guild.Guild;
 import moderation.toggle.Toggle;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.MessageChannel;
-import net.dv8tion.jda.core.entities.MessageEmbed;
-import net.dv8tion.jda.core.entities.User;
-import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import utilities.Constants;
 import utilities.Parser;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
@@ -23,7 +23,6 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -34,7 +33,7 @@ public class CreateEmbedCommand extends Command {
 
     public CreateEmbedCommand(EventWaiter waiter) {
         this.name = "createembed";
-        this.aliases = new String[]{"embed"};
+        this.aliases = new String[] { "embed" };
         this.help = "Create an embed.";
         this.category = new Category("Fun");
         this.arguments = null;
@@ -44,7 +43,10 @@ public class CreateEmbedCommand extends Command {
         this.cooldown = Constants.USER_COOLDOWN;
         this.cooldownScope = CooldownScope.USER;
         this.userPermissions = new Permission[0];
-        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_ADD_REACTION, Permission.MESSAGE_MANAGE};
+        this.botPermissions = new Permission[] {
+                Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY,
+                Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_ADD_REACTION, Permission.MESSAGE_MANAGE
+        };
 
         this.waiter = waiter;
     }
@@ -52,39 +54,43 @@ public class CreateEmbedCommand extends Command {
     @Override
     protected void execute(CommandEvent event) {
         CompletableFuture.runAsync(() -> {
-            if (!Toggle.isEnabled(event, name)) return;
+            try {
+                if (!Toggle.isEnabled(event, name)) return;
 
-            var guild = event.getGuild();
-            var author = event.getAuthor();
-            var internalAuthor = new moderation.user.User(author.getIdLong());
-            var eb = new EmbedBuilder();
+                var guild = event.getGuild();
+                var author = event.getAuthor();
+                var internalAuthor = new moderation.user.User(author.getIdLong());
+                var eb = new EmbedBuilder();
 
-            var lang = LanguageHandler.getLanguage(event);
+                var lang = LanguageHandler.getLanguage(event);
 
-            eb.setColor(internalAuthor.getColor(guild, author));
-            eb.setAuthor(LanguageHandler.get(lang, "createembed_author_name"), "https://google.com/", author.getAvatarUrl());
-            eb.setThumbnail("https://i.imgur.com/wAcLhfY.png");
-            eb.setTitle(LanguageHandler.get(lang, "createembed_title"), "https://google.com/");
-            eb.setDescription(LanguageHandler.get(lang, "createembed_description"));
-            eb.addField(LanguageHandler.get(lang, "createembed_field_name_inline"), LanguageHandler.get(lang, "createembed_field_value1"), true);
-            eb.addField(LanguageHandler.get(lang, "createembed_field_name_inline"), LanguageHandler.get(lang, "createembed_field_value2"), true);
-            eb.addField(LanguageHandler.get(lang, "createembed_field_name_inline"), LanguageHandler.get(lang, "createembed_field_value3"), true);
-            eb.addField(LanguageHandler.get(lang, "createembed_field_name_noninline"), LanguageHandler.get(lang, "createembed_field_value_noninline"), false);
-            eb.setImage("https://i.imgur.com/9G46UQx.png");
-            eb.setFooter(LanguageHandler.get(lang, "createembed_footer"), event.getSelfUser().getAvatarUrl());
-            eb.setTimestamp(OffsetDateTime.now());
+                eb.setColor(internalAuthor.getColor(guild, author));
+                eb.setAuthor(LanguageHandler.get(lang, "createembed_author_name"), "https://google.com/", author.getAvatarUrl());
+                eb.setThumbnail("https://i.imgur.com/wAcLhfY.png");
+                eb.setTitle(LanguageHandler.get(lang, "createembed_title"), "https://google.com/");
+                eb.setDescription(LanguageHandler.get(lang, "createembed_description"));
+                eb.addField(LanguageHandler.get(lang, "createembed_field_name_inline"), LanguageHandler.get(lang, "createembed_field_value1"), true);
+                eb.addField(LanguageHandler.get(lang, "createembed_field_name_inline"), LanguageHandler.get(lang, "createembed_field_value2"), true);
+                eb.addField(LanguageHandler.get(lang, "createembed_field_name_inline"), LanguageHandler.get(lang, "createembed_field_value3"), true);
+                eb.addField(LanguageHandler.get(lang, "createembed_field_name_noninline"), LanguageHandler.get(lang, "createembed_field_value_noninline"), false);
+                eb.setImage("https://i.imgur.com/9G46UQx.png");
+                eb.setFooter(LanguageHandler.get(lang, "createembed_footer"), event.getSelfUser().getAvatarUrl());
+                eb.setTimestamp(OffsetDateTime.now());
 
 
-            var channel = event.getChannel();
-            channel.sendMessage(eb.build()).queue(message -> {
-                EmbedUser embedUser;
-                embedUser = new EmbedUser(message, message.getEmbeds().get(0));
-                processIntroduction(channel, author, embedUser, event, lang);
-            });
+                var channel = event.getChannel();
+                channel.sendMessage(eb.build()).queue(message -> {
+                    EmbedUser embedUser;
+                    embedUser = new EmbedUser(message, message.getEmbeds().get(0));
+                    processIntroduction(channel, author, embedUser, event, lang);
+                });
 
-            // Statistics.
-            new moderation.user.User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-            new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+                // Statistics.
+                new moderation.user.User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+                new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
     }
 
@@ -146,14 +152,18 @@ public class CreateEmbedCommand extends Command {
                             var ogEmbed = embedUser.getEmbed();
                             var eb = new EmbedBuilder();
                             eb.setColor(ogEmbed.getColor());
-                            eb.setAuthor(authorName, ogEmbed.getAuthor().getUrl(), ogEmbed.getAuthor().getIconUrl());
-                            eb.setThumbnail(ogEmbed.getThumbnail().getUrl());
+                            var ogAuthor = ogEmbed.getAuthor();
+                            eb.setAuthor(authorName, ogAuthor == null ? null : ogAuthor.getUrl(), ogAuthor == null ? null : ogAuthor.getIconUrl());
+                            var ogThumbnail = ogEmbed.getThumbnail();
+                            eb.setThumbnail(ogThumbnail == null ? null : ogThumbnail.getUrl());
                             eb.setTitle(ogEmbed.getTitle(), ogEmbed.getUrl());
                             eb.setDescription(ogEmbed.getDescription());
                             var fields = ogEmbed.getFields();
                             for (var field : fields) eb.addField(field.getName(), field.getValue(), field.isInline());
-                            eb.setImage(ogEmbed.getImage().getUrl());
-                            eb.setFooter(ogEmbed.getFooter().getText(), ogEmbed.getFooter().getIconUrl());
+                            var ogImage = ogEmbed.getImage();
+                            eb.setImage(ogImage == null ? null : ogImage.getUrl());
+                            var ogFooter = ogEmbed.getFooter();
+                            eb.setFooter(ogFooter == null ? null : ogFooter.getText(), ogFooter == null ? null : ogFooter.getIconUrl());
                             eb.setTimestamp(ogEmbed.getTimestamp());
 
                             ogMessage.editMessage(eb.build()).queue();
@@ -200,14 +210,18 @@ public class CreateEmbedCommand extends Command {
                             var ogEmbed = embedUser.getEmbed();
                             var eb = new EmbedBuilder();
                             eb.setColor(ogEmbed.getColor());
-                            eb.setAuthor(ogEmbed.getAuthor().getName(), authorUrl, ogEmbed.getAuthor().getIconUrl());
-                            eb.setThumbnail(ogEmbed.getThumbnail().getUrl());
+                            var ogAuthor = ogEmbed.getAuthor();
+                            eb.setAuthor(ogAuthor == null ? null : ogAuthor.getName(), authorUrl, ogAuthor == null ? null : ogAuthor.getIconUrl());
+                            var ogThumbnail = ogEmbed.getThumbnail();
+                            eb.setThumbnail(ogThumbnail == null ? null : ogThumbnail.getUrl());
                             eb.setTitle(ogEmbed.getTitle(), ogEmbed.getUrl());
                             eb.setDescription(ogEmbed.getDescription());
                             var fields = ogEmbed.getFields();
                             for (var field : fields) eb.addField(field.getName(), field.getValue(), field.isInline());
-                            eb.setImage(ogEmbed.getImage().getUrl());
-                            eb.setFooter(ogEmbed.getFooter().getText(), ogEmbed.getFooter().getIconUrl());
+                            var ogImage = ogEmbed.getImage();
+                            eb.setImage(ogImage == null ? null : ogImage.getUrl());
+                            var ogFooter = ogEmbed.getFooter();
+                            eb.setFooter(ogFooter == null ? null : ogFooter.getText(), ogFooter == null ? null : ogFooter.getIconUrl());
                             eb.setTimestamp(ogEmbed.getTimestamp());
 
                             ogMessage.editMessage(eb.build()).queue();
@@ -221,14 +235,18 @@ public class CreateEmbedCommand extends Command {
         var ogEmbed = embedUser.getEmbed();
         var eb = new EmbedBuilder();
         eb.setColor(ogEmbed.getColor());
-        eb.setAuthor(ogEmbed.getAuthor().getName(), null, ogEmbed.getAuthor().getIconUrl());
-        eb.setThumbnail(ogEmbed.getThumbnail().getUrl());
+        var ogAuthor = ogEmbed.getAuthor();
+        eb.setAuthor(ogAuthor == null ? null : ogAuthor.getName(), null, ogAuthor == null ? null : ogAuthor.getIconUrl());
+        var ogThumbnail = ogEmbed.getThumbnail();
+        eb.setThumbnail(ogThumbnail == null ? null : ogThumbnail.getUrl());
         eb.setTitle(ogEmbed.getTitle(), ogEmbed.getUrl());
         eb.setDescription(ogEmbed.getDescription());
         var fields = ogEmbed.getFields();
         for (var field : fields) eb.addField(field.getName(), field.getValue(), field.isInline());
-        eb.setImage(ogEmbed.getImage().getUrl());
-        eb.setFooter(ogEmbed.getFooter().getText(), ogEmbed.getFooter().getIconUrl());
+        var ogImage = ogEmbed.getImage();
+        eb.setImage(ogImage == null ? null : ogImage.getUrl());
+        var ogFooter = ogEmbed.getFooter();
+        eb.setFooter(ogFooter == null ? null : ogFooter.getText(), ogFooter == null ? null : ogFooter.getIconUrl());
         eb.setTimestamp(ogEmbed.getTimestamp());
 
         ogMessage.editMessage(eb.build()).queue();
@@ -274,14 +292,18 @@ public class CreateEmbedCommand extends Command {
                             var ogEmbed = embedUser.getEmbed();
                             var eb = new EmbedBuilder();
                             eb.setColor(ogEmbed.getColor());
-                            eb.setAuthor(ogEmbed.getAuthor().getName(), ogEmbed.getAuthor().getUrl(), authorIconUrl);
-                            eb.setThumbnail(ogEmbed.getThumbnail().getUrl());
+                            var ogAuthor = ogEmbed.getAuthor();
+                            eb.setAuthor(ogAuthor == null ? null : ogAuthor.getName(), ogAuthor == null ? null : ogAuthor.getUrl(), authorIconUrl);
+                            var ogThumbnail = ogEmbed.getThumbnail();
+                            eb.setThumbnail(ogThumbnail == null ? null : ogThumbnail.getUrl());
                             eb.setTitle(ogEmbed.getTitle(), ogEmbed.getUrl());
                             eb.setDescription(ogEmbed.getDescription());
                             var fields = ogEmbed.getFields();
                             for (var field : fields) eb.addField(field.getName(), field.getValue(), field.isInline());
-                            eb.setImage(ogEmbed.getImage().getUrl());
-                            eb.setFooter(ogEmbed.getFooter().getText(), ogEmbed.getFooter().getIconUrl());
+                            var ogImage = ogEmbed.getImage();
+                            eb.setImage(ogImage == null ? null : ogImage.getUrl());
+                            var ogFooter = ogEmbed.getFooter();
+                            eb.setFooter(ogFooter == null ? null : ogFooter.getText(), ogFooter == null ? null : ogFooter.getIconUrl());
                             eb.setTimestamp(ogEmbed.getTimestamp());
 
                             ogMessage.editMessage(eb.build()).queue();
@@ -295,14 +317,18 @@ public class CreateEmbedCommand extends Command {
         var ogEmbed = embedUser.getEmbed();
         var eb = new EmbedBuilder();
         eb.setColor(ogEmbed.getColor());
-        eb.setAuthor(ogEmbed.getAuthor().getName(), ogEmbed.getAuthor().getUrl(), null);
-        eb.setThumbnail(ogEmbed.getThumbnail().getUrl());
+        var ogAuthor = ogEmbed.getAuthor();
+        eb.setAuthor(ogAuthor == null ? null : ogAuthor.getName(), ogAuthor == null ? null : ogAuthor.getUrl(), null);
+        var ogThumbnail = ogEmbed.getThumbnail();
+        eb.setThumbnail(ogThumbnail == null ? null : ogThumbnail.getUrl());
         eb.setTitle(ogEmbed.getTitle(), ogEmbed.getUrl());
         eb.setDescription(ogEmbed.getDescription());
         var fields = ogEmbed.getFields();
         for (var field : fields) eb.addField(field.getName(), field.getValue(), field.isInline());
-        eb.setImage(ogEmbed.getImage().getUrl());
-        eb.setFooter(ogEmbed.getFooter().getText(), ogEmbed.getFooter().getIconUrl());
+        var ogImage = ogEmbed.getImage();
+        eb.setImage(ogImage == null ? null : ogImage.getUrl());
+        var ogFooter = ogEmbed.getFooter();
+        eb.setFooter(ogFooter == null ? null : ogFooter.getText(), ogFooter == null ? null : ogFooter.getIconUrl());
         eb.setTimestamp(ogEmbed.getTimestamp());
 
         ogMessage.editMessage(eb.build()).queue();
@@ -316,13 +342,16 @@ public class CreateEmbedCommand extends Command {
         var eb = new EmbedBuilder();
         eb.setColor(ogEmbed.getColor());
         eb.setAuthor(null, null, null);
-        eb.setThumbnail(ogEmbed.getThumbnail().getUrl());
+        var ogThumbnail = ogEmbed.getThumbnail();
+        eb.setThumbnail(ogThumbnail == null ? null : ogThumbnail.getUrl());
         eb.setTitle(ogEmbed.getTitle(), ogEmbed.getUrl());
         eb.setDescription(ogEmbed.getDescription());
         var fields = ogEmbed.getFields();
         for (var field : fields) eb.addField(field.getName(), field.getValue(), field.isInline());
-        eb.setImage(ogEmbed.getImage().getUrl());
-        eb.setFooter(ogEmbed.getFooter().getText(), ogEmbed.getFooter().getIconUrl());
+        var ogImage = ogEmbed.getImage();
+        eb.setImage(ogImage == null ? null : ogImage.getUrl());
+        var ogFooter = ogEmbed.getFooter();
+        eb.setFooter(ogFooter == null ? null : ogFooter.getText(), ogFooter == null ? null : ogFooter.getIconUrl());
         eb.setTimestamp(ogEmbed.getTimestamp());
 
         ogMessage.editMessage(eb.build()).queue();
@@ -378,8 +407,10 @@ public class CreateEmbedCommand extends Command {
                             eb.setDescription(ogEmbed.getDescription());
                             var fields = ogEmbed.getFields();
                             for (var field : fields) eb.addField(field.getName(), field.getValue(), field.isInline());
-                            eb.setImage(ogEmbed.getImage().getUrl());
-                            eb.setFooter(ogEmbed.getFooter().getText(), ogEmbed.getFooter().getIconUrl());
+                            var ogImage = ogEmbed.getImage();
+                            eb.setImage(ogImage == null ? null : ogImage.getUrl());
+                            var ogFooter = ogEmbed.getFooter();
+                            eb.setFooter(ogFooter == null ? null : ogFooter.getText(), ogFooter == null ? null : ogFooter.getIconUrl());
                             eb.setTimestamp(ogEmbed.getTimestamp());
 
                             ogMessage.editMessage(eb.build()).queue();
@@ -402,8 +433,10 @@ public class CreateEmbedCommand extends Command {
         eb.setDescription(ogEmbed.getDescription());
         var fields = ogEmbed.getFields();
         for (var field : fields) eb.addField(field.getName(), field.getValue(), field.isInline());
-        eb.setImage(ogEmbed.getImage().getUrl());
-        eb.setFooter(ogEmbed.getFooter().getText(), ogEmbed.getFooter().getIconUrl());
+        var ogImage = ogEmbed.getImage();
+        eb.setImage(ogImage == null ? null : ogImage.getUrl());
+        var ogFooter = ogEmbed.getFooter();
+        eb.setFooter(ogFooter == null ? null : ogFooter.getText(), ogFooter == null ? null : ogFooter.getIconUrl());
         eb.setTimestamp(ogEmbed.getTimestamp());
 
         ogMessage.editMessage(eb.build()).queue();
@@ -453,8 +486,10 @@ public class CreateEmbedCommand extends Command {
                             eb.setDescription(ogEmbed.getDescription());
                             var fields = ogEmbed.getFields();
                             for (var field : fields) eb.addField(field.getName(), field.getValue(), field.isInline());
-                            eb.setImage(ogEmbed.getImage().getUrl());
-                            eb.setFooter(ogEmbed.getFooter().getText(), ogEmbed.getFooter().getIconUrl());
+                            var ogImage = ogEmbed.getImage();
+                            eb.setImage(ogImage == null ? null : ogImage.getUrl());
+                            var ogFooter = ogEmbed.getFooter();
+                            eb.setFooter(ogFooter == null ? null : ogFooter.getText(), ogFooter == null ? null : ogFooter.getIconUrl());
                             eb.setTimestamp(ogEmbed.getTimestamp());
 
                             ogMessage.editMessage(eb.build()).queue();
@@ -511,8 +546,10 @@ public class CreateEmbedCommand extends Command {
                             eb.setDescription(ogEmbed.getDescription());
                             var fields = ogEmbed.getFields();
                             for (var field : fields) eb.addField(field.getName(), field.getValue(), field.isInline());
-                            eb.setImage(ogEmbed.getImage().getUrl());
-                            eb.setFooter(ogEmbed.getFooter().getText(), ogEmbed.getFooter().getIconUrl());
+                            var ogImage = ogEmbed.getImage();
+                            eb.setImage(ogImage == null ? null : ogImage.getUrl());
+                            var ogFooter = ogEmbed.getFooter();
+                            eb.setFooter(ogFooter == null ? null : ogFooter.getText(), ogFooter == null ? null : ogFooter.getIconUrl());
                             eb.setTimestamp(ogEmbed.getTimestamp());
 
                             ogMessage.editMessage(eb.build()).queue();
@@ -536,8 +573,10 @@ public class CreateEmbedCommand extends Command {
         eb.setDescription(ogEmbed.getDescription());
         var fields = ogEmbed.getFields();
         for (var field : fields) eb.addField(field.getName(), field.getValue(), field.isInline());
-        eb.setImage(ogEmbed.getImage().getUrl());
-        eb.setFooter(ogEmbed.getFooter().getText(), ogEmbed.getFooter().getIconUrl());
+        var ogImage = ogEmbed.getImage();
+        eb.setImage(ogImage == null ? null : ogImage.getUrl());
+        var ogFooter = ogEmbed.getFooter();
+        eb.setFooter(ogFooter == null ? null : ogFooter.getText(), ogFooter == null ? null : ogFooter.getIconUrl());
         eb.setTimestamp(ogEmbed.getTimestamp());
 
         ogMessage.editMessage(eb.build()).queue();
@@ -560,8 +599,10 @@ public class CreateEmbedCommand extends Command {
         eb.setDescription(ogEmbed.getDescription());
         var fields = ogEmbed.getFields();
         for (var field : fields) eb.addField(field.getName(), field.getValue(), field.isInline());
-        eb.setImage(ogEmbed.getImage().getUrl());
-        eb.setFooter(ogEmbed.getFooter().getText(), ogEmbed.getFooter().getIconUrl());
+        var ogImage = ogEmbed.getImage();
+        eb.setImage(ogImage == null ? null : ogImage.getUrl());
+        var ogFooter = ogEmbed.getFooter();
+        eb.setFooter(ogFooter == null ? null : ogFooter.getText(), ogFooter == null ? null : ogFooter.getIconUrl());
         eb.setTimestamp(ogEmbed.getTimestamp());
 
         ogMessage.editMessage(eb.build()).queue();
@@ -611,8 +652,10 @@ public class CreateEmbedCommand extends Command {
                             eb.setDescription(description);
                             var fields = ogEmbed.getFields();
                             for (var field : fields) eb.addField(field.getName(), field.getValue(), field.isInline());
-                            eb.setImage(ogEmbed.getImage().getUrl());
-                            eb.setFooter(ogEmbed.getFooter().getText(), ogEmbed.getFooter().getIconUrl());
+                            var ogImage = ogEmbed.getImage();
+                            eb.setImage(ogImage == null ? null : ogImage.getUrl());
+                            var ogFooter = ogEmbed.getFooter();
+                            eb.setFooter(ogFooter == null ? null : ogFooter.getText(), ogFooter == null ? null : ogFooter.getIconUrl());
                             eb.setTimestamp(ogEmbed.getTimestamp());
 
                             ogMessage.editMessage(eb.build()).queue();
@@ -636,8 +679,10 @@ public class CreateEmbedCommand extends Command {
         eb.setDescription(null);
         var fields = ogEmbed.getFields();
         for (var field : fields) eb.addField(field.getName(), field.getValue(), field.isInline());
-        eb.setImage(ogEmbed.getImage().getUrl());
-        eb.setFooter(ogEmbed.getFooter().getText(), ogEmbed.getFooter().getIconUrl());
+        var ogImage = ogEmbed.getImage();
+        eb.setImage(ogImage == null ? null : ogImage.getUrl());
+        var ogFooter = ogEmbed.getFooter();
+        eb.setFooter(ogFooter == null ? null : ogFooter.getText(), ogFooter == null ? null : ogFooter.getIconUrl());
         eb.setTimestamp(ogEmbed.getTimestamp());
 
         ogMessage.editMessage(eb.build()).queue();
@@ -686,12 +731,17 @@ public class CreateEmbedCommand extends Command {
                             embedUser.setFieldCounter(embedUser.getFieldCounter() + 1);
 
                             var fields = ogEmbed.getFields();
-                            if (fields == null) fields = new ArrayList<>();
-                            if (!fields.isEmpty() && fields.get(0).getName().equalsIgnoreCase(LanguageHandler.get(lang, "createembed_field_name_inline"))) fields = new ArrayList<>();
-                            for (MessageEmbed.Field field : fields) eb.addField(field.getName(), field.getValue(), field.isInline());
+                            if (!fields.isEmpty()) {
+                                var field0 = fields.get(0);
+                                if (field0.getName() != null && field0.getName().equalsIgnoreCase(LanguageHandler.get(lang, "createembed_field_name_inline")))
+                                    fields = new ArrayList<>();
+                            }
+                            for (var field : fields) eb.addField(field.getName(), field.getValue(), field.isInline());
                             eb.addField(fieldName, "", false);
-                            eb.setImage(ogEmbed.getImage().getUrl());
-                            eb.setFooter(ogEmbed.getFooter().getText(), ogEmbed.getFooter().getIconUrl());
+                            var ogImage = ogEmbed.getImage();
+                            eb.setImage(ogImage == null ? null : ogImage.getUrl());
+                            var ogFooter = ogEmbed.getFooter();
+                            eb.setFooter(ogFooter == null ? null : ogFooter.getText(), ogFooter == null ? null : ogFooter.getIconUrl());
                             eb.setTimestamp(ogEmbed.getTimestamp());
 
                             ogMessage.editMessage(eb.build()).queue();
@@ -725,8 +775,10 @@ public class CreateEmbedCommand extends Command {
                                 else eb.addField(fields.get(i).getName(), fields.get(i).getValue(), fields.get(i).isInline());
                             }
 
-                            eb.setImage(ogEmbed.getImage().getUrl());
-                            eb.setFooter(ogEmbed.getFooter().getText(), ogEmbed.getFooter().getIconUrl());
+                            var ogImage = ogEmbed.getImage();
+                            eb.setImage(ogImage == null ? null : ogImage.getUrl());
+                            var ogFooter = ogEmbed.getFooter();
+                            eb.setFooter(ogFooter == null ? null : ogFooter.getText(), ogFooter == null ? null : ogFooter.getIconUrl());
                             eb.setTimestamp(ogEmbed.getTimestamp());
 
                             ogMessage.editMessage(eb.build()).queue();
@@ -763,8 +815,10 @@ public class CreateEmbedCommand extends Command {
                             else eb.addField(fields.get(i).getName(), fields.get(i).getValue(), fields.get(i).isInline());
                         }
 
-                        eb.setImage(ogEmbed.getImage().getUrl());
-                        eb.setFooter(ogEmbed.getFooter().getText(), ogEmbed.getFooter().getIconUrl());
+                        var ogImage = ogEmbed.getImage();
+                        eb.setImage(ogImage == null ? null : ogImage.getUrl());
+                        var ogFooter = ogEmbed.getFooter();
+                        eb.setFooter(ogFooter == null ? null : ogFooter.getText(), ogFooter == null ? null : ogFooter.getIconUrl());
                         eb.setTimestamp(ogEmbed.getTimestamp());
 
                         ogMessage.editMessage(eb.build()).queue();
@@ -782,8 +836,11 @@ public class CreateEmbedCommand extends Command {
         eb.setColor(ogEmbed.getColor());
 
         var fields = ogEmbed.getFields();
-        if (!fields.isEmpty() && fields.get(0).getName().equalsIgnoreCase(LanguageHandler.get(lang, "createembed_field_name_inline"))) fields = new ArrayList<>();
-
+        if (!fields.isEmpty()) {
+            var field0 = fields.get(0);
+            if (field0.getName() != null && field0.getName().equalsIgnoreCase(LanguageHandler.get(lang, "createembed_field_name_inline")))
+                fields = new ArrayList<>();
+        }
         if (ogEmbed.getAuthor() == null) eb.setAuthor(null, null, null);
         else eb.setAuthor(ogEmbed.getAuthor().getName(), ogEmbed.getAuthor().getUrl(), ogEmbed.getAuthor().getIconUrl());
 
@@ -792,8 +849,10 @@ public class CreateEmbedCommand extends Command {
         eb.setTitle(ogEmbed.getTitle(), ogEmbed.getUrl());
         eb.setDescription(ogEmbed.getDescription());
         for (MessageEmbed.Field field : fields) eb.addField(field.getName(), field.getValue(), field.isInline());
-        eb.setImage(ogEmbed.getImage().getUrl());
-        eb.setFooter(ogEmbed.getFooter().getText(), ogEmbed.getFooter().getIconUrl());
+        var ogImage = ogEmbed.getImage();
+        eb.setImage(ogImage == null ? null : ogImage.getUrl());
+        var ogFooter = ogEmbed.getFooter();
+        eb.setFooter(ogFooter == null ? null : ogFooter.getText(), ogFooter == null ? null : ogFooter.getIconUrl());
         eb.setTimestamp(ogEmbed.getTimestamp());
 
         ogMessage.editMessage(eb.build()).queue();
@@ -851,7 +910,8 @@ public class CreateEmbedCommand extends Command {
                             var fields = ogEmbed.getFields();
                             for (var field : fields) eb.addField(field.getName(), field.getValue(), field.isInline());
                             eb.setImage(imageUrl);
-                            eb.setFooter(ogEmbed.getFooter().getText(), ogEmbed.getFooter().getIconUrl());
+                            var ogFooter = ogEmbed.getFooter();
+                            eb.setFooter(ogFooter == null ? null : ogFooter.getText(), ogFooter == null ? null : ogFooter.getIconUrl());
                             eb.setTimestamp(ogEmbed.getTimestamp());
 
                             ogMessage.editMessage(eb.build()).queue();
@@ -876,7 +936,8 @@ public class CreateEmbedCommand extends Command {
         var fields = ogEmbed.getFields();
         for (var field : fields) eb.addField(field.getName(), field.getValue(), field.isInline());
         eb.setImage(null);
-        eb.setFooter(ogEmbed.getFooter().getText(), ogEmbed.getFooter().getIconUrl());
+        var ogFooter = ogEmbed.getFooter();
+        eb.setFooter(ogFooter == null ? null : ogFooter.getText(), ogFooter == null ? null : ogFooter.getIconUrl());
         eb.setTimestamp(ogEmbed.getTimestamp());
 
         ogMessage.editMessage(eb.build()).queue();
@@ -927,7 +988,8 @@ public class CreateEmbedCommand extends Command {
                             var fields = ogEmbed.getFields();
                             for (var field : fields) eb.addField(field.getName(), field.getValue(), field.isInline());
                             eb.setImage((ogEmbed.getImage() == null ? null : ogEmbed.getImage().getUrl()));
-                            eb.setFooter(footerText, ogEmbed.getFooter().getIconUrl());
+                            var ogFooter = ogEmbed.getFooter();
+                            eb.setFooter(footerText, ogFooter == null ? null : ogFooter.getIconUrl());
                             eb.setTimestamp(ogEmbed.getTimestamp());
 
                             ogMessage.editMessage(eb.build()).queue();
@@ -985,7 +1047,8 @@ public class CreateEmbedCommand extends Command {
                             var fields = ogEmbed.getFields();
                             for (var field : fields) eb.addField(field.getName(), field.getValue(), field.isInline());
                             eb.setImage((ogEmbed.getImage() == null ? null : ogEmbed.getImage().getUrl()));
-                            eb.setFooter(ogEmbed.getFooter().getText(), footerIconUrl);
+                            var ogFooter = ogEmbed.getFooter();
+                            eb.setFooter(ogFooter == null ? null : ogEmbed.getFooter().getText(), footerIconUrl);
                             eb.setTimestamp(ogEmbed.getTimestamp());
 
                             ogMessage.editMessage(eb.build()).queue();
@@ -1010,7 +1073,8 @@ public class CreateEmbedCommand extends Command {
         var fields = ogEmbed.getFields();
         for (var field : fields) eb.addField(field.getName(), field.getValue(), field.isInline());
         eb.setImage((ogEmbed.getImage() == null ? null : ogEmbed.getImage().getUrl()));
-        eb.setFooter(ogEmbed.getFooter().getText(), null);
+        var ogFooter = ogEmbed.getFooter();
+        eb.setFooter(ogFooter == null ? null : ogFooter.getText(), ogFooter == null ? null : ogFooter.getIconUrl());
         eb.setTimestamp(ogEmbed.getTimestamp());
 
         ogMessage.editMessage(eb.build()).queue();
@@ -1154,8 +1218,9 @@ public class CreateEmbedCommand extends Command {
                             }
 
                             var destinationChannel = e.getMessage().getMentionedChannels().get(0);
+                            var destinationMember = event.getGuild().getMemberById(author.getIdLong());
 
-                            if (!destinationChannel.canTalk(event.getGuild().getMemberById(author.getIdLong()))) {
+                            if (destinationMember == null || !destinationChannel.canTalk(destinationMember)) {
                                 processFinish(channel, author, previous, embedUser, event, lang, true);
                                 return;
                             }
@@ -1173,7 +1238,7 @@ public class CreateEmbedCommand extends Command {
 
                             eb.setTitle(ogEmbed.getTitle(), ogEmbed.getUrl());
                             eb.setDescription(ogEmbed.getDescription());
-                            List<MessageEmbed.Field> fields = ogEmbed.getFields();
+                            var fields = ogEmbed.getFields();
                             for (var field : fields) eb.addField(field.getName(), field.getValue(), field.isInline());
                             eb.setImage((ogEmbed.getImage() == null ? null : ogEmbed.getImage().getUrl()));
                             if (ogEmbed.getFooter() == null) eb.setFooter(null, null);

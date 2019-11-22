@@ -4,9 +4,10 @@ package useful.votes.quickvote;
 import files.language.LanguageHandler;
 import moderation.guild.Guild;
 import moderation.toggle.Toggle;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 import useful.votes.VotesDatabase;
 import utilities.Emote;
 
@@ -15,7 +16,7 @@ import java.time.ZoneId;
 import java.util.concurrent.CompletableFuture;
 
 public class QuickvoteEndListener extends ListenerAdapter {
-    public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {
+    public void onGuildMessageReactionAdd(@NotNull GuildMessageReactionAddEvent event) {
         CompletableFuture.runAsync(() -> {
             if (!Toggle.isEnabled(event, "quickvote")) return;
 
@@ -38,7 +39,7 @@ public class QuickvoteEndListener extends ListenerAdapter {
             if (user.getIdLong() != VotesDatabase.getAuthorId(messageId, guild, user)) return; // Has to be done by author.
 
             // The author has reacted with an ending emote on their quickvote.
-            event.getChannel().getMessageById(messageId).queue(message -> {
+            event.getChannel().retrieveMessageById(messageId).queue(message -> {
                 var upvoteCount = 0;
                 var downvoteCount = 0;
 
@@ -53,9 +54,12 @@ public class QuickvoteEndListener extends ListenerAdapter {
                 }
 
                 var messageEmbed = message.getEmbeds().get(0);
+                var author = messageEmbed.getAuthor();
+                if (author == null) return; // todo: always null?
+
                 var eb = new EmbedBuilder();
                 eb.setColor(messageEmbed.getColor());
-                eb.setAuthor(String.format(LanguageHandler.get(lang, "quickvote_ended"), user.getName()), null, messageEmbed.getAuthor().getIconUrl());
+                eb.setAuthor(String.format(LanguageHandler.get(lang, "quickvote_ended"), user.getName()), null, author.getIconUrl());
                 eb.setDescription(messageEmbed.getDescription());
                 eb.addField(upvoteEmoji, String.valueOf(upvoteCount), true);
                 eb.addField(downvoteEmoji, String.valueOf(downvoteCount), true);

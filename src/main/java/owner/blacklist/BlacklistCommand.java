@@ -2,7 +2,7 @@
 package owner.blacklist;
 
 import files.language.LanguageHandler;
-import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.api.Permission;
 import utilities.Constants;
 import utilities.Parser;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
@@ -23,38 +23,44 @@ public class BlacklistCommand extends Command {
         this.cooldown = Constants.OWNER_COOLDOWN;
         this.cooldownScope = CooldownScope.USER;
         this.userPermissions = new Permission[0];
-        this.botPermissions = new Permission[0];
+        this.botPermissions = new Permission[] {
+                Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY
+        };
     }
 
     @Override
     protected void execute(CommandEvent event) {
         CompletableFuture.runAsync(() -> {
-            var lang = LanguageHandler.getLanguage(event);
+            try {
+                var lang = LanguageHandler.getLanguage(event);
 
-            if (event.getArgs().isEmpty()) {
-                event.replyError(LanguageHandler.get(lang, "blacklist_missingid"));
-                return;
-            }
+                if (event.getArgs().isEmpty()) {
+                    event.replyError(LanguageHandler.get(lang, "blacklist_missingid"));
+                    return;
+                }
 
-            var guild = event.getGuild();
-            var author = event.getAuthor();
+                var guild = event.getGuild();
+                var author = event.getAuthor();
 
-            if (event.getArgs().equals("show") || event.getArgs().equals("sh")) {
-                var ids = Blacklist.getBlacklistedIds(guild, author);
-                var sb = new StringBuilder();
-                for (var id : ids) sb.append(id).append("\n");
-                event.reply(ids.isEmpty() ? LanguageHandler.get(lang, "blacklist_empty") : sb.toString());
-            } else {
-                if (Parser.isValidId(event.getArgs())) {
-                    var id = Long.parseLong(event.getArgs());
-                    if (Blacklist.isBlacklisted(id, guild, author)) Blacklist.unsetBlacklist(id, guild, author);
-                    else {
-                        Blacklist.setBlacklist(id, guild, author);
-                        var blacklistedGuild = event.getJDA().getGuildById(id);
-                        if (blacklistedGuild != null) blacklistedGuild.leave().queue();
-                    }
-                    event.reactSuccess();
-                } else event.reactError();
+                if (event.getArgs().equals("show") || event.getArgs().equals("sh")) {
+                    var ids = Blacklist.getBlacklistedIds(guild, author);
+                    var sb = new StringBuilder();
+                    for (var id : ids) sb.append(id).append("\n");
+                    event.reply(ids.isEmpty() ? LanguageHandler.get(lang, "blacklist_empty") : sb.toString());
+                } else {
+                    if (Parser.isValidId(event.getArgs())) {
+                        var id = Long.parseLong(event.getArgs());
+                        if (Blacklist.isBlacklisted(id, guild, author)) Blacklist.unsetBlacklist(id, guild, author);
+                        else {
+                            Blacklist.setBlacklist(id, guild, author);
+                            var blacklistedGuild = event.getJDA().getGuildById(id);
+                            if (blacklistedGuild != null) blacklistedGuild.leave().queue();
+                        }
+                        event.reactSuccess();
+                    } else event.reactError();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
     }

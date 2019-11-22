@@ -4,11 +4,12 @@ package moderation.join;
 import files.language.LanguageHandler;
 import moderation.guild.Guild;
 import moderation.toggle.Toggle;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.MessageEmbed;
-import net.dv8tion.jda.core.entities.User;
-import net.dv8tion.jda.core.events.guild.member.GuildMemberJoinEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 import utilities.Image;
 
 import java.time.OffsetDateTime;
@@ -16,7 +17,7 @@ import java.time.ZoneOffset;
 import java.util.concurrent.CompletableFuture;
 
 public class JoinListener extends ListenerAdapter {
-    public void onGuildMemberJoin(GuildMemberJoinEvent event) {
+    public void onGuildMemberJoin(@NotNull GuildMemberJoinEvent event) {
         CompletableFuture.runAsync(() -> {
             if (!Toggle.isEnabled(event, "join")) return;
 
@@ -30,7 +31,7 @@ public class JoinListener extends ListenerAdapter {
         });
     }
 
-    private MessageEmbed getEmbed(User joinedUser, net.dv8tion.jda.core.entities.Guild guild, Guild internalGuild, String lang) {
+    private MessageEmbed getEmbed(User joinedUser, net.dv8tion.jda.api.entities.Guild guild, Guild internalGuild, String lang) {
         var eb = new EmbedBuilder();
         var internalJoinedUser = new moderation.user.User(joinedUser.getIdLong());
         eb.setColor(internalJoinedUser.getColor(guild, joinedUser));

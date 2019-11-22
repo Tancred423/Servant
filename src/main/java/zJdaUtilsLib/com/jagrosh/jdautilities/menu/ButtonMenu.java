@@ -15,36 +15,32 @@
  */
 package zJdaUtilsLib.com.jagrosh.jdautilities.menu;
 
-import java.awt.Color;
+import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.requests.RestAction;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.MessageBuilder;
+import net.dv8tion.jda.api.entities.MessageReaction.ReactionEmote;
+import net.dv8tion.jda.internal.utils.Checks;
+import zJdaUtilsLib.com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+
+import java.awt.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.MessageBuilder;
-import net.dv8tion.jda.core.entities.Emote;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.MessageChannel;
-import net.dv8tion.jda.core.entities.MessageReaction.ReactionEmote;
-import net.dv8tion.jda.core.entities.Role;
-import net.dv8tion.jda.core.entities.User;
-import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent;
-import net.dv8tion.jda.core.requests.RestAction;
-import net.dv8tion.jda.core.utils.Checks;
-import zJdaUtilsLib.com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-
 public class ButtonMenu extends Menu {
     private final Color color;
     private final String text;
     private final String description;
     private final List<String> choices;
-    private final Consumer<ReactionEmote> action;
+    private final Consumer<MessageReaction.ReactionEmote> action;
     private final Consumer<Message> finalAction;
     
     ButtonMenu(EventWaiter waiter, Set<User> users, Set<Role> roles, long timeout, TimeUnit unit,
-               Color color, String text, String description, List<String> choices, Consumer<ReactionEmote> action, Consumer<Message> finalAction) {
+               Color color, String text, String description, List<String> choices, Consumer<MessageReaction.ReactionEmote> action, Consumer<Message> finalAction) {
         super(waiter, users, roles, timeout, unit);
         this.color = color;
         this.text = text;

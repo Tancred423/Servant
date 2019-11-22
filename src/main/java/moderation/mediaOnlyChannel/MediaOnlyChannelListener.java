@@ -4,12 +4,13 @@ package moderation.mediaOnlyChannel;
 import files.language.LanguageHandler;
 import moderation.guild.Guild;
 import moderation.toggle.Toggle;
-import net.dv8tion.jda.core.MessageBuilder;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.events.channel.text.TextChannelDeleteEvent;
-import net.dv8tion.jda.core.events.guild.GuildLeaveEvent;
-import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.MessageBuilder;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
+import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 import utilities.MessageHandler;
 import utilities.Parser;
 
@@ -17,7 +18,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class MediaOnlyChannelListener extends ListenerAdapter {
-    public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
+    public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
         CompletableFuture.runAsync(() -> {
             if (!Toggle.isEnabled(event, "mediaononlychannel")) return;
 
@@ -57,19 +58,21 @@ public class MediaOnlyChannelListener extends ListenerAdapter {
         });
     }
 
-    public void onTextChannelDelete(TextChannelDeleteEvent event) {
+    public void onTextChannelDelete(@NotNull TextChannelDeleteEvent event) {
         CompletableFuture.runAsync(() -> {
             var guild = event.getGuild();
             var internalGuild = new Guild(guild.getIdLong());
-            internalGuild.unsetMediaOnlyChannel(event.getChannel(), guild, guild.getOwner().getUser());
+            var owner = guild.getOwner();
+            internalGuild.unsetMediaOnlyChannel(event.getChannel(), guild, owner == null ? null : owner.getUser());
         });
     }
 
-    public void onGuildLeave(GuildLeaveEvent event) {
+    public void onGuildLeave(@NotNull GuildLeaveEvent event) {
         CompletableFuture.runAsync(() -> {
             var guild = event.getGuild();
             var internalGuild = new Guild(guild.getIdLong());
-            internalGuild.unsetMediaOnlyChannels(guild, guild.getOwner().getUser());
+            var owner = guild.getOwner();
+            internalGuild.unsetMediaOnlyChannels(guild, owner == null ? null : owner.getUser());
         });
     }
 }

@@ -5,7 +5,7 @@ import files.language.LanguageHandler;
 import moderation.guild.Guild;
 import moderation.guild.GuildHandler;
 import moderation.user.User;
-import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.api.Permission;
 import owner.blacklist.Blacklist;
 import utilities.Constants;
 import utilities.UsageEmbed;
@@ -28,132 +28,140 @@ public class ToggleCommand extends Command {
         this.ownerCommand = false;
         this.cooldown = Constants.MOD_COOLDOWN;
         this.cooldownScope = CooldownScope.GUILD;
-        this.userPermissions = new Permission[]{Permission.MANAGE_SERVER};
-        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.userPermissions = new Permission[] { Permission.MANAGE_SERVER };
+        this.botPermissions = new Permission[] {
+                Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY,
+                Permission.MESSAGE_EMBED_LINKS
+        };
     }
 
     @Override
     protected void execute(CommandEvent event) {
         CompletableFuture.runAsync(() -> {
-            if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
+            try {
+                if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
 
-            var lang = LanguageHandler.getLanguage(event);
-            var p = GuildHandler.getPrefix(event);
+                var lang = LanguageHandler.getLanguage(event);
+                var p = GuildHandler.getPrefix(event);
 
-            if (event.getArgs().isEmpty()) {
-                var description = String.format(LanguageHandler.get(lang, "toggle_description"), p, name);
-                var usage = String.format(LanguageHandler.get(lang, "toggle_usage"), p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name);
-                var hint = LanguageHandler.get(lang, "toggle_hint");
+                if (event.getArgs().isEmpty()) {
+                    var description = String.format(LanguageHandler.get(lang, "toggle_description"), p, name);
+                    var usage = String.format(LanguageHandler.get(lang, "toggle_usage"), p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name);
+                    var hint = LanguageHandler.get(lang, "toggle_hint");
 
-                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
-                return;
-            }
-
-            List<String> validFeatures = new ArrayList<>(){{
-                // moderation
-                add("autorole");
-                add("birthday");
-                add("bestofimage");
-                add("bestofquote");
-                add("clear");
-                add("join");
-                add("leave");
-                add("levelrole");
-                add("livestream");
-                add("mediaonlychannel");
-                add("reactionrole");
-                add("role");
-                add("server");
-                add("setupwizard");
-                add("user");
-                add("voicelobby");
-
-                // information
-                add("botinfo");
-                add("ping");
-                add("serverinfo");
-
-                // useful
-                add("alarm");
-                add("giveaway");
-                add("quickvote");
-                add("reminder");
-                add("signup");
-                add("timezone");
-                add("vote");
-
-                // fun
-                add("avatar");
-                add("baguette");
-                add("bird");
-                add("cat");
-                add("coinflip");
-                add("createembed");
-                add("dog");
-                add("editembed");
-                add("flip");
-                add("level");
-                add("love");
-                add("profile");
-
-                // interaction
-                add("interaction");
-            }};
-
-            var args = event.getArgs().split(" ");
-            if (args.length < 2) {
-                event.reply(LanguageHandler.get(lang, "toggle_args"));
-                return;
-            }
-
-            var feature = getAlias(args[0]);
-            // Has to be improved. Redundant text.
-            if (feature == null) {
-                event.reply(LanguageHandler.get(lang, "toggle_invalid_feature"));
-                return;
-            } else if (!validFeatures.contains(feature) && !feature.equals("all")) {
-                event.reply(LanguageHandler.get(lang, "toggle_invalid_feature"));
-                return;
-            }
-
-            var arg1 = args[1].toLowerCase();
-            if (!arg1.equals("on") && !arg1.equals("off") && !arg1.equals("status") && !arg1.equals("show")) {
-                event.reply(LanguageHandler.get(lang, "toggle_invalid_argument"));
-                return;
-            }
-
-            var author = event.getAuthor();
-            var guild = event.getGuild();
-            var internalGuild = new Guild(guild.getIdLong());
-
-            if (arg1.equals("show") || arg1.equals("status")) {
-                if (feature.equals("all")) {
-                    // Toggle Status All Features
-                    var stringBuilder = new StringBuilder();
-                    for (var validFeature : validFeatures) {
-                        var toggleStatus = internalGuild.getToggleStatus(validFeature, guild, author);
-                        stringBuilder.append(validFeature).append(": ").append(toggleStatus ? "on" : "off").append("\n");
-                    }
-                    event.reply(stringBuilder.toString());
-                } else {
-                    // Toggle Status Single Feature
-                    var toggleStatus = internalGuild.getToggleStatus(feature, guild, author);
-                    event.reply(feature + "'s status: " + (toggleStatus ? "on" : "off"));
+                    event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+                    return;
                 }
-                return;
+
+                List<String> validFeatures = new ArrayList<>() {{
+                    // moderation
+                    add("autorole");
+                    add("birthday");
+                    add("bestofimage");
+                    add("bestofquote");
+                    add("clear");
+                    add("join");
+                    add("leave");
+                    add("levelrole");
+                    add("livestream");
+                    add("mediaonlychannel");
+                    add("reactionrole");
+                    add("role");
+                    add("server");
+                    add("setupwizard");
+                    add("user");
+                    add("voicelobby");
+
+                    // information
+                    add("botinfo");
+                    add("ping");
+                    add("serverinfo");
+
+                    // useful
+                    add("alarm");
+                    add("giveaway");
+                    add("quickvote");
+                    add("reminder");
+                    add("signup");
+                    add("timezone");
+                    add("vote");
+
+                    // fun
+                    add("avatar");
+                    add("baguette");
+                    add("bird");
+                    add("cat");
+                    add("coinflip");
+                    add("createembed");
+                    add("dog");
+                    add("editembed");
+                    add("flip");
+                    add("level");
+                    add("love");
+                    add("profile");
+
+                    // interaction
+                    add("interaction");
+                }};
+
+                var args = event.getArgs().split(" ");
+                if (args.length < 2) {
+                    event.reply(LanguageHandler.get(lang, "toggle_args"));
+                    return;
+                }
+
+                var feature = getAlias(args[0]);
+                // Has to be improved. Redundant text.
+                if (feature == null) {
+                    event.reply(LanguageHandler.get(lang, "toggle_invalid_feature"));
+                    return;
+                } else if (!validFeatures.contains(feature) && !feature.equals("all")) {
+                    event.reply(LanguageHandler.get(lang, "toggle_invalid_feature"));
+                    return;
+                }
+
+                var arg1 = args[1].toLowerCase();
+                if (!arg1.equals("on") && !arg1.equals("off") && !arg1.equals("status") && !arg1.equals("show")) {
+                    event.reply(LanguageHandler.get(lang, "toggle_invalid_argument"));
+                    return;
+                }
+
+                var author = event.getAuthor();
+                var guild = event.getGuild();
+                var internalGuild = new Guild(guild.getIdLong());
+
+                if (arg1.equals("show") || arg1.equals("status")) {
+                    if (feature.equals("all")) {
+                        // Toggle Status All Features
+                        var stringBuilder = new StringBuilder();
+                        for (var validFeature : validFeatures) {
+                            var toggleStatus = internalGuild.getToggleStatus(validFeature, guild, author);
+                            stringBuilder.append(validFeature).append(": ").append(toggleStatus ? "on" : "off").append("\n");
+                        }
+                        event.reply(stringBuilder.toString());
+                    } else {
+                        // Toggle Status Single Feature
+                        var toggleStatus = internalGuild.getToggleStatus(feature, guild, author);
+                        event.reply(feature + "'s status: " + (toggleStatus ? "on" : "off"));
+                    }
+                    return;
+                }
+
+                var statusBool = arg1.equals("on");
+
+                if (feature.equals("all"))
+                    for (var validFeature : validFeatures)
+                        internalGuild.setToggleStatus(validFeature, statusBool, guild, author);
+                else internalGuild.setToggleStatus(feature, statusBool, guild, author);
+                event.reactSuccess();
+
+                // Statistics.
+                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+                if (event.getGuild() != null)
+                    new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
-            var statusBool = arg1.equals("on");
-
-            if (feature.equals("all"))
-                for (var validFeature : validFeatures)
-                    internalGuild.setToggleStatus(validFeature, statusBool, guild, author);
-            else internalGuild.setToggleStatus(feature, statusBool, guild, author);
-            event.reactSuccess();
-
-            // Statistics.
-            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
         });
     }
 

@@ -15,7 +15,7 @@
  */
 package zJdaUtilsLib.com.jagrosh.jdautilities.doc.standard;
 
-import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.api.Permission;
 import zJdaUtilsLib.com.jagrosh.jdautilities.doc.ConvertedBy;
 import zJdaUtilsLib.com.jagrosh.jdautilities.doc.DocConverter;
 

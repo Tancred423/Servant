@@ -5,8 +5,8 @@ import files.language.LanguageHandler;
 import moderation.guild.Guild;
 import moderation.toggle.Toggle;
 import moderation.user.User;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import owner.blacklist.Blacklist;
 import servant.Servant;
 import useful.votes.VotesDatabase;
@@ -23,7 +23,7 @@ import java.util.concurrent.CompletableFuture;
 public class QuickvoteCommand extends Command {
     public QuickvoteCommand() {
         this.name = "quickpoll";
-        this.aliases = new String[]{"quickvote"};
+        this.aliases = new String[] { "quickvote" };
         this.help = "Smol poll with yes/no.";
         this.category = new Category("Useful");
         this.arguments = "[optional text]";
@@ -33,43 +33,58 @@ public class QuickvoteCommand extends Command {
         this.cooldown = Constants.USER_COOLDOWN;
         this.cooldownScope = CooldownScope.USER;
         this.userPermissions = new Permission[0];
-        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_ADD_REACTION};
+        this.botPermissions = new Permission[] {
+                Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY,
+                Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_ADD_REACTION
+        };
     }
 
     @Override
     protected void execute(CommandEvent event) {
         CompletableFuture.runAsync(() -> {
-            if (!Toggle.isEnabled(event, name)) return;
-            if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
-
-            var lang = LanguageHandler.getLanguage(event);
-            var message = event.getMessage();
-            var guild = event.getGuild();
-            var author = message.getAuthor();
-            var internalAuthor = new User(author.getIdLong());
-            var eb = new EmbedBuilder();
-
-            eb.setColor(internalAuthor.getColor(guild, author));
-            eb.setAuthor(String.format(LanguageHandler.get(lang, "quickvote_started"), author.getName()), null, author.getEffectiveAvatarUrl());
-            eb.setDescription(event.getArgs());
-            eb.setFooter(LanguageHandler.get(lang, "votes_active"), event.getJDA().getSelfUser().getAvatarUrl());
             try {
-                eb.setTimestamp(OffsetDateTime.now(ZoneId.of(new Guild(event.getGuild().getIdLong()).getOffset(guild, author))));
-            } catch (DateTimeException e) {
-                eb.setTimestamp(OffsetDateTime.now(ZoneId.of(Servant.config.getDefaultOffset())).getOffset());
+                if (!Toggle.isEnabled(event, name)) return;
+                if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
+
+                var lang = LanguageHandler.getLanguage(event);
+                var message = event.getMessage();
+                var guild = event.getGuild();
+                var author = message.getAuthor();
+                var internalAuthor = new User(author.getIdLong());
+                var eb = new EmbedBuilder();
+
+                eb.setColor(internalAuthor.getColor(guild, author));
+                eb.setAuthor(String.format(LanguageHandler.get(lang, "quickvote_started"), author.getName()), null, author.getEffectiveAvatarUrl());
+                eb.setDescription(event.getArgs());
+                eb.setFooter(LanguageHandler.get(lang, "votes_active"), event.getJDA().getSelfUser().getAvatarUrl());
+                try {
+                    eb.setTimestamp(OffsetDateTime.now(ZoneId.of(new Guild(event.getGuild().getIdLong()).getOffset(guild, author))));
+                } catch (DateTimeException e) {
+                    eb.setTimestamp(OffsetDateTime.now(ZoneId.of(Servant.config.getDefaultOffset())).getOffset());
+                }
+
+                var upvote = Emote.getEmoji("upvote");
+                var downvote = Emote.getEmoji("downvote");
+                var end = Emote.getEmoji("end");
+
+                if (upvote == null || downvote == null || end == null) return; // todo: always null?
+
+                message.getChannel().sendMessage(eb.build()).queue(sentMessage -> {
+                    sentMessage.addReaction(upvote).queue();
+                    sentMessage.addReaction(downvote).queue();
+                    sentMessage.addReaction(end).queue();
+                    VotesDatabase.setVote(sentMessage.getIdLong(), author.getIdLong(), "quick", guild, author);
+                });
+
+                message.delete().queue();
+
+                // Statistics.
+                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+                if (event.getGuild() != null)
+                    new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            message.getChannel().sendMessage(eb.build()).queue(sentMessage -> {
-                sentMessage.addReaction(Emote.getEmoji("upvote")).queue();
-                sentMessage.addReaction(Emote.getEmoji("downvote")).queue();
-                sentMessage.addReaction(Emote.getEmoji("end")).queue();
-                VotesDatabase.setVote(sentMessage.getIdLong(), author.getIdLong(), "quick", guild, author);
-            });
-
-            message.delete().queue();
-
-            // Statistics.
-            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
         });
     }
 }

@@ -15,6 +15,7 @@ public class LanguageFile {
         en_gb.setProperty("blocking_dm", "Help cannot be sent because you are blocking Direct Messages.");
         en_gb.setProperty("invalid_mention", "Invalid mention.");
         en_gb.setProperty("current_prefix", "Current prefix: %s");
+        en_gb.setProperty("unknown_message", "Unknown message.");
 
         // Features
         /// Achievement
@@ -42,7 +43,7 @@ public class LanguageFile {
         en_gb.setProperty("invite_author", "%s, at your service!");
         en_gb.setProperty("invite_description", "Thank you for choosing me to assist you and your server.\n" +
                 "I have a lot of features. Most of them are enabled by default but some of them are not.\n" +
-                "Type `%stoggle all status` to check the status of all available features.\n" +
+                "Type `%stoggle all show` to check the status of all available features.\n" +
                 "Then you can enable/disable the features to your desire.\n" +
                 "\n" +
                 "To get started, I recommend you to use my `%shelp` command.\n" +
@@ -292,8 +293,8 @@ public class LanguageFile {
 
         /// Livestream
         en_gb.setProperty("livestream_description", "You can set up streamers, one stream notification channel and one streamer role.\n" +
-                "Once a streamer goes online, a notification **with** @everyone will be posted and the streamer will receive the set role.\n" +
-                "If you toggle the streamer mode `off`, a notification **without** @everyone will be posted and the member will receive the set role.");
+                "Once a streamer goes online, a notification **with** @here will be posted and the streamer will receive the set role.\n" +
+                "If you toggle the streamer mode `off`, a notification **without** @here will be posted and the member will receive the set role.");
         en_gb.setProperty("livestream_usage", "**(Un)setting a streamer**\n" +
                 "Set: `%s%s set @user`\n" +
                 "Unset: `%s%s unset @user`\n" +
@@ -311,8 +312,7 @@ public class LanguageFile {
                 "\n" +
                 "**Showing current stream settings**\n" +
                 "Command: `%s%s show`");
-        en_gb.setProperty("livestream_hint", "There can be multiple streamers but only one notification channel.\n" +
-                "Streamer Mode: Only set up streamers will get notifications and roles.\n" +
+        en_gb.setProperty("livestream_hint", "Streamer Mode: Only set up streamers will get notifications and roles.\n" +
                 "Public Mode: Anyone will get notifications and roles.");
         en_gb.setProperty("livestream_missingmention", "You didn't mention a channel, user nor role.");
         en_gb.setProperty("livestream_toomanymentions", "You mentioned too much. One at a time!");
@@ -327,7 +327,6 @@ public class LanguageFile {
         en_gb.setProperty("livestream_streamers", "Streamers");
         en_gb.setProperty("livestream_nochannelset", "No channel set");
         en_gb.setProperty("livestream_noroleset", "No role set");
-        en_gb.setProperty("livestream_streamermode", "Streamer Mode");
         en_gb.setProperty("livestream_publicmode", "Public Mode");
         en_gb.setProperty("livestream_nostreamersset", "No streamers set");
         en_gb.setProperty("livestream_announcement_title", "Livestream!");
@@ -372,10 +371,10 @@ public class LanguageFile {
                 "Command: `%s%s unset [#channel | channel ID] [message Id] [emoji/emote]`\n" +
                 "Example: %s%s unset #test-channel 999999999999999999 %s");
         en_gb.setProperty("reactionrole_hint", "**How to get ID's:**\n" +
-                "Role: `\\@role` - THIS ALSO PINGS. Maybe do this is a non public channel.\n" +
-                "Channels: \n" +
-                "1. Activate Discord Developer Mode: User Settings → Appearance → ADVANCED → Developer Mode\n" +
-                "2. Rightclick a text channel → Copy ID");
+                "Possibility 1: Post in chat: `\\@role`, `\\#channel`, etc. - THIS ALSO PINGS. Maybe do this is a non public channel.\n" +
+                "Possibility 2:\n" +
+                "- Discord Settings → Appearance → ADVANCED → Enable Developer Mode\n" +
+                "- Rightclick on channel, role, etc. → Copy ID");
         en_gb.setProperty("reactionrole_toofewargs", "Too few arguments. You have to declare the channel ID, message ID, an emoji or emote and a role mention or role ID behind `set`.");
         en_gb.setProperty("reactionrole_alreadyset", "This emoji or emote was already set. Unset first if you want to update the emoji or emote.");
         en_gb.setProperty("reactionrole_notset", "This emoji or emote was not set.");
@@ -391,6 +390,7 @@ public class LanguageFile {
         en_gb.setProperty("role_missing", "Missing role name.");
         en_gb.setProperty("role_notfound", "Sorry, master! I couldn't find a role with that name.");
         en_gb.setProperty("role_missingrolename", "Please also provide the role name.");
+        en_gb.setProperty("role_cantinteract", "I cannot interact with that user! (Check permissions)");
 
         /// Server
         en_gb.setProperty("server_description", "With this command you can personalize the bot to your server's desire.");
@@ -421,7 +421,7 @@ public class LanguageFile {
                 "Offset always adds on UTC.\n" +
                 "Unsettings the prefix, recovers the default bot prefix (%s)\n\n" +
                 "Current available languages:\n" +
-                "- en_gb - British English\n" +
+                "- en_gb - English (British)\n" +
                 "- de_de - German (Deutsch)");
         en_gb.setProperty("server_args_set", "To set a setting, there have to be 3 arguments.\n" +
                 "... set [setting] [value]");
@@ -444,12 +444,12 @@ public class LanguageFile {
         en_gb.setProperty("setupwizard_timeout", "The setup wizard timed out.");
         en_gb.setProperty("setupwizard_language", "Please state in what language you want me to speak in.\n" +
                 "Currently available languages:\n" +
-                "   \u200B⤷ `en_gb` - British English\n" +
+                "   \u200B⤷ `en_gb` - English (British)\n" +
                 "   \u200B⤷ `de_de` - German (Deutsch)\n" +
                 "**Provide the language code:**");
         en_gb.setProperty("setupwizard_language_repeated", "This language is not available.\n" +
                 "Currently available languages:\n" +
-                "   \u200B⤷ `en_gb` - British English\n" +
+                "   \u200B⤷ `en_gb` - English (British)\n" +
                 "   \u200B⤷ `de_de` - German (Deutsch)\n" +
                 "**Try again:**");
         en_gb.setProperty("setupwizard_prefix", "%s Language set.\n" +
@@ -532,7 +532,7 @@ public class LanguageFile {
                 "An embed colour is the colour you can see right know on the left of this text field thingy.\n" +
                 "Settings like offset, prefix and language only work in DM's. For server settings please refer to `%sserver`." +
                 "Available languages:\n" +
-                "- en_gb - British English\n" +
+                "- en_gb - English (British)\n" +
                 "- de_de - German (Deutsch)\n" +
                 "You can hide yourself from being highlighted with streaming role while streaming (server specific).");
         en_gb.setProperty("user_streamhide_description", "You have to use this in a server to specify what server you want to be muted on.\n" +
@@ -1039,9 +1039,10 @@ public class LanguageFile {
 
         // General
         de_de.setProperty("permission", ":x: Du brauchst in diesem Server die Berechtigung %s, um dies zu tun!");
-        de_de.setProperty("blocking_dm", "Die Hilfe konnte nicht gesendet werden, da du private Nachrichten blockierst.");
+        de_de.setProperty("blocking_dm", "Die Hilfe konnte nicht gesendet werden, da Du private Nachrichten blockierst.");
         de_de.setProperty("invalid_mention", "Ungültige Erwähnung.");
         de_de.setProperty("current_prefix", "Aktueller Prefix: %s");
+        de_de.setProperty("unknown_message", "Unbekannte Nachricht.");
 
         // Features
         /// Achievement
@@ -1067,15 +1068,15 @@ public class LanguageFile {
 
         /// Invite
         de_de.setProperty("invite_author", "%s, zu Ihren Diensten!");
-        de_de.setProperty("invite_description", "Danke Dir, dass du mich gewählt hast, Dich und Deinen Server zu unterstützen.\n" +
+        de_de.setProperty("invite_description", "Danke Dir, dass Du mich gewählt hast, Dich und Deinen Server zu unterstützen.\n" +
                 "Ich habe eine Menge Funktionen. Die meisten davon sind standardmäßig aktiviert, aber einige sind es nicht.\n" +
-                "Schreibe `%stoggle all status`, um den Status aller Funktionen nachzusehen.\n" +
-                "Danach kannst du die Features nach belieben ein- bzw. ausschalten.\n" +
+                "Schreibe `%stoggle all show`, um den Status aller Funktionen nachzusehen.\n" +
+                "Danach kannst Du die Features nach belieben ein- bzw. ausschalten.\n" +
                 "\n" +
-                "Für den Start empfehle ich dir den `%shelp` Befehl zu benutzen.\n" +
+                "Für den Start empfehle ich Dir den `%shelp` Befehl zu benutzen.\n" +
                 "Um eine detailierte Hilfe zu einem Befehl zu bekommen, gebe diesen einfach ohne Argumente ein. Z. B. `%savatar`\n" +
                 "\n" +
-                "Falls du weitere Hilfe benötigst, kannst Du meinem Hilfsserver beitreten oder meinen Ersteller privat anschreiben.\n" +
+                "Falls Du weitere Hilfe benötigst, kannst Du meinem Hilfsserver beitreten oder meinen Ersteller privat anschreiben.\n" +
                 "Hilfsserver: [Klicke um beizutreten](https://%s)\n" +
                 "Name des Erstellers: %s#%s\n" +
                 "E-Mail: `servant@tanc.red`\n" +
@@ -1088,7 +1089,7 @@ public class LanguageFile {
         de_de.setProperty("kick_description", "Es ist sehr traurig zu hören, dass Du mich nicht mehr benötigst.\n" +
                 "Falls es irgendetwas gibt, das ich an mir verbessern kann, lasse es mich bitte wissen.\n" +
                 "\n" +
-                "Um eine Rückmeldung zu geben kannst du dem Hilfsserver beitreten oder meinen Erschaffer privat schreiben.\n" +
+                "Um eine Rückmeldung zu geben kannst Du dem Hilfsserver beitreten oder meinen Erschaffer privat schreiben.\n" +
                 "Hilfsserver: [Click to join](https://%s)\n" +
                 "Name des Erschaffers: %s#%s\n" +
                 "E-Mail: `servant@tanc.red`\n");
@@ -1241,8 +1242,8 @@ public class LanguageFile {
                 "Befehl: `%s%s [1 - 100 ODER @Nutzer]`\n" +
                 "Beispiel 1: `%s%s 50`\n" +
                 "Beispiel 2: `%s%s @Name");
-        de_de.setProperty("clear_hint", "Die Anzahl der Nachrichten ist inklusiv, d. h. du kannst nur eine Nachricht oder auch ganze 100 löschen.");
-        de_de.setProperty("clear_input", "Du kannst du eine Nummer oder eine Nutzererwähnung angeben!");
+        de_de.setProperty("clear_hint", "Die Anzahl der Nachrichten ist inklusiv, d. h. Du kannst nur eine Nachricht oder auch ganze 100 löschen.");
+        de_de.setProperty("clear_input", "Du kannst nur eine Nummer oder eine Nutzererwähnung angeben!");
         de_de.setProperty("clear_sub_one", "Die Eingabe darf nicht niedriger als 1 sein.");
         de_de.setProperty("clear_cleared", "%s Nachrichten gelöscht");
         de_de.setProperty("clear_invalid", "Deine Eingabe ist ungültig. Versuche es mit einer kleineren Zahl.");
@@ -1313,182 +1314,182 @@ public class LanguageFile {
         de_de.setProperty("levelrole_levelup", "LEVEL UP");
 
         /// Livestream
-        de_de.setProperty("livestream_description", "You can set up streamers, one stream notification channel and one streamer role.\n" +
-                "Once a streamer goes online, a notification **with** @everyone will be posted and the streamer will receive the set role.\n" +
-                "If you toggle the streamer mode `off`, a notification **without** @everyone will be posted and the member will receive the set role.");
-        de_de.setProperty("livestream_usage", "**(Un)setting a streamer**\n" +
-                "Set: `%s%s set @user`\n" +
-                "Unset: `%s%s unset @user`\n" +
+        de_de.setProperty("livestream_description", "Du kannst mehrere Streamer, einen Benachrichtigungskanal und eine Streamerrolle festlegen.\n" +
+                "Sobald ein Streamer online geht, wird eine Benachrichtigung **mit** @here gepostet und der Streamer bekommt die gesetzte Rolle.\n" +
+                "Falls Du den Streamer-Modus `off` togglest, wird eine Benachtigung **ohne** @here gepostet und das Mitglied bekommt die gesetzte Rolle.");
+        de_de.setProperty("livestream_usage", "**Hinzufügen/Löschen eines Streamers**\n" +
+                "Hinzufügen: `%s%s set @nutzer`\n" +
+                "Löschen: `%s%s unset @nutzer`\n" +
                 "\n" +
-                "**(Un)setting the notification channel**\n" +
-                "Set: `%s%s set #channel`\n" +
-                "Unset: `%s%s unset #channel`\n" +
+                "**(Zurück)setzen des Benachrichtigungskanals**\n" +
+                "Setzen: `%s%s set #kanal`\n" +
+                "Zurücksetzen: `%s%s unset #kanal`\n" +
                 "\n" +
-                "**(Un)settings the streaming role**\n" +
-                "Set: `%s%s set @role`\n" +
-                "Unset: `%s%s unset @role`\n" +
+                "**(Zurück)setzen der Streamer Rolle**\n" +
+                "Setzen: `%s%s set @rolle`\n" +
+                "Zurücksetzen: `%s%s unset @rolle`\n" +
                 "\n" +
-                "**Toggle streamer mode**\n" +
-                "Command: `%s%s toggle`\n" +
+                "**Toggle Streamer-Mode**\n" +
+                "Befehl: `%s%s toggle`\n" +
                 "\n" +
-                "**Showing current stream settings**\n" +
-                "Command: `%s%s show`");
-        de_de.setProperty("livestream_hint", "There can be multiple streamers but only one notification channel.\n" +
-                "Streamer Mode: Only set up streamers will get notifications and roles.\n" +
-                "Public Mode: Anyone will get notifications and roles.");
-        de_de.setProperty("livestream_missingmention", "You didn't mention a channel, user nor role.");
-        de_de.setProperty("livestream_toomanymentions", "You mentioned too much. One at a time!");
-        de_de.setProperty("livestream_nochannel", "There was no channel set.");
-        de_de.setProperty("livestream_nostreamer", "This user is not a streamer.");
-        de_de.setProperty("livestream_norole", "This role was not set.");
-        de_de.setProperty("livestream_firstarg", "Either `set`, `unset` or `show`");
-        de_de.setProperty("livestream_settings", "Livetream Settings");
-        de_de.setProperty("livestream_notificationchannel", "Notification Channel");
-        de_de.setProperty("livestream_role", "Livestreaming Role");
-        de_de.setProperty("livestream_mode", "Streamer Mode");
-        de_de.setProperty("livestream_streamers", "Streamers");
-        de_de.setProperty("livestream_nochannelset", "No channel set");
-        de_de.setProperty("livestream_noroleset", "No role set");
-        de_de.setProperty("livestream_streamermode", "Streamer Mode");
-        de_de.setProperty("livestream_publicmode", "Public Mode");
-        de_de.setProperty("livestream_nostreamersset", "No streamers set");
+                "**Zeige die aktuellen Steameinstellungen an**\n" +
+                "Befehl: `%s%s show`");
+        de_de.setProperty("livestream_hint", "Streamer-Modus: Nur gesetze Streamer lösen eine Benachrichtigung aus und erhalten eine Rolle.\n" +
+                "Öffentlicher Modus: Jeder löst eine Benachrichtigung aus und erhält eine Rolle.");
+        de_de.setProperty("livestream_missingmention", "Du kannst keinen Kanal, User oder Rolle erwähnt..");
+        de_de.setProperty("livestream_toomanymentions", "Du hast zu viel erwähnt. Eins nach dem anderen!");
+        de_de.setProperty("livestream_nochannel", "Es wurde kein Kanal gesetzt.");
+        de_de.setProperty("livestream_nostreamer", "Dieser Nutzer ist kein Streamer.");
+        de_de.setProperty("livestream_norole", "Diese Rolle wurde nicht gesetzt.");
+        de_de.setProperty("livestream_firstarg", "Entweder `set`, `unset` oder `show`");
+        de_de.setProperty("livestream_settings", "Livetream Einstellungen");
+        de_de.setProperty("livestream_notificationchannel", "Benachrichtigungskanal");
+        de_de.setProperty("livestream_role", "Livestreaming Rolle");
+        de_de.setProperty("livestream_mode", "Streamer-Modus");
+        de_de.setProperty("livestream_streamers", "Streamer");
+        de_de.setProperty("livestream_nochannelset", "Kein Kanal gesetzt");
+        de_de.setProperty("livestream_noroleset", "Keine Rolle gesetzt");
+        de_de.setProperty("livestream_publicmode", "Öffentlicher Modus");
+        de_de.setProperty("livestream_nostreamersset", "Keine Streamer gesetzt");
         de_de.setProperty("livestream_announcement_title", "Livestream!");
-        de_de.setProperty("livestream_announcement", "%s just went live on [Twitch (click me)](%s)!");
-        de_de.setProperty("livestream_announcement_game", "Streaming %s");
+        de_de.setProperty("livestream_announcement", "%s ging gerade auf [Twitch (click me)](%s) live!");
+        de_de.setProperty("livestream_announcement_game", "Streamt %s");
 
         /// Media Only Channel
-        de_de.setProperty("mediaonlychannel_description", "If a member writes a normal message into a text channel that is marked as mediaonlychannel, the message will be removed and a warning will be posted.\n" +
-                "Members only can post links or upload files.\n" +
-                "This can be very handy for e.g. a memes channel.");
-        de_de.setProperty("mediaonlychannel_usage", "**Setting up an media only channel**\n" +
-                "Command: `%s%s set [#channel]`\n" +
-                "Example: `%s%s set #images`\n" +
+        de_de.setProperty("mediaonlychannel_description", "Falls ein Mitglied eine normale Nachricht in einen Textkanal, der als MediaOnlyChannel markiert ist, schreibt, wird die Nachricht gelöscht und eine Warnung wird gesendet.\n" +
+                "Mitglieder können nur Links posten oder Dateien hochladen.\n" +
+                "Dies kann sehr nützlich sein für z.B. einen Meme Kanal.");
+        de_de.setProperty("mediaonlychannel_usage", "**Richte den MediaOnlyChannel ein**\n" +
+                "Befehl: `%s%s set [#kanal]`\n" +
+                "Beispiel: `%s%s set #memes`\n" +
                 "\n" +
-                "**Unsetting an media only channel**\n" +
-                "Command: `%s%sunset [#channel]`\n" +
-                "Example: `%s%s unset #images`\n" +
+                "**Zurücksetzen eines MediaOnlyChannels**\n" +
+                "Befehl: `%s%sunset [#kanal]`\n" +
+                "Beispiel: `%s%s unset #memes`\n" +
                 "\n" +
-                "**Showing current media only channels**\n" +
-                "Command: `%s%s show`");
-        de_de.setProperty("mediaonlychannel_hint", "You can have multiple media only channels.");
-        de_de.setProperty("mediaonlychannel_missingmention", "You did not provide a channel mention.");
-        de_de.setProperty("mediaonlychannel_invalidchannel", "The given channel is invalid.");
-        de_de.setProperty("mediaonlychannel_unset_fail", "This channel was not set as an media only channel.");
-        de_de.setProperty("mediaonlychannel_nochannels", "There are no media only channels.");
-        de_de.setProperty("mediaonlychannel_firstarg", "Invalid first argument.\nEither `set`, `unset` or `show`");
-        de_de.setProperty("mediaonlychannel_warning", "%s, this is a media only channel!\n" +
-                "You are allowed to:\n" +
-                "- Send upload files with an optional description.\n" +
-                "- Post a valid url with an optional description.\n" +
-                "*This message will be deleted in 30 seconds.*");
-        de_de.setProperty("mediaonlychannel_alreadyset", "This channel was already set.");
+                "**Zeige die aktuellen MediaOnlychannel Einstellungen an**\n" +
+                "Befehl: `%s%s show`");
+        de_de.setProperty("mediaonlychannel_hint", "Du kannst mehrere MediaOnlyChannel haben.");
+        de_de.setProperty("mediaonlychannel_missingmention", "Du hast keinen Kanal erwähnt.");
+        de_de.setProperty("mediaonlychannel_invalidchannel", "Der gegebene Kanal ist ungültig.");
+        de_de.setProperty("mediaonlychannel_unset_fail", "Dieser Kanal war nicht als MediaOnlyChannel gesetzt.");
+        de_de.setProperty("mediaonlychannel_nochannels", "Es existieren keine MediaOnlyChannel.");
+        de_de.setProperty("mediaonlychannel_firstarg", "Ungültiges erstes Argument.\n" +
+                "Entweder `set`, `unset` oder `show`");
+        de_de.setProperty("mediaonlychannel_warning", "%s, dies ist ein MediaOnlyChannel!\n" +
+                "Du darfst:\n" +
+                "- Dateien mit einer optionalen Beschreibung hochladen.\n" +
+                "- Einen gültigen Link mit einer optionalen Beschreibung senden.\n" +
+                "*Diese Nachricht wird in 30 Sekunden gelöscht.*");
+        de_de.setProperty("mediaonlychannel_alreadyset", "Dieser Kanal wurde bereits gesetzt.");
 
         /// Reaction Role
-        de_de.setProperty("reactionrole_description", "You can add reaction to a message via this command. Once a member clicks on the corresponding reaction, he will get the designated role\n" +
-                "This allows you easy role management via reactions.");
-        de_de.setProperty("reactionrole_usage", "**Set up a reaction to manage user roles**\n" +
-                "Command: `%s%s set [#channel | channel ID] [message ID] [emoji/emote] [@role | role ID]`\n" +
-                "Example: %s%s set #test-channel 999999999999999999 %s @role\n" +
+        de_de.setProperty("reactionrole_description", "Mit diesem Befehl kannst Du Reaktionen an eine Nachricht binden. Sobald ein Mitglied auf eine dieser Reaktionen drückt, erhält der die festgelegte Rolle.\n" +
+                "Dies erlaubt Dir ein einfaches Rollenverwaltungssystem via Reaktionen.");
+        de_de.setProperty("reactionrole_usage", "**Richte eine Reaktion zur Verwaltung der Rollen ein**\n" +
+                "Befehl: `%s%s set [#kanal | Kanal-ID] [Nachrichten-ID] [emoji/emote] [@rolle | Rollen-ID]`\n" +
+                "Beispiel: %s%s set #test-kanal 999999999999999999 %s @rolle\n" +
                 "\n" +
-                "**Unset a reaction role**\n" +
-                "Command: `%s%s unset [#channel | channel ID] [message Id] [emoji/emote]`\n" +
-                "Example: %s%s unset #test-channel 999999999999999999 %s");
-        de_de.setProperty("reactionrole_hint", "**How to get ID's:**\n" +
-                "Role: `\\@role` - THIS ALSO PINGS. Maybe do this is a non public channel.\n" +
-                "Channels: \n" +
-                "1. Activate Discord Developer Mode: User Settings → Appearance → ADVANCED → Developer Mode\n" +
-                "2. Rightclick a text channel → Copy ID");
-        de_de.setProperty("reactionrole_toofewargs", "Too few arguments. You have to declare the channel ID, message ID, an emoji or emote and a role mention or role ID behind `set`.");
-        de_de.setProperty("reactionrole_alreadyset", "This emoji or emote was already set. Unset first if you want to update the emoji or emote.");
-        de_de.setProperty("reactionrole_notset", "This emoji or emote was not set.");
-        de_de.setProperty("reactionrole_firstarg", "Either `set` or `unset` a reaction.");
-        de_de.setProperty("reactionrole_insufficient", "Insufficient permissions or problem with hierarchy.");
+                "**Setze eine Reaktion zurück**\n" +
+                "Befehl: `%s%s unset [#kanal | Kanal-ID] [Nachrichten-ID] [emoji/emote]`\n" +
+                "Beispiel: %s%s unset #test-kanal 999999999999999999 %s");
+        de_de.setProperty("reactionrole_hint", "**Wie man IDs erhält:**\n" +
+                "Möglichkeit 1: Im Chat posten: `\\@rolle`, `\\#kanal`, etc. - DIES WIRD DIE ROLLE AUCH ANPINGEN. Vielleicht solltest Du das in keinem öffentlichen Kanal senden.\n" +
+                "Möglichkeit 2:\n" +
+                "- Discord Einstellungen → Erscheinungsbild → ERWEITERT → Entwicklermodus anschalten\n" +
+                "- Rechtsklick auf Kanal, Rolle, etc. → ID kopieren");
+        de_de.setProperty("reactionrole_toofewargs", "Zu wenige Argumente. Du musst die Kanal-ID, Nachrichten-ID, ein Emoji oder Emote und eine Rollenerwähnung oder Rollen-ID hinter `set` angeben.");
+        de_de.setProperty("reactionrole_alreadyset", "Dieses Emoji oder Emote wurde bereits gesetzt. Setze das erste zurück falls du das Emoji oder Emote aktualisieren möchtest.");
+        de_de.setProperty("reactionrole_notset", "Dieses Emoji oder Emote wurde nicht gesetzt.");
+        de_de.setProperty("reactionrole_firstarg", "Entweder `set` oder `unset` eine Reaktion.");
+        de_de.setProperty("reactionrole_insufficient", "Ungenügende Berechtigungen oder ein Problem mit der Hierarchie.");
         de_de.setProperty("reactionrole_invalidmessageid", "Ungültige Nachrichten ID.");
 
         /// Role
-        de_de.setProperty("role_description", "Assing or remove roles from members.");
-        de_de.setProperty("role_usage", "Command: `%s%s @user [roleName]`\n" +
-                "Example: `%s%s @name member`");
-        de_de.setProperty("role_hint", "I will remove the role if the member already has it and provide it if the member doesn't have it already.");
-        de_de.setProperty("role_missing", "Missing role name.");
-        de_de.setProperty("role_notfound", "Sorry, master! I couldn't find a role with that name.");
-        de_de.setProperty("role_missingrolename", "Please also provide the role name.");
+        de_de.setProperty("role_description", "Orde Mitgliedern neuen Rollen zu oder nehme ihnen diese weg.");
+        de_de.setProperty("role_usage", "Befehl: `%s%s @user [Rollenname]`\n" +
+                "Beispiel: `%s%s @name Mitglied`");
+        de_de.setProperty("role_hint", "Ich werde die Rolle entfernen falls das Mitglied sie bereits hatte und sie ihm geben falls nicht.");
+        de_de.setProperty("role_missing", "Fehlender Rollenname.");
+        de_de.setProperty("role_notfound", "Verzeichung, Meister! Ich konnte keine Rolle mit diesem Namen finden.");
+        de_de.setProperty("role_missingrolename", "Bitte gebe auch den Rollennamen an.");
+        de_de.setProperty("role_cantinteract", "Ich kann nicht mit diesem User interagieren. (Überprüfe die Berechtigungen)");
 
         /// Server
-        de_de.setProperty("server_description", "With this command you can personalize the bot to your guild's desire.");
-        de_de.setProperty("server_usage", "**Setting an offset**\n" +
-                "Command: `%s%s set offset [offset]`\n" +
-                "Example: `%s%s set offset +01:00`\n" +
+        de_de.setProperty("server_description", "Mit diesem Befehl kannst Du den Bot nach deinen Wünschen für diesen Server einrichten.");
+        de_de.setProperty("server_usage", "**Richte einen Offset ein**\n" +
+                "Befehl: `%s%s set offset [offset]`\n" +
+                "Beispiel: `%s%s set offset +01:00`\n" +
                 "\n" +
-                "**Unsetting the offset**\n" +
-                "Command: `%s%s unset offset`\n" +
+                "**Setze den Offset zurück**\n" +
+                "Befehl: `%s%s unset offset`\n" +
                 "\n" +
-                "**Setting an server specific prefix**\n" +
-                "Command: `%s%s set prefix [prefix]`\n" +
-                "Example: `%s%s set prefix -`\n" +
+                "**Richte einen serverspezifischen Prefix ein**\n" +
+                "Befehl: `%s%s set prefix [prefix]`\n" +
+                "Beispiel: `%s%s set prefix -`\n" +
                 "\n" +
-                "**Unsettings the prefix**\n" +
-                "Command: `%s%s unset prefix`\n" +
+                "**Setze den Prefix zurück**\n" +
+                "Befehl: `%s%s unset prefix`\n" +
                 "\n" +
-                "**Setting a language**\n" +
-                "Command: `%s%s set language [language code]`\n" +
-                "Example: `%s%s set language de_de`\n" +
+                "**Setlle eine Sprache ein**\n" +
+                "Befehl: `%s%s set language [Sprachenschlüssel]`\n" +
+                "Beispiel: `%s%s set language de_de`\n" +
                 "\n" +
-                "**Unsettings the language**\n" +
-                "Command: `%s%s unset language`\n" +
+                "**Setze die Sprache zurück**\n" +
+                "Befehl: `%s%s unset language`\n" +
                 "\n" +
-                "**Show your current settings**\n" +
-                "Command: `%s%s show`");
-        de_de.setProperty("server_hint", "Unsetting an offset will just remove your custom offset and you will use the default offset (%s) again.\n" +
-                "Offset always adds on UTC.\n" +
-                "Unsettings the prefix, recovers the default bot prefix (%s)\n\n" +
-                "Current available languages:\n" +
-                "- en_gb - British English\n" +
+                "**Zeige deine aktuellen Einstellungen**\n" +
+                "Befehl: `%s%s show`");
+        de_de.setProperty("server_hint", "Sofern du den Offset zurücksetzt, wird lediglich Dein eingesteller zurückgesetzt und der Standardoffset (%s) wird wieder genutzt.\n" +
+                "Offsets nehmen immer UTC als Basis.\n" +
+                "Wenn du den Prefix zurücksetzt, wird der Defaultprefix (%s) genutzt\n\n" +
+                "Aktuell verfügbare Sprachen:\n" +
+                "- en_gb - English (British)\n" +
                 "- de_de - German (Deutsch)");
-        de_de.setProperty("server_args_set", "To set a setting, there have to be 3 arguments.\n" +
-                "... set [setting] [value]");
-        de_de.setProperty("server_offset", "Invalid offset.");
-        de_de.setProperty("server_prefix", "Invalid prefix.");
-        de_de.setProperty("server_invalidsetting", "This setting does not exist.");
-        de_de.setProperty("server_args_unset", "To unset a setting, there have to be 2 arguments.\n" +
-                "... unset [setting]");
+        de_de.setProperty("server_args_set", "Um eine Einstellung einzurichten, müssen 3 Argumente mitgegeben werden.\n" +
+                "... set [Einstellung] [Wert]");
+        de_de.setProperty("server_offset", "Ungültiger Offset.");
+        de_de.setProperty("server_prefix", "Ungültiger Prefix.");
+        de_de.setProperty("server_invalidsetting", "Diese Einstellung existiert nicht.");
+        de_de.setProperty("server_args_unset", "Um eine Einstellung zurückuzsetzen, müssen 2 Argumente mitgegeben werden.\n" +
+                "... unset [Einstellung]");
         de_de.setProperty("server_offset_text", "Offset");
         de_de.setProperty("server_prefix_text", "Prefix");
-        de_de.setProperty("server_language_text", "Language");
-        de_de.setProperty("server_settings", "Guild Settings");
-        de_de.setProperty("server_firstarg", "The first argument has to be either `set`, `unset` or `show`.");
+        de_de.setProperty("server_language_text", "Sprache");
+        de_de.setProperty("server_settings", "Server Einstellungen");
+        de_de.setProperty("server_firstarg", "Das erste Arugment muss entweder `set`, `unset` oder `show` sein.");
 
         /// Server Setup
-        de_de.setProperty("setupwizard_introduction", "Welcome to the server setup wizard!\n" +
-                "After doing this, you have all (3) base settings set up and we are ready to go!\n" +
-                "On each question you have 15 minutes to answer, otherwise this setup will time out.\n" +
-                "Do you want to start?");
-        de_de.setProperty("setupwizard_timeout", "The setup wizard timed out.");
-        de_de.setProperty("setupwizard_language", "Please state in what language you want me to speak in.\n" +
-                "Currently available languages:\n" +
-                "   \u200B⤷ `en_gb` - British English\n" +
+        de_de.setProperty("setupwizard_introduction", "Willkommen zu dem Server Setup Wizard!\n" +
+                "Nachdem wir dies abgeschlossen haben, wirst Du alle (3) Grundeinstellungen eingerichtet haben und wir sind bereit loszulegen!\n" +
+                "Bei jeder frage hast Du 15 Minuten zu antworten, andererseits wird das Setup unterbrechen.\n" +
+                "Möchtest Du starten?");
+        de_de.setProperty("setupwizard_timeout", "Der Setup Wizard wurde unterbrochen.");
+        de_de.setProperty("setupwizard_language", "Bitte gebe an in welche Sprache Du mich sprechen lassen willst.\n" +
+                "Aktuell verfügbare Sprachen:\n" +
+                "   \u200B⤷ `en_gb` - English (British)\n" +
                 "   \u200B⤷ `de_de` - German (Deutsch)\n" +
-                "**Provide the language code:**");
-        de_de.setProperty("setupwizard_language_repeated", "This language is not available.\n" +
-                "Currently available languages:\n" +
-                "   \u200B⤷ `en_gb` - British English\n" +
+                "**Gebe den Sprachenschlüssel an:**");
+        de_de.setProperty("setupwizard_language_repeated", "Diese Sprache ist nicht verfügbar.\n" +
+                "Aktuell verfügbare Sprachen:\n" +
+                "   \u200B⤷ `en_gb` - English (British)\n" +
                 "   \u200B⤷ `de_de` - German (Deutsch)\n" +
-                "**Try again:**");
-        de_de.setProperty("setupwizard_prefix", "%s Language set.\n" +
-                "Please provide a prefix you want to use.\n" +
-                "If you don't want to change the prefix, just type `%s`:");
-        de_de.setProperty("setupwizard_prefix_repeated", "This prefix is not suitable.\n" +
-                "If you don't want to change the prefix, just type `%s`\n" +
-                "Try again:");
-        de_de.setProperty("setupwizard_offset", "%s Prefix set.\n" +
-                "Please provide an offset to UTC to represent your timezone.\n" +
-                "The format is: `+HH:mm` or `-HH:mm`. E.g. `+01:00`\n" +
-                "To use UTC/GMT, just type `00:00`:");
-        de_de.setProperty("setupwizard_offset_repeated", "This offset is invalid.\n" +
-                "The format is: `+HH:mm` or `-HH:mm`. E.g. `+01:00`\n" +
-                "To use UTC/GMT, just type `00:00`\n" +
-                "Try again:");
-        de_de.setProperty("setupwizard_done", "We are done :)");
+                "**Versuche es erneut:**");
+        de_de.setProperty("setupwizard_prefix", "%s Sprache wurde gesetzt.\n" +
+                "Bitte gebe einen Prefix an, den du Nutzen möchtest.\n" +
+                "Falls du diesen nicht ändern möchtest, schreibe einfach `%s`:");
+        de_de.setProperty("setupwizard_prefix_repeated", "Dieser Prefix ist nicht geeignet.\n" +
+                "Falls du diesen nicht ändern möchtest, schreibe einfach `%s`\n" +
+                "**Versuche es erneut:**");
+        de_de.setProperty("setupwizard_offset", "%s Prefix wurde gesetzt.\n" +
+                "Bitte gebe einen Offset zu UTC an, um deine Zeitzone einzustellen.\n" +
+                "Das Format lautet: `+HH:mm` oder `-HH:mm`. Z.B. `+01:00`\n" +
+                "Um UTC/GMT zu benutzen, schreibe einfach `00:00`:");
+        de_de.setProperty("setupwizard_offset_repeated", "Dieses Offset ist ungültig.\n" +
+                "Das Format lautet: `+HH:mm` oder `-HH:mm`. Z.B. `+01:00`\n" +
+                "Um UTC/GMT zu benutzen, schreibe einfach `00:00`\n" +
+                "**Versuche es erneut:**");
+        de_de.setProperty("setupwizard_done", "Wir sind fertig :)");
 
         /// Toggle
         de_de.setProperty("toggle_description", "You can toggle almost every feature on or off.\n" +
@@ -1539,7 +1540,7 @@ public class LanguageFile {
                 "Command: `%s%s unset language`\n" +
                 "\n" +
                 "**Hide yourself from stream highlighting**\n" +
-                "Command: `%s%s streamhide [opt. guild ID]`\n" +
+                "Command: `%s%s streamhide [opt. server ID]`\n" +
                 "\n" +
                 "**Setting an embed colour**\n" +
                 "Command: `%s%s set colour [color code]`\n" +
@@ -1557,9 +1558,9 @@ public class LanguageFile {
                 "- en_gb - British English\n" +
                 "- de_de - German (Deutsch)\n" +
                 "You can hide yourself from being highlighted with streaming role while streaming (server specific).");
-        de_de.setProperty("user_streamhide_description", "You have to use this in a guild to specify what guild you want to be muted on.\n" +
-                "If you want to do this secretly, you can also provide a guild ID:\n" +
-                "Command: `%s%s streamhide [guild ID]`\n" +
+        de_de.setProperty("user_streamhide_description", "You have to use this in a server to specify what server you want to be muted on.\n" +
+                "If you want to do this secretly, you can also provide a server ID:\n" +
+                "Command: `%s%s streamhide [server ID]`\n" +
                 "Example: `%s%s streamhide 99999999999999999`");
         de_de.setProperty("user_streamhide_hidden", "You are now hidden!");
         de_de.setProperty("user_streamhide_visible", "You are now visible!");
@@ -1751,7 +1752,7 @@ public class LanguageFile {
                 "   \u200B⤷ Example: `%sgiveaway \"100 cookies\" 1 2d 12h 36m 1d`\n" +
                 "   \u200B⤷ Time result: `2d` + `12h` + `36m` + `1d` = 3 days, 12 hours, 36 minutes\n" +
                 "- Seconds are not supported");
-        de_de.setProperty("giveaway_current", "Current giveaways on this guild");
+        de_de.setProperty("giveaway_current", "Current giveaways on this server");
         de_de.setProperty("giveaway_days", "%s days");
         de_de.setProperty("giveaway_hours", "%s hours");
         de_de.setProperty("giveaway_minutes", "%s minutes");
@@ -1925,8 +1926,8 @@ public class LanguageFile {
         de_de.setProperty("embed_footer_icon_i_fail", "Your input is invalid. Please provide a valid direct url:");
         de_de.setProperty("embed_empty", "Either the embed is empty or it has over 6000 characters.\nBoth is not allowed!");
         de_de.setProperty("embed_timestamp_q", "Do you want to use a timestamp?");
-        de_de.setProperty("embed_timestamp_i", "Please provide a timestamp.\nYou either can say `now` or provide a date and time like this: `yyyy-MM-dd HH:mm` (uses guild timezone):");
-        de_de.setProperty("embed_timestamp_i_fail", "Your input is invalid.\nYou either can say `now` or provide a date and time like this: `yyyy-MM-dd HH:mm` (uses guild timezone).\nTry again:");
+        de_de.setProperty("embed_timestamp_i", "Please provide a timestamp.\nYou either can say `now` or provide a date and time like this: `yyyy-MM-dd HH:mm` (uses server timezone):");
+        de_de.setProperty("embed_timestamp_i_fail", "Your input is invalid.\nYou either can say `now` or provide a date and time like this: `yyyy-MM-dd HH:mm` (uses server timezone).\nTry again:");
 
         //// Create Embed
         de_de.setProperty("createembed_introduction", "With this command, you can create your own embed.\n" +

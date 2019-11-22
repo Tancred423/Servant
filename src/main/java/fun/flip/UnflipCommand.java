@@ -6,7 +6,7 @@ import moderation.guild.Guild;
 import moderation.guild.GuildHandler;
 import moderation.toggle.Toggle;
 import moderation.user.User;
-import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.api.Permission;
 import utilities.Constants;
 import utilities.StringFormat;
 import utilities.UsageEmbed;
@@ -28,36 +28,44 @@ public class UnflipCommand extends Command {
         this.cooldown = Constants.USER_COOLDOWN;
         this.cooldownScope = CooldownScope.USER;
         this.userPermissions = new Permission[0];
-        this.botPermissions = new Permission[]{Permission.NICKNAME_MANAGE};
+        this.botPermissions = new Permission[] {
+                Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY,
+                Permission.NICKNAME_MANAGE
+        };
     }
 
     @Override
     protected void execute(CommandEvent event) {
         CompletableFuture.runAsync(() -> {
-            if (!Toggle.isEnabled(event, "flip")) return; // flip also toggles unflip
+            try {
+                if (!Toggle.isEnabled(event, "flip")) return; // flip also toggles unflip
 
-            var message = event.getMessage();
-            var lang = LanguageHandler.getLanguage(event);
-            var p = GuildHandler.getPrefix(event);
+                var message = event.getMessage();
+                var lang = LanguageHandler.getLanguage(event);
+                var p = GuildHandler.getPrefix(event);
 
-            if (message.getMentionedMembers().isEmpty()) {
-                var description = LanguageHandler.get(lang, "unflip_description");
-                var usage = String.format(LanguageHandler.get(lang, "unflip_usage"), p, name);
-                var hint = String.format(LanguageHandler.get(lang, "unflip_hint"), p);
-                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
-                return;
+                if (message.getMentionedMembers().isEmpty()) {
+                    var description = LanguageHandler.get(lang, "unflip_description");
+                    var usage = String.format(LanguageHandler.get(lang, "unflip_usage"), p, name);
+                    var hint = String.format(LanguageHandler.get(lang, "unflip_hint"), p);
+                    event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+                    return;
+                }
+
+                var mentioned = message.getMentionedMembers().get(0);
+                var effectiveName = mentioned.getEffectiveName();
+                var flipped = StringFormat.flipString(effectiveName);
+                event.reply(flipped + "ノ( º _ ºノ)");
+                var selfMember = event.getGuild().getMemberById(event.getSelfUser().getIdLong());
+                if (selfMember != null && selfMember.canInteract(mentioned))
+                    event.getGuild().modifyNickname(mentioned, flipped).queue();
+
+                // Statistics.
+                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), event.getGuild(), event.getAuthor());
+                new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), event.getGuild(), event.getAuthor());
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
-            var mentioned = message.getMentionedMembers().get(0);
-            var effectiveName = mentioned.getEffectiveName();
-            var flipped = StringFormat.flipString(effectiveName);
-            event.reply(flipped + "ノ( º _ ºノ)");
-            if (event.getGuild().getMemberById(event.getSelfUser().getIdLong()).canInteract(mentioned))
-                event.getGuild().getController().setNickname(mentioned, flipped).queue();
-
-            // Statistics.
-            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), event.getGuild(), event.getAuthor());
-            new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), event.getGuild(), event.getAuthor());
         });
     }
 }

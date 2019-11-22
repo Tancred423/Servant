@@ -1,7 +1,7 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package utilities;
 
-import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.api.entities.*;
 
 import java.awt.*;
 import java.io.IOException;
@@ -21,7 +21,7 @@ import java.util.List;
 public class Parser {
     public static boolean isValidMessageId(MessageChannel channel, String id) {
         try {
-            channel.getMessageById(id).queue(ISnowflake::getId, Throwable::getMessage);
+            channel.retrieveMessageById(id).queue(ISnowflake::getId, Throwable::getMessage);
             return true;
         } catch (IllegalArgumentException e) {
             return false;
@@ -32,7 +32,6 @@ public class Parser {
         return language.equalsIgnoreCase("de_de") || language.equalsIgnoreCase("en_Gb");
     }
 
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean isValidDateTime(String input) {
         try {
             LocalDateTime.parse(input, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));

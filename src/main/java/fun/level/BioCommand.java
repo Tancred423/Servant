@@ -5,7 +5,7 @@ import files.language.LanguageHandler;
 import moderation.guild.Guild;
 import moderation.toggle.Toggle;
 import moderation.user.User;
-import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.api.Permission;
 import utilities.Constants;
 import utilities.Parser;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
@@ -26,35 +26,42 @@ public class BioCommand extends Command {
         this.cooldown = Constants.USER_COOLDOWN;
         this.cooldownScope = CooldownScope.USER;
         this.userPermissions = new Permission[0];
-        this.botPermissions = new Permission[0];
+        this.botPermissions = new Permission[] {
+                Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY
+        };
     }
 
     @Override
     protected void execute(CommandEvent event) {
         CompletableFuture.runAsync(() -> {
-            if (!Toggle.isEnabled(event, "profile")) return;
-            var args = event.getArgs();
+            try {
+                if (!Toggle.isEnabled(event, "profile")) return;
+                var args = event.getArgs();
 
-            var guild = event.getGuild();
-            var author = event.getAuthor();
-            var lang = LanguageHandler.getLanguage(event);
+                var guild = event.getGuild();
+                var author = event.getAuthor();
+                var lang = LanguageHandler.getLanguage(event);
 
-            if (Parser.isSqlInjection(args)) {
-                event.reactError();
-                return;
+                if (Parser.isSqlInjection(args)) {
+                    event.reactError();
+                    return;
+                }
+
+                if (args.length() > 50) {
+                    event.replyError(LanguageHandler.get(lang, "bio_maxlength"));
+                    return;
+                }
+
+                new User(event.getAuthor().getIdLong()).setBio(args, guild, author);
+                event.reactSuccess();
+
+                // Statistics.
+                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+                if (event.getGuild() != null)
+                    new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
-            if (args.length() > 50) {
-                event.replyError(LanguageHandler.get(lang, "bio_maxlength"));
-                return;
-            }
-
-            new User(event.getAuthor().getIdLong()).setBio(args, guild, author);
-            event.reactSuccess();
-
-            // Statistics.
-            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
         });
     }
 }

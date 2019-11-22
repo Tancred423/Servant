@@ -15,19 +15,18 @@
  */
 package zJdaUtilsLib.com.jagrosh.jdautilities.command;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.function.Consumer;
-
-import net.dv8tion.jda.core.OnlineStatus;
-import net.dv8tion.jda.core.entities.Game;
+import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.entities.Activity;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.impl.AnnotatedModuleCompilerImpl;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.impl.CommandClientImpl;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.function.Consumer;
+
 public class CommandClientBuilder {
-    private Game game = Game.playing("default");
+    private Activity game = Activity.playing("default");
     private OnlineStatus status = OnlineStatus.ONLINE;
     private String ownerId;
     private String[] coOwnerIds;
@@ -105,13 +104,13 @@ public class CommandClientBuilder {
         return this;
     }
 
-    public CommandClientBuilder setGame(Game game) {
+    public CommandClientBuilder setGame(Activity game) {
         this.game = game;
         return this;
     }
 
     public CommandClientBuilder useDefaultGame() {
-        this.game = Game.playing("default");
+        this.game = Activity.playing("default");
         return this;
     }
 

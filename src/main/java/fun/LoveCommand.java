@@ -6,9 +6,9 @@ import moderation.guild.Guild;
 import moderation.guild.GuildHandler;
 import moderation.toggle.Toggle;
 import moderation.user.User;
-import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
 import owner.blacklist.Blacklist;
 import servant.Servant;
 import utilities.Constants;
@@ -24,7 +24,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class LoveCommand extends Command {
     public LoveCommand() {
         this.name = "love";
-        this.aliases = new String[]{"ship"};
+        this.aliases = new String[] { "ship" };
         this.help = "I ship it!";
         this.category = new Command.Category("Fun");
         this.arguments = "@user1 @user2";
@@ -34,87 +34,96 @@ public class LoveCommand extends Command {
         this.cooldown = Constants.USER_COOLDOWN;
         this.cooldownScope = CooldownScope.USER;
         this.userPermissions = new Permission[0];
-        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS};
+        this.botPermissions = new Permission[] {
+                Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY,
+                Permission.MESSAGE_EMBED_LINKS
+        };
     }
 
     @Override
     protected void execute(CommandEvent event) {
         CompletableFuture.runAsync(() -> {
-            if (!Toggle.isEnabled(event, name)) return;
-            if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
+            try {
+                if (!Toggle.isEnabled(event, name)) return;
+                if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
 
-            var message = event.getMessage();
-            List<Member> mentioned = message.getMentionedMembers();
-            var lang = LanguageHandler.getLanguage(event);
-            var p = GuildHandler.getPrefix(event);
+                var message = event.getMessage();
+                List<Member> mentioned = message.getMentionedMembers();
+                var lang = LanguageHandler.getLanguage(event);
+                var p = GuildHandler.getPrefix(event);
 
-            if (mentioned.size() < 1) {
-                var description = LanguageHandler.get(lang, "love_description");
-                var usage = String.format(LanguageHandler.get(lang, "love_usage"), p, name, p, name);
-                var hint = LanguageHandler.get(lang, "love_hint");
-                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
-                return;
-            }
+                if (mentioned.size() < 1) {
+                    var description = LanguageHandler.get(lang, "love_description");
+                    var usage = String.format(LanguageHandler.get(lang, "love_usage"), p, name, p, name);
+                    var hint = LanguageHandler.get(lang, "love_hint");
+                    event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+                    return;
+                }
 
-            Member first;
-            Member second;
-            var isSelfLove = false;
+                Member first;
+                Member second;
+                var isSelfLove = false;
 
-            if (mentioned.size() > 1) {
-                first = mentioned.get(0);
-                second = mentioned.get(1);
-                if (first == second) isSelfLove = true;
-            } else {
-                var splitContentRaw = event.getArgs().split(" ");
+                if (mentioned.size() > 1) {
+                    first = mentioned.get(0);
+                    second = mentioned.get(1);
+                    if (first == second) isSelfLove = true;
+                } else {
+                    var splitContentRaw = event.getArgs().split(" ");
 
-                if (splitContentRaw.length > 1) {
-                    if (splitContentRaw[0].trim().equals(splitContentRaw[1].trim())) {
-                        first = mentioned.get(0);
-                        second = mentioned.get(0);
-                        isSelfLove = true;
+                    if (splitContentRaw.length > 1) {
+                        if (splitContentRaw[0].trim().equals(splitContentRaw[1].trim())) {
+                            first = mentioned.get(0);
+                            second = mentioned.get(0);
+                            isSelfLove = true;
+                        } else {
+                            first = event.getGuild().getMemberById(event.getAuthor().getIdLong());
+                            second = mentioned.get(0);
+                        }
                     } else {
                         first = event.getGuild().getMemberById(event.getAuthor().getIdLong());
                         second = mentioned.get(0);
                     }
-                } else {
-                    first = event.getGuild().getMemberById(event.getAuthor().getIdLong());
-                    second = mentioned.get(0);
                 }
+
+                var guild = event.getGuild();
+                var author = event.getAuthor();
+                var internalAuthor = new User(author.getIdLong());
+
+                var love = ThreadLocalRandom.current().nextInt(0, 101);
+                if (first == null) return;
+                if ((first.getUser().getId().equals(Servant.config.getBotOwnerId()) && second.getUser() == event.getJDA().getSelfUser()
+                        || (first.getUser() == event.getJDA().getSelfUser() && second.getUser().getId().equals(Servant.config.getBotOwnerId()))))
+                    love = 100;
+                var bar = getBar(love);
+                var quote = getQuote(love, isSelfLove, lang);
+                var shippingName = getShippingName(first, second);
+
+                checkLoveAchievements(internalAuthor, message, love);
+
+                new MessageHandler().sendEmbed(event.getChannel(),
+                        internalAuthor.getColor(guild, author),
+                        quote,
+                        null,
+                        event.getJDA().getSelfUser().getAvatarUrl(),
+                        null,
+                        "https://i.imgur.com/BaeIVWa.png", // :tancLove:
+                        first.getAsMention() + "♥" + second.getAsMention() + "\n" +
+                                "\n" +
+                                bar,
+                        null,
+                        null,
+                        shippingName,
+                        "https://i.imgur.com/JAKcV8F.png"
+                );
+
+                // Statistics.
+                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+                if (event.getGuild() != null)
+                    new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
-            var guild = event.getGuild();
-            var author = event.getAuthor();
-            var internalAuthor = new User(author.getIdLong());
-
-            var love = ThreadLocalRandom.current().nextInt(0, 101);
-            if ((first.getUser().getId().equals(Servant.config.getBotOwnerId()) && second.getUser() == event.getJDA().getSelfUser()
-                    || (first.getUser() == event.getJDA().getSelfUser() && second.getUser().getId().equals(Servant.config.getBotOwnerId()))))
-                love = 100;
-            var bar = getBar(love);
-            var quote = getQuote(love, isSelfLove, lang);
-            var shippingName = getShippingName(first, second);
-
-            checkLoveAchievements(internalAuthor, message, love);
-
-            new MessageHandler().sendEmbed(event.getChannel(),
-                    internalAuthor.getColor(guild, author),
-                    quote,
-                    null,
-                    event.getJDA().getSelfUser().getAvatarUrl(),
-                    null,
-                    "https://i.imgur.com/BaeIVWa.png", // :tancLove:
-                    first.getAsMention() + "♥" + second.getAsMention() + "\n" +
-                            "\n" +
-                            bar,
-                    null,
-                    null,
-                    shippingName,
-                    "https://i.imgur.com/JAKcV8F.png"
-            );
-
-            // Statistics.
-            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-            if (event.getGuild() != null) new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
         });
     }
 

@@ -4,16 +4,19 @@ package moderation.reactionRole;
 import files.language.LanguageHandler;
 import moderation.guild.Guild;
 import moderation.toggle.Toggle;
-import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
-import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionRemoveEvent;
-import net.dv8tion.jda.core.exceptions.HierarchyException;
-import net.dv8tion.jda.core.exceptions.InsufficientPermissionException;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
+import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionRemoveEvent;
+import net.dv8tion.jda.api.exceptions.HierarchyException;
+import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 
 public class ReactionRoleListener extends ListenerAdapter {
-    public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {
+    public void onGuildMessageReactionAdd(@NotNull GuildMessageReactionAddEvent event) {
         CompletableFuture.runAsync(() -> {
             if (event.getUser().isBot()) return;
             if (!Toggle.isEnabled(event, "reactionrole")) return;
@@ -40,7 +43,9 @@ public class ReactionRoleListener extends ListenerAdapter {
             if (internalGuild.reactionRoleHasEntry(guildId, channelId, messageId, emoji, emoteGuildId, emoteId, guild, user)) {
                 long roleId = internalGuild.getRoleId(guildId, channelId, messageId, emoji, emoteGuildId, emoteId, guild, user);
                 try {
-                    event.getGuild().getController().addSingleRoleToMember(event.getMember(), event.getGuild().getRoleById(roleId)).queue();
+                    var rolesToAdd = new ArrayList<Role>();
+                    rolesToAdd.add(event.getGuild().getRoleById(roleId));
+                    event.getGuild().modifyMemberRoles(event.getMember(), rolesToAdd, null).queue();
                 } catch (InsufficientPermissionException | HierarchyException e) {
                     event.getChannel().sendMessage(LanguageHandler.get(new Guild(event.getGuild().getIdLong()).getLanguage(guild, user), "reactionrole_insufficient")).queue();
                 }
@@ -48,7 +53,7 @@ public class ReactionRoleListener extends ListenerAdapter {
         });
     }
 
-    public void onGuildMessageReactionRemove(GuildMessageReactionRemoveEvent event) {
+    public void onGuildMessageReactionRemove(@NotNull GuildMessageReactionRemoveEvent event) {
         CompletableFuture.runAsync(() -> {
             if (!Toggle.isEnabled(event, "reactionrole")) return;
 
@@ -76,7 +81,9 @@ public class ReactionRoleListener extends ListenerAdapter {
             if (internalGuild.reactionRoleHasEntry(guildId, channelId, messageId, emoji, emoteGuildId, emoteId, guild, user)) {
                 long roleId = internalGuild.getRoleId(guildId, channelId, messageId, emoji, emoteGuildId, emoteId, guild, user);
                 try {
-                    event.getGuild().getController().removeSingleRoleFromMember(event.getMember(), event.getGuild().getRoleById(roleId)).queue();
+                    var rolesToRemove = new ArrayList<Role>();
+                    rolesToRemove.add(event.getGuild().getRoleById(roleId));
+                    event.getGuild().modifyMemberRoles(event.getMember(), null, rolesToRemove).queue();
                 } catch (InsufficientPermissionException | HierarchyException e) {
                     event.getChannel().sendMessage(LanguageHandler.get(new Guild(event.getGuild().getIdLong()).getLanguage(guild, user), "reactionrole_insufficient")).queue();
                 }

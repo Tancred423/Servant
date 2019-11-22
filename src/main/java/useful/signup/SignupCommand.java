@@ -6,8 +6,8 @@ import moderation.guild.Guild;
 import moderation.guild.GuildHandler;
 import moderation.toggle.Toggle;
 import moderation.user.User;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.Permission;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import owner.blacklist.Blacklist;
 import useful.InvalidTitleException;
 import utilities.*;
@@ -23,7 +23,7 @@ import java.util.concurrent.CompletableFuture;
 public class SignupCommand extends Command {
     public SignupCommand() {
         this.name = "signup";
-        this.aliases = new String[0];
+        this.aliases = new String[] { "event" };
         this.help = "Organise events.";
         this.category = new Category("Useful");
         this.arguments = null;
@@ -33,86 +33,97 @@ public class SignupCommand extends Command {
         this.cooldown = Constants.USER_COOLDOWN;
         this.cooldownScope = CooldownScope.USER;
         this.userPermissions = new Permission[0];
-        this.botPermissions = new Permission[]{Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_ADD_REACTION};
+        this.botPermissions = new Permission[] {
+                Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY,
+                Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_ADD_REACTION
+        };
     }
 
     @Override
     protected void execute(CommandEvent event) {
         CompletableFuture.runAsync(() -> {
-            if (!Toggle.isEnabled(event, name)) return;
-            if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
-
-            var lang = LanguageHandler.getLanguage(event);
-            var p = GuildHandler.getPrefix(event);
-
-            if (event.getArgs().isEmpty()) {
-                var description = LanguageHandler.get(lang, "signup_description");
-                var usage = String.format(LanguageHandler.get(lang, "signup_usage"), p, name, p, name, p, name, p, name, p, name);
-                var hint = LanguageHandler.get(lang, "signup_hint");
-                event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
-                return;
-            }
-
-            var contentSplit = event.getArgs().trim().replaceAll(" +", " ").replace("\\", "").split(" ");
-
-            String title;
             try {
-                title = parseTitle(event, contentSplit);
-            } catch (InvalidTitleException e) {
-                event.replyError(e.getMessage());
-                return;
+                if (!Toggle.isEnabled(event, name)) return;
+                if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
+
+                var lang = LanguageHandler.getLanguage(event);
+                var p = GuildHandler.getPrefix(event);
+
+                if (event.getArgs().isEmpty()) {
+                    var description = LanguageHandler.get(lang, "signup_description");
+                    var usage = String.format(LanguageHandler.get(lang, "signup_usage"), p, name, p, name, p, name, p, name, p, name);
+                    var hint = LanguageHandler.get(lang, "signup_hint");
+                    event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+                    return;
+                }
+
+                var contentSplit = event.getArgs().trim().replaceAll(" +", " ").replace("\\", "").split(" ");
+
+                String title;
+                try {
+                    title = parseTitle(event, contentSplit);
+                } catch (InvalidTitleException e) {
+                    event.replyError(e.getMessage());
+                    return;
+                }
+
+                int amount;
+                try {
+                    amount = parseAmount(event, contentSplit, title);
+                } catch (InvalidAmountException e) {
+                    event.replyError(e.getMessage());
+                    return;
+                }
+
+                ZonedDateTime eventDate;
+                try {
+                    eventDate = parseDate(event, contentSplit, amount);
+                } catch (InvalidDateException e) {
+                    event.replyError(e.getMessage());
+                    return;
+                }
+
+                var internalGuild = new Guild(event.getGuild().getIdLong());
+                var offset = internalGuild.getOffset(event.getGuild(), event.getAuthor());
+                var isCustomDate = false;
+                if (eventDate != null) isCustomDate = true;
+                else eventDate = ZonedDateTime.now(ZoneOffset.of(offset)).plusWeeks(4);
+                title = title == null ? "" : title;
+
+                var guild = event.getGuild();
+                var author = event.getAuthor();
+                var internalAuthor = new User(author.getIdLong());
+
+                var eb = new EmbedBuilder();
+                eb.setColor(internalAuthor.getColor(guild, author));
+                eb.setTitle(title.isEmpty() ? LanguageHandler.get(lang, "signup_embedtitle_empty") :
+                        String.format(LanguageHandler.get(lang, "signup_embedtitle_notempty"), title));
+                eb.setDescription(String.format(LanguageHandler.get(lang, "signup_embeddescription"),
+                        Emote.getEmoji("upvote"), amount,
+                        (isCustomDate ? LanguageHandler.get(lang, "signup_embeddescription_custom") : "")));
+                eb.setFooter(isCustomDate ? LanguageHandler.get(lang, "signup_event") : LanguageHandler.get(lang, "signup_timeout"),
+                        Image.getImageUrl("clock", guild, author));
+                eb.setTimestamp(eventDate.toInstant());
+
+                var upvote = Emote.getEmoji("upvote");
+                var downvote = Emote.getEmoji("end");
+                if (upvote == null || downvote == null) return; // todo: always null?
+
+                var finalEventDate = eventDate;
+                var finalIsCustomDate = isCustomDate;
+                var finalTitle = title;
+                event.getChannel().sendMessage(eb.build()).queue(sentMessage -> {
+                    sentMessage.addReaction(upvote).queue();
+                    sentMessage.addReaction(downvote).queue();
+                    internalGuild.setSignup(sentMessage.getIdLong(), author.getIdLong(), amount, finalTitle, Timestamp.valueOf(finalEventDate.toLocalDateTime()), sentMessage.getChannel().getIdLong(), finalIsCustomDate, guild, author);
+                });
+
+                // Statistics.
+                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+                new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
-            int amount;
-            try {
-                amount = parseAmount(event, contentSplit, title);
-            } catch (InvalidAmountException e) {
-                event.replyError(e.getMessage());
-                return;
-            }
-
-            ZonedDateTime eventDate;
-            try {
-                eventDate = parseDate(event, contentSplit, amount);
-            } catch (InvalidDateException e) {
-                event.replyError(e.getMessage());
-                return;
-            }
-
-            var internalGuild = new Guild(event.getGuild().getIdLong());
-            var offset = internalGuild.getOffset(event.getGuild(), event.getAuthor());
-            var isCustomDate = false;
-            if (eventDate != null) isCustomDate = true;
-            else eventDate = ZonedDateTime.now(ZoneOffset.of(offset)).plusWeeks(4);
-            title = title == null ? "" : title;
-
-            var guild = event.getGuild();
-            var author = event.getAuthor();
-            var internalAuthor = new User(author.getIdLong());
-
-            var eb = new EmbedBuilder();
-            eb.setColor(internalAuthor.getColor(guild, author));
-            eb.setTitle(title.isEmpty() ? LanguageHandler.get(lang, "signup_embedtitle_empty") :
-                    String.format(LanguageHandler.get(lang, "signup_embedtitle_notempty"), title));
-            eb.setDescription(String.format(LanguageHandler.get(lang, "signup_embeddescription"),
-                    Emote.getEmoji("upvote"), amount,
-                    (isCustomDate ? LanguageHandler.get(lang, "signup_embeddescription_custom") : "")));
-            eb.setFooter(isCustomDate ? LanguageHandler.get(lang, "signup_event") : LanguageHandler.get(lang, "signup_timeout"),
-                    Image.getImageUrl("clock", guild, author));
-            eb.setTimestamp(eventDate.toInstant());
-
-            var finalEventDate = eventDate;
-            var finalIsCustomDate = isCustomDate;
-            var finalTitle = title;
-            event.getChannel().sendMessage(eb.build()).queue(sentMessage -> {
-                sentMessage.addReaction(Emote.getEmoji("upvote")).queue();
-                sentMessage.addReaction(Emote.getEmoji("end")).queue();
-                internalGuild.setSignup(sentMessage.getIdLong(), author.getIdLong(), amount, finalTitle, Timestamp.valueOf(finalEventDate.toLocalDateTime()), sentMessage.getChannel().getIdLong(), finalIsCustomDate, guild, author);
-            });
-
-            // Statistics.
-            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-            new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
         });
     }
 

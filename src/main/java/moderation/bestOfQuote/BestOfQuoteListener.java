@@ -5,10 +5,11 @@ import files.language.LanguageHandler;
 import moderation.guild.Guild;
 import moderation.toggle.Toggle;
 import moderation.user.User;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.OnlineStatus;
-import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 import owner.blacklist.Blacklist;
 
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 public class BestOfQuoteListener extends ListenerAdapter {
     private static List<Long> temporaryBlacklist = new ArrayList<>();
 
-    public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {
+    public void onGuildMessageReactionAdd(@NotNull GuildMessageReactionAddEvent event) {
         CompletableFuture.runAsync(() -> {
             if (event.getUser().isBot()) return;
             if (!Toggle.isEnabled(event, "bestofquote")) return;
@@ -39,21 +40,21 @@ public class BestOfQuoteListener extends ListenerAdapter {
                 return;
             }
 
-            event.getChannel().getMessageById(messageId).queue(message -> {
+            event.getChannel().retrieveMessageById(messageId).queue(message -> {
                 var attachments = message.getAttachments();
                 if (!attachments.isEmpty()) {
                     temporaryBlacklist.remove(messageId);
                     return;
                 }
 
-                var voteEmote = internalGuild.getBestOfQuoteEmote(guild, user);
+                var voteEmote = internalGuild.getBestOfQuoteEmote(event.getJDA(), guild, user);
                 var voteEmoji = internalGuild.getBestOfQuoteEmoji(guild, user);
                 var reactionCount = 0;
 
                 var reactionEmote = event.getReactionEmote();
                 if (voteEmote != null) {
                     // Emote
-                    if (reactionEmote.getEmote() == null) return;
+                    // todo: never null?
                     if (!reactionEmote.getEmote().equals(voteEmote)) {
                         temporaryBlacklist.remove(messageId);
                         return;
@@ -113,7 +114,7 @@ public class BestOfQuoteListener extends ListenerAdapter {
                         sendBestOf(event, reactionCount, lang);
                     else temporaryBlacklist.remove(messageId);
                 } else temporaryBlacklist.remove(messageId);
-            });
+            }, failure -> {});
 
             final var executor = new ScheduledThreadPoolExecutor(1);
             executor.schedule(() -> {
@@ -126,7 +127,7 @@ public class BestOfQuoteListener extends ListenerAdapter {
         var user = event.getUser();
         var guild = event.getGuild();
         var internalGuild = new Guild(guild.getIdLong());
-        event.getChannel().getMessageById(event.getMessageId()).queue(message -> {
+        event.getChannel().retrieveMessageById(event.getMessageId()).queue(message -> {
             var channel = internalGuild.getBestOfQuoteChannel(guild, user);
             var author = message.getAuthor();
 
@@ -136,7 +137,7 @@ public class BestOfQuoteListener extends ListenerAdapter {
             eb.setTitle(!message.getContentDisplay().isEmpty() ? message.getContentDisplay() : null);
             eb.setDescription("[" + LanguageHandler.get(lang, "bestof_jump") + "](" + message.getJumpUrl() + ")");
             eb.setFooter(String.format(LanguageHandler.get(lang, "bestof_footer"), reactionCount, event.getChannel().getName()), null);
-            eb.setTimestamp(message.getCreationTime());
+            eb.setTimestamp(message.getTimeCreated());
 
             channel.sendMessage(eb.build()).queue();
 
