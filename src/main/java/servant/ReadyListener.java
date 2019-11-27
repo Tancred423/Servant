@@ -54,7 +54,6 @@ public class ReadyListener extends ListenerAdapter {
     private void checkStuff(JDA jda) {
         var service = Executors.newSingleThreadScheduledExecutor();
         service.scheduleAtFixedRate(() -> {
-            System.out.println("[" + OffsetDateTime.now(ZoneId.of(Constants.LOG_OFFSET)).toString().replaceAll("T", " ").substring(0, 19) + "] " + "Checking alarms, giveaways, reminders and signups.");
             Alarm.check(jda);
             Giveaway.checkGiveaways(jda);
             Reminder.check(jda);
@@ -97,7 +96,6 @@ public class ReadyListener extends ListenerAdapter {
 
     @SuppressWarnings({"ResultOfMethodCallIgnored", "unchecked"})
     private void logServerAmount(JDA jda) throws IOException, ParseException {
-        System.out.println("[" + OffsetDateTime.now(ZoneId.of(Constants.LOG_OFFSET)).toString().replaceAll("T", " ").substring(0, 19) + "] " + "Logging Server Amount.");
         var currentDir = System.getProperty("user.dir");
         var logDir = currentDir + "/server_log";
         var jsonDir = logDir + "/server_log.json";
