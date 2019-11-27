@@ -48,9 +48,9 @@ public class BirthdayCommand extends Command {
                 var p = GuildHandler.getPrefix(event);
 
                 if (event.getArgs().isEmpty()) {
-                    var description = String.format(LanguageHandler.get(lang, "birthday_description"), event.getJDA().getSelfUser().getName());
+                    var description = String.format(LanguageHandler.get(lang, "birthday_description"), event.getJDA().getSelfUser().getName(), event.getJDA().getSelfUser().getName());
                     var usage = String.format(LanguageHandler.get(lang, "birthday_usage"),
-                            p, name, p, name, p, name, p, name, p, name, p, name, p, name);
+                            p, name, p, name, p, name, p, name, p, name, p, name, p, name, event.getJDA().getSelfUser().getName(), p, name, event.getJDA().getSelfUser().getName());
                     var hint = LanguageHandler.get(lang, "birthday_hint");
                     event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
                     return;

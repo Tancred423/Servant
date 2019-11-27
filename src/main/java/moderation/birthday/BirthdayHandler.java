@@ -39,7 +39,7 @@ class BirthdayHandler {
                 if (authorMember == null) return; // todo: always null?
                 tc.retrieveMessageById(messageId).queue(message -> {
                     try {
-                        var list = createList(guild, authorMember.getUser(), tc);
+                        var list = createList(guild, authorMember.getUser(), tc, true);
                         message.editMessage(list == null ? new EmbedBuilder().build() : list).queue();
                     } catch (ParseException e) {
                         new Log(e, guild, authorMember.getUser(), "BirthdayHandler - Update Lists", null).sendLog(false);
@@ -54,7 +54,7 @@ class BirthdayHandler {
         var guild = event.getGuild();
         var internalGuild = new moderation.guild.Guild(guild.getIdLong());
         var author = event.getAuthor();
-        var embed = createList(guild, author, channel);
+        var embed = createList(guild, author, channel, isAutoUpdate);
         if (embed != null) {
             channel.sendMessage(embed).queue(sentMessage -> {
                 if (isAutoUpdate)
@@ -105,7 +105,7 @@ class BirthdayHandler {
         ).queue();
     }
     
-    private static MessageEmbed createList(Guild guild, net.dv8tion.jda.api.entities.User author, MessageChannel channel) throws ParseException {
+    private static MessageEmbed createList(Guild guild, net.dv8tion.jda.api.entities.User author, MessageChannel channel, boolean isAutoUpdate) throws ParseException {
         var internalGuild = new moderation.guild.Guild(guild.getIdLong());
         var internalAuthor = new User(author.getIdLong());
 
@@ -145,7 +145,7 @@ class BirthdayHandler {
             eb.setColor(internalAuthor.getColor(guild, author));
             eb.setAuthor(String.format(LanguageHandler.get(lang, "birthday_guild"), guild.getName() + (guild.getName().toLowerCase().endsWith("s") ? "'" : "'s")), null, guild.getIconUrl());
             eb.setDescription(sb.toString());
-            eb.setFooter(LanguageHandler.get(lang, "birthday_as_of"), Image.getImageUrl("clock", guild, author));
+            eb.setFooter(LanguageHandler.get(lang, "birthday_as_of"), isAutoUpdate ? Image.getImageUrl("clock", guild, author) : null);
             eb.setTimestamp(OffsetDateTime.now());
 
             return eb.build();

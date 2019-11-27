@@ -124,7 +124,8 @@ public class LanguageFile {
                 "- Members can remove their birthday from the list.\n" +
                 "- Members can create a one-time list of all birthdays of this server.\n" +
                 "- Moderators can set up a notification channel, where %s will post a Happy-Birthday-Message.\n" +
-                "- Moderators can create a list of all birthdays of this server, which will be updated regulary.");
+                "- Moderators can create a list of all birthdays of this server, which will be updated regulary.\n" +
+                "- Moderators can add or remove %s's birthday.");
         en_gb.setProperty("birthday_usage", "**Set notification channel**\n" +
                 "Command: `%s%s #channel`\n" +
                 "**Unset notification channel**\n" +
@@ -137,10 +138,12 @@ public class LanguageFile {
                 "**Unset birthday**\n" +
                 "Command: `%s%s unsetbirthday`\n" +
                 "**Create a non-updating birthday list**\n" +
-                "Command: `%s%s list`");
+                "Command: `%s%s list`\n" +
+                "**Add/Remove %s's birthday**\n" +
+                "Command: `%s%s %s`");
         en_gb.setProperty("birthday_hint", "The commands have different required permissions.\n" +
                 "See description:\n" +
-                "- \"Members\": Everyone\n" +
+                "- \"Members\": No permission required\n" +
                 "- \"Moderators\": Manage Channels");
         en_gb.setProperty("birthday_countdown", "Countdown");
         en_gb.setProperty("birthday_countdown_value", "in %s days");
@@ -1149,8 +1152,9 @@ public class LanguageFile {
                 "- Mitglieder können ihren Geburtstag der Liste hinzufügen.\n" +
                 "- Mitglieder können ihren Geburstag von der Liste enfernen.\n" +
                 "- Mitglieder können eine einmalige Liste aller Geburtstage des Servers erstellen.\n" +
-                "- Moderatioen können einen Benachrichtungskanal festlegen, in welchem %s den entsprechenden Mitgliedern gratulieren wird.\n" +
-                "- Modeatioren können eine Liste aller Geburtstage des Servers erstellen, welche sich regelmäßig aktualisiert.");
+                "- Moderatoren können einen Benachrichtungskanal festlegen, in welchem %s den entsprechenden Mitgliedern gratulieren wird.\n" +
+                "- Moderatoren können eine Liste aller Geburtstage des Servers erstellen, welche sich regelmäßig aktualisiert.\n" +
+                "- Moderatoren können %ss Geburtstag hinuzfügen oder entfernen.");
         de_de.setProperty("birthday_usage", "**Stelle einen Benachrichtungskanal ein**\n" +
                 "Befehl: `%s%s #kanal`\n" +
                 "**Setze den Benachrichtungskanal zurück**\n" +
@@ -1163,7 +1167,9 @@ public class LanguageFile {
                 "**Entferne Deinen Geburtstag**\n" +
                 "Befehl: `%s%s unsetbirthday`\n" +
                 "**Erstelle eine einmalige Geburtstagsliste**\n" +
-                "Befehl: `%s%s list`");
+                "Befehl: `%s%s list`\n" +
+                "**Füge/Entferne %ss Geburtstag hinzu**\n" +
+                "Befehl: `%s%s %s`");
         de_de.setProperty("birthday_hint", "Die Befehle haben unterschiedliche benötigte Berechtigungen.\n" +
                 "Siehe Beschreibung:\n" +
                 "- \"Mitglieder\": Jeder\n" +

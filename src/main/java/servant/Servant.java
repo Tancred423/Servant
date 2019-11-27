@@ -107,9 +107,9 @@ public class Servant {
 
                 // Moderation
                 new AutoRoleCommand(),
-                new BirthdayCommand(),
                 new BestOfImageCommand(),
                 new BestOfQuoteCommand(),
+                new BirthdayCommand(),
                 new ClearCommand(),
                 new JoinCommand(),
                 new LeaveCommand(),

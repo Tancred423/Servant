@@ -13,7 +13,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class PrefixListener extends ListenerAdapter {
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
-        if (event.getGuild().getIdLong() == 264445053596991498L) return; // Discord Bot List
+        if (event.isFromGuild() && event.getGuild().getIdLong() == 264445053596991498L) return; // Discord Bot List
         CompletableFuture.runAsync(() -> {
             try {
                 if (event.getAuthor().isBot()) return;

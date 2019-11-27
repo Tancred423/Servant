@@ -15,6 +15,7 @@ import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 public class Toggle {
     public static boolean isEnabled(CommandEvent event, String name) {
+        if (event.getGuild() == null) return true;
         return new moderation.guild.Guild(event.getGuild().getIdLong()).getToggleStatus(name, event.getGuild(), event.getAuthor());
     }
 
