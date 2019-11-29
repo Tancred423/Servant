@@ -23,6 +23,6 @@ public class BegCommand extends InteractionCommand {
                 Permission.MESSAGE_EMBED_LINKS
         };
 
-        this.emoji = "\uD83D\uDE4C"; // 🙌.
+        this.emoji = "\uD83D\uDE4C"; // 🙌
     }
 }

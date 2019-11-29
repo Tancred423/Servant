@@ -7,7 +7,7 @@ import utilities.Constants;
 public class HugCommand extends InteractionCommand {
     public HugCommand() {
         this.name = "hug";
-        this.aliases = new String[0];
+        this.aliases = new String[]{ "cuddle" };
         this.help = "Hug someone.";
         this.category = new Category("Interaction");
         this.arguments = "@user";
@@ -22,6 +22,6 @@ public class HugCommand extends InteractionCommand {
                 Permission.MESSAGE_EMBED_LINKS
         };
 
-        this.emoji = "\uD83E\uDD17"; // 🤗.
+        this.emoji = "\uD83E\uDD17"; // 🤗
     }
 }

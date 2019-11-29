@@ -1089,24 +1089,26 @@ public class User {
         return feature;
     }
 
-
     public Map<String, Integer> getTop10MostUsedFeatures(Guild guild, net.dv8tion.jda.api.entities.User user, String lang) {
         Connection connection = null;
-        var feature = new LinkedHashMap<String, Integer>();
+        var features = new LinkedHashMap<String, Integer>();
 
         try {
             connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT * FROM feature_count WHERE id=? ORDER BY count DESC");
+            var select = connection.prepareStatement("SELECT * FROM feature_count WHERE id=?");
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
-            var counter = 0;
             if (resultSet.first()) {
                 // get total count
-                feature.put(LanguageHandler.get(lang, "profile_total_muc"), getTotalFeatureCount(guild, user));
+//                features.put(LanguageHandler.get(lang, "profile_total_muc"), getTotalFeatureCount(guild, user));
                 do {
-                    feature.put(resultSet.getString("feature"), resultSet.getInt("count"));
-                    if (counter < 9) counter++;
-                    else break;
+                    var feature = resultSet.getString("feature");
+                    var count = resultSet.getInt("count");
+
+                    if (feature.equals("dog") || feature.equals("cat") || feature.equals("bird")) continue;
+                    if (feature.equals("random")) count += getBirdCatDogCount(connection);
+
+                    features.put(feature, count);
                 } while (resultSet.next());
             }
         } catch (SQLException e) {
@@ -1115,6 +1117,37 @@ public class User {
             closeQuietly(connection);
         }
 
-        return feature;
+        if (!features.isEmpty()) {
+            var sortedFeatures = new LinkedHashMap<String, Integer>();
+            sortedFeatures.put(LanguageHandler.get(lang, "profile_total_muc"), getTotalFeatureCount(guild, user));
+            var counter = 0;
+
+            List<Map.Entry<String, Integer>> entries = new ArrayList<>(features.entrySet());
+            entries.sort(Map.Entry.comparingByValue());
+            Collections.reverse(entries);
+            for (Map.Entry<String, Integer> entry : entries) {
+                if (counter >= 9) break;
+                sortedFeatures.put(entry.getKey(), entry.getValue());
+                counter++;
+            }
+            return sortedFeatures;
+        } else return features;
+    }
+
+    private int getBirdCatDogCount(Connection connection) throws SQLException {
+        var count = 0;
+
+        var select = connection.prepareStatement("SELECT * FROM feature_count WHERE id=?");
+        select.setLong(1, userId);
+        var resultSet = select.executeQuery();
+        if (resultSet.first()) {
+            do {
+                var feature = resultSet.getString("feature");
+                if (feature.equals("bird") || feature.equals("cat") || feature.equals("dog"))
+                    count += resultSet.getInt("count");
+            } while (resultSet.next());
+        }
+
+        return count;
     }
 }

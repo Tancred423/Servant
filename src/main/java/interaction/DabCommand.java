@@ -22,6 +22,6 @@ public class DabCommand extends InteractionCommand {
                 Permission.MESSAGE_EMBED_LINKS
         };
 
-        this.emoji = "\uD83E\uDD26"; // 🤦.
+        this.emoji = "\uD83E\uDD26"; // 🤦
     }
 }

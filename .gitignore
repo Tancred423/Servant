@@ -29,22 +29,16 @@ hs_err_pid*
 *.iml
 /src/main/resources/*
 
-# Personalized Settings
+# Runtime files
 /resources/*.ini
 /resources/*.properties
-
-# Database Backups
-/database/*
-
-# Old Versions
-/old_versions/*
+/server_log/*
 
 # Image Files
 /images/*
 
-# Easter Eggs Files
+# Easter Eggs Files (No spoilers!)
 /src/main/java/easteregg/*
 
-# Logs
-/logs/*
-/server_log/*
+# Backup (Database, Logs, Server Logs, Old Versions)
+/backup/*

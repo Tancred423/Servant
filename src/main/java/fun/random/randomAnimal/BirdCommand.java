@@ -1,7 +1,9 @@
 // Author: Tancred423 (https://github.com/Tancred423)
-package fun.randomAnimal;
+package fun.random.randomAnimal;
 
+import files.language.LanguageHandler;
 import moderation.guild.Guild;
+import moderation.guild.GuildHandler;
 import moderation.toggle.Toggle;
 import moderation.user.User;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -45,12 +47,16 @@ public class BirdCommand extends Command {
                 var guild = event.getGuild();
                 var author = event.getAuthor();
 
+                var lang = LanguageHandler.getLanguage(event);
+                var p = GuildHandler.getPrefix(event);
+
                 JSONObject json;
                 try {
                     json = JsonReader.readJsonFromUrl("http://random.birb.pw/tweet.json/");
                     var eb = new EmbedBuilder();
                     eb.setColor(new User(event.getAuthor().getIdLong()).getColor(guild, author));
                     eb.setImage("https://random.birb.pw/img/" + json.get("file"));
+                    eb.setFooter(String.format(LanguageHandler.get(lang, "random_discontinued"), p, name, p, name), null);
                     event.reply(eb.build());
                 } catch (IOException e) {
                     new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);

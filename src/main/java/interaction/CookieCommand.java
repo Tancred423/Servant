@@ -22,6 +22,6 @@ public class CookieCommand extends InteractionCommand {
                 Permission.MESSAGE_EMBED_LINKS
         };
 
-        this.emoji = "\uD83C\uDF6A"; // 🍪.
+        this.emoji = "\uD83C\uDF6A"; // 🍪
     }
 }

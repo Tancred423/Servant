@@ -231,7 +231,6 @@ public class LevelImage {
 
         // MUC Content
         var features = internalUser.getTop10MostUsedFeatures(guild, user, lang);
-
         var mucContentX = mucTitleX;
         var mucContentY = mucTitleY;
         var mucContentH = 70;

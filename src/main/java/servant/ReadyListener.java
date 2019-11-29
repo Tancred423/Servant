@@ -67,7 +67,6 @@ public class ReadyListener extends ListenerAdapter {
     }
 
     private void settingPresence(JDA jda) {
-        System.out.println("[" + OffsetDateTime.now(ZoneId.of(Constants.LOG_OFFSET)).toString().replaceAll("T", " ").substring(0, 19) + "] " + "Changing Presence.");
         var lang = Servant.config.getDefaultLanguage();
 
         if (counter == 0)

@@ -12,9 +12,10 @@ import fun.flip.UnflipCommand;
 import fun.level.BioCommand;
 import fun.level.LevelRoleCommand;
 import fun.level.ProfileCommand;
-import fun.randomAnimal.BirdCommand;
-import fun.randomAnimal.CatCommand;
-import fun.randomAnimal.DogCommand;
+import fun.random.RandomCommand;
+import fun.random.randomAnimal.BirdCommand;
+import fun.random.randomAnimal.CatCommand;
+import fun.random.randomAnimal.DogCommand;
 import information.*;
 import moderation.bestOfImage.BestOfImageCommand;
 import moderation.bestOfImage.BestOfImageListener;
@@ -152,12 +153,14 @@ public class Servant {
                 new FlipCommand(),
                 new LoveCommand(),
                 new ProfileCommand(),
+                new RandomCommand(),
                 new ThanksCommand(),
                 new UnflipCommand(),
 
                 // Interaction
                 new BegCommand(),
                 new CookieCommand(),
+                new CopCommand(),
                 new DabCommand(),
                 new FlexCommand(),
                 new HighfiveCommand(),

@@ -22,6 +22,6 @@ public class SlapCommand extends InteractionCommand {
                 Permission.MESSAGE_EMBED_LINKS
         };
 
-        this.emoji = "✋"; // ✋.
+        this.emoji = "✋"; // ✋
     }
 }

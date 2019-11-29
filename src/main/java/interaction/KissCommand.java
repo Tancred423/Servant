@@ -22,6 +22,6 @@ public class KissCommand extends InteractionCommand {
                 Permission.MESSAGE_EMBED_LINKS
         };
 
-        this.emoji = "\uD83D\uDC8B"; // 💋.
+        this.emoji = "\uD83D\uDC8B"; // 💋
     }
 }

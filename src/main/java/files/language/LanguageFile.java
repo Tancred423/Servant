@@ -1013,6 +1013,9 @@ public class LanguageFile {
         en_gb.setProperty("profile_total_muc", "Total commands used");
         en_gb.setProperty("profile_total_ap", "Total AP");
 
+        // Random
+        en_gb.setProperty("random_discontinued", "\"%s%s\" will be discontinued. Use \"%srandom %s\" instead.");
+
         /// Unflip
         en_gb.setProperty("unflip_description", "Unlip a user.");
         en_gb.setProperty("unflip_usage", "Command: `%s%s @user`");
@@ -2041,6 +2044,9 @@ public class LanguageFile {
         de_de.setProperty("profile_baguette", "Biggest baguette: %s (%s times)");
         de_de.setProperty("profile_total_muc", "Total commands used");
         de_de.setProperty("profile_total_ap", "Total AP");
+
+        // Random
+        de_de.setProperty("random_discontinued", "\"%s%s\" wird eingestellt. Benutze stattdessen \"%srandom %s\".");
 
         /// Unflip
         de_de.setProperty("unflip_description", "Unlip a user.");
