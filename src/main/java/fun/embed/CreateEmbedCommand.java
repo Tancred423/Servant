@@ -1074,7 +1074,7 @@ public class CreateEmbedCommand extends Command {
         for (var field : fields) eb.addField(field.getName(), field.getValue(), field.isInline());
         eb.setImage((ogEmbed.getImage() == null ? null : ogEmbed.getImage().getUrl()));
         var ogFooter = ogEmbed.getFooter();
-        eb.setFooter(ogFooter == null ? null : ogFooter.getText(), ogFooter == null ? null : ogFooter.getIconUrl());
+        eb.setFooter(ogFooter == null ? null : ogFooter.getText(), null);
         eb.setTimestamp(ogEmbed.getTimestamp());
 
         ogMessage.editMessage(eb.build()).queue();
