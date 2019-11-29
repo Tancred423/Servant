@@ -10,9 +10,9 @@ Your Multifunctional Discord Bot
 
 ### Moderation
 * Autorole: Role for new members. (with optional time delay)
-* Birthday: Birthdays of server members. (with announcement and list)
 * BestOfImage: Users can rate images that may be posted in a best-of channel.
 * BestOfQuote: Users can rate messages that may be posted in a best-of channel.
+* Birthday: Birthdays of server members. (with announcement and list)
 * Clear: Delete messages. (amount or user based)
 * Join: Alert for joining user.
 * Leave: Alert for leaving user.
@@ -41,8 +41,8 @@ Your Multifunctional Discord Bot
 ### Useful
 * Alarm: Set up an alarm.
 * Giveaway: Host a giveaway.
-* QuickPoll: Smol poll with yes / no.
 * Poll: Host a voting with customizable answers.
+* QuickPoll: Smol poll with yes / no.
 * Reminder: Set up a reminder.
 * Signup: Organise events by letting users sign up.
 * Timezone: Converter (e.g. PDT to CET).
@@ -60,11 +60,13 @@ Your Multifunctional Discord Bot
 * Flip: Flip a user!
 * Love: Ship two users.
 * Profile: Shows your profile. (Contains levels, achievements, statistics)
+* Random: Shows a random picture. Optionally with a keyword (e.g. !random cat)
 * Unflip: Unflip a user.
 
 ### Interaction
 * Beg: Beg someone.
 * Cookie: Give someone a cookie.
+* Cop: Arrest someone.
 * Dab: Dab on someone.
 * Flex: Flex on someone.
 * HighFive: Give someone a high five.
@@ -74,15 +76,15 @@ Your Multifunctional Discord Bot
 * Slap: Slap someone.
 
 ## Invite
-* [Invite Servant](https://discordapp.com/oauth2/authorize?client_id=436916794796670977&scope=bot&permissions=8)
+* [Invite Servant](https://inviteservant.tanc.red)
 
 ## Support
-* [Join Servant's Kingdom](https://discord.gg/4GpaH5V)
+* [Join Servant's Kingdom](https://servantskingdom.tanc.red)
 
 ## Built with
 * [Java 11](https://openjdk.java.net/projects/jdk/11/) - Programming Language
-* [JDA 3.8.3_460](https://github.com/DV8FromTheWorld/JDA) - Java Wrapper for Discord API
-* [JDA-Utilities 2.1.5](https://github.com/JDA-Applications/JDA-Utilities) - JDA Commands Extension
+* [JDA 4.0.0_61](https://github.com/DV8FromTheWorld/JDA) - Java Wrapper for Discord API
+* [JDA-Utilities 3.0.2](https://github.com/JDA-Applications/JDA-Utilities) - JDA Commands Extension
 * [Maven](https://maven.apache.org/) - Dependency Management
 * Heart :heart:
 
@@ -94,7 +96,8 @@ Your Multifunctional Discord Bot
 * [Maselkov](https://github.com/Maselkov) - Motivation & Support
 * fschill - Support
 * [MEE6](https://mee6.xyz/) - Inspiration
-* [Random Bird Pictures](http://random.birb.pw)
-* [Random Cat Pictures](http://random.cat)
-* [Random Dog Pictures](https://dog.ceo/dog-api)
+* [Random Images](https://imgur.com)
+* [Random Bird Images](http://random.birb.pw)
+* [Random Cat Images](http://random.cat)
+* [Random Dog Images](https://dog.ceo/dog-api)
 * [Inspiration & Libraries](https://github.com/jagrosh)
