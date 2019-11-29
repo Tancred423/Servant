@@ -6,7 +6,10 @@ import fun.level.LevelImage;
 import moderation.user.User;
 import net.dv8tion.jda.api.entities.Guild;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 public class StringFormat {
     public static String fillWithWhitespace(String text, int desiredStringLength) {

@@ -1,6 +1,7 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package fun.random;
 
+import files.language.LanguageHandler;
 import moderation.guild.Guild;
 import moderation.user.User;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -13,6 +14,8 @@ import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -41,9 +44,16 @@ public class RandomCommand extends Command {
             var guild = event.getGuild();
             var author = event.getAuthor();
 
+            var lang = LanguageHandler.getLanguage(event);
+
             Image image;
             if (event.getArgs().isEmpty()) image = getRandomImage();
-            else image = getRandomImage(event.getArgs());
+            else image = getRandomImage(URLEncoder.encode(event.getArgs(), StandardCharsets.UTF_8));
+
+            if (image == null) {
+                event.replyWarning(LanguageHandler.get(lang, "random_empty"));
+                return;
+            }
 
             var eb = new EmbedBuilder();
             eb.setTitle(image.getTitle(), image.getLink());
@@ -64,29 +74,33 @@ public class RandomCommand extends Command {
         var galleryLinks = new ArrayList<String>();
 
         // Get gallery links from imgur search
-        while (galleryLinks.isEmpty()) {
-            var urlObject = new URL("https://imgur.com/search?q=" + keyword);
-            var doc = Jsoup.parse(urlObject, 10 * 60 * 1000);
-            var content = doc.getElementById("content");
-            var links = content.getElementsByTag("a");
-            for (var link : links) {
-                var linkHref = link.attr("href");
-                if (linkHref.startsWith("/gallery/")) galleryLinks.add(linkHref);
-            }
+        var urlObject = new URL("https://imgur.com/search?q=" + keyword);
+        var doc = Jsoup.parse(urlObject, 10 * 60 * 1000);
+        var content = doc.getElementById("content");
+        var links = content.getElementsByTag("a");
+        for (var link : links) {
+            var linkHref = link.attr("href");
+            if (linkHref.startsWith("/gallery/")) galleryLinks.add(linkHref);
         }
+
+        if (galleryLinks.isEmpty()) return null;
 
         // Get random image (.jpg, .png or .gif from gallery links)
         var imageTitle = "";
         var imageLink = "";
         var imageDirectLink = "";
 
+        var counter = 0;
         while (!imageDirectLink.endsWith(".jpg") && !imageDirectLink.endsWith(".png") && !imageDirectLink.endsWith(".gif")) {
-            var random = ThreadLocalRandom.current().nextInt(0, galleryLinks.size() - 1);
+            if (counter >= 3) break;
+            int random;
+            if (galleryLinks.size() == 1) random = 0;
+            else random = ThreadLocalRandom.current().nextInt(0, galleryLinks.size() - 1);
             var galleryLink = galleryLinks.get(random);
             imageLink = "https://imgur.com" + galleryLink;
 
-            var urlObject = new URL(imageLink);
-            var doc = Jsoup.parse(urlObject, 10 * 60 * 1000);
+            urlObject = new URL(imageLink);
+            doc = Jsoup.parse(urlObject, 10 * 60 * 1000);
 
             // Get Image Title
             var title = doc.getElementsByAttribute("name");
@@ -95,9 +109,11 @@ public class RandomCommand extends Command {
             // Get Image Link
             var ele = doc.getElementsByAttribute("rel");
             for (var el : ele) if (el.attr("rel").equals("image_src")) imageDirectLink = el.attr("href");
+            counter++;
         }
 
-        return new Image(imageTitle, imageLink, imageDirectLink);
+        if (imageTitle.isEmpty()) return null;
+        else return new Image(imageTitle, imageLink, imageDirectLink);
     }
 
     private Image getRandomImage() throws IOException {
@@ -105,7 +121,9 @@ public class RandomCommand extends Command {
         var imageLink = "";
         var imageDirectLink = "";
 
+        var counter = 0;
         while (!imageDirectLink.endsWith(".jpg") && !imageDirectLink.endsWith(".png") && !imageDirectLink.endsWith(".gif")) {
+            if (counter >= 3) break;
             var urlObject = new URL("https://imgur.com/random");
             var doc = Jsoup.parse(urlObject, 10 * 60 * 1000);
             urlObject = new URL(doc.baseUri());
@@ -119,8 +137,10 @@ public class RandomCommand extends Command {
             // Get Image Link
             var ele = doc.getElementsByAttribute("rel");
             for (var el : ele) if (el.attr("rel").equals("image_src")) imageDirectLink = el.attr("href");
+            counter++;
         }
 
-        return new Image(imageTitle, imageLink, imageDirectLink);
+        if (imageTitle.isEmpty()) return null;
+        else return new Image(imageTitle, imageLink, imageDirectLink);
     }
 }

@@ -1015,6 +1015,7 @@ public class LanguageFile {
 
         // Random
         en_gb.setProperty("random_discontinued", "\"%s%s\" will be discontinued. Use \"%srandom %s\" instead.");
+        en_gb.setProperty("random_empty", "I couldn't find anything with this keyword.");
 
         /// Unflip
         en_gb.setProperty("unflip_description", "Unlip a user.");
@@ -2047,6 +2048,7 @@ public class LanguageFile {
 
         // Random
         de_de.setProperty("random_discontinued", "\"%s%s\" wird eingestellt. Benutze stattdessen \"%srandom %s\".");
+        de_de.setProperty("random_empty", "Ich konnte unter diesem Suchwort nichts finden.");
 
         /// Unflip
         de_de.setProperty("unflip_description", "Unlip a user.");
