@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -55,6 +57,8 @@ public class RandomCommand extends Command {
                 return;
             }
 
+            System.out.println("[" + OffsetDateTime.now(ZoneId.of(Constants.LOG_OFFSET)).toString().replaceAll("T", " ").substring(0, 19) + "] " +
+                    "RANDOM - Title: " + image.getTitle() + ". Link: " + image.getLink() + ". Direct Link: " + image.getDirectLink() + ".");
             var eb = new EmbedBuilder();
             eb.setTitle(image.getTitle(), image.getLink());
             eb.setImage(image.getDirectLink());

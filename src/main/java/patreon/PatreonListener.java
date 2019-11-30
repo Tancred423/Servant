@@ -18,7 +18,7 @@ public class PatreonListener extends ListenerAdapter {
         if (event.getGuild().getIdLong() == 264445053596991498L) return; // Discord Bot List
         CompletableFuture.runAsync(() -> {
             if (event.getMember().getUser().isBot()) return;
-            if (event.getGuild().getId().equals(Servant.config.getSupportGuildId())) return;
+            if (!event.getGuild().getId().equals(Servant.config.getSupportGuildId())) return;
 
             switch (event.getRoles().get(0).getId()) {
                 case "489738762838867969": // Donation

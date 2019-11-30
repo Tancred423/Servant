@@ -87,7 +87,7 @@ public class ClearCommand extends Command {
                                 new MessageBuilder().setContent(String.format(LanguageHandler.get(lang, "clear_cleared"), clearValue)).build(),
                                 5 * 1000 // 5 seconds.
                         );
-                    }));
+                    }), failure -> {});
                 } else {
                     var user = event.getMessage().getMentionedMembers().get(0).getUser();
                     event.getMessage().delete().queue(success -> new MessageHistory(channel).retrievePast(100).queue(messages -> {
@@ -100,7 +100,7 @@ public class ClearCommand extends Command {
                                 new MessageBuilder().setContent(String.format(LanguageHandler.get(lang, "clear_cleared"), deleteList.size())).build(),
                                 5 * 1000 // 5 seconds.
                         );
-                    }));
+                    }), failure -> {});
                 }
 
                 var guild = event.getGuild();

@@ -11,8 +11,11 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import owner.blacklist.Blacklist;
 import servant.Servant;
+import utilities.Constants;
 import utilities.Image;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.concurrent.CompletableFuture;
 
 public class InviteKickListener extends ListenerAdapter {
@@ -24,7 +27,8 @@ public class InviteKickListener extends ListenerAdapter {
                 if (guildOwner == null) return; // todo: always null?
                 var guildOwnerUser = guildOwner.getUser();
 
-                System.out.println("Servant was invited to " + guild.getName() + " (" + guild.getIdLong() + "). Owner: " + guildOwnerUser + "#" + guildOwnerUser.getDiscriminator() + " (" + guildOwner.getIdLong() + ").");
+                System.out.println("[" + OffsetDateTime.now(ZoneId.of(Constants.LOG_OFFSET)).toString().replaceAll("T", " ").substring(0, 19) + "] " +
+                        "Servant was invited to " + guild.getName() + " (" + guild.getIdLong() + "). Owner: " + guildOwnerUser + "#" + guildOwnerUser.getDiscriminator() + " (" + guildOwner.getIdLong() + ").");
 
                 if (Blacklist.isBlacklisted(guildOwnerUser, guild)) {
                     event.getGuild().leave().queue();
@@ -64,7 +68,8 @@ public class InviteKickListener extends ListenerAdapter {
 
             if (Blacklist.isBlacklisted(guildOwnerUser, guild)) return;
 
-            System.out.println("Servant was kicked from " + guild.getName() + " (" + guild.getIdLong() + "). Owner: " + guildOwnerUser.getName() + "#" + guildOwnerUser.getDiscriminator() + " (" + guildOwner.getIdLong() + ").");
+            System.out.println("[" + OffsetDateTime.now(ZoneId.of(Constants.LOG_OFFSET)).toString().replaceAll("T", " ").substring(0, 19) + "] " +
+                    "Servant was kicked from " + guild.getName() + " (" + guild.getIdLong() + "). Owner: " + guildOwnerUser.getName() + "#" + guildOwnerUser.getDiscriminator() + " (" + guildOwner.getIdLong() + ").");
 
             guildOwnerUser.openPrivateChannel().queue(privateChannel -> {
                         var internalGuildOwner = new User(guildOwnerUser.getIdLong());
