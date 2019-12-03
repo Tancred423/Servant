@@ -56,9 +56,9 @@ public class ToggleCommand extends Command {
                 List<String> validFeatures = new ArrayList<>() {{
                     // moderation
                     add("autorole");
-                    add("birthday");
                     add("bestofimage");
                     add("bestofquote");
+                    add("birthday");
                     add("clear");
                     add("join");
                     add("leave");
@@ -68,7 +68,7 @@ public class ToggleCommand extends Command {
                     add("reactionrole");
                     add("role");
                     add("server");
-                    add("setupwizard");
+                    add("serversetup");
                     add("user");
                     add("voicelobby");
 
@@ -80,13 +80,14 @@ public class ToggleCommand extends Command {
                     // useful
                     add("alarm");
                     add("giveaway");
-                    add("quickvote");
+                    add("poll");
+                    add("quickpoll");
                     add("reminder");
                     add("signup");
                     add("timezone");
-                    add("vote");
 
                     // fun
+                    add("easteregg");
                     add("avatar");
                     add("baguette");
                     add("bird");
@@ -99,6 +100,7 @@ public class ToggleCommand extends Command {
                     add("level");
                     add("love");
                     add("profile");
+                    add("random");
 
                     // interaction
                     add("interaction");
@@ -175,16 +177,17 @@ public class ToggleCommand extends Command {
             // moderation
             case "autorole":
                 return "autorole";
-            case "birthday":
-            case "bday":
-                return "birthday";
             case "bestofimage":
             case "image":
                 return "bestofimage";
             case "bestofquote":
             case "quote":
                 return "bestofquote";
+            case "birthday":
+            case "bday":
+                return "birthday";
             case "clear":
+            case "clean":
             case "remove":
             case "delete":
             case "purge":
@@ -209,9 +212,9 @@ public class ToggleCommand extends Command {
             case "server":
             case "guild":
                 return "server";
-            case "setupwizard":
+            case "serversetup":
             case "setup":
-                return "setupwizard";
+                return "serversetup";
             case "user":
                 return "user";
             case "voicelobby":
@@ -234,20 +237,26 @@ public class ToggleCommand extends Command {
                 return "alarm";
             case "giveaway":
                 return "giveaway";
-            case "reminder":
-                return "reminder";
+            case "poll":
+            case "vote":
+                return "poll";
+            case "quickpoll":
             case "quickvote":
-            case "qv":
-                return "quickvote";
+                return "quickpoll";
+            case "reminder":
+            case "remindme":
+                return "reminder";
             case "signup":
+            case "event":
                 return "signup";
             case "timezone":
                 return "timezone";
-            case "vote":
-            case "v":
-                return "vote";
 
             // fun
+            case "easteregg":
+            case "eastereggs":
+            case "achievement":
+                return "easteregg";
             case "avatar":
             case "ava":
                 return "avatar";
@@ -272,13 +281,14 @@ public class ToggleCommand extends Command {
             case "unflip":
                 return "flip";
             case "level":
-            case "rank":
                 return "level";
             case "love":
             case "ship":
                 return "love";
             case "profile":
                 return "profile";
+            case "random":
+                return "random";
 
             // interaction
             case "interaction":

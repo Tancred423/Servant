@@ -52,7 +52,7 @@ public class InviteKickListener extends ListenerAdapter {
                     eb.setFooter(String.format(LanguageHandler.get(language, "invite_footer"), guild.getName()), null);
 
                     privateChannel.sendMessage(eb.build()).queue();
-                });
+                }, failure -> { /* ignore */ });
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -86,8 +86,7 @@ public class InviteKickListener extends ListenerAdapter {
                         eb.setFooter(String.format(LanguageHandler.get(language, "kick_footer"), guild.getName()), null);
 
                         privateChannel.sendMessage(eb.build()).queue();
-                    },
-                    fail -> System.out.println("Couldn't send guild owner DM after kick."));
+                    }, failure -> { /* ignore */ });
         });
     }
 }

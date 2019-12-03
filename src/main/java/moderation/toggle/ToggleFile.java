@@ -8,9 +8,9 @@ import java.io.*;
 public class ToggleFile {
     // Moderation
     private boolean autorole;
-    private boolean birthday;
     private boolean bestofimage;
     private boolean bestofquote;
+    private boolean birthday;
     private boolean clear;
     private boolean join;
     private boolean leave;
@@ -20,26 +20,26 @@ public class ToggleFile {
     private boolean reactionrole;
     private boolean role;
     private boolean server;
-    private boolean setupwizard;
+    private boolean serversetup;
     private boolean user;
     private boolean voicelobby;
 
     // Information
     private boolean botinfo;
     private boolean ping;
-    private boolean guildinfo;
+    private boolean serverinfo;
 
     // Useful
     private boolean alarm;
     private boolean giveaway;
-    private boolean quickvote;
+    private boolean poll;
+    private boolean quickpoll;
     private boolean reminder;
     private boolean signup;
     private boolean timezone;
-    private boolean vote;
 
     // Fun
-    private boolean achievement;
+    private boolean easteregg;
     private boolean avatar;
     private boolean baguette;
     private boolean bird;
@@ -52,6 +52,7 @@ public class ToggleFile {
     private boolean level;
     private boolean love;
     private boolean profile;
+    private boolean random;
 
     // Interaction
     private boolean interaction;
@@ -87,9 +88,9 @@ public class ToggleFile {
 
         // Moderation
         toggle.setProperty("autorole", "on");
-        toggle.setProperty("birthday", "on");
         toggle.setProperty("bestofimage", "on");
         toggle.setProperty("bestofquote", "on");
+        toggle.setProperty("birthday", "on");
         toggle.setProperty("clear", "on");
         toggle.setProperty("guild", "on");
         toggle.setProperty("join", "on");
@@ -99,23 +100,23 @@ public class ToggleFile {
         toggle.setProperty("mediaonlychannel", "on");
         toggle.setProperty("reactionrole", "on");
         toggle.setProperty("role", "on");
-        toggle.setProperty("setupwizard", "on");
+        toggle.setProperty("serversetup", "on");
         toggle.setProperty("user", "on");
         toggle.setProperty("voicelobby", "on");
 
         // Information
         toggle.setProperty("botinfo", "on");
         toggle.setProperty("ping", "on");
-        toggle.setProperty("guildinfo", "on");
+        toggle.setProperty("serverinfo", "on");
 
         // Useful
         toggle.setProperty("alarm", "on");
         toggle.setProperty("giveaway", "on");
-        toggle.setProperty("quickvote", "on");
+        toggle.setProperty("poll", "on");
+        toggle.setProperty("quickpoll", "on");
         toggle.setProperty("reminder", "on");
         toggle.setProperty("signup", "on");
         toggle.setProperty("timezone", "on");
-        toggle.setProperty("vote", "on");
 
         // Fun
         toggle.setProperty("easteregg", "on");
@@ -131,6 +132,7 @@ public class ToggleFile {
         toggle.setProperty("level", "off");
         toggle.setProperty("love", "on");
         toggle.setProperty("profile", "on");
+        toggle.setProperty("random", "on");
 
         // Interaction
         toggle.setProperty("interaction", "on");
@@ -150,9 +152,9 @@ public class ToggleFile {
 
         // Moderation
         this.autorole = toggle.getProperty("autorole").equals("on");
-        this.birthday = toggle.getProperty("birthday").equals("on");
         this.bestofimage = toggle.getProperty("bestofimage").equals("on");
         this.bestofquote = toggle.getProperty("bestofquote").equals("on");
+        this.birthday = toggle.getProperty("birthday").equals("on");
         this.clear = toggle.getProperty("clear").equals("on");
         this.server = toggle.getProperty("guild").equals("on");
         this.join = toggle.getProperty("join").equals("on");
@@ -162,26 +164,26 @@ public class ToggleFile {
         this.mediaonlychannel = toggle.getProperty("mediaonlychannel").equals("on");
         this.reactionrole = toggle.getProperty("reactionrole").equals("on");
         this.role = toggle.getProperty("role").equals("on");
-        this.setupwizard = toggle.getProperty("setupwizard").equals("on");
+        this.serversetup = toggle.getProperty("serversetup").equals("on");
         this.user = toggle.getProperty("user").equals("on");
         this.voicelobby = toggle.getProperty("voicelobby").equals("on");
 
         // Information
         this.botinfo = toggle.getProperty("botinfo").equals("on");
         this.ping = toggle.getProperty("ping").equals("on");
-        this.guildinfo = toggle.getProperty("guildinfo").equals("on");
+        this.serverinfo = toggle.getProperty("serverinfo").equals("on");
 
         // Useful
         this.alarm = toggle.getProperty("alarm").equals("on");
         this.giveaway = toggle.getProperty("giveaway").equals("on");
-        this.quickvote = toggle.getProperty("quickvote").equals("on");
+        this.poll = toggle.getProperty("poll").equals("on");
+        this.quickpoll = toggle.getProperty("quickpoll").equals("on");
         this.reminder = toggle.getProperty("reminder").equals("on");
         this.signup = toggle.getProperty("signup").equals("on");
         this.timezone = toggle.getProperty("timezone").equals("on");
-        this.vote = toggle.getProperty("vote").equals("on");
 
         // Fun
-        this.achievement = toggle.getProperty("easteregg").equals("on");
+        this.easteregg = toggle.getProperty("easteregg").equals("on");
         this.avatar = toggle.getProperty("avatar").equals("on");
         this.baguette = toggle.getProperty("baguette").equals("on");
         this.bird = toggle.getProperty("bird").equals("on");
@@ -194,6 +196,7 @@ public class ToggleFile {
         this.level = toggle.getProperty("level").equals("on");
         this.love = toggle.getProperty("love").equals("on");
         this.profile = toggle.getProperty("profile").equals("on");
+        this.random = toggle.getProperty("random").equals("on");
 
         // Interaction
         this.interaction = toggle.getProperty("interaction").equals("on");
@@ -204,9 +207,9 @@ public class ToggleFile {
         switch (feature.toLowerCase()) {
             // Moderation
             case "autorole": return autorole;
-            case "birthday": return birthday;
             case "bestofimage": return bestofimage;
             case "bestofquote": return bestofquote;
+            case "birthday": return birthday;
             case "clear": return clear;
             case "guild": return server;
             case "join": return join;
@@ -216,26 +219,26 @@ public class ToggleFile {
             case "mediaonlychannel": return mediaonlychannel;
             case "reactionrole": return reactionrole;
             case "role": return role;
-            case "setupwizard": return setupwizard;
+            case "serversetup": return serversetup;
             case "user": return user;
             case "voicelobby": return voicelobby;
 
             // Information
             case "botinfo": return botinfo;
             case "ping": return ping;
-            case "guildinfo": return guildinfo;
+            case "serverinfo": return serverinfo;
 
             // Useful
             case "alarm": return alarm;
             case "giveaway": return giveaway;
-            case "quickvote": return quickvote;
+            case "poll": return poll;
+            case "quickpoll": return quickpoll;
             case "reminder": return reminder;
             case "signup": return signup;
             case "timezone": return timezone;
-            case "vote": return vote;
 
             // Fun
-            case "easteregg": return achievement;
+            case "easteregg": return easteregg;
             case "avatar": return avatar;
             case "baguette": return baguette;
             case "bird": return bird;
@@ -248,6 +251,7 @@ public class ToggleFile {
             case "level": return level;
             case "love": return love;
             case "profile": return profile;
+            case "random": return random;
 
             // Interaction
             case "interaction": return interaction;

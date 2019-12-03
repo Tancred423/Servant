@@ -761,10 +761,53 @@ public class EditEmbedCommand extends Command {
 
         ogMessage.editMessage(eb.build()).queue();
         embedUser.setEmbed(eb.build());
-        processFieldUsage(channel, author, previous, embedUser, event, edit, lang);
+        if (fields.isEmpty()) processFieldUsage(channel, author, previous, embedUser, event, edit, lang);
+        else processFieldDeleteUsage(channel, author, previous, embedUser, event, edit, lang);
     }
 
     // Fields
+    private void processFieldDeleteUsage(MessageChannel channel, User author, Message previous, EmbedUser embedUser, CommandEvent event, Message edit, String lang) {
+        previous.clearReactions().queue();
+        previous.editMessage(LanguageHandler.get(lang, "embed_field_remove_q")).queue(message -> {
+            message.addReaction(accept).queue();
+            message.addReaction(decline).queue();
+
+            waiter.waitForEvent(GuildMessageReactionAddEvent.class,
+                    e -> e.getUser().equals(author)
+                            && (e.getReactionEmote().getName().equals(accept)
+                            || e.getReactionEmote().getName().equals(decline)),
+                    e -> {
+                        if (e.getReactionEmote().getName().equals(accept))
+                            processFieldRemove(channel, author, message, embedUser, event, edit, lang);
+                        else processFieldUsage(channel, author, message, embedUser, event, edit, lang);
+                    }, 15, TimeUnit.MINUTES, () -> timeout(message, embedUser.getMessage(), event, lang));
+        });
+    }
+
+    private void processFieldRemove(MessageChannel channel, User author, Message previous, EmbedUser embedUser, CommandEvent event, Message edit, String lang) {
+        var ogMessage = embedUser.getMessage();
+        var ogEmbed = embedUser.getEmbed();
+        var eb = new EmbedBuilder();
+        eb.setColor(ogEmbed.getColor());
+
+        if (ogEmbed.getAuthor() == null) eb.setAuthor(null, null, null);
+        else eb.setAuthor(ogEmbed.getAuthor().getName(), ogEmbed.getAuthor().getUrl(), ogEmbed.getAuthor().getIconUrl());
+
+        eb.setThumbnail((ogEmbed.getThumbnail() == null ? null : ogEmbed.getThumbnail().getUrl()));
+
+        eb.setTitle(ogEmbed.getTitle(), ogEmbed.getUrl());
+        eb.setDescription(ogEmbed.getDescription());
+        // No fields
+        if (ogEmbed.getFooter() == null) eb.setFooter(null, null);
+        else
+            eb.setFooter((ogEmbed.getFooter() == null ? null : ogEmbed.getFooter().getText()), (ogEmbed.getFooter() == null ? null : ogEmbed.getFooter().getIconUrl()));
+        eb.setTimestamp(ogEmbed.getTimestamp());
+
+        ogMessage.editMessage(eb.build()).queue();
+        embedUser.setEmbed(eb.build());
+        processFieldUsage(channel, author, previous, embedUser, event, edit, lang);
+    }
+
     private void processFieldUsage(MessageChannel channel, User author, Message previous, EmbedUser embedUser, CommandEvent event, Message edit, String lang) {
         previous.clearReactions().queue();
         previous.editMessage(LanguageHandler.get(lang, "embed_field_q")).queue(message -> {
@@ -1325,6 +1368,8 @@ public class EditEmbedCommand extends Command {
                     e -> {
                         if (e.getReactionEmote().getName().equals(accept))
                             processFinish(message, embedUser, event, edit);
+                        else
+                            processNoFinish(event, message, embedUser.getMessage());
                     }, 15, TimeUnit.MINUTES, () -> timeout(message, embedUser.getMessage(), event, lang));
         });
     }
@@ -1355,5 +1400,11 @@ public class EditEmbedCommand extends Command {
         previous.delete().queue();
         ogMessage.delete().queue();
         event.reactSuccess();
+    }
+
+    private void processNoFinish(CommandEvent event, Message botMessage, Message embedMessage) {
+        event.reactError();
+        botMessage.delete().queue();
+        embedMessage.delete().queue();
     }
 }

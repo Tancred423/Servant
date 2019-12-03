@@ -116,7 +116,7 @@ public class RandomCommand extends Command {
             counter++;
         }
 
-        if (imageTitle.isEmpty()) return null;
+        if (imageTitle.isEmpty() || imageLink.isEmpty() || imageDirectLink.isEmpty()) return null;
         else return new Image(imageTitle, imageLink, imageDirectLink);
     }
 
@@ -144,7 +144,7 @@ public class RandomCommand extends Command {
             counter++;
         }
 
-        if (imageTitle.isEmpty()) return null;
+        if (imageTitle.isEmpty() || imageLink.isEmpty() || imageDirectLink.isEmpty()) return null;
         else return new Image(imageTitle, imageLink, imageDirectLink);
     }
 }

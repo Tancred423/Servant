@@ -76,18 +76,23 @@ public class PatreonListener extends ListenerAdapter {
                 case "donation":
                     role = guild.getRoleById(489738762838867969L);
                     if (role != null) roleMention = role.getAsMention();
+                    break;
                 case "$1":
                     role = guild.getRoleById(502472440455233547L);
                     if (role != null) roleMention = role.getAsMention();
+                    break;
                 case "$3":
                     role = guild.getRoleById(502472546600353796L);
                     if (role != null) roleMention = role.getAsMention();
+                    break;
                 case "$5":
                     role = guild.getRoleById(502472823638458380L);
                     if (role != null) roleMention = role.getAsMention();
+                    break;
                 case "$10":
                     role = guild.getRoleById(502472869234868224L);
                     if (role != null) roleMention = role.getAsMention();
+                    break;
             }
 
         return roleMention;

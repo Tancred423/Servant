@@ -950,6 +950,7 @@ public class LanguageFile {
         en_gb.setProperty("editembed_confirm", "We're done! Please confirm you want to overwrite the old embed.");
         en_gb.setProperty("editembed_notfound", "I cannot find this message, master!");
         en_gb.setProperty("editembed_missingpermission", "You need to be able to write in the given channel to access embeds.");
+        en_gb.setProperty("embed_field_remove_q", "Do you want to remove the current fields?");
 
         /// Flip
         en_gb.setProperty("flip_description", "Flip a user.");
@@ -1981,6 +1982,7 @@ public class LanguageFile {
         de_de.setProperty("editembed_confirm", "We're done! Please confirm you want to overwrite the old embed.");
         de_de.setProperty("editembed_notfound", "I cannot find this message, master!");
         de_de.setProperty("editembed_missingpermission", "You need to be able to write in the given channel to access embeds.");
+        de_de.setProperty("embed_field_remove_q", "Do you want to remove the current fields?");
 
         /// Flip
         de_de.setProperty("flip_description", "Flip a user.");
