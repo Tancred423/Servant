@@ -114,6 +114,9 @@ public class Emote {
             case "love":
                 return "♥";
 
+            case "servant_padoru":
+                return "\uD83C\uDF84"; // 🎄
+
             default:
                 return null;
         }

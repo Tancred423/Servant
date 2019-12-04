@@ -3,13 +3,18 @@ package servant;
 
 import easteregg.EasterEggsListener;
 import easteregg.ThanksCommand;
+import files.ConfigFile;
 import files.language.LanguageHandler;
-import fun.*;
+import fun.AvatarCommand;
+import fun.BaguetteCommand;
+import fun.CoinflipCommand;
+import fun.LoveCommand;
 import fun.embed.CreateEmbedCommand;
 import fun.embed.EditEmbedCommand;
 import fun.flip.FlipCommand;
 import fun.flip.UnflipCommand;
 import fun.level.BioCommand;
+import fun.level.LevelListener;
 import fun.level.LevelRoleCommand;
 import fun.level.ProfileCommand;
 import fun.random.RandomCommand;
@@ -17,31 +22,41 @@ import fun.random.randomAnimal.BirdCommand;
 import fun.random.randomAnimal.CatCommand;
 import fun.random.randomAnimal.DogCommand;
 import information.*;
+import interaction.*;
+import moderation.ClearCommand;
+import moderation.InviteKickListener;
+import moderation.RoleCommand;
+import moderation.ServerSetupCommand;
+import moderation.autorole.AutoRoleCommand;
+import moderation.autorole.AutoRoleListener;
 import moderation.bestOfImage.BestOfImageCommand;
 import moderation.bestOfImage.BestOfImageListener;
 import moderation.bestOfQuote.BestOfQuoteCommand;
 import moderation.bestOfQuote.BestOfQuoteListener;
 import moderation.birthday.BirthdayCommand;
 import moderation.birthday.BirthdayListener;
+import moderation.guild.GuildCommand;
+import moderation.guild.GuildManager;
+import moderation.join.JoinCommand;
+import moderation.join.JoinListener;
 import moderation.leave.LeaveCommand;
 import moderation.leave.LeaveListener;
 import moderation.livestream.LivestreamCommand;
 import moderation.livestream.LivestreamListener;
-import moderation.toggle.ToggleCommand;
-import moderation.user.UserCommand;
-import owner.*;
-import moderation.*;
-import moderation.autorole.AutoRoleCommand;
-import moderation.autorole.AutoRoleListener;
-import moderation.guild.GuildCommand;
-import moderation.guild.GuildManager;
-import moderation.join.JoinCommand;
 import moderation.lobby.VoiceLobbyCommand;
 import moderation.lobby.VoiceLobbyListener;
 import moderation.mediaOnlyChannel.MediaOnlyChannelCommand;
 import moderation.mediaOnlyChannel.MediaOnlyChannelListener;
 import moderation.reactionRole.ReactionRoleCommand;
 import moderation.reactionRole.ReactionRoleListener;
+import moderation.toggle.ToggleCommand;
+import moderation.toggle.ToggleFile;
+import moderation.user.UserCommand;
+import net.dv8tion.jda.api.AccountType;
+import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.entities.Activity;
+import owner.*;
 import owner.blacklist.BlacklistCommand;
 import patreon.PatreonListener;
 import useful.alarm.AlarmCommand;
@@ -50,17 +65,10 @@ import useful.giveaway.GiveawayListener;
 import useful.reminder.ReminderCommand;
 import useful.signup.SignupCommand;
 import useful.signup.SignupListener;
+import useful.timezone.TimezoneCommand;
 import useful.votes.quickvote.QuickvoteCommand;
 import useful.votes.quickvote.QuickvoteEndListener;
 import useful.votes.quickvote.QuickvoteMultipleVoteListener;
-import moderation.toggle.ToggleFile;
-import moderation.join.JoinListener;
-import fun.level.LevelListener;
-import files.ConfigFile;
-import interaction.*;
-import net.dv8tion.jda.api.*;
-import net.dv8tion.jda.api.entities.Activity;
-import useful.timezone.TimezoneCommand;
 import useful.votes.vote.RadiovoteMultipleVoteListener;
 import useful.votes.vote.VoteCommand;
 import useful.votes.vote.VoteEndListener;
@@ -154,7 +162,6 @@ public class Servant {
                 new LoveCommand(),
                 new ProfileCommand(),
                 new RandomCommand(),
-                new ThanksCommand(),
                 new UnflipCommand(),
 
                 // Interaction
@@ -167,7 +174,10 @@ public class Servant {
                 new HugCommand(),
                 new KissCommand(),
                 new PatCommand(),
-                new SlapCommand()
+                new SlapCommand(),
+
+                // Easter Eggs
+                new ThanksCommand()
         );
 
         new JDABuilder(AccountType.BOT)

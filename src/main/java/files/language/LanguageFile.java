@@ -38,6 +38,8 @@ public class LanguageFile {
         en_gb.setProperty("achievement_kind", "Being kind to %s");
         en_gb.setProperty("achievement_navi", "Hey Listen!");
         en_gb.setProperty("achievement_deusvult", "DEUS VULT!");
+        en_gb.setProperty("achievement_fiteme", "Fite me!!!");
+        en_gb.setProperty("achievement_xmas", "Xmas Time");
 
         /// Invite
         en_gb.setProperty("invite_author", "%s, at your service!");
@@ -1073,6 +1075,8 @@ public class LanguageFile {
         de_de.setProperty("achievement_kind", "War nett zu %s");
         de_de.setProperty("achievement_navi", "Hey Listen!");
         de_de.setProperty("achievement_deusvult", "DEUS VULT!");
+        de_de.setProperty("achievement_fiteme", "Fite me!!!");
+        de_de.setProperty("achievement_xmas", "Xmas Time");
 
         /// Invite
         de_de.setProperty("invite_author", "%s, zu Ihren Diensten!");

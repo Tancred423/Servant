@@ -72,12 +72,13 @@ public class ProfileCommand extends Command {
 
                     var eb = new EmbedBuilder();
                     eb.setColor(internalProfileUser.getColor(guild, author));
+                    eb.setImage("attachment://" + image.getName() + ".png");
                     eb.setFooter(profileUser.equals(author) ?
                                     String.format(LanguageHandler.get(lang, "profile_footer1"), p, name) :
                                     String.format(LanguageHandler.get(lang, "profile_footer2"), p, name),
                             event.getSelfUser().getEffectiveAvatarUrl());
 
-                    event.getChannel().sendFile(image, image.getPath()).embed(eb.build()).queue();
+                    event.getChannel().sendFile(image, image.getName() + ".png").embed(eb.build()).queue();
 
                     // Delete File.
                     var thread = new Thread(() -> {

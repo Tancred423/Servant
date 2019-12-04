@@ -13,6 +13,8 @@ public class Achievement {
 
             case "navi": return LanguageHandler.get(lang, "achievement_navi");
             case "deusvult": return LanguageHandler.get(lang, "achievement_deusvult");
+            case "fiteme": return LanguageHandler.get(lang, "achievement_fiteme");
+            case "xmas": return LanguageHandler.get(lang, "achievement_xmas");
 
             case "level10": return LanguageHandler.get(lang, "achievement_level10");
             case "level20": return LanguageHandler.get(lang, "achievement_level20");
