@@ -77,9 +77,11 @@ public class ReadyListener extends ListenerAdapter {
             jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.watching(String.format(LanguageHandler.get(lang, "presence_2"), jda.getGuilds().size(), Servant.config.getDefaultPrefix())));
         else if (counter == 3)
             jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing(String.format(LanguageHandler.get(lang, "presence_3"), Servant.config.getDefaultPrefix(), Servant.config.getDefaultPrefix())));
+        else if (counter == 4)
+            jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing(LanguageHandler.get(lang, "presence_4")));
 
         counter++;
-        if (counter == 4) counter = 0;
+        if (counter == 5) counter = 0;
     }
 
     private void startServerAmountLogging(JDA jda) {

@@ -111,7 +111,7 @@ public class Giveaway {
                                     message.editMessage(eb.build()).queue();
                                 }
 
-                            });
+                            }, failure -> deleteGiveawayFromDb(guildId, channelId, messageId, jda.getGuildById(guildId), jda.getSelfUser()));
                         } else
                             deleteGiveawayFromDb(guildId, channelId, messageId, jda.getGuildById(guildId), jda.getSelfUser());
                     }

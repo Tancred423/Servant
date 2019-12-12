@@ -81,6 +81,7 @@ public class EditEmbedCommand extends Command {
                 if (event.getArgs().split(" ").length < 2) {
                     event.reactError();
                     event.reply(String.format(LanguageHandler.get(lang, "editembed_missing_message_id"), p));
+                    return;
                 }
 
                 var mentionedChannel = event.getMessage().getMentionedChannels().get(0);

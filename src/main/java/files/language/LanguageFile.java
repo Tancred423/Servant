@@ -78,6 +78,7 @@ public class LanguageFile {
         en_gb.setProperty("presence_1", "%s masters | %shelp");
         en_gb.setProperty("presence_2", "%s servers | %shelp");
         en_gb.setProperty("presence_3", "%spatreon | %shelp");
+        en_gb.setProperty("presence_4", "https://servant.tanc.red");
 
         // Owner
         /// Add Gif
@@ -1115,6 +1116,7 @@ public class LanguageFile {
         de_de.setProperty("presence_1", "%s Meister | %shelp");
         de_de.setProperty("presence_2", "%s Server | %shelp");
         de_de.setProperty("presence_3", "%spatreon | %shelp");
+        de_de.setProperty("presence_4", "https://servant.tanc.red");
 
         // Owner
         /// Add Gif
