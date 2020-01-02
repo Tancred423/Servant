@@ -58,7 +58,6 @@ public class CatCommand extends Command {
                     var eb = new EmbedBuilder();
                     eb.setColor(new User(event.getAuthor().getIdLong()).getColor(guild, author));
                     eb.setImage(getImageUrl());
-                    eb.setFooter(String.format(LanguageHandler.get(lang, "random_discontinued"), p, name, p, name), null);
                     event.reply(eb.build());
                 } catch (IOException | IllegalArgumentException e) {
                     new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);

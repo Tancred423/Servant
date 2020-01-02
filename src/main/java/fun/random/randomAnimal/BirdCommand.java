@@ -56,7 +56,6 @@ public class BirdCommand extends Command {
                     var eb = new EmbedBuilder();
                     eb.setColor(new User(event.getAuthor().getIdLong()).getColor(guild, author));
                     eb.setImage("https://random.birb.pw/img/" + json.get("file"));
-                    eb.setFooter(String.format(LanguageHandler.get(lang, "random_discontinued"), p, name, p, name), null);
                     event.reply(eb.build());
                 } catch (IOException e) {
                     new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);

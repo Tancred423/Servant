@@ -56,7 +56,6 @@ public class DogCommand extends Command {
                     var eb = new EmbedBuilder();
                     eb.setColor(new User(event.getAuthor().getIdLong()).getColor(guild, author));
                     eb.setImage(String.valueOf(json.get("message")));
-                    eb.setFooter(String.format(LanguageHandler.get(lang, "random_discontinued"), p, name, p, name), null);
                     event.reply(eb.build());
                 } catch (IOException e) {
                     new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
