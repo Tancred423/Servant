@@ -1424,6 +1424,26 @@ public class Guild {
         return lobbies;
     }
 
+    public boolean isLobby(long channelId, net.dv8tion.jda.api.entities.Guild guild, User user) {
+        Connection connection = null;
+        var isLobby = false;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement("SELECT * FROM lobby WHERE guild_id=? AND channel_id=?");
+            select.setLong(1, guildId);
+            select.setLong(2, channelId);
+            var resultSet = select.executeQuery();
+            if (resultSet.first()) isLobby = true;
+        } catch (SQLException e) {
+            new Log(e, guild, user, "lobby", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return isLobby;
+    }
+
     public void setLobby(long channelId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 

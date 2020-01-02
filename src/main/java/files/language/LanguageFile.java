@@ -590,6 +590,7 @@ public class LanguageFile {
         en_gb.setProperty("voicelobby_firstarg", "Invalid argument. Either `set`, `unset`, `show` or `toggletext`.");
         en_gb.setProperty("voicelobby_apostrophe", "\'");
         en_gb.setProperty("voicelobby_apostropge_s", "\'s");
+        en_gb.setProperty("voicelobby_already_set", "This channel was already set as an voice lobby.");
 
         // Information
         /// Bot Info
@@ -1626,6 +1627,7 @@ public class LanguageFile {
         de_de.setProperty("voicelobby_firstarg", "Invalid argument. Either `set`, `unset`, `show` or `toggletext`.");
         de_de.setProperty("voicelobby_apostrophe", "\'");
         de_de.setProperty("voicelobby_apostropge_s", "\'s");
+        de_de.setProperty("voicelobby_already_set", "This channel was already set as an voice lobby.");
 
         // Information
         /// Bot Info

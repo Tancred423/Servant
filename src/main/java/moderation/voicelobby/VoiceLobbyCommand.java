@@ -1,5 +1,5 @@
 // Author: Tancred423 (https://github.com/Tancred423)
-package moderation.lobby;
+package moderation.voicelobby;
 
 import files.language.LanguageHandler;
 import moderation.guild.GuildHandler;
@@ -30,7 +30,7 @@ public class VoiceLobbyCommand extends Command {
         this.userPermissions = new Permission[] { Permission.MANAGE_CHANNEL };
         this.botPermissions = new Permission[] {
                 Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY,
-                Permission.MESSAGE_EMBED_LINKS, Permission.MANAGE_CHANNEL, Permission.VOICE_MOVE_OTHERS
+                Permission.MESSAGE_EMBED_LINKS, Permission.MANAGE_CHANNEL
         };
     }
 
@@ -75,8 +75,11 @@ public class VoiceLobbyCommand extends Command {
                             return;
                         }
 
-                        internalGuild.setLobby(Long.parseLong(args[1]), guild, author);
-                        event.reactSuccess();
+                        var channelIdLong = Long.parseLong(args[1]);
+                        if (!internalGuild.isLobby(channelIdLong, guild, author)) {
+                            internalGuild.setLobby(channelIdLong, guild, author);
+                            event.reactSuccess();
+                        } else event.replyWarning(LanguageHandler.get(lang, "voicelobby_already_set"));
                         break;
 
                     case "unset":
