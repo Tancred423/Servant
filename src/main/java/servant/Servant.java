@@ -62,16 +62,16 @@ import patreon.PatreonListener;
 import useful.alarm.AlarmCommand;
 import useful.giveaway.GiveawayCommand;
 import useful.giveaway.GiveawayListener;
+import useful.polls.poll.PollCommand;
 import useful.reminder.ReminderCommand;
 import useful.signup.SignupCommand;
 import useful.signup.SignupListener;
 import useful.timezone.TimezoneCommand;
-import useful.votes.quickvote.QuickvoteCommand;
-import useful.votes.quickvote.QuickvoteEndListener;
-import useful.votes.quickvote.QuickvoteMultipleVoteListener;
-import useful.votes.vote.RadiovoteMultipleVoteListener;
-import useful.votes.vote.VoteCommand;
-import useful.votes.vote.VoteEndListener;
+import useful.polls.quickpoll.QuickpollCommand;
+import useful.polls.quickpoll.QuickpollEndListener;
+import useful.polls.quickpoll.QuickpollMultipleVoteListener;
+import useful.polls.poll.RadiopollMultipleVoteListener;
+import useful.polls.poll.PollEndListener;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandClientBuilder;
 import zJdaUtilsLib.com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
@@ -142,11 +142,11 @@ public class Servant {
                 // Useful
                 new AlarmCommand(),
                 new GiveawayCommand(),
-                new QuickvoteCommand(),
+                new QuickpollCommand(),
                 new ReminderCommand(),
                 new SignupCommand(),
                 new TimezoneCommand(),
-                new VoteCommand(waiter),
+                new PollCommand(waiter),
 
                 // Fun
                 new AvatarCommand(),
@@ -204,14 +204,14 @@ public class Servant {
                 .addEventListeners(new MediaOnlyChannelListener())
                 .addEventListeners(new PatreonListener())
                 .addEventListeners(new PrefixListener())
-                .addEventListeners(new QuickvoteEndListener())
-                .addEventListeners(new QuickvoteMultipleVoteListener())
-                .addEventListeners(new RadiovoteMultipleVoteListener())
+                .addEventListeners(new QuickpollEndListener())
+                .addEventListeners(new QuickpollMultipleVoteListener())
+                .addEventListeners(new RadiopollMultipleVoteListener())
                 .addEventListeners(new ReactionRoleListener())
                 .addEventListeners(new ReadyListener())
                 .addEventListeners(new SignupListener())
                 .addEventListeners(new VoiceLobbyListener())
-                .addEventListeners(new VoteEndListener())
+                .addEventListeners(new PollEndListener())
 
                 .build();
     }

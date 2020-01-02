@@ -1,5 +1,5 @@
 // Author: Tancred423 (https://github.com/Tancred423)
-package useful.votes;
+package useful.polls;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
@@ -8,29 +8,33 @@ import servant.Servant;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 
 import static utilities.DatabaseConn.closeQuietly;
 
-public class VotesDatabase {
+public class PollsDatabase {
     // Votes
-    public static void setVote(long messageId, long authorId, String type, Guild guild, User user) {
+    public static void setVote(long guildId, long channelId, long messageId, long authorId, String type, Timestamp endingDate, Guild guild, User user) {
         Connection connection = null;
 
         try {
             connection = Servant.db.getHikari().getConnection();
-            var insert = connection.prepareStatement("INSERT INTO votes (message_id,author_id,type) VALUES (?,?,?)");
-            insert.setLong(1, messageId);
-            insert.setLong(2, authorId);
-            insert.setString(3, type);
+            var insert = connection.prepareStatement("INSERT INTO votes (guild_id,channel_id,message_id,author_id,type,ending_date) VALUES (?,?,?,?,?,?)");
+            insert.setLong(1, guildId);
+            insert.setLong(2, channelId);
+            insert.setLong(3, messageId);
+            insert.setLong(4, authorId);
+            insert.setString(5, type);
+            insert.setTimestamp(6, endingDate);
             insert.executeUpdate();
         } catch (SQLException e) {
-            new Log(e, guild, user, "levelrole", null).sendLog(false);
+            new Log(e, guild, user, "poll", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
     }
 
-    public static void unsetVote(long messageId, Guild guild, User user) {
+    static void unsetVote(long messageId, Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -39,7 +43,7 @@ public class VotesDatabase {
             delete.setLong(1, messageId);
             delete.executeUpdate();
         } catch (SQLException e) {
-            new Log(e, guild, user, "levelrole", null).sendLog(false);
+            new Log(e, guild, user, "poll", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -57,7 +61,7 @@ public class VotesDatabase {
             var resultSet = select.executeQuery();
             if (resultSet.first()) if (resultSet.getString("type").equals("quick")) isQuickvote = true;
         } catch (SQLException e) {
-            new Log(e, guild, user, "levelrole", null).sendLog(false);
+            new Log(e, guild, user, "poll", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -76,7 +80,7 @@ public class VotesDatabase {
             var resultSet = select.executeQuery();
             if (resultSet.first()) if (resultSet.getString("type").equals("vote")) isVote = true;
         } catch (SQLException e) {
-            new Log(e, guild, user, "levelrole", null).sendLog(false);
+            new Log(e, guild, user, "poll", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -96,7 +100,7 @@ public class VotesDatabase {
             var resultSet = select.executeQuery();
             if (resultSet.first()) if (resultSet.getString("type").equals("radio")) isRadiovote = true;
         } catch (SQLException e) {
-            new Log(e, guild, user, "levelrole", null).sendLog(false);
+            new Log(e, guild, user, "poll", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -115,7 +119,7 @@ public class VotesDatabase {
             var resultSet = select.executeQuery();
             if (resultSet.first()) authorId = resultSet.getLong("author_id");
         } catch (SQLException e) {
-            new Log(e, guild, user, "levelrole", null).sendLog(false);
+            new Log(e, guild, user, "poll", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -136,7 +140,7 @@ public class VotesDatabase {
             insert.setString(4, emoji);
             insert.executeUpdate();
         } catch (SQLException e) {
-            new Log(e, guild, user, "levelrole", null).sendLog(false);
+            new Log(e, guild, user, "poll", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -152,7 +156,7 @@ public class VotesDatabase {
             delete.setLong(2, userId);
             delete.executeUpdate();
         } catch (SQLException e) {
-            new Log(e, guild, user, "levelrole", null).sendLog(false);
+            new Log(e, guild, user, "poll", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -167,7 +171,7 @@ public class VotesDatabase {
             delete.setLong(1, messageId);
             delete.executeUpdate();
         } catch (SQLException e) {
-            new Log(e, guild, user, "levelrole", null).sendLog(false);
+            new Log(e, guild, user, "poll", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -185,7 +189,7 @@ public class VotesDatabase {
             var resultSet = select.executeQuery();
             if (resultSet.first()) hasVoted = true;
         } catch (SQLException e) {
-            new Log(e, guild, user, "levelrole", null).sendLog(false);
+            new Log(e, guild, user, "poll", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -205,7 +209,7 @@ public class VotesDatabase {
             var resultSet = select.executeQuery();
             if (resultSet.first()) id = resultSet.getLong("emote_id");
         } catch (SQLException e) {
-            new Log(e, guild, user, "levelrole", null).sendLog(false);
+            new Log(e, guild, user, "poll", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -225,7 +229,7 @@ public class VotesDatabase {
             var resultSet = select.executeQuery();
             if (resultSet.first()) emote = resultSet.getString("emoji");
         } catch (SQLException e) {
-            new Log(e, guild, user, "levelrole", null).sendLog(false);
+            new Log(e, guild, user, "poll", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }

@@ -1,5 +1,5 @@
 // Author: Tancred423 (https://github.com/Tancred423)
-package useful.votes.quickvote;
+package useful.polls.quickpoll;
 
 import files.language.LanguageHandler;
 import moderation.guild.Guild;
@@ -8,20 +8,19 @@ import moderation.user.User;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import owner.blacklist.Blacklist;
-import servant.Servant;
-import useful.votes.VotesDatabase;
+import useful.polls.PollsDatabase;
 import utilities.Constants;
 import utilities.Emote;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
-import java.time.DateTimeException;
+import java.sql.Timestamp;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.concurrent.CompletableFuture;
 
-public class QuickvoteCommand extends Command {
-    public QuickvoteCommand() {
+public class QuickpollCommand extends Command {
+    public QuickpollCommand() {
         this.name = "quickpoll";
         this.aliases = new String[] { "quickvote" };
         this.help = "Smol poll with yes/no.";
@@ -57,11 +56,9 @@ public class QuickvoteCommand extends Command {
                 eb.setAuthor(String.format(LanguageHandler.get(lang, "quickvote_started"), author.getName()), null, author.getEffectiveAvatarUrl());
                 eb.setDescription(event.getArgs());
                 eb.setFooter(LanguageHandler.get(lang, "votes_active"), event.getJDA().getSelfUser().getAvatarUrl());
-                try {
-                    eb.setTimestamp(OffsetDateTime.now(ZoneId.of(new Guild(event.getGuild().getIdLong()).getOffset(guild, author))));
-                } catch (DateTimeException e) {
-                    eb.setTimestamp(OffsetDateTime.now(ZoneId.of(Servant.config.getDefaultOffset())).getOffset());
-                }
+                var dateIn7DaysOtd = OffsetDateTime.now(ZoneOffset.UTC).plusDays(7).toLocalDateTime();
+                var dateIn7Days = Timestamp.valueOf(dateIn7DaysOtd);
+                eb.setTimestamp(dateIn7DaysOtd);
 
                 var upvote = Emote.getEmoji("upvote");
                 var downvote = Emote.getEmoji("downvote");
@@ -73,7 +70,7 @@ public class QuickvoteCommand extends Command {
                     sentMessage.addReaction(upvote).queue();
                     sentMessage.addReaction(downvote).queue();
                     sentMessage.addReaction(end).queue();
-                    VotesDatabase.setVote(sentMessage.getIdLong(), author.getIdLong(), "quick", guild, author);
+                    PollsDatabase.setVote(guild.getIdLong(), sentMessage.getChannel().getIdLong(), sentMessage.getIdLong(), author.getIdLong(), "quick", dateIn7Days, guild, author);
                 });
 
                 message.delete().queue();

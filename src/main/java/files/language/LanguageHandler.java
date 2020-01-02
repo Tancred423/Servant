@@ -3,6 +3,7 @@ package files.language;
 
 import moderation.guild.Guild;
 import moderation.user.User;
+import servant.Servant;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.io.File;
@@ -51,7 +52,8 @@ public class LanguageHandler {
     }
 
     public static String getLanguage(CommandEvent event) {
-        return event.getGuild() == null ?
+        if (event == null) return Servant.config.getDefaultLanguage();
+        else return event.getGuild() == null ?
                 new User(event.getAuthor().getIdLong()).getLanguage(event.getGuild(), event.getAuthor()) :
                 new Guild(event.getGuild().getIdLong()).getLanguage(event.getGuild(), event.getAuthor());
     }

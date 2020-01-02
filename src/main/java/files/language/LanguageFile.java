@@ -838,7 +838,7 @@ public class LanguageFile {
         en_gb.setProperty("timezone_invalid", "Invalid input. Check your formatting.");
 
         // Votes
-        en_gb.setProperty("votes_active", "This poll is active.");
+        en_gb.setProperty("votes_active", "Ends at");
         en_gb.setProperty("votes_inactive", "This poll has ended.");
 
         /// Quickvote
@@ -856,6 +856,8 @@ public class LanguageFile {
         en_gb.setProperty("vote_started", "%s started a poll!");
         en_gb.setProperty("vote_ended", "%s has ended the poll!");
         en_gb.setProperty("vote_missing_db", "Greetings mediator! I couldn't remove a succesful vote ending from the database.");
+        en_gb.setProperty("vote_multiple", "You can select multiple answers.");
+        en_gb.setProperty("vote_single", "You can only pick one answer.");
 
         // Fun
         /// Avatar
@@ -1873,7 +1875,7 @@ public class LanguageFile {
         de_de.setProperty("timezone_invalid", "Invalid input. Check your formatting.");
 
         // Votes
-        de_de.setProperty("votes_active", "This poll is active.");
+        de_de.setProperty("votes_active", "Endet am");
         de_de.setProperty("votes_inactive", "This poll has ended.");
 
         /// Quickvote
@@ -1891,6 +1893,8 @@ public class LanguageFile {
         de_de.setProperty("vote_started", "%s started a poll!");
         de_de.setProperty("vote_ended", "%s has ended the poll!");
         de_de.setProperty("vote_missing_db", "Greetings mediator! I couldn't remove a succesful vote ending from the database.");
+        de_de.setProperty("vote_multiple", "You can select multiple answers.");
+        de_de.setProperty("vote_single", "You can only pick one answer.");
 
         // Fun
         /// Avatar

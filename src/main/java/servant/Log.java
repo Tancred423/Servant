@@ -26,7 +26,6 @@ public class Log {
         if (notifyUser && commandEvent != null) commandEvent.reply("Something went wrong, master!\n" + "A report was sent to the bot owner.");
         if (e != null) e.printStackTrace();
         var botOwner = user.getJDA().getUserById(Servant.config.getBotOwnerId());
-        // todo: always null?
         if (botOwner == null) return;
         botOwner.openPrivateChannel().queue(privateChannel ->
                 privateChannel.sendMessage("```c\n" +

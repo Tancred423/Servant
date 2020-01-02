@@ -1,5 +1,5 @@
 // Author: Tancred423 (https://github.com/Tancred423)
-package useful.votes.vote;
+package useful.polls.poll;
 
 import files.language.LanguageHandler;
 import moderation.guild.Guild;
@@ -11,8 +11,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import owner.blacklist.Blacklist;
-import servant.Servant;
-import useful.votes.VotesDatabase;
+import useful.polls.PollsDatabase;
 import utilities.Constants;
 import utilities.Emote;
 import utilities.UsageEmbed;
@@ -20,21 +19,21 @@ import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 import zJdaUtilsLib.com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
-import java.time.DateTimeException;
+import java.sql.Timestamp;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-public class VoteCommand extends Command {
+public class PollCommand extends Command {
     private final EventWaiter waiter;
     private String accept = "✅";
     private String decline = "❌";
 
-    public VoteCommand(EventWaiter waiter) {
+    public PollCommand(EventWaiter waiter) {
         this.name = "poll";
         this.aliases = new String[] { "vote" };
         this.help = "Host a voting.";
@@ -123,20 +122,22 @@ public class VoteCommand extends Command {
         var eb = new EmbedBuilder();
         eb.setColor(new User(author.getIdLong()).getColor(guild, user));
         eb.setAuthor(String.format(LanguageHandler.get(lang, "vote_started"), author.getName()), null, author.getEffectiveAvatarUrl());
-        eb.setTitle(question);
+        eb.setDescription(allowsMultipleAnswers ? LanguageHandler.get(lang, "vote_multiple") : LanguageHandler.get(lang, "vote_single"));
         eb.setFooter(LanguageHandler.get(lang, "votes_active"), event.getSelfUser().getAvatarUrl());
-        try {
-            eb.setTimestamp(OffsetDateTime.now(ZoneId.of(new Guild(event.getGuild().getIdLong()).getOffset(guild, user))));
-        } catch (DateTimeException e) {
-            eb.setTimestamp(OffsetDateTime.now(ZoneId.of(Servant.config.getDefaultOffset())).getOffset());
-        }
 
+        var dateIn7DaysOtd = OffsetDateTime.now(ZoneOffset.UTC).plusDays(7).toLocalDateTime();
+        var dateIn7Days = Timestamp.valueOf(dateIn7DaysOtd);
+        eb.setTimestamp(dateIn7DaysOtd);
+
+        var sb = new StringBuilder();
         String[] emoji = Emote.getVoteEmotes(guild, user);
-        for (int i = 0; i < answers.size(); i++) eb.appendDescription("\n" + emoji[i] + " " + answers.get(i));
+        for (int i = 0; i < answers.size(); i++) sb.append("\n").append(emoji[i]).append(" ").append(answers.get(i));
+
+        eb.addField(question, sb.toString(), false);
 
         event.getChannel().sendMessage(eb.build()).queue(message -> {
-            if (allowsMultipleAnswers) VotesDatabase.setVote(message.getIdLong(), author.getIdLong(), "vote", guild, user);
-            else  VotesDatabase.setVote(message.getIdLong(), author.getIdLong(), "radio", guild, user);
+            if (allowsMultipleAnswers) PollsDatabase.setVote(guild.getIdLong(), message.getChannel().getIdLong(), message.getIdLong(), author.getIdLong(), "vote", dateIn7Days, guild, user);
+            else  PollsDatabase.setVote(guild.getIdLong(), message.getChannel().getIdLong(), message.getIdLong(), author.getIdLong(), "radio", dateIn7Days, guild, user);
             for (int i = 0; i < answers.size(); i++) message.addReaction(emoji[i]).queue();
 
             var end = Emote.getEmoji("end");

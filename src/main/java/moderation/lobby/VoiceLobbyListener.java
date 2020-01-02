@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
+import servant.Log;
 
 import java.util.LinkedList;
 import java.util.concurrent.CompletableFuture;
@@ -39,7 +40,9 @@ public class VoiceLobbyListener extends ListenerAdapter {
             var lang = internalGuild.getLanguage(guild, user);
 
             if (channels.contains(channel.getIdLong())) {
-                channel.createCopy().queue(newChannel ->
+                channel.createCopy().queue(newChannel -> {
+                    try {
+                        newChannel.wait(100);
                         newChannel.getManager().setName(getLobbyName(member, lang)).queue(name ->
                                 newChannel.getManager().setParent(channel.getParent()).queue(parent ->
                                         guild.modifyVoiceChannelPositions().selectPosition(newChannel).moveTo(channel.getPosition() + 1).queue(position ->
@@ -71,9 +74,11 @@ public class VoiceLobbyListener extends ListenerAdapter {
                                                     }
                                                 })
                                         )
-                                )
-                        ), failure -> System.out.println("Couldn't create new voice channel. User: " + user.getName() + "#" + user.getDiscriminator() + " (" + user.getIdLong() + ") Guild: " + guild.getName() + " (" + guild.getIdLong() + ")")
-                );
+                                ), failure -> System.out.println("Couldn't create new voice channel. User: " + user.getName() + "#" + user.getDiscriminator() + " (" + user.getIdLong() + ") Guild: " + guild.getName() + " (" + guild.getIdLong() + ")"));
+                    } catch (InterruptedException e) {
+                        new Log(e, guild, user, "voicelobby", null).sendLog(false);
+                    }
+                });
             }
         });
     }
@@ -94,6 +99,9 @@ public class VoiceLobbyListener extends ListenerAdapter {
 
             if (channels.contains(joinedChannel.getIdLong())) {
                 joinedChannel.createCopy().queue(newChannel ->
+                {
+                    try {
+                        newChannel.wait(100);
                         newChannel.getManager().setName(getLobbyName(member, lang)).queue(name ->
                                 newChannel.getManager().setParent(joinedChannel.getParent()).queue(parent ->
                                         guild.modifyVoiceChannelPositions().selectPosition(newChannel).moveTo(joinedChannel.getPosition() + 1).queue(position ->
@@ -125,9 +133,11 @@ public class VoiceLobbyListener extends ListenerAdapter {
                                                     }
                                                 })
                                         )
-                                )
-                        ), failure -> System.out.println("Couldn't create new voice channel. User: " + user.getName() + "#" + user.getDiscriminator() + " (" + user.getIdLong() + ") Guild: " + guild.getName() + " (" + guild.getIdLong() + ")")
-                );
+                        ), failure -> System.out.println("Couldn't create new voice channel. User: " + user.getName() + "#" + user.getDiscriminator() + " (" + user.getIdLong() + ") Guild: " + guild.getName() + " (" + guild.getIdLong() + ")"));
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                });
             }
 
             // Leave

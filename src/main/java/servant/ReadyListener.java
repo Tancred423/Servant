@@ -13,12 +13,16 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import useful.alarm.Alarm;
 import useful.giveaway.Giveaway;
+import useful.polls.Poll;
 import useful.reminder.Reminder;
 import useful.signup.Signup;
 import utilities.Constants;
 import utilities.Time;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
@@ -58,6 +62,7 @@ public class ReadyListener extends ListenerAdapter {
             Giveaway.checkGiveaways(jda);
             Reminder.check(jda);
             Signup.checkSignups(jda);
+            Poll.check(jda);
         }, Time.getDelayToNextMinuteInMillis(), 60 * 1000, TimeUnit.MILLISECONDS); // 1 minute
     }
 
