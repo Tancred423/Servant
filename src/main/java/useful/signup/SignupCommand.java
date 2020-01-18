@@ -9,6 +9,7 @@ import moderation.user.User;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import owner.blacklist.Blacklist;
+import servant.Servant;
 import useful.InvalidTitleException;
 import utilities.*;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
@@ -124,7 +125,7 @@ public class SignupCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        });
+        }, Servant.cpuPool);
     }
 
     private String parseTitle(CommandEvent event, String[] contentSplit) throws InvalidTitleException {

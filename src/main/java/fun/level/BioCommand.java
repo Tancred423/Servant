@@ -6,6 +6,7 @@ import moderation.guild.Guild;
 import moderation.toggle.Toggle;
 import moderation.user.User;
 import net.dv8tion.jda.api.Permission;
+import servant.Servant;
 import utilities.Constants;
 import utilities.Parser;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
@@ -47,7 +48,7 @@ public class BioCommand extends Command {
                     return;
                 }
 
-                if (args.length() > 50) {
+                if (args.length() > 30) {
                     event.replyError(LanguageHandler.get(lang, "bio_maxlength"));
                     return;
                 }
@@ -62,6 +63,6 @@ public class BioCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        });
+        }, Servant.cpuPool);
     }
 }

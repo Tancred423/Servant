@@ -181,6 +181,6 @@ public class GuildCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        });
+        }, Servant.cpuPool);
     }
 }

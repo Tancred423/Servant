@@ -8,6 +8,7 @@ import moderation.user.User;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import owner.blacklist.Blacklist;
+import servant.Servant;
 import utilities.Constants;
 import utilities.UsageEmbed;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
@@ -119,6 +120,6 @@ public class MediaOnlyChannelCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        });
+        }, Servant.cpuPool);
     }
 }

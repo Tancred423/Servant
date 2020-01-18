@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import owner.blacklist.Blacklist;
 import servant.Log;
+import servant.Servant;
 import utilities.Constants;
 import utilities.UsageEmbed;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
@@ -116,6 +117,6 @@ public class TimezoneCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        });
+        }, Servant.cpuPool);
     }
 }

@@ -69,9 +69,9 @@ public class LevelImage {
         var bg = getBg(user);
         if (bg == null) {
             var border = 30;
-            g2d.setColor(Color.decode("#202225"));
+            g2d.setColor(Color.decode("#202225")); // Dark Gray
             g2d.fillRect(0, 0, width, height);
-            g2d.setColor(Color.decode("#36393f"));
+            g2d.setColor(Color.decode("#36393f")); // Light Gray
             g2d.fillRect(border, border, width - border * 2, height - border * 2);
         } else g2d.drawImage(bg, 0, 0, null);
 

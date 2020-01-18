@@ -98,7 +98,7 @@ public class LevelListener extends ListenerAdapter {
                     event.getChannel().sendMessage(mb.toString()).queue();
                 }
             }
-        });
+        }, Servant.cpuPool);
     }
 
     private List<String> checkForNewRole(int level, GuildMessageReceivedEvent event, String lang) {

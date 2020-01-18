@@ -7,6 +7,7 @@ import moderation.guild.GuildHandler;
 import moderation.user.User;
 import net.dv8tion.jda.api.Permission;
 import owner.blacklist.Blacklist;
+import servant.Servant;
 import utilities.Constants;
 import utilities.UsageEmbed;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
@@ -164,7 +165,7 @@ public class ToggleCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        });
+        }, Servant.cpuPool);
     }
 
     private String getAlias(String arg) {

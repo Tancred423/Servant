@@ -8,6 +8,7 @@ import moderation.toggle.Toggle;
 import moderation.user.User;
 import net.dv8tion.jda.api.Permission;
 import owner.blacklist.Blacklist;
+import servant.Servant;
 import useful.InvalidTitleException;
 import utilities.Constants;
 import utilities.UsageEmbed;
@@ -92,7 +93,7 @@ public class AlarmCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        });
+        }, Servant.cpuPool);
     }
 
     private String parseTitle(CommandEvent event, String[] contentSplit) throws InvalidTitleException {

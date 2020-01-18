@@ -46,7 +46,7 @@ public class StringFormat {
     public static LinkedHashMap<String, String> achievementSortByKey(LinkedHashMap<String, String> map, String lang, User internalUser, Guild guild, net.dv8tion.jda.api.entities.User user, Locale locale) {
         SortedSet<String> keys = new TreeSet<>(map.keySet());
         var newMap = new LinkedHashMap<String, String>();
-        newMap.put(LanguageHandler.get(lang, "profile_total_ap"), LevelImage.formatDecimal(locale, internalUser.getTotelAP(guild, user)));
+        newMap.put(LanguageHandler.get(lang, "profile_total_ap"), LevelImage.formatDecimal(locale, internalUser.getTotalAP(guild, user)));
         for (var key : keys) newMap.put(key, map.get(key));
         return newMap;
     }

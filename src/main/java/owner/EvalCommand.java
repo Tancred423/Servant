@@ -5,6 +5,7 @@ import groovy.lang.GroovyShell;
 import moderation.guild.Guild;
 import moderation.user.User;
 import net.dv8tion.jda.api.Permission;
+import servant.Servant;
 import utilities.Constants;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
@@ -81,6 +82,6 @@ public class EvalCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        });
+        }, Servant.cpuPool);
     }
 }

@@ -9,6 +9,7 @@ import moderation.user.User;
 import net.dv8tion.jda.api.Permission;
 import owner.blacklist.Blacklist;
 import servant.Log;
+import servant.Servant;
 import utilities.Constants;
 import utilities.Parser;
 import utilities.UsageEmbed;
@@ -124,6 +125,6 @@ public class BirthdayCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        });
+        }, Servant.cpuPool);
     }
 }

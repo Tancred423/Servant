@@ -8,6 +8,7 @@ import moderation.toggle.Toggle;
 import moderation.user.User;
 import net.dv8tion.jda.api.Permission;
 import owner.blacklist.Blacklist;
+import servant.Servant;
 import utilities.Constants;
 import utilities.Parser;
 import utilities.UsageEmbed;
@@ -118,6 +119,6 @@ public class ReminderCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        });
+        }, Servant.cpuPool);
     }
 }

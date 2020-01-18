@@ -3,6 +3,7 @@ package owner.blacklist;
 
 import files.language.LanguageHandler;
 import net.dv8tion.jda.api.Permission;
+import servant.Servant;
 import utilities.Constants;
 import utilities.Parser;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
@@ -62,6 +63,6 @@ public class BlacklistCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        });
+        }, Servant.cpuPool);
     }
 }

@@ -8,6 +8,7 @@ import moderation.user.User;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import owner.blacklist.Blacklist;
+import servant.Servant;
 import useful.polls.PollsDatabase;
 import utilities.Constants;
 import utilities.Emote;
@@ -82,6 +83,6 @@ public class QuickpollCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        });
+        }, Servant.cpuPool);
     }
 }

@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import org.jsoup.Jsoup;
 import servant.Log;
+import servant.Servant;
 import utilities.Constants;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
@@ -19,6 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class RandomCommand extends Command {
@@ -41,37 +43,39 @@ public class RandomCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        event.getChannel().sendTyping().queue();
-        try {
-            var guild = event.getGuild();
-            var author = event.getAuthor();
+        CompletableFuture.runAsync(() -> {
+            event.getChannel().sendTyping().queue();
+            try {
+                var guild = event.getGuild();
+                var author = event.getAuthor();
 
-            var lang = LanguageHandler.getLanguage(event);
+                var lang = LanguageHandler.getLanguage(event);
 
-            Image image;
-            if (event.getArgs().isEmpty()) image = getRandomImage();
-            else image = getRandomImage(URLEncoder.encode(event.getArgs(), StandardCharsets.UTF_8));
+                Image image;
+                if (event.getArgs().isEmpty()) image = getRandomImage();
+                else image = getRandomImage(URLEncoder.encode(event.getArgs(), StandardCharsets.UTF_8));
 
-            if (image == null) {
-                event.replyWarning(LanguageHandler.get(lang, "random_empty"));
-                return;
+                if (image == null) {
+                    event.replyWarning(LanguageHandler.get(lang, "random_empty"));
+                    return;
+                }
+
+                System.out.println("[" + OffsetDateTime.now(ZoneId.of(Constants.LOG_OFFSET)).toString().replaceAll("T", " ").substring(0, 19) + "] " +
+                        "RANDOM - Title: " + image.getTitle() + ". Link: " + image.getLink() + ". Direct Link: " + image.getDirectLink() + ".");
+                var eb = new EmbedBuilder();
+                eb.setTitle(image.getTitle(), image.getLink());
+                eb.setImage(image.getDirectLink());
+                eb.setColor(new User(event.getAuthor().getIdLong()).getColor(guild, author));
+                event.reply(eb.build());
+
+                // Statistics.
+                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+                if (event.getGuild() != null)
+                    new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
+            } catch (IOException e) {
+                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
             }
-
-            System.out.println("[" + OffsetDateTime.now(ZoneId.of(Constants.LOG_OFFSET)).toString().replaceAll("T", " ").substring(0, 19) + "] " +
-                    "RANDOM - Title: " + image.getTitle() + ". Link: " + image.getLink() + ". Direct Link: " + image.getDirectLink() + ".");
-            var eb = new EmbedBuilder();
-            eb.setTitle(image.getTitle(), image.getLink());
-            eb.setImage(image.getDirectLink());
-            eb.setColor(new User(event.getAuthor().getIdLong()).getColor(guild, author));
-            event.reply(eb.build());
-
-            // Statistics.
-            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-            if (event.getGuild() != null)
-                new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-        } catch (IOException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-        }
+        }, Servant.cpuPool);
     }
 
     private Image getRandomImage(String keyword) throws IOException {

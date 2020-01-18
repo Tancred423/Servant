@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import owner.blacklist.Blacklist;
+import servant.Servant;
 import useful.polls.PollsDatabase;
 import utilities.Constants;
 import utilities.Emote;
@@ -112,7 +113,7 @@ public class PollCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        });
+        }, Servant.cpuPool);
     }
 
     private void processVote(CommandEvent event, String question, List<String> answers, String lang, boolean allowsMultipleAnswers) {

@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import owner.blacklist.Blacklist;
 import servant.Log;
+import servant.Servant;
 import utilities.Constants;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
@@ -20,6 +21,7 @@ import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 public class ProfileCommand extends Command {
@@ -58,17 +60,19 @@ public class ProfileCommand extends Command {
                 var internalProfileUser = new User(profileUser.getIdLong());
 
                 try {
-                    var image = new File(OffsetDateTime.now(ZoneOffset.UTC).toEpochSecond() + ".png");
+                    var image = new File(OffsetDateTime.now(ZoneOffset.UTC).toEpochSecond() + "_" + ThreadLocalRandom.current().nextInt(100) + ".png");
 
                     try {
-                        var profile = new LevelImage(event, profileUser, event.getGuild(), lang);
-                        ImageIO.write(profile.getImage(), "png", image);
+                        var profileImage = new ProfileImage(profileUser, event.getGuild(), lang).generateImage();
+                        if (profileImage == null) {
+                            System.out.println("error null");
+                            return;
+                        }
+                        ImageIO.write(profileImage, "png", image);
                     } catch (IOException e) {
                         new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                         return;
                     }
-
-
 
                     var eb = new EmbedBuilder();
                     eb.setColor(internalProfileUser.getColor(guild, author));
@@ -81,18 +85,16 @@ public class ProfileCommand extends Command {
                     event.getChannel().sendFile(image, image.getName() + ".png").embed(eb.build()).queue();
 
                     // Delete File.
-                    var thread = new Thread(() -> {
+                    CompletableFuture.runAsync(() -> {
                         try {
-                            TimeUnit.MILLISECONDS.sleep(15000); // 15 seconds.
+                            TimeUnit.MILLISECONDS.sleep(30 * 1000); // 30s
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
 
                         if (!image.delete())
                             new Log(null, event.getGuild(), event.getAuthor(), name, null).sendLog(false);
-                    });
-
-                    thread.start();
+                    }, Servant.cpuPool);
                 } catch (Exception e) {
                     new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                 }
@@ -103,6 +105,6 @@ public class ProfileCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        });
+        }, Servant.cpuPool);
     }
 }

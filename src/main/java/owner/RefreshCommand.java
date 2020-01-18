@@ -4,6 +4,7 @@ package owner;
 import moderation.guild.Guild;
 import moderation.user.User;
 import net.dv8tion.jda.api.Permission;
+import servant.Servant;
 import utilities.Constants;
 import utilities.Parser;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
@@ -49,7 +50,7 @@ public class RefreshCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        });
+        }, Servant.cpuPool);
     }
 
     private void assignLevelAchievement(CommandEvent event) {

@@ -6,6 +6,7 @@ import moderation.user.User;
 import moderation.guild.Guild;
 import net.dv8tion.jda.api.Permission;
 import owner.blacklist.Blacklist;
+import servant.Servant;
 import utilities.Emote;
 import utilities.Constants;
 import moderation.toggle.Toggle;
@@ -93,6 +94,6 @@ public class BaguetteCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        });
+        }, Servant.cpuPool);
     }
 }

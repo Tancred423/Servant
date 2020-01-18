@@ -8,6 +8,7 @@ import moderation.toggle.Toggle;
 import net.dv8tion.jda.api.Permission;
 import owner.blacklist.Blacklist;
 import patreon.PatreonHandler;
+import servant.Servant;
 import utilities.*;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
@@ -243,6 +244,6 @@ public class UserCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        });
+        }, Servant.cpuPool);
     }
 }

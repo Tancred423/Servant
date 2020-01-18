@@ -161,6 +161,6 @@ public class BestOfQuoteCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        });
+        }, Servant.cpuPool);
     }
 }

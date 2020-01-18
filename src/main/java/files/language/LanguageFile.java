@@ -588,8 +588,8 @@ public class LanguageFile {
         en_gb.setProperty("voicelobby_current", "Current Lobbies");
         en_gb.setProperty("voicelobby_footer", "Type `%slobby` to get help.");
         en_gb.setProperty("voicelobby_firstarg", "Invalid argument. Either `set`, `unset`, `show` or `toggletext`.");
-        en_gb.setProperty("voicelobby_apostrophe", "\'");
-        en_gb.setProperty("voicelobby_apostropge_s", "\'s");
+        en_gb.setProperty("voicelobby_apostrophe", "'");
+        en_gb.setProperty("voicelobby_apostropge_s", "'s");
         en_gb.setProperty("voicelobby_already_set", "This channel was already set as an voice lobby.");
 
         // Information
@@ -871,7 +871,7 @@ public class LanguageFile {
         en_gb.setProperty("baguette_50", "JACKPOT! Now you're cool.");
 
         /// Bio
-        en_gb.setProperty("bio_maxlength", "Bio max length is 50.");
+        en_gb.setProperty("bio_maxlength", "Bio max length is 30.");
 
         /// Coin Flip
         en_gb.setProperty("coinflip_head", "Head!");
@@ -1009,16 +1009,33 @@ public class LanguageFile {
         en_gb.setProperty("profile_noachievements", "No achievements");
         en_gb.setProperty("profile_nocommands", "No commands were used yet");
         en_gb.setProperty("profile_level", "Level");
-        en_gb.setProperty("profile_rank",  "Rank #%s");
+        en_gb.setProperty("profile_rank",  "Rank");
+        en_gb.setProperty("profile_generalinfo", "General info");
+        en_gb.setProperty("profile_commandstats", "Command stats");
         en_gb.setProperty("profile_mostused", "Most used commands");
         en_gb.setProperty("profile_achievements", "Achievements");
         en_gb.setProperty("profile_footer1", "Also try \"%s%s @user\"");
         en_gb.setProperty("profile_footer2", "Also try \"%s%s\"");
         en_gb.setProperty("profile_baguettecounter", "Baguette Statistics");
         en_gb.setProperty("profile_nobaguette", "No baguette yet");
-        en_gb.setProperty("profile_baguette", "Biggest baguette: %s (%s times)");
-        en_gb.setProperty("profile_total_muc", "Total commands used");
-        en_gb.setProperty("profile_total_ap", "Total AP");
+        en_gb.setProperty("profile_baguette", "Biggest Baguette");
+        en_gb.setProperty("profile_baguette_value", "%s (%s times)");
+        en_gb.setProperty("profile_total_muc", "Commands Used");
+        en_gb.setProperty("profile_total_ap", "Achivement Points");
+        en_gb.setProperty("profile_title_vip", "The VIP");
+        en_gb.setProperty("profile_title_$10", "The Saber");
+        en_gb.setProperty("profile_title_$5", "The Archer");
+        en_gb.setProperty("profile_title_$3", "The Lancer");
+        en_gb.setProperty("profile_title_$1", "The Caster");
+        en_gb.setProperty("profile_title_donator", "The Assassin");
+        en_gb.setProperty("profile_title_booster", "The Berserker");
+        en_gb.setProperty("profile_title_normal", "The Master");
+        en_gb.setProperty("profile_animal", "Favourite Animal");
+        en_gb.setProperty("profile_bird", "Bird");
+        en_gb.setProperty("profile_cat", "Cat");
+        en_gb.setProperty("profile_dog", "Dog");
+        en_gb.setProperty("profile_nofavourite", "No Favourite");
+
 
         // Random
         en_gb.setProperty("random_empty", "I couldn't find anything with this keyword.");
@@ -1908,7 +1925,7 @@ public class LanguageFile {
         de_de.setProperty("baguette_50", "JACKPOT! Now you're cool.");
 
         /// Bio
-        de_de.setProperty("bio_maxlength", "Bio max length is 50.");
+        de_de.setProperty("bio_maxlength", "Bio max length is 30.");
 
         /// Coin Flip
         de_de.setProperty("coinflip_head", "Head!");
@@ -2047,17 +2064,33 @@ public class LanguageFile {
         /// Profile
         de_de.setProperty("profile_noachievements", "No achievements");
         de_de.setProperty("profile_nocommands", "No commands were used yet");
-        de_de.setProperty("profile_level", "Level");
-        de_de.setProperty("profile_rank",  "Rank #%s");
-        de_de.setProperty("profile_mostused", "Most used commands");
-        de_de.setProperty("profile_achievements", "Achievements");
+        de_de.setProperty("profile_level", "Stufe");
+        de_de.setProperty("profile_rank",  "Rang");
+        de_de.setProperty("profile_generalinfo", "Allgemeine Infos");
+        de_de.setProperty("profile_commandstats", "Befehlstatistiken");
+        de_de.setProperty("profile_mostused", "Meist genutzte Befehle");
+        de_de.setProperty("profile_achievements", "Errungenschaften");
         de_de.setProperty("profile_footer1", "Also try \"%s%s @user\"");
         de_de.setProperty("profile_footer2", "Also try \"%s%s\"");
         de_de.setProperty("profile_baguettecounter", "Baguette Statistics");
         de_de.setProperty("profile_nobaguette", "No baguette yet");
-        de_de.setProperty("profile_baguette", "Biggest baguette: %s (%s times)");
-        de_de.setProperty("profile_total_muc", "Total commands used");
-        de_de.setProperty("profile_total_ap", "Total AP");
+        de_de.setProperty("profile_baguette", "Größtes Baguette");
+        de_de.setProperty("profile_baguette_value", "%s (%s mal)");
+        de_de.setProperty("profile_total_muc", "Genutzte Befehle");
+        de_de.setProperty("profile_total_ap", "Erfolgspunkte");
+        de_de.setProperty("profile_title_vip", "VIP");
+        de_de.setProperty("profile_title_$10", "Saber");
+        de_de.setProperty("profile_title_$5", "Bogenschütze");
+        de_de.setProperty("profile_title_$3", "Lancer");
+        de_de.setProperty("profile_title_$1", "Beschwörer");
+        de_de.setProperty("profile_title_donator", "Assassine");
+        de_de.setProperty("profile_title_booster", "Berserker");
+        de_de.setProperty("profile_title_normal", "Meister");
+        de_de.setProperty("profile_animal", "Lieblingstier");
+        de_de.setProperty("profile_bird", "Vogel");
+        de_de.setProperty("profile_cat", "Katze");
+        de_de.setProperty("profile_dog", "Hund");
+        de_de.setProperty("profile_nofavourite", "Kein Favorit");
 
         // Random
         de_de.setProperty("random_empty", "Ich konnte unter diesem Suchwort nichts finden.");

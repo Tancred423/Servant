@@ -7,6 +7,7 @@ import moderation.guild.GuildHandler;
 import moderation.toggle.Toggle;
 import moderation.user.User;
 import net.dv8tion.jda.api.Permission;
+import servant.Servant;
 import utilities.Constants;
 import utilities.StringFormat;
 import utilities.UsageEmbed;
@@ -67,6 +68,6 @@ public class FlipCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        });
+        }, Servant.cpuPool);
     }
 }

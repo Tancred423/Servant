@@ -124,7 +124,7 @@ public class LoveCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        });
+        }, Servant.cpuPool);
     }
 
     private String getBar(int love) {

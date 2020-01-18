@@ -37,8 +37,5 @@ hs_err_pid*
 # Image Files
 /images/*
 
-# Easter Eggs Files (No spoilers!)
-/src/main/java/easteregg/*
-
 # Backup (Database, Logs, Server Logs, Old Versions)
 /backup/*

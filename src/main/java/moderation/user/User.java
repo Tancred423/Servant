@@ -397,7 +397,7 @@ public class User {
         return achievements;
     }
 
-    public int getTotelAP(Guild guild, net.dv8tion.jda.api.entities.User user) {
+    public int getTotalAP(Guild guild, net.dv8tion.jda.api.entities.User user) {
         Connection connection = null;
         var ap = 0;
 
@@ -1069,7 +1069,7 @@ public class User {
     }
 
     // Feature Count
-    private int getTotalFeatureCount(Guild guild, net.dv8tion.jda.api.entities.User user) {
+    public int getTotalFeatureCount(Guild guild, net.dv8tion.jda.api.entities.User user) {
         Connection connection = null;
         var feature = 0;
 
@@ -1099,14 +1099,9 @@ public class User {
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) {
-                // get total count
-//                features.put(LanguageHandler.get(lang, "profile_total_muc"), getTotalFeatureCount(guild, user));
                 do {
                     var feature = resultSet.getString("feature");
                     var count = resultSet.getInt("count");
-
-                    if (feature.equals("dog") || feature.equals("cat") || feature.equals("bird")) continue;
-                    if (feature.equals("random")) count += getBirdCatDogCount(connection);
 
                     features.put(feature, count);
                 } while (resultSet.next());
@@ -1134,20 +1129,34 @@ public class User {
         } else return features;
     }
 
-    private int getBirdCatDogCount(Connection connection) throws SQLException {
-        var count = 0;
+    public String getFavouriteAnimal(Guild guild, net.dv8tion.jda.api.entities.User user, String lang) {
+        Connection connection = null;
+        var bird = 0;
+        var cat = 0;
+        var dog = 0;
 
-        var select = connection.prepareStatement("SELECT * FROM feature_count WHERE id=?");
-        select.setLong(1, userId);
-        var resultSet = select.executeQuery();
-        if (resultSet.first()) {
-            do {
-                var feature = resultSet.getString("feature");
-                if (feature.equals("bird") || feature.equals("cat") || feature.equals("dog"))
-                    count += resultSet.getInt("count");
-            } while (resultSet.next());
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement("SELECT * FROM feature_count WHERE id=?");
+            select.setLong(1, userId);
+            var resultSet = select.executeQuery();
+            if (resultSet.first()) {
+                do {
+                    var feature = resultSet.getString("feature");
+                    if (feature.equals("bird")) bird = resultSet.getInt("count");
+                    if (feature.equals("cat")) cat = resultSet.getInt("count");
+                    if (feature.equals("dog")) dog = resultSet.getInt("count");
+                } while (resultSet.next());
+            }
+        } catch (SQLException e) {
+            new Log(e, guild, user, "featurecount", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
         }
 
-        return count;
+        if (bird > cat && bird > dog) return LanguageHandler.get(lang, "profile_bird");
+        else if (cat > bird && cat > dog) return LanguageHandler.get(lang, "profile_cat");
+        else if (dog > bird && dog > cat) return LanguageHandler.get(lang, "profile_dog");
+        else return LanguageHandler.get(lang, "profile_nofavourite");
     }
 }

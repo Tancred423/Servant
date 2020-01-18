@@ -1,14 +1,13 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package fun.random.randomAnimal;
 
-import files.language.LanguageHandler;
 import moderation.guild.Guild;
-import moderation.guild.GuildHandler;
 import moderation.toggle.Toggle;
 import moderation.user.User;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import servant.Log;
+import servant.Servant;
 import utilities.Constants;
 import utilities.Parser;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
@@ -51,9 +50,6 @@ public class CatCommand extends Command {
                 var guild = event.getGuild();
                 var author = event.getAuthor();
 
-                var lang = LanguageHandler.getLanguage(event);
-                var p = GuildHandler.getPrefix(event);
-
                 try {
                     var eb = new EmbedBuilder();
                     eb.setColor(new User(event.getAuthor().getIdLong()).getColor(guild, author));
@@ -70,7 +66,7 @@ public class CatCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        });
+        }, Servant.cpuPool);
     }
 
     private String getImageUrl() throws IOException {

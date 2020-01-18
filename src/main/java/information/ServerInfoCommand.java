@@ -58,7 +58,7 @@ public class ServerInfoCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        });
+        }, Servant.cpuPool);
     }
 
     private void processInfo(CommandEvent event, Guild guild, String vanityUrl, String lang) {

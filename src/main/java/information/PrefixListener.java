@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import owner.blacklist.Blacklist;
+import servant.Servant;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -41,6 +42,6 @@ public class PrefixListener extends ListenerAdapter {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        });
+        }, Servant.cpuPool);
     }
 }

@@ -77,11 +77,16 @@ import zJdaUtilsLib.com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Servant {
     public static ConfigFile config;
     public static ToggleFile toggle;
     public static Database db;
+
+    public static ExecutorService cpuPool;
+//    public static ExecutorService ioPool;
 
     public static void main(String[] args) throws IOException, LoginException {
         config = new ConfigFile();
@@ -97,7 +102,10 @@ public class Servant {
 
         toggle = new ToggleFile();
 
-        var waiter = new EventWaiter(); // Has to be added to JDABuilder.
+        cpuPool = Executors.newFixedThreadPool(10);
+//        ioPool = Executors.newCachedThreadPool();
+
+        var waiter = new EventWaiter();
         var client = new CommandClientBuilder();
 
         client.setOwnerId(config.getBotOwnerId());

@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.Permission;
 import moderation.guild.Guild;
 import owner.blacklist.Blacklist;
 import moderation.user.User;
+import servant.Servant;
 import utilities.Constants;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
@@ -55,6 +56,6 @@ public class CoinflipCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        });
+        }, Servant.cpuPool);
     }
 }
