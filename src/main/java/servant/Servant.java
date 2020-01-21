@@ -87,7 +87,7 @@ public class Servant {
 
         var availProcessors = Runtime.getRuntime().availableProcessors();
         System.out.println("Available Processors: " + availProcessors);
-        threadPool = Executors.newFixedThreadPool(availProcessors);
+        threadPool = Executors.newFixedThreadPool(availProcessors + 1);
 
         var waiter = new EventWaiter();
         var client = new CommandClientBuilder();
