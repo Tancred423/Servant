@@ -93,7 +93,7 @@ public class AlarmCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, Servant.cpuPool);
+        }, Servant.threadPool);
     }
 
     private String parseTitle(CommandEvent event, String[] contentSplit) throws InvalidTitleException {

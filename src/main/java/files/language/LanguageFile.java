@@ -40,6 +40,7 @@ public class LanguageFile {
         en_gb.setProperty("achievement_deusvult", "DEUS VULT!");
         en_gb.setProperty("achievement_fiteme", "Fite me!!!");
         en_gb.setProperty("achievement_xmas", "Xmas Time");
+        en_gb.setProperty("achievement_padoru", "Padoru Padoruu");
 
         /// Invite
         en_gb.setProperty("invite_author", "%s, at your service!");

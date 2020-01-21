@@ -1,10 +1,8 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package moderation.voicelobby;
 
-import files.language.LanguageHandler;
 import moderation.guild.Guild;
 import moderation.toggle.Toggle;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.channel.voice.VoiceChannelDeleteEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
@@ -18,12 +16,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 public class VoiceLobbyListener extends ListenerAdapter {
-    private String getLobbyName(Member member, String lang) {
-        return "⤷ " + member.getEffectiveName() +
-                (member.getEffectiveName().toLowerCase().endsWith("s") ?
-                        LanguageHandler.get(lang, "voicelobby_apostrophe") :
-                        LanguageHandler.get(lang, "voicelobby_apostropge_s")) + " Lobby"; }
-
     public void onGuildVoiceJoin(@NotNull GuildVoiceJoinEvent event) {
         if (event.getGuild().getIdLong() == 264445053596991498L) return; // Discord Bot List
         CompletableFuture.runAsync(() -> {
@@ -40,7 +32,7 @@ public class VoiceLobbyListener extends ListenerAdapter {
 
             if (channels.contains(channel.getIdLong())) {
                 channel.createCopy().queue(newChannel ->
-                        newChannel.getManager().setName(getLobbyName(member, lang)).queue(name ->
+                        newChannel.getManager().setName(VoiceLobby.getLobbyName(member, lang)).queue(name ->
                                 newChannel.getManager().setParent(channel.getParent()).queue(parent ->
                                         guild.modifyVoiceChannelPositions().selectPosition(newChannel).moveTo(channel.getPosition() + 1).queue(position ->
                                                 guild.moveVoiceMember(member, newChannel).queue(move -> {
@@ -94,7 +86,7 @@ public class VoiceLobbyListener extends ListenerAdapter {
 
             if (channels.contains(joinedChannel.getIdLong())) {
                 joinedChannel.createCopy().queue(newChannel ->
-                        newChannel.getManager().setName(getLobbyName(member, lang)).queue(name ->
+                        newChannel.getManager().setName(VoiceLobby.getLobbyName(member, lang)).queue(name ->
                                 newChannel.getManager().setParent(joinedChannel.getParent()).queue(parent ->
                                         guild.modifyVoiceChannelPositions().selectPosition(newChannel).moveTo(joinedChannel.getPosition() + 1).queue(position ->
                                                 guild.moveVoiceMember(member, newChannel).queue(move -> {

@@ -108,7 +108,7 @@ public class SignupCommand extends Command {
 
                 var upvote = Emote.getEmoji("upvote");
                 var downvote = Emote.getEmoji("end");
-                if (upvote == null || downvote == null) return; // todo: always null?
+                if (upvote == null || downvote == null) return;
 
                 var finalEventDate = eventDate;
                 var finalIsCustomDate = isCustomDate;
@@ -125,7 +125,7 @@ public class SignupCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, Servant.cpuPool);
+        }, Servant.threadPool);
     }
 
     private String parseTitle(CommandEvent event, String[] contentSplit) throws InvalidTitleException {

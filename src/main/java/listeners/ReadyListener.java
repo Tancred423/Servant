@@ -1,7 +1,8 @@
 // Author: Tancred423 (https://github.com/Tancred423)
-package servant;
+package listeners;
 
 import files.language.LanguageHandler;
+import moderation.birthday.BirthdayHandler;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
@@ -11,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import servant.Servant;
 import useful.alarm.Alarm;
 import useful.giveaway.Giveaway;
 import useful.polls.Poll;
@@ -36,6 +38,7 @@ public class ReadyListener extends ListenerAdapter {
     private int counter = 0;
 
     public void onReady(@NotNull ReadyEvent event) {
+        // Check database connection
         Connection connection = null;
         try {
             connection = Servant.db.getHikari().getConnection();
@@ -48,27 +51,44 @@ public class ReadyListener extends ListenerAdapter {
 
         var jda = event.getJDA();
 
-        setPresence(jda);
-        checkStuff(jda);
-        startServerAmountLogging(jda);
+        startExecutor(jda);
 
         System.out.println(jda.getSelfUser().getName() + " ready.");
     }
 
-    private void checkStuff(JDA jda) {
+    private void startExecutor(JDA jda) {
         var service = Executors.newSingleThreadScheduledExecutor();
+
+        var delayToNextMinute = Time.getDelayToNextMinuteInMillis();
+        var delayToNextDay = Time.getDelayToNextDayInMillis();
+
+        // 1 Minute Period
         service.scheduleAtFixedRate(() -> {
             Alarm.check(jda);
             Giveaway.checkGiveaways(jda);
             Reminder.check(jda);
             Signup.checkSignups(jda);
             Poll.check(jda);
-        }, Time.getDelayToNextMinuteInMillis(), 60 * 1000, TimeUnit.MILLISECONDS); // 1 minute
-    }
+        }, delayToNextMinute, 60 * 1000, TimeUnit.MILLISECONDS);
 
-    private void setPresence(JDA jda) {
-        var service = Executors.newSingleThreadScheduledExecutor();
-        service.scheduleAtFixedRate(() -> settingPresence(jda), 0, 5, TimeUnit.MINUTES);
+        // 5 Minute Period
+        service.scheduleAtFixedRate(() -> settingPresence(jda), delayToNextMinute, 5 * 60 * 1000, TimeUnit.MILLISECONDS);
+
+        // 15 Minute Period
+        service.scheduleAtFixedRate(() -> {
+            // Birthday
+            BirthdayHandler.checkBirthdays(jda);
+            BirthdayHandler.updateLists(jda);
+        }, delayToNextMinute, 15 * 60 * 1000, TimeUnit.MILLISECONDS);
+
+        // 24 Hour Period
+        service.scheduleAtFixedRate(() -> {
+            try {
+                logServerAmount(jda);
+            } catch (IOException | ParseException e) {
+                e.printStackTrace();
+            }
+        }, delayToNextDay, 24 * 60 * 60 * 1000, TimeUnit.MILLISECONDS);
     }
 
     private void settingPresence(JDA jda) {
@@ -87,17 +107,6 @@ public class ReadyListener extends ListenerAdapter {
 
         counter++;
         if (counter == 5) counter = 0;
-    }
-
-    private void startServerAmountLogging(JDA jda) {
-        var service = Executors.newSingleThreadScheduledExecutor();
-        service.scheduleAtFixedRate(() -> {
-            try {
-                logServerAmount(jda);
-            } catch (IOException | ParseException e) {
-                e.printStackTrace();
-            }
-        }, 0, 24, TimeUnit.HOURS);
     }
 
     @SuppressWarnings({"ResultOfMethodCallIgnored", "unchecked"})

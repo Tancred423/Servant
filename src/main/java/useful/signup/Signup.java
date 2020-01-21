@@ -47,7 +47,7 @@ public class Signup {
                         var remainingTimeMillis = Giveaway.zonedDateTimeDifference(now, expiration);
 
                         if (remainingTimeMillis <= 0) {
-                            if (guild == null) return; // todo: always null?
+                            if (guild == null) return;
                             var internalGuild = new Guild(guild.getIdLong());
                             var messageId = resultSet.getLong("message_id");
                             var finalExpiration = isCustomDate ? expiration.plusMinutes(30) : expiration;
@@ -65,8 +65,8 @@ public class Signup {
         }
     }
 
-    static void endSignup(Guild internalGuild, long messageId, Message message, net.dv8tion.jda.api.entities.Guild guild,
-                          net.dv8tion.jda.api.entities.User author, boolean forceEnd, ZonedDateTime expiration) {
+    public static void endSignup(Guild internalGuild, long messageId, Message message, net.dv8tion.jda.api.entities.Guild guild,
+                                 net.dv8tion.jda.api.entities.User author, boolean forceEnd, ZonedDateTime expiration) {
         if (!internalGuild.isSignupMessage(messageId, guild, author)) return;
         var amount = internalGuild.getSignupAmount(messageId, guild, author);
         var reactionList = message.getReactions();

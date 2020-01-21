@@ -78,7 +78,6 @@ public class ServerlistCommand extends Command {
                 var author = event.getAuthor();
 
                 Paginator p;
-                // todo: shard info never null?
                 event.getJDA().getShardInfo();
                 p = pbuilder.setColor(new User(event.getAuthor().getIdLong()).getColor(guild, author))
                         .setText(String.format(LanguageHandler.get(lang, "guildlist_connected"), event.getSelfUser().getName()) + ("(Shard ID " + event.getJDA().getShardInfo().getShardId() + "):"))
@@ -94,6 +93,6 @@ public class ServerlistCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, Servant.cpuPool);
+        }, Servant.threadPool);
     }
 }

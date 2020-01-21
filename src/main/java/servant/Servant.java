@@ -1,7 +1,6 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package servant;
 
-import easteregg.EasterEggsListener;
 import easteregg.ThanksCommand;
 import files.ConfigFile;
 import files.language.LanguageHandler;
@@ -14,64 +13,49 @@ import fun.embed.EditEmbedCommand;
 import fun.flip.FlipCommand;
 import fun.flip.UnflipCommand;
 import fun.level.BioCommand;
-import fun.level.LevelListener;
 import fun.level.LevelRoleCommand;
 import fun.level.ProfileCommand;
 import fun.random.RandomCommand;
 import fun.random.randomAnimal.BirdCommand;
 import fun.random.randomAnimal.CatCommand;
 import fun.random.randomAnimal.DogCommand;
-import information.*;
+import information.BotInfoCommand;
+import information.PatreonCommand;
+import information.PingCommand;
+import information.ServerInfoCommand;
 import interaction.*;
+import listeners.*;
 import moderation.ClearCommand;
-import moderation.InviteKickListener;
 import moderation.RoleCommand;
 import moderation.ServerSetupCommand;
 import moderation.autorole.AutoRoleCommand;
-import moderation.autorole.AutoRoleListener;
 import moderation.bestOfImage.BestOfImageCommand;
-import moderation.bestOfImage.BestOfImageListener;
 import moderation.bestOfQuote.BestOfQuoteCommand;
-import moderation.bestOfQuote.BestOfQuoteListener;
 import moderation.birthday.BirthdayCommand;
-import moderation.birthday.BirthdayListener;
 import moderation.guild.GuildCommand;
 import moderation.guild.GuildManager;
 import moderation.join.JoinCommand;
-import moderation.join.JoinListener;
 import moderation.leave.LeaveCommand;
-import moderation.leave.LeaveListener;
 import moderation.livestream.LivestreamCommand;
-import moderation.livestream.LivestreamListener;
-import moderation.voicelobby.VoiceLobbyCommand;
-import moderation.voicelobby.VoiceLobbyListener;
 import moderation.mediaOnlyChannel.MediaOnlyChannelCommand;
-import moderation.mediaOnlyChannel.MediaOnlyChannelListener;
 import moderation.reactionRole.ReactionRoleCommand;
-import moderation.reactionRole.ReactionRoleListener;
 import moderation.toggle.ToggleCommand;
 import moderation.toggle.ToggleFile;
 import moderation.user.UserCommand;
+import moderation.voicelobby.VoiceLobbyCommand;
 import net.dv8tion.jda.api.AccountType;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import owner.*;
 import owner.blacklist.BlacklistCommand;
-import patreon.PatreonListener;
 import useful.alarm.AlarmCommand;
 import useful.giveaway.GiveawayCommand;
-import useful.giveaway.GiveawayListener;
 import useful.polls.poll.PollCommand;
+import useful.polls.quickpoll.QuickpollCommand;
 import useful.reminder.ReminderCommand;
 import useful.signup.SignupCommand;
-import useful.signup.SignupListener;
 import useful.timezone.TimezoneCommand;
-import useful.polls.quickpoll.QuickpollCommand;
-import useful.polls.quickpoll.QuickpollEndListener;
-import useful.polls.quickpoll.QuickpollMultipleVoteListener;
-import useful.polls.poll.RadiopollMultipleVoteListener;
-import useful.polls.poll.PollEndListener;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandClientBuilder;
 import zJdaUtilsLib.com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
@@ -85,8 +69,7 @@ public class Servant {
     public static ToggleFile toggle;
     public static Database db;
 
-    public static ExecutorService cpuPool;
-//    public static ExecutorService ioPool;
+    public static ExecutorService threadPool;
 
     public static void main(String[] args) throws IOException, LoginException {
         config = new ConfigFile();
@@ -102,8 +85,9 @@ public class Servant {
 
         toggle = new ToggleFile();
 
-        cpuPool = Executors.newFixedThreadPool(10);
-//        ioPool = Executors.newCachedThreadPool();
+        var availProcessors = Runtime.getRuntime().availableProcessors();
+        System.out.println("Available Processors: " + availProcessors);
+        threadPool = Executors.newFixedThreadPool(availProcessors);
 
         var waiter = new EventWaiter();
         var client = new CommandClientBuilder();
@@ -181,6 +165,7 @@ public class Servant {
                 new HighfiveCommand(),
                 new HugCommand(),
                 new KissCommand(),
+                new LickCommand(),
                 new PatCommand(),
                 new SlapCommand(),
 
@@ -198,28 +183,49 @@ public class Servant {
                 .addEventListeners(client.build())
                 .addEventListeners(waiter)
 
-                .addEventListeners(new AutoRoleListener())
-                .addEventListeners(new BestOfImageListener())
-                .addEventListeners(new BestOfQuoteListener())
-                .addEventListeners(new BirthdayListener())
-                .addEventListeners(new EasterEggsListener())
-                .addEventListeners(new GiveawayListener())
-                .addEventListeners(new InviteKickListener())
-                .addEventListeners(new JoinListener())
-                .addEventListeners(new LeaveListener())
-                .addEventListeners(new LevelListener())
-                .addEventListeners(new LivestreamListener())
-                .addEventListeners(new MediaOnlyChannelListener())
-                .addEventListeners(new PatreonListener())
-                .addEventListeners(new PrefixListener())
-                .addEventListeners(new QuickpollEndListener())
-                .addEventListeners(new QuickpollMultipleVoteListener())
-                .addEventListeners(new RadiopollMultipleVoteListener())
-                .addEventListeners(new ReactionRoleListener())
-                .addEventListeners(new ReadyListener())
-                .addEventListeners(new SignupListener())
-                .addEventListeners(new VoiceLobbyListener())
-                .addEventListeners(new PollEndListener())
+                /* To not block the main thread, we will run CompletableFuture#runAsync
+                 * with our own thread-pool.
+                 * To reduce the amount of thrown events and created threads, we will
+                 * handle all commands from the same event type in the same class and thread.
+                 */
+                .addEventListeners(new GuildJoinListener()) // Invite
+                .addEventListeners(new GuildLeaveListener()) // Birthday, Kick
+                .addEventListeners(new GuildMemberJoinListener()) // AutoRole, Join
+                .addEventListeners(new GuildMemberLeaveListener()) // Leave
+                .addEventListeners(new GuildMemberRoleAddListener()) // Patreon
+                .addEventListeners(new GuildMessageDeleteListener())  // Birthday
+                .addEventListeners(new GuildMessageReactionAddListener()) // BestOfImage, BestOfQuote, Quickpoll, Poll, Radiopoll, Reaction Role, Signup
+                .addEventListeners(new GuildMessageReactionRemoveListener()) // Quickpoll, Radiopoll, Reaction Role
+                .addEventListeners(new GuildVoiceJoinListener()) // VoiceLobby
+                .addEventListeners(new GuildVoiceLeaveListener()) // VoiceLobby
+                .addEventListeners(new GuildVoiceMoveListener()) // Voicelobby
+                .addEventListeners(new MessageReceivedListener()) // EasterEggs, Level, MediaOnlyChannel, Prefix
+                .addEventListeners(new ReadyListener()) // Birthday
+                .addEventListeners(new TextChannelDeleteListener()) // Giveaway
+                .addEventListeners(new UserActivityEndListener()) // Livestream
+                .addEventListeners(new UserActivityStartListener()) // Livestream
+
+//                .addEventListeners(new AutoRoleListener())
+//                .addEventListeners(new BestOfImageListener())
+//                .addEventListeners(new BestOfQuoteListener())
+//                .addEventListeners(new BirthdayListener())
+//                .addEventListeners(new EasterEggsListener())
+//                .addEventListeners(new GiveawayListener())
+//                .addEventListeners(new InviteKickListener())
+//                .addEventListeners(new JoinListener())
+//                .addEventListeners(new LeaveListener())
+//                .addEventListeners(new LevelListener())
+//                .addEventListeners(new LivestreamListener())
+//                .addEventListeners(new MediaOnlyChannelListener())
+//                .addEventListeners(new PatreonListener())
+//                .addEventListeners(new PrefixListener())
+//                .addEventListeners(new QuickpollEndListener())
+//                .addEventListeners(new QuickpollMultipleVoteListener())
+//                .addEventListeners(new PollEndListener())
+//                .addEventListeners(new RadiopollMultipleVoteListener())
+//                .addEventListeners(new ReactionRoleListener())
+//                .addEventListeners(new SignupListener())
+//                .addEventListeners(new VoiceLobbyListener())
 
                 .build();
     }

@@ -66,7 +66,7 @@ public class CatCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, Servant.cpuPool);
+        }, Servant.threadPool);
     }
 
     private String getImageUrl() throws IOException {

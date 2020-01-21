@@ -82,6 +82,6 @@ public class EvalCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, Servant.cpuPool);
+        }, Servant.threadPool);
     }
 }

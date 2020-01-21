@@ -11,7 +11,6 @@ import utilities.Time;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class BirthdayListener extends ListenerAdapter {
@@ -21,7 +20,7 @@ public class BirthdayListener extends ListenerAdapter {
             var guild = event.getGuild();
             var internalGuild = new Guild(guild.getIdLong());
             var guildOwner = guild.getOwner();
-            if (guildOwner == null) return; // todo: always null?
+            if (guildOwner == null) return;
             var guildOwnerUser = guildOwner.getUser();
             if (internalGuild.getBirthdayMessageMessageId(guild, guildOwnerUser) == event.getMessageIdLong())
                 internalGuild.unsetBirthdayMessage(guild, guildOwnerUser);
@@ -32,13 +31,13 @@ public class BirthdayListener extends ListenerAdapter {
         CompletableFuture.runAsync(() -> {
             var guild = event.getGuild();
             var guildOwner = guild.getOwner();
-            if (guildOwner == null) return; // todo: always null?
+            if (guildOwner == null) return;
             new Guild(guild.getIdLong()).purgeBirthday(guild, guildOwner.getUser());
         });
     }
 
     public void onReady(@NotNull ReadyEvent event) {
-        ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
+        var service = Executors.newSingleThreadScheduledExecutor();
         service.scheduleAtFixedRate(() -> {
             BirthdayHandler.checkBirthdays(event.getJDA());
             BirthdayHandler.updateLists(event.getJDA());

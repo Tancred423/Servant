@@ -30,10 +30,10 @@ public class AutoRoleListener extends ListenerAdapter {
                 Thread delay = new Thread(() -> {
                     try {
                         var roleAndDelay = internalGuild.getAutorole(guild, eventUser);
-                        TimeUnit.MINUTES.sleep(roleAndDelay.entrySet().iterator().next().getValue());
+                        TimeUnit.MINUTES.sleep(roleAndDelay.getValue());
                         var member = event.getMember();
                         var rolesToAdd = new ArrayList<Role>();
-                        rolesToAdd.add(internalGuild.getAutorole(guild, eventUser).entrySet().iterator().next().getKey());
+                        rolesToAdd.add(internalGuild.getAutorole(guild, eventUser).getKey());
                         guild.modifyMemberRoles(member, rolesToAdd, null).queue();
                     } catch (InterruptedException e) {
                         new Log(e, event.getGuild(), eventUser, "Autorole Listener", null).sendLog(false);

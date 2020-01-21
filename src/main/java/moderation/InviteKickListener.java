@@ -24,7 +24,7 @@ public class InviteKickListener extends ListenerAdapter {
             try {
                 var guild = event.getGuild();
                 var guildOwner = guild.getOwner();
-                if (guildOwner == null) return; // todo: always null?
+                if (guildOwner == null) return;
                 var guildOwnerUser = guildOwner.getUser();
 
                 System.out.println("[" + OffsetDateTime.now(ZoneId.of(Constants.LOG_OFFSET)).toString().replaceAll("T", " ").substring(0, 19) + "] " +
@@ -41,7 +41,7 @@ public class InviteKickListener extends ListenerAdapter {
                     var language = new Guild(guild.getIdLong()).getLanguage(guild, guildOwnerUser);
                     var p = Servant.config.getDefaultPrefix();
                     var botOwner = event.getJDA().getUserById(Servant.config.getBotOwnerId());
-                    if (botOwner == null) return; // todo: always null?
+                    if (botOwner == null) return;
                     var bot = event.getJDA().getSelfUser();
                     var eb = new EmbedBuilder();
 
@@ -63,7 +63,7 @@ public class InviteKickListener extends ListenerAdapter {
         CompletableFuture.runAsync(() -> {
             var guild = event.getGuild();
             var guildOwner = guild.getOwner();
-            if (guildOwner == null) return; // todo: always null?
+            if (guildOwner == null) return;
             var guildOwnerUser = guildOwner.getUser();
 
             if (Blacklist.isBlacklisted(guildOwnerUser, guild)) return;
@@ -76,7 +76,7 @@ public class InviteKickListener extends ListenerAdapter {
                         String language;
                         language = new Guild(guild.getIdLong()).getLanguage(guild, guildOwnerUser);
                         var botOwner = event.getJDA().getUserById(Servant.config.getBotOwnerId());
-                        if (botOwner == null) return; // todo: always null?
+                        if (botOwner == null) return;
                         var eb = new EmbedBuilder();
 
                         eb.setColor(internalGuildOwner.getColor(guild, guildOwnerUser));

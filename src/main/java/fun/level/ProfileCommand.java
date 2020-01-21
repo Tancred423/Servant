@@ -94,7 +94,7 @@ public class ProfileCommand extends Command {
 
                         if (!image.delete())
                             new Log(null, event.getGuild(), event.getAuthor(), name, null).sendLog(false);
-                    }, Servant.cpuPool);
+                    }, Servant.threadPool);
                 } catch (Exception e) {
                     new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                 }
@@ -105,6 +105,6 @@ public class ProfileCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, Servant.cpuPool);
+        }, Servant.threadPool);
     }
 }

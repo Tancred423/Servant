@@ -140,7 +140,7 @@ public class LivestreamCommand extends Command {
                         long channelId = internalGuild.getStreamChannelId(guild, author);
                         for (Long streamer : streamers) {
                             var streamerMember = guild.getMemberById(streamer);
-                            if (streamerMember != null) // todo: always null?
+                            if (streamerMember != null)
                                 sb.append(streamerMember.getAsMention()).append("\n");
                         }
 
@@ -174,6 +174,6 @@ public class LivestreamCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, Servant.cpuPool);
+        }, Servant.threadPool);
     }
 }

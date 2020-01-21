@@ -85,7 +85,7 @@ public class ServerSetupCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, Servant.cpuPool);
+        }, Servant.threadPool);
     }
 
     // Timeout

@@ -51,7 +51,7 @@ public class ReactionRoleCommand extends Command {
                 var lang = LanguageHandler.getLanguage(event);
                 var p = GuildHandler.getPrefix(event);
                 var tancWave = utilities.Emote.getEmote("tancWave", guild, author);
-                var g = event.getJDA().getGuildById(436925371577925642L); // todo: always null?
+                var g = event.getJDA().getGuildById(436925371577925642L);
                 if (g != null && tancWave == null) tancWave = g.getEmoteById(582852645765775360L); // todo: Delete later
                 if (tancWave == null) return;
 
@@ -85,7 +85,7 @@ public class ReactionRoleCommand extends Command {
                         else channelId = message.getMentionedChannels().get(0).getIdLong();
 
                         reactionChannel = event.getGuild().getTextChannelById(channelId);
-                        if (reactionChannel == null) return; // todo: always null?
+                        if (reactionChannel == null) return;
 
                         // Message ID
                         try {
@@ -129,7 +129,7 @@ public class ReactionRoleCommand extends Command {
                                 var finalEmoji = emoji;
                                 var finalEmote = emote;
                                 var tc = event.getGuild().getTextChannelById(channelId);
-                                if (tc == null) return; // todo: always null?
+                                if (tc == null) return;
                                 tc.retrieveMessageById(messageId).queue(msg -> {
                                     if (finalEmoji == null && finalEmote != null) msg.addReaction(finalEmote).queue();
                                     else if (finalEmoji != null) msg.addReaction(finalEmoji).queue();
@@ -151,7 +151,7 @@ public class ReactionRoleCommand extends Command {
                         else channelId = message.getMentionedChannels().get(0).getIdLong();
 
                         reactionChannel = event.getGuild().getTextChannelById(channelId);
-                        if (reactionChannel == null) return; // todo: always null?
+                        if (reactionChannel == null) return;
 
                         // Message ID
                         messageId = Long.parseLong(args[2]);
@@ -183,7 +183,7 @@ public class ReactionRoleCommand extends Command {
                                 var finalEmoji = emoji;
                                 var finalEmote = emote;
                                 var tc = event.getGuild().getTextChannelById(channelId);
-                                if (tc == null) return; // todo: always null?
+                                if (tc == null) return;
                                 tc.retrieveMessageById(messageId).queue(msg -> {
                                     List<MessageReaction> reactions = msg.getReactions();
                                     for (MessageReaction reaction : reactions)
@@ -217,6 +217,6 @@ public class ReactionRoleCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, Servant.cpuPool);
+        }, Servant.threadPool);
     }
 }

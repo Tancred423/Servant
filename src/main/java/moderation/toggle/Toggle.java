@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.events.guild.member.GuildMemberLeaveEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMoveEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionRemoveEvent;
@@ -48,6 +49,10 @@ public class Toggle {
     }
 
     public static boolean isEnabled(GuildMessageReceivedEvent event, String name) {
+        return new moderation.guild.Guild(event.getGuild().getIdLong()).getToggleStatus(name, event.getGuild(), event.getAuthor());
+    }
+
+    public static boolean isEnabled(MessageReceivedEvent event, String name) {
         return new moderation.guild.Guild(event.getGuild().getIdLong()).getToggleStatus(name, event.getGuild(), event.getAuthor());
     }
 

@@ -116,7 +116,6 @@ public class VoiceLobbyCommand extends Command {
                         var builder = new StringBuilder();
                         builder.append("```c\n");
                         for (long lobby : lobbies) {
-                            // todo: always null?
                             var vc = guild.getVoiceChannelById(lobby);
                             if (vc != null) builder.append(vc.getName()).append(" (").append(lobby).append(")\n");
                         }
@@ -152,6 +151,6 @@ public class VoiceLobbyCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, Servant.cpuPool);
+        }, Servant.threadPool);
     }
 }

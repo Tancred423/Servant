@@ -32,7 +32,6 @@ import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageDeleteEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
-import net.dv8tion.jda.internal.JDAImpl;
 import net.dv8tion.jda.internal.requests.Requester;
 import net.dv8tion.jda.internal.utils.Checks;
 import okhttp3.*;
@@ -423,28 +422,28 @@ public class CommandClientImpl implements CommandClient, EventListener {
     }
 
     @Override
-    public void onEvent(GenericEvent event) {
-        if(event instanceof MessageReceivedEvent) onMessageReceived((MessageReceivedEvent)event);
+    public void onEvent(@NotNull GenericEvent event) {
+        if (event instanceof MessageReceivedEvent) onMessageReceived((MessageReceivedEvent)event);
 
-        else if(event instanceof GuildMessageDeleteEvent && usesLinkedDeletion()) onMessageDelete((GuildMessageDeleteEvent) event);
+        else if (event instanceof GuildMessageDeleteEvent && usesLinkedDeletion()) onMessageDelete((GuildMessageDeleteEvent) event);
 
-        else if(event instanceof GuildJoinEvent) {
-            if(((GuildJoinEvent)event).getGuild().getSelfMember().getTimeJoined()
+        else if (event instanceof GuildJoinEvent) {
+            if (((GuildJoinEvent)event).getGuild().getSelfMember().getTimeJoined()
                     .plusMinutes(10).isAfter(OffsetDateTime.now()))
                 sendStats(event.getJDA());
         }
-        else if(event instanceof GuildLeaveEvent) sendStats(event.getJDA());
-        else if(event instanceof ReadyEvent) onReady((ReadyEvent)event);
-        else if(event instanceof ShutdownEvent) {
+        else if (event instanceof GuildLeaveEvent) sendStats(event.getJDA());
+        else if (event instanceof ReadyEvent) onReady((ReadyEvent)event);
+        else if (event instanceof ShutdownEvent) {
             GuildSettingsManager<?> manager = getSettingsManager();
-            if(manager != null)
+            if (manager != null)
                 manager.shutdown();
             executor.shutdown();
         }
     }
 
     private void onReady(ReadyEvent event) {
-        if(!event.getJDA().getSelfUser().isBot()) {
+        if (!event.getJDA().getSelfUser().isBot()) {
             LOG.error("JDA-Utilities does not support CLIENT accounts.");
             event.getJDA().shutdown();
             return;
@@ -538,17 +537,16 @@ public class CommandClientImpl implements CommandClient, EventListener {
     }
 
     private void sendStats(JDA jda) {
-        OkHttpClient client = ((JDAImpl) jda).getHttpClient();
+        OkHttpClient client = jda.getHttpClient();
 
         if(carbonKey != null) {
             FormBody.Builder bodyBuilder = new FormBody.Builder()
                     .add("key", carbonKey)
                     .add("servercount", Integer.toString(jda.getGuilds().size()));
-            
-            if(jda.getShardInfo() != null) {
-                bodyBuilder.add("shard_id", Integer.toString(jda.getShardInfo().getShardId()))
-                           .add("shard_count", Integer.toString(jda.getShardInfo().getShardTotal()));
-            }
+
+            jda.getShardInfo();
+            bodyBuilder.add("shard_id", Integer.toString(jda.getShardInfo().getShardId()))
+                       .add("shard_count", Integer.toString(jda.getShardInfo().getShardTotal()));
 
             Request.Builder builder = new Request.Builder()
                     .post(bodyBuilder.build())
@@ -572,11 +570,10 @@ public class CommandClientImpl implements CommandClient, EventListener {
         // structure for POST requests to their stats APIs, so we reuse the same
         // JSON for both
         JSONObject body = new JSONObject().put("server_count", jda.getGuilds().size());
-        if(jda.getShardInfo() != null) {
-            body.put("shard_id", jda.getShardInfo().getShardId())
-                .put("shard_count", jda.getShardInfo().getShardTotal());
-        }
-        
+        jda.getShardInfo();
+        body.put("shard_id", jda.getShardInfo().getShardId())
+            .put("shard_count", jda.getShardInfo().getShardTotal());
+
         if(botsOrgKey != null) {
             Request.Builder builder = new Request.Builder()
                     .post(RequestBody.create(Requester.MEDIA_TYPE_JSON, body.toString()))
@@ -661,7 +658,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
         }
     }
 
-    private GuildSettingsProvider provideSettings(Guild guild) {
+    public GuildSettingsProvider provideSettings(Guild guild) {
         Object settings = getSettingsFor(guild);
         if(settings instanceof GuildSettingsProvider)
             return (GuildSettingsProvider)settings;

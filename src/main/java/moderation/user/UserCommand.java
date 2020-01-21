@@ -72,7 +72,7 @@ public class UserCommand extends Command {
                     }
 
                     var givenGuild = event.getJDA().getGuildById(args[1]);
-                    if (givenGuild == null) return; // todo: always null?
+                    if (givenGuild == null) return;
                     var guildId = event.getGuild() == null ? givenGuild.getIdLong() : event.getGuild().getIdLong();
 
                     if (internalUser.toggleStreamHidden(guildId, guild, author))
@@ -244,6 +244,6 @@ public class UserCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, Servant.cpuPool);
+        }, Servant.threadPool);
     }
 }

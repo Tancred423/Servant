@@ -20,8 +20,8 @@ import java.time.ZoneOffset;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-class BirthdayHandler {
-    static void updateLists(JDA jda) {
+public class BirthdayHandler {
+    public static void updateLists(JDA jda) {
         List<Guild> guilds = jda.getGuilds();
         for (var guild : guilds) {
             if (guild.getIdLong() == 264445053596991498L) continue; // Discord Bot List
@@ -33,10 +33,9 @@ class BirthdayHandler {
                 var messageId = internalGuild.getBirthdayMessageMessageId(guild, guildOwner);
                 var authorId = internalGuild.getBirthdayMessageAuthorId(guild, guildOwner);
                 var tc = guild.getTextChannelById(channelId);
-                // todo: always null?
                 if (tc == null) return;
                 var authorMember = guild.getMemberById(authorId);
-                if (authorMember == null) return; // todo: always null?
+                if (authorMember == null) return;
                 tc.retrieveMessageById(messageId).queue(message -> {
                     try {
                         var list = createList(guild, authorMember.getUser(), tc, true);
@@ -64,12 +63,12 @@ class BirthdayHandler {
         }
     }
 
-    static void checkBirthdays(JDA jda) {
+    public static void checkBirthdays(JDA jda) {
         List<Guild> guilds = jda.getGuilds();
         for (var guild : guilds) {
             if (guild.getIdLong() == 264445053596991498L) continue; // Discord Bot List
             var guildOwner = guild.getOwner();
-            if (guildOwner == null) return; // todo: always null?
+            if (guildOwner == null) return;
             var guildOwnerUser = guildOwner.getUser();
             var internalGuild = new moderation.guild.Guild(guild.getIdLong());
 
@@ -92,13 +91,11 @@ class BirthdayHandler {
 
     private static void gratulate(Guild guild, long userId) {
         var guildOwner = guild.getOwner();
-        // todo: always null?
         if (guildOwner == null) return;
         var guildOwnerUser = guildOwner.getUser();
         var internalGuild = new moderation.guild.Guild(guild.getIdLong());
         var birthdayChannel = guild.getTextChannelById(internalGuild.getBirthdayChannelId(guild, guildOwnerUser));
         var birthdayMember = guild.getMemberById(userId);
-        // todo: always null?
         if (birthdayChannel != null && birthdayMember != null)
         birthdayChannel.sendMessage(
                 String.format(LanguageHandler.get(internalGuild.getLanguage(guild, guildOwnerUser), "birthday_gratulation"), birthdayMember.getAsMention())
@@ -119,7 +116,7 @@ class BirthdayHandler {
 
         Map<Long, String> birthdays2 = new HashMap<>();
         for (Map.Entry<Long, String> entry : birthdays.entrySet()) {
-            var birthdayMember = guild.getMemberById(entry.getKey()); // todo: always null?
+            var birthdayMember = guild.getMemberById(entry.getKey());
             if (guild.getMemberById(entry.getKey()) == null) internalGuild.unsetBirthday(entry.getKey(), guild, author);
             else if (birthdayMember != null) birthdays2.put(getCooldown(entry.getValue()), entry.getValue() + " " + birthdayMember.getUser().getName());
         }

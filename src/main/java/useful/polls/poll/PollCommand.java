@@ -113,7 +113,7 @@ public class PollCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, Servant.cpuPool);
+        }, Servant.threadPool);
     }
 
     private void processVote(CommandEvent event, String question, List<String> answers, String lang, boolean allowsMultipleAnswers) {
@@ -142,7 +142,7 @@ public class PollCommand extends Command {
             for (int i = 0; i < answers.size(); i++) message.addReaction(emoji[i]).queue();
 
             var end = Emote.getEmoji("end");
-            if (end != null) message.addReaction(end).queue(); // todo: always null?
+            if (end != null) message.addReaction(end).queue();
         });
     }
 

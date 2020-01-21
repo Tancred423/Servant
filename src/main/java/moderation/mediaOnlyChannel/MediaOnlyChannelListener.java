@@ -5,7 +5,6 @@ import files.language.LanguageHandler;
 import moderation.guild.Guild;
 import moderation.toggle.Toggle;
 import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -14,7 +13,6 @@ import org.jetbrains.annotations.NotNull;
 import utilities.MessageHandler;
 import utilities.Parser;
 
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class MediaOnlyChannelListener extends ListenerAdapter {
@@ -36,7 +34,7 @@ public class MediaOnlyChannelListener extends ListenerAdapter {
                 var validMessage = true;
                 var message = event.getMessage();
 
-                List<Message.Attachment> attachments = message.getAttachments();
+                var attachments = message.getAttachments();
                 if (attachments.isEmpty()) {
                     String url = null;
                     var args = event.getMessage().getContentDisplay().split(" ");

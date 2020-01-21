@@ -171,6 +171,6 @@ public class EasterEggsListener extends ListenerAdapter {
                     event.getChannel().sendMessage(new EmbedBuilder().setColor(internalAuthor.getColor(guild, author)).setImage(Image.getImageUrl("padoru", guild, author)).build()).queue();
                     break;
             }
-        });
+        }, Servant.threadPool);
     }
 }

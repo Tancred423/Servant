@@ -75,7 +75,7 @@ public class RandomCommand extends Command {
             } catch (IOException e) {
                 new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
             }
-        }, Servant.cpuPool);
+        }, Servant.threadPool);
     }
 
     private Image getRandomImage(String keyword) throws IOException {

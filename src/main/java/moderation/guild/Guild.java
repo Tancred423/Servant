@@ -102,7 +102,7 @@ public class Guild {
         Connection connection = null;
         ZonedDateTime expiration = null;
 
-        if (guild.getOwner() == null) return null; // todo: always null?
+        if (guild.getOwner() == null) return null;
 
         try {
             connection = Servant.db.getHikari().getConnection();
@@ -201,7 +201,7 @@ public class Guild {
         Emote emote = null;
 
         var thisGuild = jda.getGuildById(guildId);
-        if (thisGuild == null) return null; // todo: always null?
+        if (thisGuild == null) return null;
 
         try {
             connection = Servant.db.getHikari().getConnection();
@@ -247,7 +247,7 @@ public class Guild {
         TextChannel channel = null;
 
         var thisGuild = guild.getJDA().getGuildById(guildId);
-        if (thisGuild == null) return null; // todo: always null?
+        if (thisGuild == null) return null;
 
         try {
             connection = Servant.db.getHikari().getConnection();
@@ -507,7 +507,7 @@ public class Guild {
         Emote emote = null;
 
         var thisGuild = guild.getJDA().getGuildById(guildId);
-        if (thisGuild == null) return null; // todo: always null?
+        if (thisGuild == null) return null;
 
         try {
             connection = Servant.db.getHikari().getConnection();
@@ -553,7 +553,7 @@ public class Guild {
         TextChannel channel = null;
 
         var thisGuild = guild.getJDA().getGuildById(guildId);
-        if (thisGuild == null) return null; // todo: always null?
+        if (thisGuild == null) return null;
 
         try {
             connection = Servant.db.getHikari().getConnection();
@@ -1699,12 +1699,12 @@ public class Guild {
         return hasAutorole;
     }
 
-    public Map<Role, Integer> getAutorole(net.dv8tion.jda.api.entities.Guild guild, User user) {
+    public Map.Entry<Role, Integer> getAutorole(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
         var role = new HashMap<Role, Integer>();
 
         var thisGuild = guild.getJDA().getGuildById(guildId);
-        if (thisGuild == null) return null; // todo: always null?
+        if (thisGuild == null) return null;
 
         try {
             connection = Servant.db.getHikari().getConnection();
@@ -1722,7 +1722,7 @@ public class Guild {
             closeQuietly(connection);
         }
 
-        return role;
+        return role.entrySet().iterator().next();
     }
 
     private boolean autoroleHasEntry(net.dv8tion.jda.api.entities.Guild guild, User user) {
@@ -1875,7 +1875,7 @@ public class Guild {
         var channels = new ArrayList<MessageChannel>();
 
         var thisGuild = guild.getJDA().getGuildById(guildId);
-        if (thisGuild == null) return null; // todo: always null?
+        if (thisGuild == null) return null;
 
         try {
             connection = Servant.db.getHikari().getConnection();
@@ -1983,12 +1983,12 @@ public class Guild {
         return hasEntry;
     }
 
-    public MessageChannel getJoinNotifierChannel(net.dv8tion.jda.api.entities.Guild guild, User user) {
+    public TextChannel getJoinNotifierChannel(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
-        MessageChannel channel = null;
+        TextChannel channel = null;
 
         var thisGuild = guild.getJDA().getGuildById(guildId);
-        if (thisGuild == null) return null; // todo: always null?
+        if (thisGuild == null) return null;
 
         try {
             connection = Servant.db.getHikari().getConnection();
@@ -2069,12 +2069,12 @@ public class Guild {
         return hasEntry;
     }
 
-    public MessageChannel getLeaveNotifierChannel(net.dv8tion.jda.api.entities.Guild guild, User user) {
+    public TextChannel getLeaveNotifierChannel(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
-        MessageChannel channel = null;
+        TextChannel channel = null;
 
         var thisGuild = guild.getJDA().getGuildById(guildId);
-        if (thisGuild == null) return null; // todo: always null?
+        if (thisGuild == null) return null;
 
         try {
             connection = Servant.db.getHikari().getConnection();

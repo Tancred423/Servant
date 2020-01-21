@@ -2,8 +2,6 @@
 package useful.polls.quickpoll;
 
 import moderation.toggle.Toggle;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -60,12 +58,8 @@ public class QuickpollMultipleVoteListener extends ListenerAdapter {
 
             event.getChannel().retrieveMessageById(messageId).queue(message -> {
                 if (reactionEmote.getName().equals(PollsDatabase.getVoteEmoji(messageId, user.getIdLong(), guild, user)))
-                    unsetVote(messageId, user, guild);
+                    PollsDatabase.unsetUserVote(messageId, user.getIdLong(), guild, user);
             });
         });
-    }
-
-    private void unsetVote(long messageId, User user, Guild guild) {
-        PollsDatabase.unsetUserVote(messageId, user.getIdLong(), guild, user);
     }
 }

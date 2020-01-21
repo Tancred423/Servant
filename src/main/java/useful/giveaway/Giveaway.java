@@ -27,6 +27,66 @@ import java.util.concurrent.TimeUnit;
 import static utilities.DatabaseConn.closeQuietly;
 
 public class Giveaway {
+    public static boolean isGiveaway(long guildId, long channelId, long messageId, net.dv8tion.jda.api.entities.Guild guild, User user) {
+        Connection connection = null;
+        var isGiveaway = false;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var preparedStatement = connection.prepareStatement("SELECT * FROM giveawaylist WHERE guild_id=? AND channel_id=? AND message_id=?");
+            preparedStatement.setLong(1, guildId);
+            preparedStatement.setLong(2, channelId);
+            preparedStatement.setLong(3, messageId);
+            var resultSet = preparedStatement.executeQuery();
+            isGiveaway = resultSet.first();
+        } catch (SQLException e) {
+            new Log(e, guild, user, "giveaway", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return isGiveaway;
+    }
+
+    public static boolean isGiveaway(long guildId, long channelId, net.dv8tion.jda.api.entities.Guild guild, User user) {
+        Connection connection = null;
+        var isGiveaway = false;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var preparedStatement = connection.prepareStatement("SELECT * FROM giveawaylist WHERE guild_id=? AND channel_id=?");
+            preparedStatement.setLong(1, guildId);
+            preparedStatement.setLong(2, channelId);
+            var resultSet = preparedStatement.executeQuery();
+            isGiveaway = resultSet.first();
+        } catch (SQLException e) {
+            new Log(e, guild, user, "giveaway", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return isGiveaway;
+    }
+
+    public static boolean isGiveaway(long guildId, net.dv8tion.jda.api.entities.Guild guild, User user) {
+        Connection connection = null;
+        var isGiveaway = false;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var preparedStatement = connection.prepareStatement("SELECT * FROM giveawaylist WHERE guild_id=?");
+            preparedStatement.setLong(1, guildId);
+            var resultSet = preparedStatement.executeQuery();
+            isGiveaway = resultSet.first();
+        } catch (SQLException e) {
+            new Log(e, guild, user, "giveaway", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return isGiveaway;
+    }
+
     private static ZonedDateTime getDate(ZonedDateTime date, String timeString) throws NumberFormatException {
         var timeArray = timeString.split(" ");
         String days;
@@ -76,13 +136,12 @@ public class Giveaway {
                         var hostId = resultSet.getLong("host_id");
                         var prize = resultSet.getString("prize");
                         var thisGuild = jda.getGuildById(guildId);
-                        if (thisGuild == null) return; // todo: always null?
+                        if (thisGuild == null) return;
                         var giveaway = resultSet.getTimestamp("time").toLocalDateTime()
                                 .atZone(ZoneId.of(new Guild(thisGuild.getIdLong())
                                         .getOffset(jda.getGuildById(guildId), jda.getSelfUser())));
                         var amountWinners = resultSet.getInt("amount_winners");
 
-                        // todo: always null?
                         var tc = thisGuild.getTextChannelById(channelId);
                         if (tc == null) return;
                         var hostUser = jda.getUserById(hostId);
@@ -91,7 +150,7 @@ public class Giveaway {
                             tc.retrieveMessageById(messageId).queue(message -> {
                                 var guild = message.getGuild();
                                 var author = jda.getUserById(hostId);
-                                if (author == null) return; // todo: always null?
+                                if (author == null) return;
                                 var lang = new Guild(guild.getIdLong()).getLanguage(guild, jda.getSelfUser());
                                 var now = ZonedDateTime.now(ZoneOffset.of(new Guild(message.getGuild().getIdLong()).getOffset(guild, author)));
 
@@ -196,7 +255,7 @@ public class Giveaway {
     }
 
     // Deletes the giveaway entry from the database table "giveawaylist".
-    static void deleteGiveawayFromDb(long guildId, long channelId, long messageId, net.dv8tion.jda.api.entities.Guild guild, User user) {
+    public static void deleteGiveawayFromDb(long guildId, long channelId, long messageId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -213,7 +272,7 @@ public class Giveaway {
         }
     }
 
-    static void deleteGiveawayFromDb(long guildId, long channelId, net.dv8tion.jda.api.entities.Guild guild, User user) {
+    public static void deleteGiveawayFromDb(long guildId, long channelId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -229,7 +288,7 @@ public class Giveaway {
         }
     }
 
-    static void deleteGiveawayFromDb(long guildId, net.dv8tion.jda.api.entities.Guild guild, User user) {
+    public static void deleteGiveawayFromDb(long guildId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -248,9 +307,9 @@ public class Giveaway {
     private static String getRunningGiveaways(JDA jda, ResultSet resultSet, String lang) throws SQLException {
         var giveawayList = new StringBuilder();
         var guild = jda.getGuildById(resultSet.getLong("guild_id"));
-        if (guild == null) return giveawayList.toString(); // todo: always null?
+        if (guild == null) return giveawayList.toString();
         var tc = guild.getTextChannelById(resultSet.getLong("channel_id"));
-        if (tc == null) return giveawayList.toString(); // todo: always null?
+        if (tc == null) return giveawayList.toString();
         do giveawayList.append("- ")
                 .append(tc.getAsMention())
                 .append(" ").append(LanguageHandler.get(lang, "giveaway_messageid")).append(" ").append(resultSet.getLong("message_id"))

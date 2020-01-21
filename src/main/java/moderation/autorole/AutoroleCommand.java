@@ -88,9 +88,9 @@ public class AutoRoleCommand extends Command {
                     case "show":
                     case "sh":
                         var roleAndDelay = internalGuild.getAutorole(guild, author);
-                        if (!roleAndDelay.isEmpty()) {
-                            role = roleAndDelay.entrySet().iterator().next().getKey();
-                            delay = roleAndDelay.get(role);
+                        if (roleAndDelay != null) {
+                            role = roleAndDelay.getKey();
+                            delay = roleAndDelay.getValue();
                         }
                         if (role == null) event.reply(LanguageHandler.get(lang, "autorole_no_current"));
                         else
@@ -107,6 +107,6 @@ public class AutoRoleCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, Servant.cpuPool);
+        }, Servant.threadPool);
     }
 }

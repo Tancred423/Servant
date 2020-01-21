@@ -55,7 +55,6 @@ public class BestOfQuoteListener extends ListenerAdapter {
                 var reactionEmote = event.getReactionEmote();
                 if (voteEmote != null) {
                     // Emote
-                    // todo: never null?
                     if (!reactionEmote.getEmote().equals(voteEmote)) {
                         temporaryBlacklist.remove(messageId);
                         return;

@@ -158,7 +158,7 @@ public class Poll {
         if (description != null) lines = Arrays.asList(description.split("\\r?\\n"));
 
         var author = messageEmbed.getAuthor();
-        if (author == null) return; // todo: always null?
+        if (author == null) return;
 
         eb.setColor(messageEmbed.getColor());
         eb.setAuthor(String.format(LanguageHandler.get(lang, "vote_ended"), user.getName()), null, author.getIconUrl());

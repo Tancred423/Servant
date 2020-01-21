@@ -65,7 +65,7 @@ public class QuickpollCommand extends Command {
                 var downvote = Emote.getEmoji("downvote");
                 var end = Emote.getEmoji("end");
 
-                if (upvote == null || downvote == null || end == null) return; // todo: always null?
+                if (upvote == null || downvote == null || end == null) return;
 
                 message.getChannel().sendMessage(eb.build()).queue(sentMessage -> {
                     sentMessage.addReaction(upvote).queue();
@@ -83,6 +83,6 @@ public class QuickpollCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, Servant.cpuPool);
+        }, Servant.threadPool);
     }
 }

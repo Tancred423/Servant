@@ -51,7 +51,7 @@ public class ThanksCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, Servant.cpuPool);
+        }, Servant.threadPool);
     }
 
     private void checkAchievement(User internalUser, Message message, net.dv8tion.jda.api.entities.Guild guild, net.dv8tion.jda.api.entities.User user, String lang) {

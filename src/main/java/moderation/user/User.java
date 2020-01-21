@@ -755,7 +755,7 @@ public class User {
             if (resultSet.first()) colorCode = resultSet.getString("value");
             else {
                 var servantsKingdom = user.getJDA().getGuildById(436925371577925642L);
-                if (servantsKingdom == null) return colorCode; // todo: always null?
+                if (servantsKingdom == null) return colorCode;
                 Color color = null;
                 if (PatreonHandler.isVIP(user)) {
                     var role = servantsKingdom.getRoleById(510204269568458753L);
@@ -812,7 +812,7 @@ public class User {
             if (resultSet.first()) color = Color.decode(resultSet.getString("value"));
             else {
                 var servantsKingdom = user.getJDA().getGuildById(436925371577925642L);
-                if (servantsKingdom == null) return color; // todo: always null?
+                if (servantsKingdom == null) return color;
                 if (PatreonHandler.isVIP(user)) {
                     var role = servantsKingdom.getRoleById(510204269568458753L);
                     if (role != null) color = role.getColor();

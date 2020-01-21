@@ -165,7 +165,7 @@ public class ToggleCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, Servant.cpuPool);
+        }, Servant.threadPool);
     }
 
     private String getAlias(String arg) {

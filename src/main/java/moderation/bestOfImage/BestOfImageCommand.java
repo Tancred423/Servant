@@ -46,7 +46,6 @@ public class BestOfImageCommand extends Command {
                 var lang = LanguageHandler.getLanguage(event);
                 var p = GuildHandler.getPrefix(event);
                 var supportGuild = event.getJDA().getGuildById(Servant.config.getSupportGuildId());
-                // todo: always null?
                 if (supportGuild == null) return;
                 var usageEmote = event.getGuild().getEmotes().isEmpty() ?
                         supportGuild.getEmotes().get(0) :
@@ -133,7 +132,6 @@ public class BestOfImageCommand extends Command {
                 if (!message.getEmotes().isEmpty()) {
                     var mentionedEmote = message.getEmotes().get(0);
                     try {
-                        // todo: always null?
                         if (mentionedEmote.getGuild() != null)
                             internalGuild.setBestOfImageEmote(mentionedEmote.getGuild().getIdLong(), mentionedEmote.getIdLong(), guild, author);
                     } catch (NullPointerException ex) {
@@ -161,6 +159,6 @@ public class BestOfImageCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, Servant.cpuPool);
+        }, Servant.threadPool);
     }
 }

@@ -58,7 +58,7 @@ public class ServerInfoCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, Servant.cpuPool);
+        }, Servant.threadPool);
     }
 
     private void processInfo(CommandEvent event, Guild guild, String vanityUrl, String lang) {
@@ -70,7 +70,6 @@ public class ServerInfoCommand extends Command {
         var splash = guild.getSplashUrl();
 
         var owner = guild.getOwner();
-        // todo: always null?
         if (owner == null) return;
 
         var textChannelCount = guild.getTextChannels().size();
@@ -133,7 +132,7 @@ public class ServerInfoCommand extends Command {
         var birthdayChannel = guild.getTextChannelById(internalGuild.getBirthdayChannelId(guild, author));
         eb.addField(LanguageHandler.get(lang, "serverinfo_bdaychannel"), birthdayChannel == null ?
                 LanguageHandler.get(lang, "serverinfo_nobdaychannel") : birthdayChannel.getAsMention(), true);
-        var roleIntegerEntry = internalGuild.getAutorole(guild, author).isEmpty() ? null : internalGuild.getAutorole(guild, author).entrySet().iterator().next();
+        var roleIntegerEntry = internalGuild.getAutorole(guild, author);
         eb.addField(LanguageHandler.get(lang, "serverinfo_autorole"), roleIntegerEntry == null ?
                 LanguageHandler.get(lang, "serverinfo_noautorole") :
                 String.format(LanguageHandler.get(lang, "serverinfo_autorole_value"), roleIntegerEntry.getKey().getAsMention(), roleIntegerEntry.getValue()), true);
