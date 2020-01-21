@@ -12,6 +12,7 @@ import owner.blacklist.Blacklist;
 import servant.Log;
 import servant.Servant;
 import utilities.Constants;
+import utilities.Time;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
@@ -20,9 +21,9 @@ import java.io.File;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.Timer;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
 
 public class ProfileCommand extends Command {
     public ProfileCommand() {
@@ -85,16 +86,7 @@ public class ProfileCommand extends Command {
                     event.getChannel().sendFile(image, image.getName() + ".png").embed(eb.build()).queue();
 
                     // Delete File.
-                    CompletableFuture.runAsync(() -> {
-                        try {
-                            TimeUnit.MILLISECONDS.sleep(30 * 1000); // 30s
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-
-                        if (!image.delete())
-                            new Log(null, event.getGuild(), event.getAuthor(), name, null).sendLog(false);
-                    }, Servant.threadPool);
+                    new Timer().schedule(Time.wrap(image::delete), 10 * 1000);
                 } catch (Exception e) {
                     new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                 }
@@ -105,6 +97,6 @@ public class ProfileCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, Servant.threadPool);
+        }, Servant.profilePool);
     }
 }

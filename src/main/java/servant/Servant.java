@@ -70,6 +70,7 @@ public class Servant {
     public static Database db;
 
     public static ExecutorService threadPool;
+    public static ExecutorService profilePool;
 
     public static void main(String[] args) throws IOException, LoginException {
         config = new ConfigFile();
@@ -88,6 +89,7 @@ public class Servant {
         var availProcessors = Runtime.getRuntime().availableProcessors();
         System.out.println("Available Processors: " + availProcessors);
         threadPool = Executors.newFixedThreadPool(availProcessors + 1);
+        profilePool = Executors.newCachedThreadPool();
 
         var waiter = new EventWaiter();
         var client = new CommandClientBuilder();
