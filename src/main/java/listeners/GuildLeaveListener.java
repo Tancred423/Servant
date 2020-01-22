@@ -39,22 +39,24 @@ public class GuildLeaveListener extends ListenerAdapter {
 
         CompletableFuture.runAsync(() -> {
             var internalGuild = new Guild(guild.getIdLong());
-            var owner = guild.getOwner();
 
             // Birthday
-            new Guild(guild.getIdLong()).purgeBirthday(guild, guildOwner.getUser());
+            internalGuild.purgeBirthday(guild, guildOwner.getUser());
 
             // Giveaway
-            if (Giveaway.isGiveaway(guild.getIdLong(), guild, user))
-                Giveaway.deleteGiveawayFromDb(guild.getIdLong(), guild, user);
+            Giveaway.purgeGiveaways(guild.getIdLong(), guild, user);
 
             // Kick
             processKick(event, guild, guildOwner, user);
 
             // MediaOnlyChannel
-            internalGuild.unsetMediaOnlyChannels(guild, user);
+            internalGuild.purgeMediaOnlyChannels(guild, user);
 
-            // todo: poll etc ending?
+            // Signup
+            internalGuild.purgeSignups(guild, user);
+
+            // Poll
+            internalGuild.purgePolls(guild, user);
         }, Servant.threadPool);
     }
 
@@ -62,7 +64,6 @@ public class GuildLeaveListener extends ListenerAdapter {
         System.out.println("[" + OffsetDateTime.now(ZoneId.of(Constants.LOG_OFFSET)).toString().replaceAll("T", " ").substring(0, 19) + "] " +
                 "Servant was kicked from " + guild.getName() + " (" + guild.getIdLong() + "). Owner: " + guildOwnerUser.getName() + "#" + guildOwnerUser.getDiscriminator() + " (" + guildOwner.getIdLong() + ").");
 
-        // todo: check if can talk
         guildOwnerUser.openPrivateChannel().queue(privateChannel -> {
             var internalGuildOwner = new User(guildOwnerUser.getIdLong());
             String language;
@@ -77,7 +78,7 @@ public class GuildLeaveListener extends ListenerAdapter {
             eb.setImage(Image.getImageUrl("kick", guild, guildOwnerUser));
             eb.setFooter(String.format(LanguageHandler.get(language, "kick_footer"), guild.getName()), null);
 
-            privateChannel.sendMessage(eb.build()).queue();
+            privateChannel.sendMessage(eb.build()).queue(success -> { /* ignore */ }, failure -> { /* ignore */ });
         }, failure -> { /* ignore */ });
     }
 }

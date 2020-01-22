@@ -48,45 +48,6 @@ public class Giveaway {
         return isGiveaway;
     }
 
-    public static boolean isGiveaway(long guildId, long channelId, net.dv8tion.jda.api.entities.Guild guild, User user) {
-        Connection connection = null;
-        var isGiveaway = false;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var preparedStatement = connection.prepareStatement("SELECT * FROM giveawaylist WHERE guild_id=? AND channel_id=?");
-            preparedStatement.setLong(1, guildId);
-            preparedStatement.setLong(2, channelId);
-            var resultSet = preparedStatement.executeQuery();
-            isGiveaway = resultSet.first();
-        } catch (SQLException e) {
-            new Log(e, guild, user, "giveaway", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-
-        return isGiveaway;
-    }
-
-    public static boolean isGiveaway(long guildId, net.dv8tion.jda.api.entities.Guild guild, User user) {
-        Connection connection = null;
-        var isGiveaway = false;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var preparedStatement = connection.prepareStatement("SELECT * FROM giveawaylist WHERE guild_id=?");
-            preparedStatement.setLong(1, guildId);
-            var resultSet = preparedStatement.executeQuery();
-            isGiveaway = resultSet.first();
-        } catch (SQLException e) {
-            new Log(e, guild, user, "giveaway", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-
-        return isGiveaway;
-    }
-
     private static ZonedDateTime getDate(ZonedDateTime date, String timeString) throws NumberFormatException {
         var timeArray = timeString.split(" ");
         String days;
@@ -272,7 +233,7 @@ public class Giveaway {
         }
     }
 
-    public static void deleteGiveawayFromDb(long guildId, long channelId, net.dv8tion.jda.api.entities.Guild guild, User user) {
+    public static void purgeGiveawaysFromChannel(long guildId, long channelId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -288,7 +249,7 @@ public class Giveaway {
         }
     }
 
-    public static void deleteGiveawayFromDb(long guildId, net.dv8tion.jda.api.entities.Guild guild, User user) {
+    public static void purgeGiveaways(long guildId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {

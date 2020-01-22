@@ -20,7 +20,104 @@ public class Guild {
         this.guildId = guildId;
     }
 
+    // Poll
+    public void purgePollsFromChannel(long channelId, net.dv8tion.jda.api.entities.Guild guild, User user) {
+        Connection connection = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var delete = connection.prepareStatement("DELETE FROM votes WHERE guild_id=? AND channel_id=?");
+            delete.setLong(1, guildId);
+            delete.setLong(2, channelId);
+            delete.executeUpdate();
+        } catch (SQLException e) {
+            new Log(e, guild, user, "poll", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+    }
+
+    public void purgePolls(net.dv8tion.jda.api.entities.Guild guild, User user) {
+        Connection connection = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var delete = connection.prepareStatement("DELETE FROM votes WHERE guild_id=?");
+            delete.setLong(1, guildId);
+            delete.executeUpdate();
+        } catch (SQLException e) {
+            new Log(e, guild, user, "poll", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+    }
+
+    public boolean isPoll(long messageId, net.dv8tion.jda.api.entities.Guild guild, User user) {
+        Connection connection = null;
+        var isSignupMessage = false;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement("SELECT message_id FROM votes WHERE message_id=?");
+            select.setLong(1, messageId);
+            var resultSet = select.executeQuery();
+            isSignupMessage = resultSet.first();
+        } catch (SQLException e) {
+            new Log(e, guild, user, "poll", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return isSignupMessage;
+    }
+
+    public void unsetPoll(long messageId, net.dv8tion.jda.api.entities.Guild guild, User user) {
+        Connection connection = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var delete = connection.prepareStatement("DELETE FROM votes WHERE message_id=?");
+            delete.setLong(1, messageId);
+            delete.executeUpdate();
+        } catch (SQLException e) {
+            new Log(e, guild, user, "poll", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+    }
+
     // Signup
+    public void purgeSignupsFromChannel(long channelId, net.dv8tion.jda.api.entities.Guild guild, User user) {
+        Connection connection = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var delete = connection.prepareStatement("DELETE FROM signup WHERE guild_id=? AND channel_id=?");
+            delete.setLong(1, guildId);
+            delete.setLong(2, channelId);
+            delete.executeUpdate();
+        } catch (SQLException e) {
+            new Log(e, guild, user, "signup", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+    }
+
+    public void purgeSignups(net.dv8tion.jda.api.entities.Guild guild, User user) {
+        Connection connection = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var delete = connection.prepareStatement("DELETE FROM signup WHERE guild_id=?");
+            delete.setLong(1, guildId);
+            delete.executeUpdate();
+        } catch (SQLException e) {
+            new Log(e, guild, user, "signup", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+    }
+
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isSignupMessage(long messageId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
@@ -1855,7 +1952,7 @@ public class Guild {
         return wasUnset;
     }
 
-    public void unsetMediaOnlyChannels(net.dv8tion.jda.api.entities.Guild guild, User user) {
+    public void purgeMediaOnlyChannels(net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;
 
         try {

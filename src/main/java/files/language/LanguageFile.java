@@ -388,6 +388,7 @@ public class LanguageFile {
         en_gb.setProperty("reactionrole_firstarg", "Either `set` or `unset` a reaction.");
         en_gb.setProperty("reactionrole_insufficient", "Insufficient permissions or problem with hierarchy.");
         en_gb.setProperty("reactionrole_invalidmessageid", "Invalid message ID.");
+        en_gb.setProperty("reactionrole_unavailable_emote", "The given emote is unavailable in the current channel.");
 
         /// Role
         en_gb.setProperty("role_description", "Assing or remove roles from members.");
@@ -1441,6 +1442,7 @@ public class LanguageFile {
         de_de.setProperty("reactionrole_firstarg", "Entweder `set` oder `unset` eine Reaktion.");
         de_de.setProperty("reactionrole_insufficient", "Ungenügende Berechtigungen oder ein Problem mit der Hierarchie.");
         de_de.setProperty("reactionrole_invalidmessageid", "Ungültige Nachrichten ID.");
+        de_de.setProperty("reactionrole_unavailable_emote", "Das mitgelieferte Emote ist nicht in diesem Kanal verfügbar.");
 
         /// Role
         de_de.setProperty("role_description", "Orde Mitgliedern neuen Rollen zu oder nehme ihnen diese weg.");

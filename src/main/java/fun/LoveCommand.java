@@ -67,15 +67,12 @@ public class LoveCommand extends Command {
                 if (mentioned.size() > 1) {
                     first = mentioned.get(0);
                     second = mentioned.get(1);
-                    if (first == second) isSelfLove = true;
                 } else {
                     var splitContentRaw = event.getArgs().split(" ");
-
                     if (splitContentRaw.length > 1) {
                         if (splitContentRaw[0].trim().equals(splitContentRaw[1].trim())) {
                             first = mentioned.get(0);
                             second = mentioned.get(0);
-                            isSelfLove = true;
                         } else {
                             first = event.getGuild().getMemberById(event.getAuthor().getIdLong());
                             second = mentioned.get(0);
@@ -86,15 +83,14 @@ public class LoveCommand extends Command {
                     }
                 }
 
+                if (first == second) isSelfLove = true;
+
                 var guild = event.getGuild();
                 var author = event.getAuthor();
                 var internalAuthor = new User(author.getIdLong());
 
                 var love = ThreadLocalRandom.current().nextInt(0, 101);
                 if (first == null) return;
-                if ((first.getUser().getId().equals(Servant.config.getBotOwnerId()) && second.getUser() == event.getJDA().getSelfUser()
-                        || (first.getUser() == event.getJDA().getSelfUser() && second.getUser().getId().equals(Servant.config.getBotOwnerId()))))
-                    love = 100;
                 var bar = getBar(love);
                 var quote = getQuote(love, isSelfLove, lang);
                 var shippingName = getShippingName(first, second);

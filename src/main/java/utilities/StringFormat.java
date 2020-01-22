@@ -2,10 +2,10 @@
 package utilities;
 
 import files.language.LanguageHandler;
-import fun.level.LevelImage;
 import moderation.user.User;
 import net.dv8tion.jda.api.entities.Guild;
 
+import java.text.NumberFormat;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.SortedSet;
@@ -46,8 +46,12 @@ public class StringFormat {
     public static LinkedHashMap<String, String> achievementSortByKey(LinkedHashMap<String, String> map, String lang, User internalUser, Guild guild, net.dv8tion.jda.api.entities.User user, Locale locale) {
         SortedSet<String> keys = new TreeSet<>(map.keySet());
         var newMap = new LinkedHashMap<String, String>();
-        newMap.put(LanguageHandler.get(lang, "profile_total_ap"), LevelImage.formatDecimal(locale, internalUser.getTotalAP(guild, user)));
+        newMap.put(LanguageHandler.get(lang, "profile_total_ap"), formatDecimal(locale, internalUser.getTotalAP(guild, user)));
         for (var key : keys) newMap.put(key, map.get(key));
         return newMap;
+    }
+
+    public static String formatDecimal(Locale locale, int i) {
+        return NumberFormat.getInstance(locale).format(i);
     }
 }

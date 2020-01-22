@@ -1,5 +1,5 @@
 // Author: Tancred423 (https://github.com/Tancred423)
-package useful.polls.quickpoll;
+package useful.polls;
 
 import files.language.LanguageHandler;
 import moderation.guild.Guild;
@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import owner.blacklist.Blacklist;
 import servant.Servant;
-import useful.polls.PollsDatabase;
 import utilities.Constants;
 import utilities.Emote;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;

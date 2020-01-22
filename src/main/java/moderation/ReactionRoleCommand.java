@@ -1,5 +1,5 @@
 // Author: Tancred423 (https://github.com/Tancred423)
-package moderation.reactionRole;
+package moderation;
 
 import files.language.LanguageHandler;
 import moderation.guild.Guild;
@@ -51,8 +51,6 @@ public class ReactionRoleCommand extends Command {
                 var lang = LanguageHandler.getLanguage(event);
                 var p = GuildHandler.getPrefix(event);
                 var tancWave = utilities.Emote.getEmote("tancWave", guild, author);
-                var g = event.getJDA().getGuildById(436925371577925642L);
-                if (g != null && tancWave == null) tancWave = g.getEmoteById(582852645765775360L); // todo: Delete later
                 if (tancWave == null) return;
 
                 if (event.getArgs().isEmpty()) {
@@ -101,8 +99,15 @@ public class ReactionRoleCommand extends Command {
                             Emote emote = null;
                             if (message.getEmotes().isEmpty()) emoji = args[3];
                             else emote = message.getEmotes().get(0);
-                            if (emoji == null && emote != null) message.addReaction(emote).queue();
-                            else if (emoji != null) message.addReaction(emoji).queue();
+
+                            try {
+                                if (emoji == null && emote != null) message.addReaction(emote).queue();
+                                else if (emoji != null) message.addReaction(emoji).queue();
+                            } catch (IllegalArgumentException e) {
+                                event.reactWarning();
+                                event.reply(LanguageHandler.get(lang, "reactionrole_unavailable_emote"));
+                                return;
+                            }
 
                             // Role
                             long roleId;

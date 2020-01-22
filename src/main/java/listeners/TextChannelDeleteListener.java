@@ -29,17 +29,24 @@ public class TextChannelDeleteListener extends ListenerAdapter {
 
         CompletableFuture.runAsync(() -> {
             var internalGuild = new Guild(guild.getIdLong());
-            var owner = guild.getOwner();
             var channel = event.getChannel();
 
+            // Birthday (Auto Updating Lists)
+            if (internalGuild.getBirthdayMessageChannelId(guild, user) == channel.getIdLong())
+                internalGuild.unsetBirthdayMessage(guild, user);
+
             // Giveaway
-            if (Giveaway.isGiveaway(guild.getIdLong(), channel.getIdLong(), guild, user))
-                Giveaway.deleteGiveawayFromDb(guild.getIdLong(),channel.getIdLong(), guild, user);
+            Giveaway.purgeGiveawaysFromChannel(guild.getIdLong(),channel.getIdLong(), guild, user);
 
             // MediaOnlyChannel
-            if (internalGuild.mediaOnlyChannelHasEntry(channel, guild, user)) {
+            if (internalGuild.mediaOnlyChannelHasEntry(channel, guild, user))
                 internalGuild.unsetMediaOnlyChannel(channel, guild, user);
-            }
+
+            // Signup
+            internalGuild.purgeSignupsFromChannel(channel.getIdLong(), guild, user);
+
+            // Poll
+            internalGuild.purgePollsFromChannel(channel.getIdLong(), guild, user);
         }, Servant.threadPool);
     }
 }

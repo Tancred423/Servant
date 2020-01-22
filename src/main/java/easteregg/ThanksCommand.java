@@ -20,7 +20,7 @@ public class ThanksCommand extends Command {
         this.name = "thanks";
         this.aliases = new String[] { "thank", "thankyou" };
         this.help = "Thank Servant for her work.";
-        this.category = null;
+        this.category = new Category("EasterEggs");
         this.arguments = null;
         this.hidden = true;
         this.guildOnly = false;

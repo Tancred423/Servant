@@ -19,26 +19,23 @@ import fun.random.RandomCommand;
 import fun.random.randomAnimal.BirdCommand;
 import fun.random.randomAnimal.CatCommand;
 import fun.random.randomAnimal.DogCommand;
-import information.BotInfoCommand;
-import information.PatreonCommand;
-import information.PingCommand;
-import information.ServerInfoCommand;
+import information.*;
 import interaction.*;
 import listeners.*;
 import moderation.ClearCommand;
 import moderation.RoleCommand;
 import moderation.ServerSetupCommand;
-import moderation.autorole.AutoRoleCommand;
-import moderation.bestOfImage.BestOfImageCommand;
-import moderation.bestOfQuote.BestOfQuoteCommand;
+import moderation.AutoRoleCommand;
+import moderation.BestOfImageCommand;
+import moderation.BestOfQuoteCommand;
 import moderation.birthday.BirthdayCommand;
 import moderation.guild.GuildCommand;
 import moderation.guild.GuildManager;
-import moderation.join.JoinCommand;
-import moderation.leave.LeaveCommand;
+import moderation.JoinCommand;
+import moderation.LeaveCommand;
 import moderation.livestream.LivestreamCommand;
-import moderation.mediaOnlyChannel.MediaOnlyChannelCommand;
-import moderation.reactionRole.ReactionRoleCommand;
+import moderation.MediaOnlyChannelCommand;
+import moderation.ReactionRoleCommand;
 import moderation.toggle.ToggleCommand;
 import moderation.toggle.ToggleFile;
 import moderation.user.UserCommand;
@@ -51,8 +48,8 @@ import owner.*;
 import owner.blacklist.BlacklistCommand;
 import useful.alarm.AlarmCommand;
 import useful.giveaway.GiveawayCommand;
-import useful.polls.poll.PollCommand;
-import useful.polls.quickpoll.QuickpollCommand;
+import useful.polls.PollCommand;
+import useful.polls.QuickpollCommand;
 import useful.reminder.ReminderCommand;
 import useful.signup.SignupCommand;
 import useful.timezone.TimezoneCommand;
@@ -206,28 +203,6 @@ public class Servant {
                 .addEventListeners(new TextChannelDeleteListener()) // Giveaway
                 .addEventListeners(new UserActivityEndListener()) // Livestream
                 .addEventListeners(new UserActivityStartListener()) // Livestream
-
-//                .addEventListeners(new AutoRoleListener())
-//                .addEventListeners(new BestOfImageListener())
-//                .addEventListeners(new BestOfQuoteListener())
-//                .addEventListeners(new BirthdayListener())
-//                .addEventListeners(new EasterEggsListener())
-//                .addEventListeners(new GiveawayListener())
-//                .addEventListeners(new InviteKickListener())
-//                .addEventListeners(new JoinListener())
-//                .addEventListeners(new LeaveListener())
-//                .addEventListeners(new LevelListener())
-//                .addEventListeners(new LivestreamListener())
-//                .addEventListeners(new MediaOnlyChannelListener())
-//                .addEventListeners(new PatreonListener())
-//                .addEventListeners(new PrefixListener())
-//                .addEventListeners(new QuickpollEndListener())
-//                .addEventListeners(new QuickpollMultipleVoteListener())
-//                .addEventListeners(new PollEndListener())
-//                .addEventListeners(new RadiopollMultipleVoteListener())
-//                .addEventListeners(new ReactionRoleListener())
-//                .addEventListeners(new SignupListener())
-//                .addEventListeners(new VoiceLobbyListener())
 
                 .build();
     }

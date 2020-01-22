@@ -40,7 +40,13 @@ public class GuildMessageDeleteListener extends ListenerAdapter {
             if (Giveaway.isGiveaway(guild.getIdLong(), event.getChannel().getIdLong(), event.getMessageIdLong(), guild, user))
                 Giveaway.deleteGiveawayFromDb(guild.getIdLong(), event.getChannel().getIdLong(), messageId, guild, user);
 
-            // todo: poll etc ending?
+            // Signup
+            if (internalGuild.isSignupMessage(messageId, guild, user))
+                internalGuild.unsetSignup(messageId, guild, user);
+
+            // Poll
+            if (internalGuild.isPoll(messageId, guild, user))
+                internalGuild.unsetPoll(messageId, guild, user);
         }, Servant.threadPool);
     }
 }

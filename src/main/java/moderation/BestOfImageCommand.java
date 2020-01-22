@@ -1,5 +1,5 @@
 // Author: Tancred423 (https://github.com/Tancred423)
-package moderation.bestOfQuote;
+package moderation;
 
 import files.language.LanguageHandler;
 import moderation.guild.Guild;
@@ -17,11 +17,11 @@ import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.util.concurrent.CompletableFuture;
 
-public class BestOfQuoteCommand extends Command {
-    public BestOfQuoteCommand() {
-        this.name = "bestofquote";
-        this.aliases = new String[] { "quote" };
-        this.help = "Quote rating and best of.";
+public class BestOfImageCommand extends Command {
+    public BestOfImageCommand() {
+        this.name = "bestofimage";
+        this.aliases = new String[] { "image" };
+        this.help = "Image rating and best of.";
         this.category = new Category("Moderation");
         this.arguments = null;
         this.hidden = false;
@@ -29,7 +29,7 @@ public class BestOfQuoteCommand extends Command {
         this.ownerCommand = false;
         this.cooldown = Constants.MOD_COOLDOWN;
         this.cooldownScope = CooldownScope.GUILD;
-        this.userPermissions = new Permission[]{Permission.MANAGE_CHANNEL};
+        this.userPermissions = new Permission[] { Permission.MANAGE_CHANNEL };
         this.botPermissions = new Permission[] {
                 Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY,
                 Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_ADD_REACTION
@@ -52,7 +52,7 @@ public class BestOfQuoteCommand extends Command {
                         event.getGuild().getEmotes().get(0);
 
                 if (event.getArgs().isEmpty()) {
-                    var description = LanguageHandler.get(lang, "bestofquote_description");
+                    var description = LanguageHandler.get(lang, "bestofimage_description");
                     var usage = String.format(LanguageHandler.get(lang, "bestof_usage"),
                             p, name, p, name, p, name, usageEmote.getAsMention(), p, name, p, name, p, name, p, name, "%", p, name, "%", p, name);
                     var hint = LanguageHandler.get(lang, "bestof_hint");
@@ -70,13 +70,13 @@ public class BestOfQuoteCommand extends Command {
                 eb.setColor(internalAuthor.getColor(guild, author));
 
                 if (args[0].equalsIgnoreCase("show") || args[0].equalsIgnoreCase("sh")) {
-                    var emote = internalGuild.getBestOfQuoteEmote(event.getJDA(), guild, author);
-                    var emoji = internalGuild.getBestOfQuoteEmoji(guild, author);
-                    var number = internalGuild.getBestOfQuoteNumber(guild, author);
-                    var percentage = internalGuild.getBestOfQuotePercentage(guild, author);
-                    var channel = internalGuild.getBestOfQuoteChannel(guild, author);
+                    var emote = internalGuild.getBestOfImageEmote(guild, author);
+                    var emoji = internalGuild.getBestOfImageEmoji(guild, author);
+                    var number = internalGuild.getBestOfImageNumber(guild, author);
+                    var percentage = internalGuild.getBestOfImagePercentage(guild, author);
+                    var channel = internalGuild.getBestOfImageChannel(guild, author);
 
-                    eb.setAuthor(LanguageHandler.get(lang, "bestofquote_setup"), null, null);
+                    eb.setAuthor(LanguageHandler.get(lang, "bestofimage_setup"), null, null);
                     eb.addField(LanguageHandler.get(lang, "bestof_emote"), emote == null ? (emoji == null ? LanguageHandler.get(lang, "bestof_noemote") : emoji) : emote.getAsMention(), true);
                     eb.addField(LanguageHandler.get(lang, "bestof_number"), number == 0 ? LanguageHandler.get(lang, "bestof_nonumber") : String.valueOf(number), true);
                     eb.addField(LanguageHandler.get(lang, "bestof_percentage"), percentage == 0 ? LanguageHandler.get(lang, "bestof_nopercentage") : percentage + "%", true);
@@ -90,7 +90,7 @@ public class BestOfQuoteCommand extends Command {
                 var message = event.getMessage();
                 if (!message.getMentionedChannels().isEmpty()) {
                     var mentionedChannel = message.getMentionedChannels().get(0);
-                    internalGuild.setBestOfQuoteChannel(mentionedChannel.getIdLong(), guild, author);
+                    internalGuild.setBestOfImageChannel(mentionedChannel.getIdLong(), guild, author);
                     event.reactSuccess();
                     return;
                 }
@@ -99,7 +99,7 @@ public class BestOfQuoteCommand extends Command {
                 if (args[0].matches("[0-9]+")) {
                     try {
                         var mentionedNumber = Integer.parseInt(args[0]);
-                        internalGuild.setBestOfQuoteNumber(mentionedNumber, guild, author);
+                        internalGuild.setBestOfImageNumber(mentionedNumber, guild, author);
                     } catch (NumberFormatException ex) {
                         event.reactError();
                         event.reply(LanguageHandler.get(lang, "bestof_numbertoobig"));
@@ -119,7 +119,7 @@ public class BestOfQuoteCommand extends Command {
                             event.reactError();
                             return;
                         }
-                        internalGuild.setBestOfQuotePercentage(mentionedPercentage, guild, author);
+                        internalGuild.setBestOfImagePercentage(mentionedPercentage, guild, author);
                         event.reactSuccess();
                     } else {
                         event.reply(LanguageHandler.get(lang, "bestof_invalidpercentage"));
@@ -133,7 +133,7 @@ public class BestOfQuoteCommand extends Command {
                     var mentionedEmote = message.getEmotes().get(0);
                     try {
                         if (mentionedEmote.getGuild() != null)
-                            internalGuild.setBestOfQuoteEmote(mentionedEmote.getGuild().getIdLong(), mentionedEmote.getIdLong(), guild, author);
+                            internalGuild.setBestOfImageEmote(mentionedEmote.getGuild().getIdLong(), mentionedEmote.getIdLong(), guild, author);
                     } catch (NullPointerException ex) {
                         event.reply(LanguageHandler.get(lang, "bestof_invalidemote"));
                         event.reactError();
@@ -146,7 +146,7 @@ public class BestOfQuoteCommand extends Command {
                 // Emoji
                 message.addReaction(args[0]).queue(success -> {
                     var mentionedEmoji = args[0];
-                    internalGuild.setBestOfQuoteEmoji(mentionedEmoji, guild, author);
+                    internalGuild.setBestOfImageEmoji(mentionedEmoji, guild, author);
                     event.reactSuccess();
                 }, failure -> {
                     event.reply(LanguageHandler.get(lang, "bestof_invalidemoji"));

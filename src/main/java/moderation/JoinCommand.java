@@ -1,5 +1,5 @@
 // Author: Tancred423 (https://github.com/Tancred423)
-package moderation.leave;
+package moderation;
 
 import files.language.LanguageHandler;
 import moderation.guild.GuildHandler;
@@ -16,11 +16,11 @@ import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.util.concurrent.CompletableFuture;
 
-public class LeaveCommand extends Command {
-    public LeaveCommand() {
-        this.name = "leave";
+public class JoinCommand extends Command {
+    public JoinCommand() {
+        this.name = "join";
         this.aliases = new String[0];
-        this.help = "Alert for leaving user.";
+        this.help = "Alert for joining user.";
         this.category = new Category("Moderation");
         this.arguments = null;
         this.hidden = false;
@@ -44,14 +44,13 @@ public class LeaveCommand extends Command {
 
                 var lang = LanguageHandler.getLanguage(event);
                 var p = GuildHandler.getPrefix(event);
+
+                var author = event.getAuthor();
                 var guild = event.getGuild();
                 var internalGuild = new moderation.guild.Guild(guild.getIdLong());
-                var author = event.getAuthor();
-
-                // Usage
                 if (event.getArgs().isEmpty()) {
-                    var description = LanguageHandler.get(lang, "leave_description");
-                    var usage = String.format(LanguageHandler.get(lang, "leave_usage"), p, name, p, name, p, name, p, name);
+                    var description = LanguageHandler.get(lang, "join_description");
+                    var usage = String.format(LanguageHandler.get(lang, "join_usage"), p, name, p, name, p, name, p, name);
                     event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, null).getEmbed());
                     return;
                 }
@@ -62,28 +61,28 @@ public class LeaveCommand extends Command {
                 switch (args[0].toLowerCase()) {
                     case "set":
                     case "s":
-                        if (args.length < 2) {
+                        if (args.length < 2 || event.getMessage().getMentionedChannels().isEmpty()) {
                             event.reply(LanguageHandler.get(lang, "joinleave_nochannel_mention"));
                             return;
                         }
 
                         channel = event.getMessage().getMentionedChannels().get(0);
 
-                        internalGuild.setLeaveNotifierChannel(channel, guild, author);
+                        internalGuild.setJoinNotifierChannel(channel, guild, author);
                         event.reactSuccess();
                         break;
 
                     case "unset":
                     case "u":
                         boolean wasUnset;
-                        wasUnset = internalGuild.unsetLeaveNotifierChannel(guild, author);
+                        wasUnset = internalGuild.unsetJoinNotifierChannel(guild, author);
                         if (wasUnset) event.reactSuccess();
                         else event.reply(LanguageHandler.get(lang, "joinleave_unset_fail"));
                         break;
 
                     case "show":
                     case "sh":
-                        channel = internalGuild.getLeaveNotifierChannel(guild, author);
+                        channel = internalGuild.getJoinNotifierChannel(guild, author);
                         if (channel == null) event.reply(LanguageHandler.get(lang, "joinleave_nochannel_set"));
                         else
                             event.reply(String.format(LanguageHandler.get(lang, "joinleave_current"), channel.getName()));

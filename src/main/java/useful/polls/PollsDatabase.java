@@ -14,6 +14,7 @@ import static utilities.DatabaseConn.closeQuietly;
 
 public class PollsDatabase {
     // Votes
+    // todo: in guild class
     public static void setVote(long guildId, long channelId, long messageId, long authorId, String type, Timestamp endingDate, Guild guild, User user) {
         Connection connection = null;
 

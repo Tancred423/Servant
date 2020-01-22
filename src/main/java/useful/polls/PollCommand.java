@@ -1,5 +1,5 @@
 // Author: Tancred423 (https://github.com/Tancred423)
-package useful.polls.poll;
+package useful.polls;
 
 import files.language.LanguageHandler;
 import moderation.guild.Guild;
@@ -12,7 +12,6 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import owner.blacklist.Blacklist;
 import servant.Servant;
-import useful.polls.PollsDatabase;
 import utilities.Constants;
 import utilities.Emote;
 import utilities.UsageEmbed;
