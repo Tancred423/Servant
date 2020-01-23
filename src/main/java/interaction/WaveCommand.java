@@ -7,7 +7,7 @@ import utilities.Constants;
 public class WaveCommand extends InteractionCommand {
     public WaveCommand() {
         this.name = "wave";
-        this.aliases = new String[] { "hi", "hello", "greet" };
+        this.aliases = new String[0];
         this.help = "Wave to someone!";
         this.category = new Category("Interaction");
         this.arguments = "@user";

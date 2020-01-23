@@ -162,7 +162,6 @@ public class Servant {
                 new CopCommand(),
                 new DabCommand(),
                 new FlexCommand(),
-                new GoodbyeCommand(),
                 new HighfiveCommand(),
                 new HugCommand(),
                 new KissCommand(),
