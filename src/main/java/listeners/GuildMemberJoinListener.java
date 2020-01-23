@@ -46,11 +46,12 @@ public class GuildMemberJoinListener extends ListenerAdapter {
             // AutoRole
             if (Toggle.isEnabled(event, "autorole") && internalGuild.hasAutorole(guild, user)) {
                 var roleAndDelay = internalGuild.getAutorole(guild, user); // Map.Entry<Role, Integer>
-                var role = roleAndDelay.getKey();
-                var delay = roleAndDelay.getValue() * 60 * 1000; // Milliseconds
-
-                if (selfMember.hasPermission(Permission.MANAGE_ROLES) && role != null && selfMember.canInteract(role))
-                    new Timer().schedule(Time.wrap(() -> guild.addRoleToMember(member, role).queue()), delay);
+                if (roleAndDelay != null) {
+                    var role = roleAndDelay.getKey();
+                    var delay = roleAndDelay.getValue() * 60 * 1000; // Milliseconds
+                    if (selfMember.hasPermission(Permission.MANAGE_ROLES) && role != null && selfMember.canInteract(role))
+                        new Timer().schedule(Time.wrap(() -> guild.addRoleToMember(member, role).queue()), delay);
+                }
             }
 
             // Join

@@ -2,8 +2,6 @@
 package owner;
 
 import groovy.lang.GroovyShell;
-import moderation.guild.Guild;
-import moderation.user.User;
 import net.dv8tion.jda.api.Permission;
 import servant.Servant;
 import utilities.Constants;
@@ -71,14 +69,6 @@ public class EvalCommand extends Command {
                 } catch (Exception e) {
                     event.reply(e.getMessage());
                 }
-
-                var guild = event.getGuild();
-                var author = event.getAuthor();
-
-                // Statistics.
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-                if (event.getGuild() != null)
-                    new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
             } catch (Exception e) {
                 e.printStackTrace();
             }

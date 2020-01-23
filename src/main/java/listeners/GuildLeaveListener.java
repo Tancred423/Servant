@@ -66,8 +66,7 @@ public class GuildLeaveListener extends ListenerAdapter {
 
         guildOwnerUser.openPrivateChannel().queue(privateChannel -> {
             var internalGuildOwner = new User(guildOwnerUser.getIdLong());
-            String language;
-            language = new Guild(guild.getIdLong()).getLanguage(guild, guildOwnerUser);
+            var language = new Guild(guild.getIdLong()).getLanguage(guild, guildOwnerUser);
             var botOwner = event.getJDA().getUserById(Servant.config.getBotOwnerId());
             if (botOwner == null) return;
             var eb = new EmbedBuilder();

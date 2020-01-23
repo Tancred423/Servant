@@ -1,7 +1,6 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package owner;
 
-import moderation.guild.Guild;
 import moderation.user.User;
 import net.dv8tion.jda.api.Permission;
 import servant.Servant;
@@ -40,13 +39,6 @@ public class RefreshCommand extends Command {
                 assignLevelAchievement(event);
                 clearLevelAchievements(event);
                 event.reactSuccess();
-
-                var guild = event.getGuild();
-                var author = event.getAuthor();
-                // Statistics.
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-                if (event.getGuild() != null)
-                    new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
             } catch (Exception e) {
                 e.printStackTrace();
             }

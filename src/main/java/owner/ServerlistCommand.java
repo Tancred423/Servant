@@ -2,7 +2,6 @@
 package owner;
 
 import files.language.LanguageHandler;
-import moderation.guild.Guild;
 import moderation.user.User;
 import net.dv8tion.jda.api.Permission;
 import servant.Servant;
@@ -85,11 +84,6 @@ public class ServerlistCommand extends Command {
                         .build();
 
                 p.paginate(event.getChannel(), page);
-
-                // Statistics.
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-                if (event.getGuild() != null)
-                    new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
             } catch (Exception e) {
                 e.printStackTrace();
             }

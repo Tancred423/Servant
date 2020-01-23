@@ -521,7 +521,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
                 if (command != null) {
                     System.out.println("[" + OffsetDateTime.now(ZoneId.of(Constants.LOG_OFFSET)).toString().replaceAll("T", " ").substring(0, 19) + "] " +
                             "Command executed: " + event.getMessage().getContentDisplay() + ". " +
-                            "Guild: " + (event.isFromGuild() ? event.getGuild().getName() + " (" + event.getGuild().getIdLong() + ")" : "DM") + "."  +
+                            "Guild: " + (event.isFromGuild() ? event.getGuild().getName() + " (" + event.getGuild().getIdLong() + ")" : "DM") + ". "  +
                             "User: " + event.getAuthor().getName() + "#" + event.getAuthor().getDiscriminator() + " (" + event.getAuthor().getIdLong() + ").");
                     CommandEvent cevent = new CommandEvent(event, args, this);
                     if (listener != null)

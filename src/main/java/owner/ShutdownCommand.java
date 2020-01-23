@@ -1,8 +1,6 @@
 // Modified by: Tancred423 (https://github.com/Tancred423)
 package owner;
 
-import moderation.guild.Guild;
-import moderation.user.User;
 import net.dv8tion.jda.api.Permission;
 import utilities.Constants;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
@@ -30,18 +28,7 @@ public class ShutdownCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        try {
-            var guild = event.getGuild();
-            var author = event.getAuthor();
-            // Statistics.
-            new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-            if (event.getGuild() != null)
-                new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-
-            event.reactSuccess();
-            event.getJDA().shutdown();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        event.reactSuccess();
+        event.getJDA().shutdown();
     }
 }

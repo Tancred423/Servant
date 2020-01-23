@@ -4,11 +4,11 @@ package interaction;
 import net.dv8tion.jda.api.Permission;
 import utilities.Constants;
 
-public class SlapCommand extends InteractionCommand {
-    public SlapCommand() {
-        this.name = "slap";
-        this.aliases = new String[] { "hit", "punch" };
-        this.help = "Slap someone! BAM";
+public class GoodbyeCommand extends InteractionCommand {
+    public GoodbyeCommand() {
+        this.name = "goodbye";
+        this.aliases = new String[] { "bye", "cya" };
+        this.help = "Say goodbye to someone!";
         this.category = new Category("Interaction");
         this.arguments = "@user";
         this.hidden = false;
@@ -22,6 +22,6 @@ public class SlapCommand extends InteractionCommand {
                 Permission.MESSAGE_EMBED_LINKS
         };
 
-        this.emoji = "✋"; // ✋
+        this.emoji = "\uD83D\uDC4B"; // 👋
     }
 }

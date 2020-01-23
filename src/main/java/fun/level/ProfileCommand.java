@@ -44,6 +44,7 @@ public class ProfileCommand extends Command {
         };
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     protected void execute(CommandEvent event) {
         CompletableFuture.runAsync(() -> {

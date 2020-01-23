@@ -104,6 +104,7 @@ public class Servant {
                 new RefreshCommand(),
                 new ServerlistCommand(waiter),
                 new ShutdownCommand(),
+                new ThreadCommand(),
 
                 // Moderation
                 new AutoRoleCommand(),
@@ -161,12 +162,14 @@ public class Servant {
                 new CopCommand(),
                 new DabCommand(),
                 new FlexCommand(),
+                new GoodbyeCommand(),
                 new HighfiveCommand(),
                 new HugCommand(),
                 new KissCommand(),
                 new LickCommand(),
                 new PatCommand(),
                 new SlapCommand(),
+                new WaveCommand(),
 
                 // Easter Eggs
                 new ThanksCommand()

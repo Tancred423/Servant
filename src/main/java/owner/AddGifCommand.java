@@ -3,10 +3,9 @@ package owner;
 
 import files.language.LanguageHandler;
 import moderation.guild.GuildHandler;
-import moderation.user.User;
-import moderation.guild.Guild;
 import net.dv8tion.jda.api.Permission;
-import servant.*;
+import servant.Log;
+import servant.Servant;
 import utilities.Constants;
 import utilities.UsageEmbed;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
@@ -103,11 +102,6 @@ public class AddGifCommand extends Command {
                 }
 
                 event.reactSuccess();
-
-                // Statistics.
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-                if (event.getGuild() != null)
-                    new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
             } catch (Exception e) {
                 e.printStackTrace();
             }

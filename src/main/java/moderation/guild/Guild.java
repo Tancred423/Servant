@@ -1819,7 +1819,8 @@ public class Guild {
             closeQuietly(connection);
         }
 
-        return role.entrySet().iterator().next();
+        if (role.isEmpty()) return null;
+        else return role.entrySet().iterator().next();
     }
 
     private boolean autoroleHasEntry(net.dv8tion.jda.api.entities.Guild guild, User user) {
