@@ -208,7 +208,7 @@ public class MessageReceivedListener extends ListenerAdapter {
                 var attachments = message.getAttachments();
                 if (attachments.isEmpty()) {
                     String url = null;
-                    var args = event.getMessage().getContentDisplay().split(" ");
+                    var args = event.getMessage().getContentDisplay().replace("\n", " ").split(" ");
                     for (var arg : args)
                         if (arg.startsWith("http")) url = arg;
                         else if (arg.startsWith("||http") && arg.endsWith("||"))

@@ -14,7 +14,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import servant.Servant;
 import useful.alarm.Alarm;
-import useful.giveaway.Giveaway;
+import useful.giveaway.GiveawayHandler;
 import useful.polls.Poll;
 import useful.reminder.Reminder;
 import useful.signup.Signup;
@@ -65,7 +65,7 @@ public class ReadyListener extends ListenerAdapter {
         // 1 Minute Period
         service.scheduleAtFixedRate(() -> {
             Alarm.check(jda);
-            Giveaway.checkGiveaways(jda);
+            GiveawayHandler.checkGiveaways(jda);
             Reminder.check(jda);
             Signup.checkSignups(jda);
             Poll.check(jda);

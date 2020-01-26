@@ -767,6 +767,7 @@ public class LanguageFile {
         en_gb.setProperty("giveaway_description_nowinner", "Prize: **%s**\n" +
                 "Amount of winners: **%s**\n\n" +
                 "Nobody participated. Therefore, nobody won.");
+        en_gb.setProperty("giveaway_end_manually", "%s, to end this giveaway manually click on ❌");
 
         /// Reminder
         en_gb.setProperty("reminder_description", "Set up a reminder to a specific date and time.\n" +
@@ -816,9 +817,10 @@ public class LanguageFile {
         en_gb.setProperty("signup_embedtitle_empty", "Sign up");
         en_gb.setProperty("signup_embedtitle_notempty", "Sign up for %s");
         en_gb.setProperty("signup_embeddescription", "Click on %s to participate.\n" +
-                "Remove said reaction if you have changed your mind.\n\n" +
-                "%s people can participate!" +
-                "%s");
+                "%s people can participate!\n\n" +
+                "Remove said reaction if you have changed your mind." +
+                "%s\n" +
+                "%s, to manually end this signup click on ❌");
         en_gb.setProperty("signup_embeddescription_custom", "\nThe signup will close 30 minutes prior to the scheduled event.");
         en_gb.setProperty("signup_embeddescriptionend", "%s people could participate!\n\n" +
                 "These are the participants:");
@@ -843,6 +845,7 @@ public class LanguageFile {
         // Votes
         en_gb.setProperty("votes_active", "Ends at");
         en_gb.setProperty("votes_inactive", "This poll has ended.");
+        en_gb.setProperty("votes_end_manually", "%s, to end this poll manually click on ❌");
 
         /// Quickvote
         en_gb.setProperty("quickvote_started", "%s started a quickpoll!");
@@ -859,8 +862,9 @@ public class LanguageFile {
         en_gb.setProperty("vote_started", "%s started a poll!");
         en_gb.setProperty("vote_ended", "%s has ended the poll!");
         en_gb.setProperty("vote_missing_db", "Greetings mediator! I couldn't remove a succesful vote ending from the database.");
-        en_gb.setProperty("vote_multiple", "You can select multiple answers.");
-        en_gb.setProperty("vote_single", "You can only pick one answer.");
+        en_gb.setProperty("vote_multiple", "Multiple Answers: %s");
+        en_gb.setProperty("vote_allowed", "Allowed");
+        en_gb.setProperty("vote_forbidden", "Forbidden");
 
         // Fun
         /// Avatar
@@ -1821,6 +1825,7 @@ public class LanguageFile {
         de_de.setProperty("giveaway_description_nowinner", "Prize: **%s**\n" +
                 "Amount of winners: **%s**\n\n" +
                 "Nobody participated. Therefore, nobody won.");
+        de_de.setProperty("giveaway_end_manually", "%s, um dieses Giveaway manuell zu beenden, drücke auf ❌");
 
         /// Reminder
         de_de.setProperty("reminder_description", "Set up a reminder to a specific date and time.\n" +
@@ -1869,11 +1874,11 @@ public class LanguageFile {
         de_de.setProperty("signup_invaliddateday", "Invalid Date and Time: The given date does not exist. (e.g. Feb 31)");
         de_de.setProperty("signup_embedtitle_empty", "Sign up");
         de_de.setProperty("signup_embedtitle_notempty", "Sign up for %s");
-        de_de.setProperty("signup_embeddescription", "%s people can participate!\n" +
-                "%s" +
-                "\n" +
-                "Click on %s to participate.\n" +
-                "Remove said reaction if you have changed your mind.");
+        de_de.setProperty("signup_embeddescription", "Click on %s to participate.\n" +
+                "%s people can participate!\n\n" +
+                "Remove said reaction if you have changed your mind." +
+                "%s\n" +
+                "%s, to manually end this signup click on ❌");
         de_de.setProperty("signup_embeddescription_custom", "The signup will close 30 minutes prior to the scheduled event.\n");
         de_de.setProperty("signup_embeddescriptionend", "%s people could participate!\n\n" +
                 "These are the participants:");
@@ -1898,6 +1903,7 @@ public class LanguageFile {
         // Votes
         de_de.setProperty("votes_active", "Endet am");
         de_de.setProperty("votes_inactive", "This poll has ended.");
+        de_de.setProperty("votes_end_manually", "%s, um diese Umfrage manuell zu beenden, drücke auf ❌");
 
         /// Quickvote
         de_de.setProperty("quickvote_started", "%s started a quickpoll!");
@@ -1914,8 +1920,9 @@ public class LanguageFile {
         de_de.setProperty("vote_started", "%s started a poll!");
         de_de.setProperty("vote_ended", "%s has ended the poll!");
         de_de.setProperty("vote_missing_db", "Greetings mediator! I couldn't remove a succesful vote ending from the database.");
-        de_de.setProperty("vote_multiple", "You can select multiple answers.");
-        de_de.setProperty("vote_single", "You can only pick one answer.");
+        de_de.setProperty("vote_multiple", "Mehrere Antworten: %s");
+        de_de.setProperty("vote_allowed", "Erlaubt");
+        de_de.setProperty("vote_forbidden", "Verboten");
 
         // Fun
         /// Avatar

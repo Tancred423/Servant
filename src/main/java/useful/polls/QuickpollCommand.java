@@ -54,7 +54,8 @@ public class QuickpollCommand extends Command {
 
                 eb.setColor(internalAuthor.getColor(guild, author));
                 eb.setAuthor(String.format(LanguageHandler.get(lang, "quickvote_started"), author.getName()), null, author.getEffectiveAvatarUrl());
-                eb.setDescription(event.getArgs());
+                eb.setDescription("**" + event.getArgs() + "**");
+                eb.appendDescription("\n\n" + String.format(LanguageHandler.get(lang, "votes_end_manually"), author.getAsMention()));
                 eb.setFooter(LanguageHandler.get(lang, "votes_active"), event.getJDA().getSelfUser().getAvatarUrl());
                 var dateIn7DaysOtd = OffsetDateTime.now(ZoneOffset.UTC).plusDays(7).toLocalDateTime();
                 var dateIn7Days = Timestamp.valueOf(dateIn7DaysOtd);

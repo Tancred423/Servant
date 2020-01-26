@@ -15,7 +15,7 @@ public class MessageHandler {
         channel.sendMessage(message).queue(sentMessage -> new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                sentMessage.delete().queue();
+                if (sentMessage != null) sentMessage.delete().queue();
             }
         }, cooldown));
     }

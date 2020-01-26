@@ -101,7 +101,8 @@ public class SignupCommand extends Command {
                         String.format(LanguageHandler.get(lang, "signup_embedtitle_notempty"), title));
                 eb.setDescription(String.format(LanguageHandler.get(lang, "signup_embeddescription"),
                         Emote.getEmoji("upvote"), amount,
-                        (isCustomDate ? LanguageHandler.get(lang, "signup_embeddescription_custom") : "")));
+                        (isCustomDate ? LanguageHandler.get(lang, "signup_embeddescription_custom") : ""),
+                        author.getAsMention()));
                 eb.setFooter(isCustomDate ? LanguageHandler.get(lang, "signup_event") : LanguageHandler.get(lang, "signup_timeout"),
                         Image.getImageUrl("clock", guild, author));
                 eb.setTimestamp(eventDate.toInstant());

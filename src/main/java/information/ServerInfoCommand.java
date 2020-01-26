@@ -163,12 +163,14 @@ public class ServerInfoCommand extends Command {
         eb.addField(LanguageHandler.get(lang, "serverinfo_mediaonlychannels"), sb.toString().isEmpty() ?
                 LanguageHandler.get(lang, "serverinfo_nomediaonlychannels") : sb.toString(), true);
 
-        var joinNotifierChannel = guild.getTextChannelById(internalGuild.getJoinNotifierChannel(guild, author).getIdLong());
+        var internalChannel = internalGuild.getJoinNotifierChannel(guild, author);
+        var joinNotifierChannel = internalChannel == null ? null : guild.getTextChannelById(internalChannel.getIdLong());
         eb.addField(LanguageHandler.get(lang, "serverinfo_join"), joinNotifierChannel == null ?
                 LanguageHandler.get(lang, "serverinfo_nojoin") :
                 joinNotifierChannel.getAsMention(), true);
 
-        var leaveNotifierChannel = guild.getTextChannelById(internalGuild.getLeaveNotifierChannel(guild, author).getIdLong());
+        internalChannel = internalGuild.getLeaveNotifierChannel(guild, author);
+        var leaveNotifierChannel = internalChannel == null ? null : guild.getTextChannelById(internalChannel.getIdLong());
         eb.addField(LanguageHandler.get(lang, "serverinfo_leave"), leaveNotifierChannel == null ?
                 LanguageHandler.get(lang, "serverinfo_noleave") :
                 leaveNotifierChannel.getAsMention(), true);

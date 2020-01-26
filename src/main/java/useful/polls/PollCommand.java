@@ -122,7 +122,9 @@ public class PollCommand extends Command {
         var eb = new EmbedBuilder();
         eb.setColor(new User(author.getIdLong()).getColor(guild, user));
         eb.setAuthor(String.format(LanguageHandler.get(lang, "vote_started"), author.getName()), null, author.getEffectiveAvatarUrl());
-        eb.setDescription(allowsMultipleAnswers ? LanguageHandler.get(lang, "vote_multiple") : LanguageHandler.get(lang, "vote_single"));
+        eb.setDescription(String.format(LanguageHandler.get(lang, "votes_end_manually"), event.getAuthor().getAsMention()) +
+                "\n\n**" + String.format(LanguageHandler.get(lang, "vote_multiple"), allowsMultipleAnswers ? LanguageHandler.get(lang, "vote_allowed") : LanguageHandler.get(lang, "vote_forbidden")) + "**"
+        );
         eb.setFooter(LanguageHandler.get(lang, "votes_active"), event.getSelfUser().getAvatarUrl());
 
         var dateIn7DaysOtd = OffsetDateTime.now(ZoneOffset.UTC).plusDays(7).toLocalDateTime();

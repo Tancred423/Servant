@@ -258,7 +258,7 @@ public class CommandEvent {
         try {
             long id = SafeIdUtil.safeConvert(reaction.replaceAll("<a?:.+:(\\d+)>", "$1"));
             Emote emote = event.getJDA().getEmoteById(id);
-            if(emote == null) event.getMessage().addReaction(reaction).queue();
+            if (emote == null) event.getMessage().addReaction(reaction).queue();
             else event.getMessage().addReaction(emote).queue();
         } catch(PermissionException ignored) {}
     }

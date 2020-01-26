@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import owner.blacklist.Blacklist;
 import servant.Servant;
-import useful.giveaway.Giveaway;
+import useful.giveaway.GiveawayHandler;
 import utilities.Constants;
 import utilities.Image;
 
@@ -44,7 +44,7 @@ public class GuildLeaveListener extends ListenerAdapter {
             internalGuild.purgeBirthday(guild, guildOwner.getUser());
 
             // Giveaway
-            Giveaway.purgeGiveaways(guild.getIdLong(), guild, user);
+            GiveawayHandler.purgeGiveaways(guild.getIdLong(), guild, user);
 
             // Kick
             processKick(event, guild, guildOwner, user);

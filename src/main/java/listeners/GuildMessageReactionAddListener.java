@@ -16,6 +16,8 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import owner.blacklist.Blacklist;
 import servant.Servant;
+import useful.giveaway.Giveaway;
+import useful.giveaway.GiveawayHandler;
 import useful.polls.Poll;
 import useful.polls.PollsDatabase;
 import useful.signup.Signup;
@@ -39,6 +41,8 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
     public void onGuildMessageReactionAdd(@NotNull GuildMessageReactionAddEvent event) {
         var guild = event.getGuild();
         var user = event.getUser();
+        var channel = event.getChannel();
+        var jda = event.getJDA();
 
         /* Certain conditions must meet, so this event is allowed to be executed:
          * 1.   Ignore any request from the Discord Bot List as this big guild
@@ -67,6 +71,16 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
                 temporaryBlacklist.add(messageId);
                 if (internalGuild.bestOfQuoteIsBlacklisted(messageId, guild, user)) temporaryBlacklist.remove(messageId);
                 else processBestOfQuote(event, guild, user, internalGuild, messageId);
+            }
+
+            // Giveaway
+            if (Toggle.isEnabled(event, "giveaway")
+                    && GiveawayHandler.isGiveaway(guild.getIdLong(), channel.getIdLong(), messageId, guild, user)
+                    && (event.getReactionEmote().isEmoji() && event.getReactionEmote().getName().equals(Emote.getEmoji("end")))) {
+                channel.retrieveMessageById(messageId).queue(message -> {
+                    var giveaway = new Giveaway(guild.getIdLong(), channel.getIdLong(), messageId, jda.getSelfUser());
+                    GiveawayHandler.announceWinners(message, giveaway.getAmountWinners(), giveaway.getPrize(), lang, jda.getUserById(giveaway.getHostId()));
+                });
             }
 
             // Quickpoll

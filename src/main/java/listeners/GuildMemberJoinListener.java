@@ -50,7 +50,7 @@ public class GuildMemberJoinListener extends ListenerAdapter {
                     var role = roleAndDelay.getKey();
                     var delay = roleAndDelay.getValue() * 60 * 1000; // Milliseconds
                     if (selfMember.hasPermission(Permission.MANAGE_ROLES) && role != null && selfMember.canInteract(role))
-                        new Timer().schedule(Time.wrap(() -> guild.addRoleToMember(member, role).queue()), delay);
+                        new Timer().schedule(Time.wrap(() -> guild.addRoleToMember(member, role).queue(success -> { /* ignored */ }, failure -> { /* ignored */ })), delay);
                 }
             }
 

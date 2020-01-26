@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import owner.blacklist.Blacklist;
 import servant.Servant;
-import useful.giveaway.Giveaway;
+import useful.giveaway.GiveawayHandler;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -36,7 +36,7 @@ public class TextChannelDeleteListener extends ListenerAdapter {
                 internalGuild.unsetBirthdayMessage(guild, user);
 
             // Giveaway
-            Giveaway.purgeGiveawaysFromChannel(guild.getIdLong(),channel.getIdLong(), guild, user);
+            GiveawayHandler.purgeGiveawaysFromChannel(guild.getIdLong(),channel.getIdLong(), guild, user);
 
             // MediaOnlyChannel
             if (internalGuild.mediaOnlyChannelHasEntry(channel, guild, user))

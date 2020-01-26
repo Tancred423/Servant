@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import owner.blacklist.Blacklist;
 import servant.Servant;
-import useful.giveaway.Giveaway;
+import useful.giveaway.GiveawayHandler;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -37,8 +37,8 @@ public class GuildMessageDeleteListener extends ListenerAdapter {
                 internalGuild.unsetBirthdayMessage(guild, user);
 
             // Giveaway
-            if (Giveaway.isGiveaway(guild.getIdLong(), event.getChannel().getIdLong(), event.getMessageIdLong(), guild, user))
-                Giveaway.deleteGiveawayFromDb(guild.getIdLong(), event.getChannel().getIdLong(), messageId, guild, user);
+            if (GiveawayHandler.isGiveaway(guild.getIdLong(), event.getChannel().getIdLong(), event.getMessageIdLong(), guild, user))
+                GiveawayHandler.deleteGiveawayFromDb(guild.getIdLong(), event.getChannel().getIdLong(), messageId, guild, user);
 
             // Signup
             if (internalGuild.isSignupMessage(messageId, guild, user))

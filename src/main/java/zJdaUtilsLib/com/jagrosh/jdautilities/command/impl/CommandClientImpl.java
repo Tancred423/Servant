@@ -134,7 +134,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
         this.executor = executor==null ? Executors.newSingleThreadScheduledExecutor() : executor;
         this.compiler = compiler;
         this.manager = manager;
-        this.helpConsumer = helpConsumer==null ? (event) -> {
+        this.helpConsumer = (helpConsumer == null) ? (event) -> {
             System.out.println("[" + OffsetDateTime.now(ZoneId.of(Constants.LOG_OFFSET)).toString().replaceAll("T", " ").substring(0, 19) + "] " +
                     "Command executed: " + event.getMessage().getContentDisplay() + ". " +
                     "Guild: " + (event.getGuild() == null ? "DM" : event.getGuild().getName() + " (" + event.getGuild().getIdLong() + ")") + ". " +
@@ -183,7 +183,11 @@ public class CommandClientImpl implements CommandClient, EventListener {
                 eb.setFooter("For additional help, contact " + owner.getName() + "#" + owner.getDiscriminator() +
                         (serverInvite != null ? " or join " + serverInvite : ""), owner.getAvatarUrl());
 
-            if (event.isFromType(ChannelType.TEXT)) event.reactSuccess();
+            if (event.isFromType(ChannelType.TEXT)) {
+                var botMember = event.getGuild().getMemberById(event.getJDA().getSelfUser().getIdLong());
+                if (botMember != null && botMember.hasPermission(Permission.MESSAGE_ADD_REACTION)) event.reactSuccess();
+            }
+
             event.replyInDm(eb.build(), unused -> {
             }, t -> event.replyWarning(LanguageHandler.get(new moderation.user.User(event.getAuthor().getIdLong()).getLanguage(event.getGuild(), event.getAuthor()), "blocking_dm")));
         } : helpConsumer;

@@ -61,15 +61,15 @@ public class GiveawayCommand extends Command {
                 var message = event.getMessage();
 
                 if (args[0].equalsIgnoreCase("list")) {
-                    var currentGiveaways = Giveaway.getCurrentGiveaways(event.getJDA(), message, lang, guild, author);
+                    var currentGiveaways = GiveawayHandler.getCurrentGiveaways(event.getJDA(), message, lang, guild, author);
                     var eb = new EmbedBuilder();
                     eb.setColor(new User(message.getAuthor().getIdLong()).getColor(guild, author));
                     eb.setAuthor(LanguageHandler.get(lang, "giveaway_current"), null, message.getGuild().getIconUrl());
                     eb.setDescription(currentGiveaways);
                     event.reply(eb.build());
                 } else {
-                    if (args[0].startsWith("\"")) Giveaway.startGiveaway(event, args, lang);
-                    else Giveaway.sendWrongArgumentError(message, lang);
+                    if (args[0].startsWith("\"")) GiveawayHandler.startGiveaway(event, args, lang);
+                    else GiveawayHandler.sendWrongArgumentError(message, lang);
                 }
 
                 // Statistics.

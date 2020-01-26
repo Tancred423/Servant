@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReaction;
 import servant.Log;
 import servant.Servant;
-import useful.giveaway.Giveaway;
+import useful.giveaway.GiveawayHandler;
 import utilities.Emote;
 import utilities.Image;
 
@@ -44,7 +44,7 @@ public class Signup {
                         if (isCustomDate) expiration = expiration.minusMinutes(30);
                         var author = jda.getUserById(resultSet.getLong("author_id"));
                         var now = ZonedDateTime.now(ZoneOffset.of(new Guild(guildId).getOffset(guild, author)));
-                        var remainingTimeMillis = Giveaway.zonedDateTimeDifference(now, expiration);
+                        var remainingTimeMillis = GiveawayHandler.zonedDateTimeDifference(now, expiration);
 
                         if (remainingTimeMillis <= 0) {
                             if (guild == null) return;
