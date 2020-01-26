@@ -5,91 +5,33 @@ Your Multifunctional Discord Bot
 
 ![Servant](https://i.imgur.com/MDRt4fA.png)
 
-## What she has
+Greetings master! I am Servant, your multifunctional Discord bot.
 
+I will help you to moderate, organize and entertain your Discord server by providing over 50 unique features. You can now go from a standard Discord server to a premium one!
 
-### Moderation
-* Autorole: Role for new members. (with optional time delay)
-* BestOfImage: Users can rate images that may be posted in a best-of channel.
-* BestOfQuote: Users can rate messages that may be posted in a best-of channel.
-* Birthday: Birthdays of server members. (with announcement and list)
-* Clear: Delete messages. (amount or user based)
-* Join: Alert for joining user.
-* Leave: Alert for leaving user.
-* LevelRole: Gain roles on certain levels.
-* Livestream: Livestream notifications (STREAMER MODE and PUBLIC MODE)
-	* Streamer Mode: Selected streamers can get a role while streaming. Also there can be a notfication once they go live.
-    * Public Mode: Anyone who goes live can get a role. No notifications here to prevent spam.
-* MediaOnlyChannel: Users can only post files and urls in these channels. (For e.g. memes without chatting)
-* ReactionRole: Add a reaction to a message that will provide a role to a member if clicked.
-* Role: Assign or remove roles via command.
-* Server: Bot personalisation like prefix, offset, etc. (Server Specific)
-* ServerSetup: The same as above but in an easy to use setup wizard.
-* Toggle: Toggle almost any feature on or off.
-* User: Bot personalisation like prefix, offset, etc. (User Specific)
-* VoiceLobby
-	* If a user joins this channel, a new one will be created for them.
-    * If everyone leaves this new channel, it will be deleted.
-    * This will safe you a lot of space while providing infinite voice channels.
+What can I do you ask? A lot, I say:
 
-### Information
-* BotInfo: Shows info about Servant.
-* Patreon: Support me <3
-* Ping: Bot's latency.
-* ServerInfo: Shows info about the server.
+* Manage roles, birthdays, twitch streamers, text and voice channels!
+* Host giveaways, sign ups and polls!
+* Set up reminders, alarms or convert a date and time to a different timzone!
+* Entertain users by posting random animal pictures, ship members or let them interact with each other. (You ever wanted to slap someone for a bad joke?)
+* Reward active users with a leveling system and I can give them roles on certain levels!
+* And much more! You may be even lucky enough to find some easter eggs :)
 
-### Useful
-* Alarm: Set up an alarm.
-* Giveaway: Host a giveaway.
-* Poll: Host a voting with customizable answers.
-* QuickPoll: Smol poll with yes / no.
-* Reminder: Set up a reminder.
-* Signup: Organise events by letting users sign up.
-* Timezone: Converter (e.g. PDT to CET).
+## Links
+* Detailed Information: [Visit Website](https://servant.tanc.red/)
+* Get The Bot: [Invite Servant](https://inviteservant.tanc.red)
+* Get Support: [Join Servant's Kingdom](https://servantskingdom.tanc.red)
 
-### Fun
-* Avatar: Steal someone's avatar.
-* Baguette: How big is your baguette? 😏
-* Bird: Random Bird Picture.
-* Bio: Your description in your profile.
-* Cat: Random cat picture.
-* Coinflip: Returns head or tail.
-* CreateEmbed: Create an own fully customizable embed.
-* Dog: Random Dog Picture.
-* EditEmbed: Edit your embeds.
-* Flip: Flip a user!
-* Love: Ship two users.
-* Profile: Shows your profile. (Contains levels, achievements, statistics)
-* Random: Shows a random picture. Optionally with a keyword (e.g. !random cat)
-* Unflip: Unflip a user.
-
-### Interaction
-* Beg: Beg someone.
-* Cookie: Give someone a cookie.
-* Cop: Arrest someone.
-* Dab: Dab on someone.
-* Flex: Flex on someone.
-* HighFive: Give someone a high five.
-* Hug: Hug someone.
-* Kiss: Kiss someone.
-* Pat: Pat someone.
-* Slap: Slap someone.
-
-## Invite
-* [Invite Servant](https://inviteservant.tanc.red)
-
-## Support
-* [Join Servant's Kingdom](https://servantskingdom.tanc.red)
+## Author
+* [Tancred#9056](https://github.com/Tancred423)
 
 ## Built with
 * [Java 11](https://openjdk.java.net/projects/jdk/11/) - Programming Language
 * [JDA 4.0.0_61](https://github.com/DV8FromTheWorld/JDA) - Java Wrapper for Discord API
 * [JDA-Utilities 3.0.2](https://github.com/JDA-Applications/JDA-Utilities) - JDA Commands Extension
 * [Maven](https://maven.apache.org/) - Dependency Management
-* Heart :heart:
-
-## Author
-* [Tancred#9056](https://github.com/Tancred423)
+* Heart ❤
 
 ## Shout-Outs
 * [NavuArt](https://twitter.com/navuart) - Servant Emotes
