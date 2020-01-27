@@ -22,6 +22,6 @@ public class WinkCommand extends InteractionCommand {
                 Permission.MESSAGE_EMBED_LINKS
         };
 
-        this.emoji = "\uD83D\uDC4B"; // 👋
+        this.emoji = "\uD83D\uDE09"; // 😉
     }
 }

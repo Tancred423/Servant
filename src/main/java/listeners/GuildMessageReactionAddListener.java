@@ -79,7 +79,8 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
                     && (event.getReactionEmote().isEmoji() && event.getReactionEmote().getName().equals(Emote.getEmoji("end")))) {
                 channel.retrieveMessageById(messageId).queue(message -> {
                     var giveaway = new Giveaway(guild.getIdLong(), channel.getIdLong(), messageId, jda.getSelfUser());
-                    GiveawayHandler.announceWinners(message, giveaway.getAmountWinners(), giveaway.getPrize(), lang, jda.getUserById(giveaway.getHostId()));
+                    if (giveaway.getHostId() == user.getIdLong())
+                        GiveawayHandler.announceWinners(message, giveaway.getAmountWinners(), giveaway.getPrize(), lang, jda.getUserById(giveaway.getHostId()));
                 });
             }
 
