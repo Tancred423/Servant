@@ -1,5 +1,5 @@
 // Author: Tancred423 (https://github.com/Tancred423)
-package fun.random;
+package random.randomImgur;
 
 public class Image {
     private String title;

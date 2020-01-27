@@ -1,5 +1,5 @@
 // Author: Tancred423 (https://github.com/Tancred423)
-package fun.random.randomAnimal;
+package random;
 
 import moderation.guild.Guild;
 import moderation.toggle.Toggle;
@@ -22,7 +22,7 @@ public class DogCommand extends Command {
         this.name = "dog";
         this.aliases = new String[] { "doggo" };
         this.help = "Random dog picture.";
-        this.category = new Category("Fun");
+        this.category = new Category("Random");
         this.arguments = null;
         this.hidden = false;
         this.guildOnly = false;
@@ -48,10 +48,10 @@ public class DogCommand extends Command {
 
                 JSONObject json;
                 try {
-                    json = JsonReader.readJsonFromUrl("https://dog.ceo/api/breeds/image/random");
+                    json = JsonReader.readJsonFromUrl("https://some-random-api.ml/img/dog");
                     var eb = new EmbedBuilder();
                     eb.setColor(new User(event.getAuthor().getIdLong()).getColor(guild, author));
-                    eb.setImage(String.valueOf(json.get("message")));
+                    eb.setImage(json.get("link").toString());
                     event.reply(eb.build());
                 } catch (IOException e) {
                     new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);

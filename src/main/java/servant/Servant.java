@@ -15,27 +15,21 @@ import fun.flip.UnflipCommand;
 import fun.level.BioCommand;
 import fun.level.LevelRoleCommand;
 import fun.level.ProfileCommand;
-import fun.random.RandomCommand;
-import fun.random.randomAnimal.BirdCommand;
-import fun.random.randomAnimal.CatCommand;
-import fun.random.randomAnimal.DogCommand;
-import information.*;
+import information.BotInfoCommand;
+import information.PatreonCommand;
+import information.PingCommand;
+import information.ServerInfoCommand;
 import interaction.*;
 import listeners.*;
-import moderation.ClearCommand;
-import moderation.RoleCommand;
-import moderation.ServerSetupCommand;
-import moderation.AutoRoleCommand;
-import moderation.BestOfImageCommand;
-import moderation.BestOfQuoteCommand;
+import moderation.*;
 import moderation.birthday.BirthdayCommand;
 import moderation.guild.GuildCommand;
 import moderation.guild.GuildManager;
-import moderation.JoinCommand;
-import moderation.LeaveCommand;
+import moderation.joinleave.JoinCommand;
+import moderation.joinleave.JoinMessageCommand;
+import moderation.joinleave.LeaveCommand;
+import moderation.joinleave.LeaveMessageCommand;
 import moderation.livestream.LivestreamCommand;
-import moderation.MediaOnlyChannelCommand;
-import moderation.ReactionRoleCommand;
 import moderation.toggle.ToggleCommand;
 import moderation.toggle.ToggleFile;
 import moderation.user.UserCommand;
@@ -46,6 +40,8 @@ import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import owner.*;
 import owner.blacklist.BlacklistCommand;
+import random.*;
+import random.randomImgur.RandomCommand;
 import useful.alarm.AlarmCommand;
 import useful.giveaway.GiveawayCommand;
 import useful.polls.PollCommand;
@@ -113,7 +109,9 @@ public class Servant {
                 new BirthdayCommand(),
                 new ClearCommand(),
                 new JoinCommand(),
+                new JoinMessageCommand(),
                 new LeaveCommand(),
+                new LeaveMessageCommand(),
                 new LevelRoleCommand(),
                 new LivestreamCommand(),
                 new MediaOnlyChannelCommand(),
@@ -143,17 +141,13 @@ public class Servant {
                 // Fun
                 new AvatarCommand(),
                 new BaguetteCommand(),
-                new BirdCommand(),
                 new BioCommand(),
-                new CatCommand(),
                 new CoinflipCommand(),
                 new CreateEmbedCommand(waiter),
-                new DogCommand(),
                 new EditEmbedCommand(waiter),
                 new FlipCommand(),
                 new LoveCommand(),
                 new ProfileCommand(),
-                new RandomCommand(),
                 new UnflipCommand(),
 
                 // Interaction
@@ -169,6 +163,19 @@ public class Servant {
                 new PatCommand(),
                 new SlapCommand(),
                 new WaveCommand(),
+                new WinkCommand(),
+
+                // Random
+                new RandomCommand(),
+                new BirdCommand(),
+                new CatCommand(),
+                new DogCommand(),
+                new FoxCommand(),
+                new KoalaCommand(),
+                new MemeCommand(),
+                new PandaCommand(),
+                new PikachuCommand(),
+                new RedPandaCommand(),
 
                 // Easter Eggs
                 new ThanksCommand()

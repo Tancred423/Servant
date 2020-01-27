@@ -107,7 +107,6 @@ public class BirthdayHandler {
         var internalAuthor = new User(author.getIdLong());
 
         Map<Long, String> birthdays = internalGuild.getBirthdays(guild, author);
-        var sb = new StringBuilder();
         var lang = internalGuild.getLanguage(guild, author);
         var countdown = StringFormat.fillWithWhitespace(LanguageHandler.get(lang, "birthday_countdown"),
                 String.format(LanguageHandler.get(lang, "birthday_countdown_value"), 999).length());
@@ -123,6 +122,8 @@ public class BirthdayHandler {
 
         Map<Long, String> birthdaysSorted = new TreeMap<>(birthdays2);
 
+        var sb = new StringBuilder();
+        sb.append(LanguageHandler.get(lang, "birthday_howtoadd")).append("\n");
         sb.append("```c\n")
                 .append(countdown).append(" ").append(date).append(" ").append(name).append("\n")
                 .append("-".repeat(countdown.length())).append(" ").append("-".repeat(date.length())).append(" ").append("-".repeat(16)).append("\n");

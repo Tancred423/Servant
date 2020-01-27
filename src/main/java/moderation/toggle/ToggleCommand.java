@@ -91,20 +91,29 @@ public class ToggleCommand extends Command {
                     add("easteregg");
                     add("avatar");
                     add("baguette");
-                    add("bird");
-                    add("cat");
                     add("coinflip");
                     add("createembed");
-                    add("dog");
                     add("editembed");
                     add("flip");
                     add("level");
+                    add("levelupmessage");
                     add("love");
                     add("profile");
-                    add("random");
 
                     // interaction
                     add("interaction");
+
+                    // random
+                    add("random");
+                    add("bird");
+                    add("cat");
+                    add("dog");
+                    add("fox");
+                    add("koala");
+                    add("meme");
+                    add("panda");
+                    add("pikachu");
+                    add("redpanda");
                 }};
 
                 var args = event.getArgs().split(" ");
@@ -263,19 +272,12 @@ public class ToggleCommand extends Command {
                 return "avatar";
             case "baguette":
                 return "baguette";
-            case "bird":
-            case "birb":
-                return "bird";
-            case "cat":
-                return "cat";
             case "coinflip":
             case "cointoss":
                 return "coinflip";
             case "createembed":
             case "embed":
                 return "createembed";
-            case "dog":
-                return "dog";
             case "editembed":
                 return "editembed";
             case "flip":
@@ -283,17 +285,44 @@ public class ToggleCommand extends Command {
                 return "flip";
             case "level":
                 return "level";
+            case "levelupmessage":
+            case "levelupmessages":
+            case "levelmessage":
+            case "levelmessages":
+                return "levelupmessage";
             case "love":
             case "ship":
                 return "love";
             case "profile":
                 return "profile";
-            case "random":
-                return "random";
 
             // interaction
             case "interaction":
                 return "interaction";
+
+            // random
+            case "random":
+                return "random";
+            case "bird":
+            case "birb":
+                return "bird";
+            case "cat":
+                return "cat";
+            case "dog":
+                return "dog";
+            case "fox":
+                return "fox";
+            case "koala":
+                return "koala";
+            case "meme":
+                return "meme";
+            case "panda":
+                return "panda";
+            case "pikachu":
+            case "pika":
+                return "pikachu";
+            case "redpanda":
+                return "redpanda";
 
             default:
                 return null;

@@ -46,12 +46,12 @@ public class GuildMemberLeaveListener extends ListenerAdapter {
                 var leaveNotifierChannel = internalGuild.getLeaveNotifierChannel(guild, user);
 
                 if (leaveNotifierChannel != null && leaveNotifierChannel.canTalk(selfMember)) {
-                    // todo: customizable farewell messages
+                    var description = internalGuild.getLeaveMessage(guild, user);
                     leaveNotifierChannel.sendMessage(
                             new EmbedBuilder()
                                     .setColor(internalUser.getColor(guild, user))
                                     .setAuthor(String.format(LanguageHandler.get(lang, "leave_author"), user.getName(), user.getDiscriminator()), null, guild.getIconUrl())
-                                    .setDescription(LanguageHandler.get(lang, "leave_embeddescription"))
+                                    .setDescription(description == null ? LanguageHandler.get(lang, "leave_embeddescription") : description)
                                     .setThumbnail(user.getEffectiveAvatarUrl())
                                     .setFooter(LanguageHandler.get(lang, "leave_footer"), Image.getImageUrl("clock", guild, user))
                                     .setTimestamp(OffsetDateTime.now(ZoneOffset.of(internalGuild.getOffset(guild, user))))

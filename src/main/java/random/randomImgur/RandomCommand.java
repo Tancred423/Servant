@@ -1,5 +1,5 @@
 // Author: Tancred423 (https://github.com/Tancred423)
-package fun.random;
+package random.randomImgur;
 
 import files.language.LanguageHandler;
 import moderation.guild.Guild;
@@ -26,7 +26,7 @@ public class RandomCommand extends Command {
         this.name = "random";
         this.aliases = new String[0];
         this.help = "Random image of your choice.";
-        this.category = new Category("Fun");
+        this.category = new Category("Random");
         this.arguments = "[keyword]";
         this.hidden = false;
         this.guildOnly = false;

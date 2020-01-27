@@ -1,5 +1,5 @@
 // Author: Tancred423 (https://github.com/Tancred423)
-package fun.random.randomAnimal;
+package random;
 
 import moderation.guild.Guild;
 import moderation.toggle.Toggle;
@@ -17,12 +17,12 @@ import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
-public class BirdCommand extends Command {
-    public BirdCommand() {
-        this.name = "bird";
-        this.aliases = new String[] { "birb" };
-        this.help = "Random bird picture.";
-        this.category = new Category("Fun");
+public class KoalaCommand extends Command {
+    public KoalaCommand() {
+        this.name = "koala";
+        this.aliases = new String[0];
+        this.help = "Random koala picture.";
+        this.category = new Category("Random");
         this.arguments = null;
         this.hidden = false;
         this.guildOnly = false;
@@ -48,12 +48,12 @@ public class BirdCommand extends Command {
 
                 JSONObject json;
                 try {
-                    json = JsonReader.readJsonFromUrl("http://random.birb.pw/tweet.json/");
+                    json = JsonReader.readJsonFromUrl("https://some-random-api.ml/img/koala");
                     var eb = new EmbedBuilder();
                     eb.setColor(new User(event.getAuthor().getIdLong()).getColor(guild, author));
-                    eb.setImage("https://random.birb.pw/img/" + json.get("file"));
+                    eb.setImage(json.get("link").toString());
                     event.reply(eb.build());
-                } catch (IOException e) {
+                } catch (IOException | IllegalArgumentException e) {
                     new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
                 }
 

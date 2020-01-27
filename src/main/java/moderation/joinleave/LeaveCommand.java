@@ -1,5 +1,5 @@
 // Author: Tancred423 (https://github.com/Tancred423)
-package moderation;
+package moderation.joinleave;
 
 import files.language.LanguageHandler;
 import moderation.guild.GuildHandler;

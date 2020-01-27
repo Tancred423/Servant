@@ -41,6 +41,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import servant.Servant;
 import utilities.Constants;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.*;
 import zJdaUtilsLib.com.jagrosh.jdautilities.commons.utils.FixedSizeCache;
@@ -452,9 +453,11 @@ public class CommandClientImpl implements CommandClient, EventListener {
             event.getJDA().shutdown();
             return;
         }
+
         textPrefix = prefix.equals(DEFAULT_PREFIX) ? "@"+event.getJDA().getSelfUser().getName()+" " : prefix;
-        event.getJDA().getPresence().setPresence(status==null ? OnlineStatus.ONLINE : status, 
-                activity ==null ? null : "default".equals(activity.getName()) ? Activity.playing("Type "+textPrefix+helpWord) : activity);
+
+        event.getJDA().getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing(String.format(LanguageHandler.get(Servant.config.getDefaultLanguage(), "presence_0"),
+                Constants.VERSION, Servant.config.getDefaultPrefix())));
 
         // Start SettingsManager if necessary
         GuildSettingsManager<?> manager = getSettingsManager();

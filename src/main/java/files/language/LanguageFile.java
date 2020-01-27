@@ -167,6 +167,7 @@ public class LanguageFile {
                 "... enter their birthday (yyyy-MM-dd) to enter the birthday list.\n" +
                 "... type `unsetbirthday` to leave the birthday list.\n" +
                 "... type `list` to create a list of all birthdays, that shows the current state, but does not update itself.");
+        en_gb.setProperty("birthday_howtoadd", "Add your birthday with `!birthday 1990-12-31`");
 
         /// Best of's
         en_gb.setProperty("bestof_usage", "**Set up vote-emote/emoji**\n" +
@@ -596,23 +597,13 @@ public class LanguageFile {
 
         // Information
         /// Bot Info
-        en_gb.setProperty("botinfo_authorname", "All about %s!");
-        en_gb.setProperty("botinfo_or", "or");
-        en_gb.setProperty("botinfo_please", "Please");
-        en_gb.setProperty("botinfo_moderationtools", "Moderation Tools");
-        en_gb.setProperty("botinfo_informativecommands", "Informative Commands");
-        en_gb.setProperty("botinfo_usefulfeatures", "Useful Features");
-        en_gb.setProperty("botinfo_funcommands", "Fun Commands");
-        en_gb.setProperty("botinfo_introduction", "Hello! I am **%s**");
-        en_gb.setProperty("botinfo_written", "was written in Java");
-        en_gb.setProperty("botinfo_owned", "am owned");
-
-        en_gb.setProperty("botinfo_description", "Hello, master! I am %s, your multifuntional bot.\n" +
-                "I was written in Java by %s using JDA-Applications's [Commands Extension](%s) (%s) and the [JDA library](%s) (%s).\n" +
-                "Type `%shelp` to see my commands!");
-        en_gb.setProperty("botinfo_join", "Join my server [`here`](%s)");
-        en_gb.setProperty("botinfo_invite", "or [`invite`](%s) me to your server!");
-        en_gb.setProperty("botinfo_features", "I provide:");
+        en_gb.setProperty("botinfo_authorname", "%s - Info");
+        en_gb.setProperty("botinfo_description", "Greetings master! I am %s, your multifunctional Discord bot.\n\n" +
+                "I will help you to moderate, organize and entertain your Discord server by providing over 50 unique features. You can now go from a standard Discord server to a premium one!\n\n" +
+                "[Visit the Website to see all the commands and more detailed information!](https://servant.tanc.red)");
+        en_gb.setProperty("botinfo_links_name", "Links");
+        en_gb.setProperty("botinfo_links_value", "Get The Bot: [Invite Servant](https://inviteservant.tanc.red)\n" +
+                "Get Support: [Join Servant's Kingdom](https://servantskingdom.tanc.red)");
         en_gb.setProperty("botinfo_stats", "Statistics");
         en_gb.setProperty("botinfo_users", "Users");
         en_gb.setProperty("botinfo_channels", "Channels");
@@ -1228,6 +1219,7 @@ public class LanguageFile {
                 "... ihren Geburtstag (yyyy-MM-dd) der Liste hinzufügen.\n" +
                 "... `unsetbirthday` schreiben, um ihren Geburtstag aus der Liste enfernen zu lassen.\n" +
                 "... `list` schreiben, um eine einmalige Geburtstagsliste zu bekommen.");
+        de_de.setProperty("birthday_howtoadd", "Füge deinen Geburtstag hinzu via `!birthday 1990-12-31`");
 
         /// Best of's
         de_de.setProperty("bestof_usage", "**Richte das Abstimmungs-Emote/Emoji ein**\n" +
@@ -1654,28 +1646,18 @@ public class LanguageFile {
 
         // Information
         /// Bot Info
-        de_de.setProperty("botinfo_authorname", "All about %s!");
-        de_de.setProperty("botinfo_or", "or");
-        de_de.setProperty("botinfo_please", "Please");
-        de_de.setProperty("botinfo_moderationtools", "Moderation Tools");
-        de_de.setProperty("botinfo_informativecommands", "Informative Commands");
-        de_de.setProperty("botinfo_usefulfeatures", "Useful Features");
-        de_de.setProperty("botinfo_funcommands", "Fun Commands");
-        de_de.setProperty("botinfo_introduction", "Hello! I am **%s**");
-        de_de.setProperty("botinfo_written", "was written in Java");
-        de_de.setProperty("botinfo_owned", "am owned");
-
-        de_de.setProperty("botinfo_description", "Hello, master! I am %s, your multifuntional bot.\n" +
-                "I was written in Java by %s using JDA-Applications's [Commands Extension](%s) (%s) and the [JDA library](%s) (%s).\n" +
-                "Type `%shelp` to see my commands!");
-        de_de.setProperty("botinfo_join", "Join my server [`here`](%s)");
-        de_de.setProperty("botinfo_invite", "or [`invite`](%s) me to your server!");
-        de_de.setProperty("botinfo_features", "I provide:");
-        de_de.setProperty("botinfo_stats", "Statistics");
-        de_de.setProperty("botinfo_users", "Users");
-        de_de.setProperty("botinfo_channels", "Channels");
-        de_de.setProperty("botinfo_shard", "This shard");
-        de_de.setProperty("botinfo_restart", "Last restart");
+        de_de.setProperty("botinfo_authorname", "%s - Info");
+        de_de.setProperty("botinfo_description", "Sei gegrüßt Master! Ich bin %s, dein multifunktionaler Discord Bot.\n\n" +
+                "Ich werde dir dabei helfen deinen Discord Server zu moderieren, organisieren und zu unterhalten, indem ich 50 einzigartige Features bereitstelle. Du kannst jetzt deinen Standard- zu einem Premium Discord Server aufwerten!\n\n" +
+                "[Besuche die Webseite um alle Befehle und mehr detailierte Informationen einzusehen!](https://servant.tanc.red)");
+        de_de.setProperty("botinfo_links_name", "Links");
+        de_de.setProperty("botinfo_links_value", "Hole Dir den Bot: [Lade Servant ein](https://inviteservant.tanc.red)\n" +
+                "Hole Dir Hilfe: [Tritt Servant's Kingdom bei](https://servantskingdom.tanc.red)");
+        de_de.setProperty("botinfo_stats", "Statistiken");
+        de_de.setProperty("botinfo_users", "Nutzer");
+        de_de.setProperty("botinfo_channels", "Kanäle");
+        de_de.setProperty("botinfo_shard", "Diese Shard");
+        de_de.setProperty("botinfo_restart", "Letzter Neustart");
 
         /// Patreon
         de_de.setProperty("patreon_supportserver", "Support Servant");

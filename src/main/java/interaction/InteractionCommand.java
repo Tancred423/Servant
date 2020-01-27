@@ -7,12 +7,15 @@ import moderation.guild.GuildHandler;
 import moderation.toggle.Toggle;
 import moderation.user.User;
 import owner.blacklist.Blacklist;
+import servant.Log;
 import servant.Servant;
+import utilities.JsonReader;
 import utilities.Parser;
 import utilities.UsageEmbed;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
+import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
 public abstract class InteractionCommand extends Command {
@@ -50,7 +53,15 @@ public abstract class InteractionCommand extends Command {
                 var internalMentioned = new User(mentioned.getIdLong());
 
                 // Get random gif.
-                var gif = InteractionDatabase.getGifUrl(name.toLowerCase(), guild, author);
+                var gif = "";
+                if (name.equals("wink") || name.equals("pat") || name.equals("hug")) {
+                    try {
+                        gif = JsonReader.readJsonFromUrl("https://some-random-api.ml/animu/" + name).get("link").toString();
+                    } catch (IOException e) {
+                        new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
+                        return;
+                    }
+                } else gif = InteractionDatabase.getGifUrl(name.toLowerCase(), guild, author);
 
                 // Increment author and mentioned command count.
                 internalAuthor.incrementInteractionCount(name, true, guild, author);

@@ -38,8 +38,6 @@ What can I do you ask? A lot, I say:
 * [Maselkov](https://github.com/Maselkov) - Motivation & Support
 * fschill - Support
 * [MEE6](https://mee6.xyz/) - Inspiration
-* [Random Images](https://imgur.com)
-* [Random Bird Images](http://random.birb.pw)
-* [Random Cat Images](http://random.cat)
-* [Random Dog Images](https://dog.ceo/dog-api)
+* [Random Command](https://imgur.com)
+* [Random Images](https://some-random-api.ml)
 * [Inspiration & Libraries](https://github.com/jagrosh)

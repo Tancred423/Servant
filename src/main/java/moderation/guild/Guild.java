@@ -2233,6 +2233,143 @@ public class Guild {
         return wasUnset;
     }
 
+    // JoinMessage LeaveMessage
+    private boolean joinLeaveMessageHasEntry(net.dv8tion.jda.api.entities.Guild guild, User user) {
+        Connection connection = null;
+        var hasEntry = false;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement("SELECT * FROM join_leave_messages WHERE guild_id=?");
+            select.setLong(1, guildId);
+            var resultSet = select.executeQuery();
+            hasEntry = resultSet.first();
+        } catch (SQLException e) {
+            new Log(e, guild, user, "join", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return hasEntry;
+    }
+
+    public void checkAndPurgeJoinLeaveMessage(net.dv8tion.jda.api.entities.Guild guild, User user) {
+        if (joinLeaveMessageHasEntry(guild, user)) {
+            var joinMsg = getJoinMessage(guild, user);
+            var leaveMsg = getLeaveMessage(guild, user);
+
+            if (joinMsg == null && leaveMsg == null) {
+                Connection connection = null;
+                try {
+                    connection = Servant.db.getHikari().getConnection();
+                    var delete = connection.prepareStatement("DELETE FROM join_leave_messages WHERE guild_id=?");
+                    delete.setLong(1, guildId);
+                    delete.executeUpdate();
+                } catch (SQLException e) {
+                    new Log(e, guild, user, "livestream", null).sendLog(false);
+                } finally {
+                    closeQuietly(connection);
+                }
+            }
+        }
+    }
+
+    public String getJoinMessage(net.dv8tion.jda.api.entities.Guild guild, User user) {
+        Connection connection = null;
+        String msg = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement("SELECT join_message FROM join_leave_messages WHERE guild_id=?");
+            select.setLong(1, guildId);
+            var resultSet = select.executeQuery();
+            if (resultSet.first()) {
+                msg = resultSet.getString("join_message");
+                if (msg.equalsIgnoreCase("empty")) msg = null;
+            }
+        } catch (SQLException e) {
+            new Log(e, guild, user, "join", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return msg;
+    }
+
+    public void setJoinMessage(String msg, net.dv8tion.jda.api.entities.Guild guild, User user) {
+        Connection connection = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            if (joinLeaveMessageHasEntry(guild, user)) {
+                var update = connection.prepareStatement("UPDATE join_leave_messages SET join_message=? WHERE guild_id=?");
+                update.setString(1, msg);
+                update.setLong(2, guildId);
+                update.executeUpdate();
+            } else {
+                var insert = connection.prepareStatement("INSERT INTO join_leave_messages (guild_id,join_message,leave_message) VALUES (?,?,?)");
+                insert.setLong(1, guildId);
+                insert.setString(2, msg);
+                insert.setString(3, "empty");
+                insert.executeUpdate();
+            }
+        } catch (SQLException e) {
+            new Log(e, guild, user, "join", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+
+        checkAndPurgeJoinLeaveMessage(guild, user);
+    }
+
+    public String getLeaveMessage(net.dv8tion.jda.api.entities.Guild guild, User user) {
+        Connection connection = null;
+        String msg = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement("SELECT leave_message FROM join_leave_messages WHERE guild_id=?");
+            select.setLong(1, guildId);
+            var resultSet = select.executeQuery();
+            if (resultSet.first()) {
+                msg = resultSet.getString("leave_message");
+                if (msg.equalsIgnoreCase("empty")) msg = null;
+            }
+        } catch (SQLException e) {
+            new Log(e, guild, user, "leave", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return msg;
+    }
+
+    public void setLeaveMessage(String msg, net.dv8tion.jda.api.entities.Guild guild, User user) {
+        Connection connection = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            if (joinLeaveMessageHasEntry(guild, user)) {
+                var update = connection.prepareStatement("UPDATE join_leave_messages SET leave_message=? WHERE guild_id=?");
+                update.setString(1, msg);
+                update.setLong(2, guildId);
+                update.executeUpdate();
+            } else {
+                var insert = connection.prepareStatement("INSERT INTO join_leave_messages (guild_id,join_message,leave_message) VALUES (?,?,?)");
+                insert.setLong(1, guildId);
+                insert.setString(2, "empty");
+                insert.setString(3, msg);
+                insert.executeUpdate();
+            }
+        } catch (SQLException e) {
+            new Log(e, guild, user, "leave", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+
+        checkAndPurgeJoinLeaveMessage(guild, user);
+    }
+
     // Exp
     public int getUserRank(long userId, net.dv8tion.jda.api.entities.Guild guild, User user) {
         Connection connection = null;

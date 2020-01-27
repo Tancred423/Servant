@@ -60,12 +60,12 @@ public class GuildMemberJoinListener extends ListenerAdapter {
                 var joinNotifierChannel = internalGuild.getJoinNotifierChannel(guild, user);
 
                 if (joinNotifierChannel != null && joinNotifierChannel.canTalk(selfMember)) {
-                    // todo: customizable welcome messages
+                    var description = internalGuild.getJoinMessage(guild, user);
                     joinNotifierChannel.sendMessage(
                             new EmbedBuilder()
                                     .setColor(internalUser.getColor(guild, user))
                                     .setAuthor(String.format(LanguageHandler.get(lang, "join_author"), user.getName(), user.getDiscriminator(), guild.getName()), null, guild.getIconUrl())
-                                    .setDescription(LanguageHandler.get(lang, "join_embeddescription"))
+                                    .setDescription(description == null ? LanguageHandler.get(lang, "join_embeddescription") : description)
                                     .setThumbnail(user.getEffectiveAvatarUrl())
                                     .setFooter(LanguageHandler.get(lang, "join_footer"), Image.getImageUrl("clock", guild, user))
                                     .setTimestamp(OffsetDateTime.now(ZoneOffset.of(internalGuild.getOffset(guild, user))))

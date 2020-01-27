@@ -42,20 +42,29 @@ public class ToggleFile {
     private boolean easteregg;
     private boolean avatar;
     private boolean baguette;
-    private boolean bird;
-    private boolean cat;
     private boolean coinflip;
     private boolean createembed;
-    private boolean dog;
     private boolean editembed;
     private boolean flip;
     private boolean level;
+    private boolean levelupmessage;
     private boolean love;
     private boolean profile;
-    private boolean random;
 
     // Interaction
     private boolean interaction;
+
+    // Random
+    private boolean random;
+    private boolean bird;
+    private boolean cat;
+    private boolean dog;
+    private boolean fox;
+    private boolean koala;
+    private boolean meme;
+    private boolean panda;
+    private boolean pikachu;
+    private boolean redpanda;
 
     // Constructor.
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -122,20 +131,29 @@ public class ToggleFile {
         toggle.setProperty("easteregg", "on");
         toggle.setProperty("avatar", "on");
         toggle.setProperty("baguette", "on");
-        toggle.setProperty("bird", "on");
-        toggle.setProperty("cat", "on");
         toggle.setProperty("coinflip", "on");
         toggle.setProperty("createembed", "on");
-        toggle.setProperty("dog", "on");
         toggle.setProperty("editembed", "on");
         toggle.setProperty("flip", "on");
         toggle.setProperty("level", "off");
+        toggle.setProperty("levelupmessage", "on");
         toggle.setProperty("love", "on");
         toggle.setProperty("profile", "on");
-        toggle.setProperty("random", "on");
 
         // Interaction
         toggle.setProperty("interaction", "on");
+
+        // Random
+        toggle.setProperty("random", "on");
+        toggle.setProperty("bird", "on");
+        toggle.setProperty("cat", "on");
+        toggle.setProperty("dog", "on");
+        toggle.setProperty("fox", "on");
+        toggle.setProperty("koala", "on");
+        toggle.setProperty("meme", "on");
+        toggle.setProperty("panda", "on");
+        toggle.setProperty("pikachu", "on");
+        toggle.setProperty("redpanda", "on");
 
         toggle.store(os,
                 "Project: Servant\n" +
@@ -186,20 +204,29 @@ public class ToggleFile {
         this.easteregg = toggle.getProperty("easteregg").equals("on");
         this.avatar = toggle.getProperty("avatar").equals("on");
         this.baguette = toggle.getProperty("baguette").equals("on");
-        this.bird = toggle.getProperty("bird").equals("on");
-        this.cat = toggle.getProperty("cat").equals("on");
         this.coinflip = toggle.getProperty("coinflip").equals("on");
         this.createembed = toggle.getProperty("createembed").equals("on");
-        this.dog = toggle.getProperty("dog").equals("on");
         this.editembed = toggle.getProperty("editembed").equals("on");
         this.flip = toggle.getProperty("flip").equals("on");
         this.level = toggle.getProperty("level").equals("on");
+        this.levelupmessage = toggle.getProperty("levelupmessage").equals("on");
         this.love = toggle.getProperty("love").equals("on");
         this.profile = toggle.getProperty("profile").equals("on");
-        this.random = toggle.getProperty("random").equals("on");
 
         // Interaction
         this.interaction = toggle.getProperty("interaction").equals("on");
+
+        // Random
+        this.random = toggle.getProperty("random").equals("on");
+        this.bird = toggle.getProperty("bird").equals("on");
+        this.cat = toggle.getProperty("cat").equals("on");
+        this.dog = toggle.getProperty("dog").equals("on");
+        this.fox = toggle.getProperty("fox").equals("on");
+        this.koala = toggle.getProperty("koala").equals("on");
+        this.meme = toggle.getProperty("meme").equals("on");
+        this.panda = toggle.getProperty("panda").equals("on");
+        this.pikachu = toggle.getProperty("pikachu").equals("on");
+        this.redpanda = toggle.getProperty("redpanda").equals("on");
     }
 
     // Getter.
@@ -241,20 +268,29 @@ public class ToggleFile {
             case "easteregg": return easteregg;
             case "avatar": return avatar;
             case "baguette": return baguette;
-            case "bird": return bird;
-            case "cat": return cat;
             case "coinflip": return coinflip;
             case "createembed": return createembed;
-            case "dog": return dog;
             case "editembed": return editembed;
             case "flip": return flip;
             case "level": return level;
+            case "levelupmessage": return levelupmessage;
             case "love": return love;
             case "profile": return profile;
-            case "random": return random;
 
             // Interaction
             case "interaction": return interaction;
+
+            // Random
+            case "random": return random;
+            case "bird": return bird;
+            case "cat": return cat;
+            case "dog": return dog;
+            case "fox": return fox;
+            case "koala": return koala;
+            case "meme": return meme;
+            case "panda": return panda;
+            case "pikachu": return pikachu;
+            case "redpanda": return redpanda;
 
             default: return true;
         }

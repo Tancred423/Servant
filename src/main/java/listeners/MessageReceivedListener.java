@@ -265,31 +265,33 @@ public class MessageReceivedListener extends ListenerAdapter {
                 Level.checkForAchievements(updatedLevel, event);
                 var sb = new StringBuilder();
                 var roles = Level.checkForNewRole(updatedLevel, event, lang);
-                if (!roles.isEmpty()) for (var roleName : roles) sb.append(roleName).append("\n");
-                var selfMember = event.getGuild().getMemberById(event.getJDA().getSelfUser().getIdLong());
 
-                if (selfMember != null && selfMember.hasPermission(Permission.MESSAGE_EMBED_LINKS)) {
-                    var eb = new EmbedBuilder();
-                    eb.setColor(new moderation.user.User(authorId).getColor(guild, user));
-                    eb.setAuthor(LanguageHandler.get(lang, "levelrole_levelup"), null, null);
-                    eb.setThumbnail(user.getEffectiveAvatarUrl());
-                    eb.setDescription(String.format(LanguageHandler.get(lang, "level_up"), user.getAsMention(), updatedLevel));
-                    if (!roles.isEmpty()) eb.addField(roles.size() == 1 ?
-                            LanguageHandler.get(lang, "levelrole_role_singular") :
-                            LanguageHandler.get(lang, "levelrole_role_plural"), sb.toString(), false);
-                    event.getChannel().sendMessage(eb.build()).queue();
-                } else {
-                    var mb = new StringBuilder();
-                    mb.append("**").append(LanguageHandler.get(lang, "levelrole_levelup")).append("**\n");
-                    mb.append(String.format(LanguageHandler.get(lang, "level_up"), user.getAsMention(), updatedLevel)).append("**\n");
-                    if (!roles.isEmpty()) {
-                        mb.append(roles.size() == 1 ?
+                if (Toggle.isEnabled(event, "levelupmessage")) {
+                    if (!roles.isEmpty()) for (var roleName : roles) sb.append(roleName).append("\n");
+                    var selfMember = event.getGuild().getMemberById(event.getJDA().getSelfUser().getIdLong());
+                    if (selfMember != null && selfMember.hasPermission(Permission.MESSAGE_EMBED_LINKS)) {
+                        var eb = new EmbedBuilder();
+                        eb.setColor(new moderation.user.User(authorId).getColor(guild, user));
+                        eb.setAuthor(LanguageHandler.get(lang, "levelrole_levelup"), null, null);
+                        eb.setThumbnail(user.getEffectiveAvatarUrl());
+                        eb.setDescription(String.format(LanguageHandler.get(lang, "level_up"), user.getAsMention(), updatedLevel));
+                        if (!roles.isEmpty()) eb.addField(roles.size() == 1 ?
                                 LanguageHandler.get(lang, "levelrole_role_singular") :
-                                LanguageHandler.get(lang, "levelrole_role_plural")).append("\n");
-                        mb.append(sb.toString()).append("\n");
+                                LanguageHandler.get(lang, "levelrole_role_plural"), sb.toString(), false);
+                        event.getChannel().sendMessage(eb.build()).queue();
+                    } else {
+                        var mb = new StringBuilder();
+                        mb.append("**").append(LanguageHandler.get(lang, "levelrole_levelup")).append("**\n");
+                        mb.append(String.format(LanguageHandler.get(lang, "level_up"), user.getAsMention(), updatedLevel)).append("**\n");
+                        if (!roles.isEmpty()) {
+                            mb.append(roles.size() == 1 ?
+                                    LanguageHandler.get(lang, "levelrole_role_singular") :
+                                    LanguageHandler.get(lang, "levelrole_role_plural")).append("\n");
+                            mb.append(sb.toString()).append("\n");
+                        }
+                        mb.append("_").append(LanguageHandler.get(lang, "level_missingpermission_embed")).append("_");
+                        event.getChannel().sendMessage(mb.toString()).queue();
                     }
-                    mb.append("_").append(LanguageHandler.get(lang, "level_missingpermission_embed")).append("_");
-                    event.getChannel().sendMessage(mb.toString()).queue();
                 }
             }
         }
