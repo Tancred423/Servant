@@ -2,23 +2,17 @@
 package fun;
 
 import files.language.LanguageHandler;
-import moderation.guild.Guild;
 import moderation.guild.GuildHandler;
-import moderation.toggle.Toggle;
-import moderation.user.User;
+import moderation.user.Master;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import owner.blacklist.Blacklist;
-import servant.Servant;
 import utilities.Constants;
 import utilities.MessageHandler;
 import utilities.UsageEmbed;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class LoveCommand extends Command {
@@ -42,85 +36,71 @@ public class LoveCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        CompletableFuture.runAsync(() -> {
-            try {
-                if (!Toggle.isEnabled(event, name)) return;
-                if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
+        var message = event.getMessage();
+        var mentioned = message.getMentionedMembers();
+        var lang = LanguageHandler.getLanguage(event);
+        var p = GuildHandler.getPrefix(event);
 
-                var message = event.getMessage();
-                List<Member> mentioned = message.getMentionedMembers();
-                var lang = LanguageHandler.getLanguage(event);
-                var p = GuildHandler.getPrefix(event);
+        if (mentioned.size() < 1) {
+            var description = LanguageHandler.get(lang, "love_description");
+            var usage = String.format(LanguageHandler.get(lang, "love_usage"), p, name, p, name);
+            var hint = LanguageHandler.get(lang, "love_hint");
+            event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+            return;
+        }
 
-                if (mentioned.size() < 1) {
-                    var description = LanguageHandler.get(lang, "love_description");
-                    var usage = String.format(LanguageHandler.get(lang, "love_usage"), p, name, p, name);
-                    var hint = LanguageHandler.get(lang, "love_hint");
-                    event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
-                    return;
-                }
+        Member first;
+        Member second;
+        var isSelfLove = false;
 
-                Member first;
-                Member second;
-                var isSelfLove = false;
-
-                if (mentioned.size() > 1) {
+        if (mentioned.size() > 1) {
+            first = mentioned.get(0);
+            second = mentioned.get(1);
+        } else {
+            var splitContentRaw = event.getArgs().split(" ");
+            if (splitContentRaw.length > 1) {
+                if (splitContentRaw[0].trim().equals(splitContentRaw[1].trim())) {
                     first = mentioned.get(0);
-                    second = mentioned.get(1);
+                    second = mentioned.get(0);
                 } else {
-                    var splitContentRaw = event.getArgs().split(" ");
-                    if (splitContentRaw.length > 1) {
-                        if (splitContentRaw[0].trim().equals(splitContentRaw[1].trim())) {
-                            first = mentioned.get(0);
-                            second = mentioned.get(0);
-                        } else {
-                            first = event.getGuild().getMemberById(event.getAuthor().getIdLong());
-                            second = mentioned.get(0);
-                        }
-                    } else {
-                        first = event.getGuild().getMemberById(event.getAuthor().getIdLong());
-                        second = mentioned.get(0);
-                    }
+                    first = event.getGuild().getMemberById(event.getAuthor().getIdLong());
+                    second = mentioned.get(0);
                 }
-
-                if (first == second) isSelfLove = true;
-
-                var guild = event.getGuild();
-                var author = event.getAuthor();
-                var internalAuthor = new User(author.getIdLong());
-
-                var love = ThreadLocalRandom.current().nextInt(0, 101);
-                if (first == null) return;
-                var bar = getBar(love);
-                var quote = getQuote(love, isSelfLove, lang);
-                var shippingName = getShippingName(first, second);
-
-                checkLoveAchievements(internalAuthor, message, love);
-
-                new MessageHandler().sendEmbed(event.getChannel(),
-                        internalAuthor.getColor(guild, author),
-                        quote,
-                        null,
-                        event.getJDA().getSelfUser().getAvatarUrl(),
-                        null,
-                        "https://i.imgur.com/BaeIVWa.png", // :tancLove:
-                        first.getAsMention() + "♥" + second.getAsMention() + "\n" +
-                                "\n" +
-                                bar,
-                        null,
-                        null,
-                        shippingName,
-                        "https://i.imgur.com/JAKcV8F.png"
-                );
-
-                // Statistics.
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-                if (event.getGuild() != null)
-                    new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-            } catch (Exception e) {
-                e.printStackTrace();
+            } else {
+                first = event.getGuild().getMemberById(event.getAuthor().getIdLong());
+                second = mentioned.get(0);
             }
-        }, Servant.threadPool);
+        }
+
+        if (first == second) isSelfLove = true;
+
+        var guild = event.getGuild();
+        var author = event.getAuthor();
+        var master = new Master(author);
+
+        var love = ThreadLocalRandom.current().nextInt(0, 101);
+        if (first == null) return;
+        var bar = getBar(love);
+        var quote = getQuote(love, isSelfLove, lang);
+        var shippingName = getShippingName(first, second);
+
+        checkLoveAchievements(master, message, love);
+
+        new MessageHandler().sendEmbed(event.getChannel(),
+                master.getColor(),
+                quote,
+                null,
+                event.getJDA().getSelfUser().getAvatarUrl(),
+                null,
+                "https://i.imgur.com/BaeIVWa.png", // :tancLove:
+                first.getAsMention() + "♥" + second.getAsMention() + "\n" +
+                        "\n" +
+                        bar,
+                null,
+                null,
+                shippingName,
+                "https://i.imgur.com/JAKcV8F.png"
+        );
     }
 
     private String getBar(int love) {
@@ -190,18 +170,15 @@ public class LoveCommand extends Command {
                 + secondName.substring(secondName.length() / 2).toLowerCase();
     }
 
-    private void checkLoveAchievements(User internalAuthor, Message message, int love) {
-        var guild = message.getGuild();
-        var author = message.getAuthor();
-
+    private void checkLoveAchievements(Master master, Message message, int love) {
         if (love == 69) {
-            if (!internalAuthor.hasAchievement("love69", guild, author)) {
-                internalAuthor.setAchievement("love69", 69, guild, author);
+            if (!master.hasAchievement("love69")) {
+                master.setAchievement("love69", 69);
                 new MessageHandler().reactAchievement(message);
             }
         } else if (love == 42) {
-            if (!internalAuthor.hasAchievement("love42", guild, author)) {
-                internalAuthor.setAchievement("love42", 42, guild, author);
+            if (!master.hasAchievement("love42")) {
+                master.setAchievement("love42", 42);
                 new MessageHandler().reactAchievement(message);
             }
         }

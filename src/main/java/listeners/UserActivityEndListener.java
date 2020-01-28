@@ -1,7 +1,8 @@
 package listeners;
 
-import moderation.guild.Guild;
+import moderation.guild.Server;
 import moderation.livestream.Livestream;
+import moderation.user.Master;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.user.UserActivityEndEvent;
@@ -30,7 +31,6 @@ public class UserActivityEndListener extends ListenerAdapter {
 
         CompletableFuture.runAsync(() -> {
             var oldActivity = event.getOldActivity();
-            var lang = new Guild(guild.getIdLong()).getLanguage(guild, user);
 
             // Livestream
             processLivestream(event, guild, user, oldActivity);
@@ -39,15 +39,15 @@ public class UserActivityEndListener extends ListenerAdapter {
 
     private static void processLivestream(UserActivityEndEvent event, net.dv8tion.jda.api.entities.Guild guild, User user, Activity oldActivity) {
         // Users can hide themselves from this feature.
-        if (new moderation.user.User(user.getIdLong()).isStreamHidden(guild.getIdLong(), guild, user)) return;
+        if (new Master(user).isStreamHidden(guild.getIdLong())) return;
 
         // Check if user is streamer if guild is in streamer mode.
-        var isStreamerMode = new Guild(guild.getIdLong()).isStreamerMode(guild, user);
+        var isStreamerMode = new Server(guild).isStreamerMode();
         if (isStreamerMode)
-            if (!new Guild(guild.getIdLong()).getStreamers(guild, user).contains(user.getIdLong())) return;
+            if (!new Server(guild).getStreamers().contains(user.getIdLong())) return;
 
         if (oldActivity.getType().name().equalsIgnoreCase("streaming")) {
-            Livestream.removeRole(guild, event.getMember(), guild.getRoleById(new Guild(guild.getIdLong()).getStreamingRoleId(guild, user)));
+            Livestream.removeRole(guild, event.getMember(), guild.getRoleById(new Server(guild).getStreamingRoleId()));
         }
     }
 }

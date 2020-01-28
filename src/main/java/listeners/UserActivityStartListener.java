@@ -1,7 +1,8 @@
 package listeners;
 
-import moderation.guild.Guild;
+import moderation.guild.Server;
 import moderation.livestream.Livestream;
+import moderation.user.Master;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.user.UserActivityStartEvent;
@@ -30,7 +31,7 @@ public class UserActivityStartListener extends ListenerAdapter {
 
         CompletableFuture.runAsync(() -> {
             var newActivity = event.getNewActivity();
-            var lang = new Guild(guild.getIdLong()).getLanguage(guild, user);
+            var lang = new Server(guild).getLanguage();
 
             // Livestream
             processLivestream(event, guild, user, newActivity, lang);
@@ -39,18 +40,18 @@ public class UserActivityStartListener extends ListenerAdapter {
 
     private static void processLivestream(UserActivityStartEvent event, net.dv8tion.jda.api.entities.Guild guild, User user, Activity newActivity, String lang) {
         // User can hide themselves
-        if (new moderation.user.User(user.getIdLong()).isStreamHidden(event.getGuild().getIdLong(), guild, user)) return;
+        if (new Master(user).isStreamHidden(event.getGuild().getIdLong())) return;
 
         // Check if user is streamer if guild is in streamer mode.
-        var isStreamerMode = new Guild(guild.getIdLong()).isStreamerMode(guild, user);
+        var isStreamerMode = new Server(guild).isStreamerMode();
         if (isStreamerMode)
-            if (!new Guild(guild.getIdLong()).getStreamers(guild, user).contains(user.getIdLong())) return;
+            if (!new Server(guild).getStreamers().contains(user.getIdLong())) return;
 
         if (newActivity.getType().name().equalsIgnoreCase("streaming")) {
-            Livestream.sendNotification(user, newActivity, guild, new Guild(guild.getIdLong()), isStreamerMode, lang);
-            Livestream.addRole(guild, event.getMember(), guild.getRoleById(new Guild(guild.getIdLong()).getStreamingRoleId(guild, user)));
+            Livestream.sendNotification(user, newActivity, guild, new Server(guild), isStreamerMode, lang);
+            Livestream.addRole(guild, event.getMember(), guild.getRoleById(new Server(guild).getStreamingRoleId()));
         } else {
-            Livestream.removeRole(guild, event.getMember(), guild.getRoleById(new Guild(guild.getIdLong()).getStreamingRoleId(guild, user)));
+            Livestream.removeRole(guild, event.getMember(), guild.getRoleById(new Server(guild).getStreamingRoleId()));
         }
     }
 }

@@ -2,19 +2,14 @@
 package information;
 
 import files.language.LanguageHandler;
-import moderation.guild.Guild;
-import moderation.user.User;
+import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import owner.blacklist.Blacklist;
-import servant.Servant;
 import utilities.Constants;
 import utilities.Image;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 import zJdaUtilsLib.com.jagrosh.jdautilities.examples.doc.Author;
-
-import java.util.concurrent.CompletableFuture;
 
 @Author("John Grosh (jagrosh)")
 public class PatreonCommand extends Command {
@@ -38,38 +33,25 @@ public class PatreonCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        CompletableFuture.runAsync(() -> {
-            try {
-                if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
+        var lang = LanguageHandler.getLanguage(event);
+        var guild = event.getGuild();
+        var user = event.getAuthor();
+        var master = new Master(user);
 
-                var lang = LanguageHandler.getLanguage(event);
-                var guild = event.getGuild();
-                var author = event.getAuthor();
-                var eb = new EmbedBuilder();
-
-                eb.setColor(new User(event.getAuthor().getIdLong()).getColor(guild, author));
-                eb.setAuthor(LanguageHandler.get(lang, "patreon_supportserver"), null, "https://i.imgur.com/rCnhGKA.jpg"); // Patreon Icon
-                eb.setDescription(LanguageHandler.get(lang, "patreon_description"));
-                eb.setThumbnail(Image.getImageUrl("love", guild, author));
-                eb.addField("1. " + LanguageHandler.get(lang, "patreon_patreontitle"), LanguageHandler.get(lang, "patreon_subscription"), false);
-                eb.addField("$1+/month", LanguageHandler.get(lang, "patreon_$1"), true);
-                eb.addField("$3+/month", LanguageHandler.get(lang, "patreon_$3"), true);
-                eb.addField("$5+/month", LanguageHandler.get(lang, "patreon_$5"), true);
-                eb.addField("$10+/month", LanguageHandler.get(lang, "patreon_$10"), true);
-                eb.addField("2. " + LanguageHandler.get(lang, "patreon_donationtitle"), LanguageHandler.get(lang, "patreon_donation"), false);
-                eb.addField("$5+ Donated In Lifetime", LanguageHandler.get(lang, "patreon_donation_$5"), true);
-                eb.addField("3. " + LanguageHandler.get(lang, "patreon_serverboosttitle"), LanguageHandler.get(lang, "patreon_serverboost"), false);
-
-                eb.setFooter(LanguageHandler.get(lang, "patreon_thanks"), event.getSelfUser().getAvatarUrl());
-                event.reply(eb.build());
-
-                // Statistics.
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-                if (event.getGuild() != null)
-                    new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }, Servant.threadPool);
+        event.reply(new EmbedBuilder()
+                .setColor(master.getColor())
+                .setAuthor(LanguageHandler.get(lang, "patreon_supportserver"), null, "https://i.imgur.com/rCnhGKA.jpg") // Patreon Icon
+                .setDescription(LanguageHandler.get(lang, "patreon_description"))
+                .setThumbnail(Image.getImageUrl("love", guild, user))
+                .addField("1. " + LanguageHandler.get(lang, "patreon_patreontitle"), LanguageHandler.get(lang, "patreon_subscription"), false)
+                .addField("$1+/month", LanguageHandler.get(lang, "patreon_$1"), true)
+                .addField("$3+/month", LanguageHandler.get(lang, "patreon_$3"), true)
+                .addField("$5+/month", LanguageHandler.get(lang, "patreon_$5"), true)
+                .addField("$10+/month", LanguageHandler.get(lang, "patreon_$10"), true)
+                .addField("2. " + LanguageHandler.get(lang, "patreon_donationtitle"), LanguageHandler.get(lang, "patreon_donation"), false)
+                .addField("$5+ Donated In Lifetime", LanguageHandler.get(lang, "patreon_donation_$5"), true)
+                .addField("3. " + LanguageHandler.get(lang, "patreon_serverboosttitle"), LanguageHandler.get(lang, "patreon_serverboost"), false)
+                .setFooter(LanguageHandler.get(lang, "patreon_thanks"), event.getSelfUser().getAvatarUrl()).build()
+        );
     }
 }

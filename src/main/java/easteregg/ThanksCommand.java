@@ -1,19 +1,14 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package easteregg;
 
-import files.language.LanguageHandler;
-import moderation.guild.Guild;
-import moderation.user.User;
+import moderation.user.Master;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
-import owner.blacklist.Blacklist;
-import servant.Servant;
+import net.dv8tion.jda.api.entities.User;
 import utilities.Emote;
 import utilities.MessageHandler;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
-
-import java.util.concurrent.CompletableFuture;
 
 public class ThanksCommand extends Command {
     public ThanksCommand() {
@@ -33,31 +28,18 @@ public class ThanksCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        CompletableFuture.runAsync(() -> {
-            try {
-                if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
+        var guild = event.getGuild();
+        var user = event.getAuthor();
 
-                var guild = event.getGuild();
-                var user = event.getAuthor();
-                var lang = LanguageHandler.getLanguage(event);
-
-                event.reply("You're welcome " + Emote.getEmoteMention(event.getJDA(), "love", guild, user));
-                checkAchievement(new User(event.getAuthor().getIdLong()), event.getMessage(), guild, user, lang);
-
-                // Statistics.
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, user);
-                if (event.getGuild() != null)
-                    new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, user);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }, Servant.threadPool);
+        event.reply("You're welcome " + Emote.getEmoteMention(event.getJDA(), "love", guild, user));
+        checkAchievement(user, event.getMessage());
     }
 
-    private void checkAchievement(User internalUser, Message message, net.dv8tion.jda.api.entities.Guild guild, net.dv8tion.jda.api.entities.User user, String lang) {
-        var achievements = internalUser.getAchievements(guild, user);
+    private void checkAchievement(User user, Message message) {
+        var master = new Master(user);
+        var achievements = master.getAchievements();
         if (!achievements.containsKey("kind")) {
-            internalUser.setAchievement("kind", 10, guild, user);
+            master.setAchievement("kind", 10);
             new MessageHandler().reactAchievement(message);
         }
     }

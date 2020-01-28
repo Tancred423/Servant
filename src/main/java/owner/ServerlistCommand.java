@@ -2,7 +2,7 @@
 package owner;
 
 import files.language.LanguageHandler;
-import moderation.user.User;
+import moderation.user.Master;
 import net.dv8tion.jda.api.Permission;
 import servant.Servant;
 import utilities.Constants;
@@ -78,7 +78,7 @@ public class ServerlistCommand extends Command {
 
                 Paginator p;
                 event.getJDA().getShardInfo();
-                p = pbuilder.setColor(new User(event.getAuthor().getIdLong()).getColor(guild, author))
+                p = pbuilder.setColor(new Master(event.getAuthor()).getColor())
                         .setText(String.format(LanguageHandler.get(lang, "guildlist_connected"), event.getSelfUser().getName()) + ("(Shard ID " + event.getJDA().getShardInfo().getShardId() + "):"))
                         .setUsers(event.getAuthor())
                         .build();

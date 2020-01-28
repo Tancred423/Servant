@@ -592,7 +592,7 @@ public class LanguageFile {
         en_gb.setProperty("voicelobby_footer", "Type `%slobby` to get help.");
         en_gb.setProperty("voicelobby_firstarg", "Invalid argument. Either `set`, `unset`, `show` or `toggletext`.");
         en_gb.setProperty("voicelobby_apostrophe", "'");
-        en_gb.setProperty("voicelobby_apostropge_s", "'s");
+        en_gb.setProperty("voicelobby_apostrophe_s", "'s");
         en_gb.setProperty("voicelobby_already_set", "This channel was already set as an voice lobby.");
 
         // Information
@@ -738,7 +738,7 @@ public class LanguageFile {
         en_gb.setProperty("giveaway_endedat", "Ended at");
         en_gb.setProperty("giveaway_messageid", "**Message ID:**");
         en_gb.setProperty("giveaway_prize", "**Prize:**");
-        en_gb.setProperty("giveaway_noreactions", "Sorry, I can't find any reactions!");
+        en_gb.setProperty("giveaway_noreactions", "Sorry, I can't find any reactions for this giveaway (Message ID: %s)!");
         en_gb.setProperty("giveaway_invalidtime", "Invalid Time.");
         en_gb.setProperty("giveaway_wrongargument", "Wrong argument");
         en_gb.setProperty("giveaway_nocurrent", "There are no giveaways running!");
@@ -1640,8 +1640,8 @@ public class LanguageFile {
         de_de.setProperty("voicelobby_current", "Current Lobbies");
         de_de.setProperty("voicelobby_footer", "Type `%slobby` to get help.");
         de_de.setProperty("voicelobby_firstarg", "Invalid argument. Either `set`, `unset`, `show` or `toggletext`.");
-        de_de.setProperty("voicelobby_apostrophe", "\'");
-        de_de.setProperty("voicelobby_apostropge_s", "\'s");
+        de_de.setProperty("voicelobby_apostrophe", "'");
+        de_de.setProperty("voicelobby_apostrophe_s", "s");
         de_de.setProperty("voicelobby_already_set", "This channel was already set as an voice lobby.");
 
         // Information
@@ -1787,7 +1787,7 @@ public class LanguageFile {
         de_de.setProperty("giveaway_endedat", "Ended at");
         de_de.setProperty("giveaway_messageid", "**Message ID:**");
         de_de.setProperty("giveaway_prize", "**Prize:**");
-        de_de.setProperty("giveaway_noreactions", "Sorry, I can't find any reactions!");
+        de_de.setProperty("giveaway_noreactions", "Sorry, I can't find any reactions for this giveaway (Message ID: %s)!");
         de_de.setProperty("giveaway_invalidtime", "Invalid Time.");
         de_de.setProperty("giveaway_wrongargument", "Wrong argument");
         de_de.setProperty("giveaway_nocurrent", "There are no giveaways running!");

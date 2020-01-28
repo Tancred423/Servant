@@ -11,7 +11,7 @@ import java.sql.Timestamp;
 import static utilities.DatabaseConn.closeQuietly;
 
 public class Giveaway {
-    private long guildId; // key
+    private long guildId;   // key
     private long channelId; // key
     private long messageId; // key
     private long hostId;

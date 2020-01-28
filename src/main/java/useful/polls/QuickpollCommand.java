@@ -2,13 +2,9 @@
 package useful.polls;
 
 import files.language.LanguageHandler;
-import moderation.guild.Guild;
-import moderation.toggle.Toggle;
-import moderation.user.User;
+import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import owner.blacklist.Blacklist;
-import servant.Servant;
 import utilities.Constants;
 import utilities.Emote;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
@@ -17,7 +13,6 @@ import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 import java.sql.Timestamp;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.concurrent.CompletableFuture;
 
 public class QuickpollCommand extends Command {
     public QuickpollCommand() {
@@ -40,49 +35,35 @@ public class QuickpollCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        CompletableFuture.runAsync(() -> {
-            try {
-                if (!Toggle.isEnabled(event, name)) return;
-                if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
+        var lang = LanguageHandler.getLanguage(event);
+        var message = event.getMessage();
+        var guild = event.getGuild();
+        var author = message.getAuthor();
+        var internalAuthor = new Master(author);
+        var eb = new EmbedBuilder();
 
-                var lang = LanguageHandler.getLanguage(event);
-                var message = event.getMessage();
-                var guild = event.getGuild();
-                var author = message.getAuthor();
-                var internalAuthor = new User(author.getIdLong());
-                var eb = new EmbedBuilder();
+        eb.setColor(internalAuthor.getColor());
+        eb.setAuthor(String.format(LanguageHandler.get(lang, "quickvote_started"), author.getName()), null, author.getEffectiveAvatarUrl());
+        eb.setDescription("**" + event.getArgs() + "**");
+        eb.appendDescription("\n\n" + String.format(LanguageHandler.get(lang, "votes_end_manually"), author.getAsMention()));
+        eb.setFooter(LanguageHandler.get(lang, "votes_active"), event.getJDA().getSelfUser().getAvatarUrl());
+        var dateIn7DaysOtd = OffsetDateTime.now(ZoneOffset.UTC).plusDays(7).toLocalDateTime();
+        var dateIn7Days = Timestamp.valueOf(dateIn7DaysOtd);
+        eb.setTimestamp(dateIn7DaysOtd);
 
-                eb.setColor(internalAuthor.getColor(guild, author));
-                eb.setAuthor(String.format(LanguageHandler.get(lang, "quickvote_started"), author.getName()), null, author.getEffectiveAvatarUrl());
-                eb.setDescription("**" + event.getArgs() + "**");
-                eb.appendDescription("\n\n" + String.format(LanguageHandler.get(lang, "votes_end_manually"), author.getAsMention()));
-                eb.setFooter(LanguageHandler.get(lang, "votes_active"), event.getJDA().getSelfUser().getAvatarUrl());
-                var dateIn7DaysOtd = OffsetDateTime.now(ZoneOffset.UTC).plusDays(7).toLocalDateTime();
-                var dateIn7Days = Timestamp.valueOf(dateIn7DaysOtd);
-                eb.setTimestamp(dateIn7DaysOtd);
+        var upvote = Emote.getEmoji("upvote");
+        var downvote = Emote.getEmoji("downvote");
+        var end = Emote.getEmoji("end");
 
-                var upvote = Emote.getEmoji("upvote");
-                var downvote = Emote.getEmoji("downvote");
-                var end = Emote.getEmoji("end");
+        if (upvote == null || downvote == null || end == null) return;
 
-                if (upvote == null || downvote == null || end == null) return;
+        message.getChannel().sendMessage(eb.build()).queue(sentMessage -> {
+            sentMessage.addReaction(upvote).queue();
+            sentMessage.addReaction(downvote).queue();
+            sentMessage.addReaction(end).queue();
+            PollsDatabase.setVote(guild.getIdLong(), sentMessage.getChannel().getIdLong(), sentMessage.getIdLong(), author.getIdLong(), "quick", dateIn7Days, guild, author);
+        });
 
-                message.getChannel().sendMessage(eb.build()).queue(sentMessage -> {
-                    sentMessage.addReaction(upvote).queue();
-                    sentMessage.addReaction(downvote).queue();
-                    sentMessage.addReaction(end).queue();
-                    PollsDatabase.setVote(guild.getIdLong(), sentMessage.getChannel().getIdLong(), sentMessage.getIdLong(), author.getIdLong(), "quick", dateIn7Days, guild, author);
-                });
-
-                message.delete().queue();
-
-                // Statistics.
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-                if (event.getGuild() != null)
-                    new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }, Servant.threadPool);
+        message.delete().queue();
     }
 }

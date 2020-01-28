@@ -2,7 +2,7 @@
 package useful.alarm;
 
 import files.language.LanguageHandler;
-import moderation.user.User;
+import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 
@@ -13,19 +13,18 @@ public class Alarm {
     public static void check(JDA jda) {
         var users = jda.getUsers();
         for (var user : users) {
-            var internalUser = new User(user.getIdLong());
-            var alarms = internalUser.getAlarms(user);
-            for (var alarm : alarms) {
+            var master = new Master(user);
+            var alarms = master.getAlarms();
+            for (var alarm : alarms.entrySet()) {
                 var now = Timestamp.from(new Date().toInstant());
-                if (now.after(alarm)) {
+                if (now.after(alarm.getKey())) {
                     user.openPrivateChannel().queue(privateChannel -> {
-                        var title = internalUser.getAlarmTitle(user);
-                        var eb = new EmbedBuilder();
-                        eb.setColor(internalUser.getColor(null, user));
-                        var lang = internalUser.getLanguage(null, user);
-                        eb.setAuthor("Alarm", null, user.getEffectiveAvatarUrl());
-                        eb.setDescription(title.isEmpty() ? LanguageHandler.get(lang, "alarm_remind") : title);
-                        privateChannel.sendMessage(eb.build()).queue(success -> internalUser.unsetAlarm(alarm, user));
+                        var lang = master.getLanguage();
+                        privateChannel.sendMessage(new EmbedBuilder()
+                                .setColor(master.getColor())
+                                .setAuthor("Alarm", null, user.getEffectiveAvatarUrl())
+                                .setDescription(alarm.getValue().isEmpty() ? LanguageHandler.get(lang, "alarm_remind") : alarm.getValue()).build()
+                        ).queue(success -> master.unsetAlarm(alarm.getKey()));
                     });
                 }
             }

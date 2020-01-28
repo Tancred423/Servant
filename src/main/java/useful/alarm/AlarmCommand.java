@@ -2,13 +2,9 @@
 package useful.alarm;
 
 import files.language.LanguageHandler;
-import moderation.guild.Guild;
 import moderation.guild.GuildHandler;
-import moderation.toggle.Toggle;
-import moderation.user.User;
+import moderation.user.Master;
 import net.dv8tion.jda.api.Permission;
-import owner.blacklist.Blacklist;
-import servant.Servant;
 import useful.InvalidTitleException;
 import utilities.Constants;
 import utilities.UsageEmbed;
@@ -18,7 +14,6 @@ import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 import java.sql.Timestamp;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.concurrent.CompletableFuture;
 
 public class AlarmCommand extends Command {
     public AlarmCommand() {
@@ -41,59 +36,44 @@ public class AlarmCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        CompletableFuture.runAsync(() -> {
-            try {
-                if (!Toggle.isEnabled(event, name)) return;
-                if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
+        var lang = LanguageHandler.getLanguage(event);
+        var p = GuildHandler.getPrefix(event);
 
-                var lang = LanguageHandler.getLanguage(event);
-                var p = GuildHandler.getPrefix(event);
+        if (event.getArgs().isEmpty()) {
+            var description = String.format(LanguageHandler.get(lang, "alarm_description"), p);
+            var usage = String.format(LanguageHandler.get(lang, "alarm_usage"), p, name, p, name, p, name);
+            var hint = String.format(LanguageHandler.get(lang, "alarm_hint"), p, name);
+            event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+            return;
+        }
 
-                if (event.getArgs().isEmpty()) {
-                    var description = String.format(LanguageHandler.get(lang, "alarm_description"), p);
-                    var usage = String.format(LanguageHandler.get(lang, "alarm_usage"), p, name, p, name, p, name);
-                    var hint = String.format(LanguageHandler.get(lang, "alarm_hint"), p, name);
-                    event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
-                    return;
-                }
+        var contentSplit = event.getArgs().trim().replaceAll(" +", " ").replace("\\", "").split(" ");
 
-                var contentSplit = event.getArgs().trim().replaceAll(" +", " ").replace("\\", "").split(" ");
+        String title;
+        try {
+            title = parseTitle(event, contentSplit);
+        } catch (InvalidTitleException e) {
+            event.replyError(e.getMessage());
+            return;
+        }
 
-                String title;
-                try {
-                    title = parseTitle(event, contentSplit);
-                } catch (InvalidTitleException e) {
-                    event.replyError(e.getMessage());
-                    return;
-                }
+        ZonedDateTime alarmDate;
+        try {
+            alarmDate = parseTime(event, contentSplit, title);
+        } catch (InvalidTimeException e) {
+            event.replyError(e.getMessage());
+            return;
+        }
 
-                ZonedDateTime alarmDate;
-                try {
-                    alarmDate = parseTime(event, contentSplit, title);
-                } catch (InvalidTimeException e) {
-                    event.replyError(e.getMessage());
-                    return;
-                }
+        var user = event.getAuthor();
+        var master = new Master(user);
 
-                var guild = event.getGuild();
-                var author = event.getAuthor();
-                var internalAuthor = new User(author.getIdLong());
-
-                var timestamp = Timestamp.valueOf(alarmDate.toLocalDateTime());
-                if (internalAuthor.setAlarm(timestamp, title == null ? "" : title, guild, author)) event.reactSuccess();
-                else {
-                    event.replyError(LanguageHandler.get(lang, "alarm_alreadyset"));
-                    event.reactError();
-                }
-
-                // Statistics.
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-                if (event.getGuild() != null)
-                    new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }, Servant.threadPool);
+        var timestamp = Timestamp.valueOf(alarmDate.toLocalDateTime());
+        if (master.setAlarm(timestamp, title == null ? "" : title)) event.reactSuccess();
+        else {
+            event.replyError(LanguageHandler.get(lang, "alarm_alreadyset"));
+            event.reactError();
+        }
     }
 
     private String parseTitle(CommandEvent event, String[] contentSplit) throws InvalidTitleException {
@@ -125,7 +105,7 @@ public class AlarmCommand extends Command {
         String hours;
         String minutes;
 
-        var alarm = ZonedDateTime.now(ZoneOffset.of(new User(event.getAuthor().getIdLong()).getOffset(event.getGuild(), event.getAuthor())));
+        var alarm = ZonedDateTime.now(ZoneOffset.of(new Master(event.getAuthor()).getOffset()));
         if (title == null) {
             // No title
             for (String arg : contentSplit) {

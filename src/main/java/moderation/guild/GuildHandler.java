@@ -6,7 +6,7 @@ import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 public class GuildHandler {
     public static String getPrefix(CommandEvent event) {
-        if (event.getGuild() != null) return new Guild(event.getGuild().getIdLong()).getPrefix(event.getGuild(), event.getAuthor());
+        if (event.getGuild() != null) return new Server(event.getGuild()).getPrefix();
         else return Servant.config.getDefaultPrefix();
     }
 }

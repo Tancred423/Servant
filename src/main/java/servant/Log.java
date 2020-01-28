@@ -25,16 +25,20 @@ public class Log {
         if (commandEvent != null) commandEvent.reactWarning();
         if (notifyUser && commandEvent != null) commandEvent.reply("Something went wrong, master!\n" + "A report was sent to the bot owner.");
         if (e != null) e.printStackTrace();
-        var botOwner = user.getJDA().getUserById(Servant.config.getBotOwnerId());
-        if (botOwner == null) return;
-        botOwner.openPrivateChannel().queue(privateChannel ->
-                privateChannel.sendMessage("```c\n" +
-                        "Error\n" +
-                        "-----\n" +
-                        (guild == null ? "" : "Guild: " + guild.getName() + " (" + guild.getIdLong() + ")\n") +
-                        (user == null ? "" : "User: " + user.getName() + " (" + user.getIdLong() + ")\n") +
-                        (name == null ? "" : "Command: " + name + "\n") +
-                        (e == null ? "" : "Error: " + e.getMessage() + "\n") +
-                        "```").queue());
+        var jda = user == null ? (guild == null ? (commandEvent == null ? null : commandEvent.getJDA()) : guild.getJDA()) : user.getJDA();
+        if (jda != null) {
+            var botOwner = guild.getJDA().getUserById(Servant.config.getBotOwnerId());
+            if (botOwner != null) {
+                botOwner.openPrivateChannel().queue(privateChannel ->
+                        privateChannel.sendMessage("```c\n" +
+                                "Error\n" +
+                                "-----\n" +
+                                (guild == null ? "" : "Guild: " + guild.getName() + " (" + guild.getIdLong() + ")\n") +
+                                (user == null ? "" : "User: " + user.getName() + " (" + user.getIdLong() + ")\n") +
+                                (name == null ? "" : "Command: " + name + "\n") +
+                                (e == null ? "" : "Error: " + e.getMessage() + "\n") +
+                                "```").queue());
+            }
+        }
     }
 }

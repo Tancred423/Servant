@@ -1,6 +1,8 @@
 package fun.level;
 
 import files.language.LanguageHandler;
+import moderation.guild.Server;
+import moderation.user.Master;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import patreon.PatreonHandler;
@@ -42,8 +44,8 @@ public class ProfileImage {
         }
 
         // Internal User & Guild
-        var internalUser = new moderation.user.User(user.getIdLong());
-        var internalGuild = new moderation.guild.Guild(guild.getIdLong());
+        var master = new Master(user);
+        var server = new Server(guild);
 
         // Fonts
         var myriadPlain100pt = new Font("Myriad Pro", Font.PLAIN, 100); // Name, Bio
@@ -75,7 +77,7 @@ public class ProfileImage {
         }
 
         // EXP
-        var currentExp = internalUser.getExp(guild.getIdLong(), guild, user);
+        var currentExp = master.getExp(guild.getIdLong());
         var currentLevel = Parser.getLevelFromExp(currentExp);
         var neededExp = Parser.getLevelExp(currentLevel);
         var currentExpOnThisLevel = currentExp - Parser.getTotalLevelExp(currentLevel - 1);
@@ -83,7 +85,7 @@ public class ProfileImage {
 
         // EXP Ring
         var expRing = createRingShape(percent); // X and Y is centered
-        g2d.setColor(internalUser.getColor(guild, user));
+        g2d.setColor(master.getColor());
         g2d.fill(expRing);
         g2d.setColor(Color.BLACK);
         g2d.draw(expRing);
@@ -97,11 +99,11 @@ public class ProfileImage {
         // Patreon Title
         var title = getTitle();
         rect = new Rectangle(0, 750, 800, 100);
-        g2d.setColor(internalUser.getColor(guild, user));
+        g2d.setColor(master.getColor());
         drawCenteredString(g2d, title, rect, myriadPlain75pt);
 
         // Bio
-        var bio = internalUser.getBio(guild, user);
+        var bio = master.getBio();
         g2d.setColor(Color.WHITE);
         if (bio.length() > 20) {
             // Three Lines
@@ -136,7 +138,7 @@ public class ProfileImage {
         var commandStats = LanguageHandler.get(lang, "profile_commandstats").toUpperCase();
         var mostUsedCommands = LanguageHandler.get(lang, "profile_mostused").toUpperCase();
         var achievements = LanguageHandler.get(lang, "profile_achievements").toUpperCase();
-        g2d.setColor(internalUser.getColor(guild, user));
+        g2d.setColor(master.getColor());
 
         rect = new Rectangle(0, 0, 1000, 100);
         drawCenteredString(g2d, generalInfo, rect, myriadPlain40pt);
@@ -198,7 +200,7 @@ public class ProfileImage {
         g2d.fill(shape);
         g2d.translate(rankX * -1, rankY * -1); // Reset
 
-        var rankValue = String.valueOf(internalGuild.getUserRank(user.getIdLong(), guild, user));
+        var rankValue = String.valueOf(server.getUserRank(user.getIdLong()));
         var rankActualWidth = g2d.getFontMetrics().stringWidth(rankValue);
         rankX = generalInfoWidth - rankActualWidth;
 
@@ -228,7 +230,7 @@ public class ProfileImage {
         g2d.fill(shape);
         g2d.translate(commandsUsedX * -1, commandsUsedY * -1); // Reset
 
-        var commandsUsedValue = String.valueOf(internalUser.getTotalFeatureCount(guild, user));
+        var commandsUsedValue = String.valueOf(master.getTotalFeatureCount());
         var commandsUsedActualWidth = g2d.getFontMetrics().stringWidth(commandsUsedValue);
         commandsUsedX = generalInfoWidth - commandsUsedActualWidth;
 
@@ -258,7 +260,7 @@ public class ProfileImage {
         g2d.fill(shape);
         g2d.translate(apX * -1, apY * -1); // Reset
 
-        var apValue = String.valueOf(internalUser.getTotalAP(guild, user));
+        var apValue = String.valueOf(master.getTotalAP());
         var apActualWidth = g2d.getFontMetrics().stringWidth(apValue);
         apX = generalInfoWidth - apActualWidth;
 
@@ -288,7 +290,7 @@ public class ProfileImage {
         g2d.fill(shape);
         g2d.translate(baguetteX * -1, baguetteY * -1); // Reset
 
-        var baguette = internalUser.getBaguette(guild, user).entrySet().iterator().hasNext() ? internalUser.getBaguette(guild, user).entrySet().iterator().next() : null;
+        var baguette = master.getBaguette();
         var baguetteValue = baguette == null ? LanguageHandler.get(lang, "profile_nobaguette") :
                 String.format(LanguageHandler.get(lang, "profile_baguette_value"), baguette.getKey(), baguette.getValue());
 
@@ -322,7 +324,7 @@ public class ProfileImage {
         g2d.fill(shape);
         g2d.translate(animalX * -1, animalY * -1); // Reset
 
-        var animalValue = internalUser.getFavouriteAnimal(guild, user, lang);
+        var animalValue = master.getFavouriteAnimal(lang);
         var animalActualWidth = g2d.getFontMetrics().stringWidth(animalValue);
         animalX = commandsStatsWidth - animalActualWidth;
 

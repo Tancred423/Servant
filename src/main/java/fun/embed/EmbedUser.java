@@ -1,7 +1,7 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package fun.embed;
 
-import moderation.guild.Guild;
+import moderation.guild.Server;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
@@ -14,7 +14,7 @@ public class EmbedUser {
     EmbedUser(Message message, MessageEmbed embed) {
         this.message = message;
         this.embed = embed;
-        this.offset = new Guild(message.getGuild().getIdLong()).getOffset(message.getGuild(), message.getAuthor());
+        this.offset = new Server(message.getGuild()).getOffset();
         this.fieldCounter = 0;
     }
 

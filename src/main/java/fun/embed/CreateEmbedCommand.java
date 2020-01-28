@@ -2,8 +2,7 @@
 package fun.embed;
 
 import files.language.LanguageHandler;
-import moderation.guild.Guild;
-import moderation.toggle.Toggle;
+import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
@@ -12,7 +11,6 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
-import servant.Servant;
 import utilities.Constants;
 import utilities.Parser;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
@@ -24,7 +22,6 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 public class CreateEmbedCommand extends Command {
@@ -54,45 +51,30 @@ public class CreateEmbedCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        CompletableFuture.runAsync(() -> {
-            try {
-                if (!Toggle.isEnabled(event, name)) return;
+        var user = event.getAuthor();
+        var master = new Master(user);
 
-                var guild = event.getGuild();
-                var author = event.getAuthor();
-                var internalAuthor = new moderation.user.User(author.getIdLong());
-                var eb = new EmbedBuilder();
+        var lang = LanguageHandler.getLanguage(event);
+        var channel = event.getChannel();
 
-                var lang = LanguageHandler.getLanguage(event);
+        var eb = new EmbedBuilder()
+                .setColor(master.getColor())
+                .setAuthor(LanguageHandler.get(lang, "createembed_author_name"), "https://google.com/", user.getAvatarUrl())
+                .setThumbnail("https://i.imgur.com/wAcLhfY.png")
+                .setTitle(LanguageHandler.get(lang, "createembed_title"), "https://google.com/")
+                .setDescription(LanguageHandler.get(lang, "createembed_description"))
+                .addField(LanguageHandler.get(lang, "createembed_field_name_inline"), LanguageHandler.get(lang, "createembed_field_value1"), true)
+                .addField(LanguageHandler.get(lang, "createembed_field_name_inline"), LanguageHandler.get(lang, "createembed_field_value2"), true)
+                .addField(LanguageHandler.get(lang, "createembed_field_name_inline"), LanguageHandler.get(lang, "createembed_field_value3"), true)
+                .addField(LanguageHandler.get(lang, "createembed_field_name_noninline"), LanguageHandler.get(lang, "createembed_field_value_noninline"), false)
+                .setImage("https://i.imgur.com/9G46UQx.png")
+                .setFooter(LanguageHandler.get(lang, "createembed_footer"), event.getSelfUser().getAvatarUrl())
+                .setTimestamp(OffsetDateTime.now());
 
-                eb.setColor(internalAuthor.getColor(guild, author));
-                eb.setAuthor(LanguageHandler.get(lang, "createembed_author_name"), "https://google.com/", author.getAvatarUrl());
-                eb.setThumbnail("https://i.imgur.com/wAcLhfY.png");
-                eb.setTitle(LanguageHandler.get(lang, "createembed_title"), "https://google.com/");
-                eb.setDescription(LanguageHandler.get(lang, "createembed_description"));
-                eb.addField(LanguageHandler.get(lang, "createembed_field_name_inline"), LanguageHandler.get(lang, "createembed_field_value1"), true);
-                eb.addField(LanguageHandler.get(lang, "createembed_field_name_inline"), LanguageHandler.get(lang, "createembed_field_value2"), true);
-                eb.addField(LanguageHandler.get(lang, "createembed_field_name_inline"), LanguageHandler.get(lang, "createembed_field_value3"), true);
-                eb.addField(LanguageHandler.get(lang, "createembed_field_name_noninline"), LanguageHandler.get(lang, "createembed_field_value_noninline"), false);
-                eb.setImage("https://i.imgur.com/9G46UQx.png");
-                eb.setFooter(LanguageHandler.get(lang, "createembed_footer"), event.getSelfUser().getAvatarUrl());
-                eb.setTimestamp(OffsetDateTime.now());
-
-
-                var channel = event.getChannel();
-                channel.sendMessage(eb.build()).queue(message -> {
-                    EmbedUser embedUser;
-                    embedUser = new EmbedUser(message, message.getEmbeds().get(0));
-                    processIntroduction(channel, author, embedUser, event, lang);
-                });
-
-                // Statistics.
-                new moderation.user.User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-                new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }, Servant.threadPool);
+        channel.sendMessage(eb.build()).queue(message -> {
+            var embedUser = new EmbedUser(message, message.getEmbeds().get(0));
+            processIntroduction(channel, user, embedUser, event, lang);
+        });
     }
 
     // Timeout

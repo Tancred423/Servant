@@ -2,17 +2,12 @@
 package fun.level;
 
 import files.language.LanguageHandler;
-import moderation.guild.Guild;
-import moderation.toggle.Toggle;
-import moderation.user.User;
+import moderation.user.Master;
 import net.dv8tion.jda.api.Permission;
-import servant.Servant;
 import utilities.Constants;
 import utilities.Parser;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
-
-import java.util.concurrent.CompletableFuture;
 
 public class BioCommand extends Command {
     public BioCommand() {
@@ -34,35 +29,23 @@ public class BioCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        CompletableFuture.runAsync(() -> {
-            try {
-                if (!Toggle.isEnabled(event, "profile")) return;
-                var args = event.getArgs();
+        var args = event.getArgs();
 
-                var guild = event.getGuild();
-                var author = event.getAuthor();
-                var lang = LanguageHandler.getLanguage(event);
+        var user = event.getAuthor();
+        var master = new Master(user);
+        var lang = LanguageHandler.getLanguage(event);
 
-                if (Parser.isSqlInjection(args)) {
-                    event.reactError();
-                    return;
-                }
+        if (Parser.isSqlInjection(args)) {
+            event.reactError();
+            return;
+        }
 
-                if (args.length() > 30) {
-                    event.replyError(LanguageHandler.get(lang, "bio_maxlength"));
-                    return;
-                }
+        if (args.length() > 30) {
+            event.replyError(LanguageHandler.get(lang, "bio_maxlength"));
+            return;
+        }
 
-                new User(event.getAuthor().getIdLong()).setBio(args, guild, author);
-                event.reactSuccess();
-
-                // Statistics.
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-                if (event.getGuild() != null)
-                    new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }, Servant.threadPool);
+        master.setBio(args);
+        event.reactSuccess();
     }
 }

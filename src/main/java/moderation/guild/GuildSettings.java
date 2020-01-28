@@ -12,7 +12,7 @@ public class GuildSettings implements GuildSettingsProvider {
     private Collection<String> prefixes = new ArrayList<>();
 
     GuildSettings(Guild guild) {
-        var prefix = new moderation.guild.Guild(guild.getIdLong()).getPrefix(guild, guild.getOwner() == null ? null : guild.getOwner().getUser());
+        var prefix = new Server(guild).getPrefix();
         if (prefix != null) addPrefixes(prefix);
     }
 

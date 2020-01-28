@@ -1,6 +1,6 @@
 package listeners;
 
-import moderation.guild.Guild;
+import moderation.guild.Server;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import owner.blacklist.Blacklist;
@@ -28,25 +28,25 @@ public class TextChannelDeleteListener extends ListenerAdapter {
         if (Blacklist.isBlacklisted(user, guild)) return;
 
         CompletableFuture.runAsync(() -> {
-            var internalGuild = new Guild(guild.getIdLong());
+            var server = new Server(guild);
             var channel = event.getChannel();
 
             // Birthday (Auto Updating Lists)
-            if (internalGuild.getBirthdayMessageChannelId(guild, user) == channel.getIdLong())
-                internalGuild.unsetBirthdayMessage(guild, user);
+            if (server.getBirthdayMessageChannelId() == channel.getIdLong())
+                server.unsetBirthdayMessage();
 
             // Giveaway
             GiveawayHandler.purgeGiveawaysFromChannel(guild.getIdLong(),channel.getIdLong(), guild, user);
 
             // MediaOnlyChannel
-            if (internalGuild.mediaOnlyChannelHasEntry(channel, guild, user))
-                internalGuild.unsetMediaOnlyChannel(channel, guild, user);
+            if (server.mediaOnlyChannelHasEntry(channel))
+                server.unsetMediaOnlyChannel(channel);
 
             // Signup
-            internalGuild.purgeSignupsFromChannel(channel.getIdLong(), guild, user);
+            server.purgeSignupsFromChannel(channel.getIdLong());
 
             // Poll
-            internalGuild.purgePollsFromChannel(channel.getIdLong(), guild, user);
+            server.purgePollsFromChannel(channel.getIdLong());
         }, Servant.threadPool);
     }
 }

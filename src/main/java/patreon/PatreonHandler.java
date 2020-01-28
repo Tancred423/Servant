@@ -2,6 +2,7 @@
 package patreon;
 
 import files.language.LanguageHandler;
+import moderation.guild.Server;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -149,9 +150,9 @@ public class PatreonHandler {
             eb.setThumbnail("https://i.imgur.com/rCnhGKA.jpg"); // Patreon Logo
         }
 
-        moderation.guild.Guild internalGuild;
-        internalGuild = new moderation.guild.Guild(event.getGuild().getIdLong());
-        eb.setTimestamp(ZonedDateTime.now(ZoneId.of(internalGuild.getOffset(event.getGuild(), event.getUser()))));
+        Server internalGuild;
+        internalGuild = new Server(event.getGuild());
+        eb.setTimestamp(ZonedDateTime.now(ZoneId.of(internalGuild.getOffset())));
 
         var guild = event.getJDA().getGuildById(436925371577925642L);
         if (guild != null) {

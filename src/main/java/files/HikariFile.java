@@ -32,7 +32,6 @@ public class HikariFile {
         config.setProperty("dataSource.portNumber", ""); // 3306
         config.setProperty("dataSource.serverName", "");
         config.setProperty("dataSource.connectionTimeout", "30000");
-//        config.setProperty("dataSource.idleTimeout", "30000");
         config.setProperty("dataSource.maxLifetime", "30000");
         config.setProperty("dataSource.maximumPoolSize", "15");
 

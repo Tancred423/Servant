@@ -2,13 +2,10 @@
 package random.randomImgur;
 
 import files.language.LanguageHandler;
-import moderation.guild.Guild;
-import moderation.user.User;
+import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import org.jsoup.Jsoup;
-import servant.Log;
-import servant.Servant;
 import utilities.Constants;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
@@ -18,13 +15,12 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class RandomCommand extends Command {
     public RandomCommand() {
         this.name = "random";
-        this.aliases = new String[0];
+        this.aliases = new String[] { "imgur" };
         this.help = "Random image of your choice.";
         this.category = new Category("Random");
         this.arguments = "[keyword]";
@@ -41,37 +37,27 @@ public class RandomCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        CompletableFuture.runAsync(() -> {
+        try {
             event.getChannel().sendTyping().queue();
-            try {
-                var guild = event.getGuild();
-                var author = event.getAuthor();
+            var lang = LanguageHandler.getLanguage(event);
 
-                var lang = LanguageHandler.getLanguage(event);
+            Image image;
+            if (event.getArgs().isEmpty()) image = getRandomImage();
+            else image = getRandomImage(URLEncoder.encode(event.getArgs(), StandardCharsets.UTF_8));
 
-                Image image;
-                if (event.getArgs().isEmpty()) image = getRandomImage();
-                else image = getRandomImage(URLEncoder.encode(event.getArgs(), StandardCharsets.UTF_8));
-
-                if (image == null) {
-                    event.replyWarning(LanguageHandler.get(lang, "random_empty"));
-                    return;
-                }
-
-                var eb = new EmbedBuilder();
-                eb.setTitle(image.getTitle(), image.getLink());
-                eb.setImage(image.getDirectLink());
-                eb.setColor(new User(event.getAuthor().getIdLong()).getColor(guild, author));
-                event.reply(eb.build());
-
-                // Statistics.
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-                if (event.getGuild() != null)
-                    new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-            } catch (IOException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
+            if (image == null) {
+                event.replyWarning(LanguageHandler.get(lang, "random_empty"));
+                return;
             }
-        }, Servant.threadPool);
+
+            var eb = new EmbedBuilder();
+            eb.setTitle(image.getTitle(), image.getLink());
+            eb.setImage(image.getDirectLink());
+            eb.setColor(new Master(event.getAuthor()).getColor());
+            event.reply(eb.build());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private Image getRandomImage(String keyword) throws IOException {

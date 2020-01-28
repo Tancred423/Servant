@@ -1,7 +1,7 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package owner;
 
-import moderation.user.User;
+import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import servant.Servant;
@@ -31,11 +31,8 @@ public class ThreadCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        var guild = event.getGuild();
-        var user = event.getAuthor();
-
         event.reply(new EmbedBuilder()
-                .setColor(new User(event.getAuthor().getIdLong()).getColor(guild, user))
+                .setColor(new Master(event.getAuthor()).getColor())
                 .setTitle("Stats for Nerds")
                 .addField("Current Threads", String.valueOf(ManagementFactory.getThreadMXBean().getThreadCount()), true)
                 .addField("Available Processors", String.valueOf(Runtime.getRuntime().availableProcessors()), true)

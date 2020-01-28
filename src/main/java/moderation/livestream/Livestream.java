@@ -1,7 +1,8 @@
 package moderation.livestream;
 
 import files.language.LanguageHandler;
-import moderation.guild.Guild;
+import moderation.guild.Server;
+import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
@@ -29,18 +30,18 @@ public class Livestream {
             guild.removeRoleFromMember(member, role).queue();
     }
 
-    public static void sendNotification(User author, Activity newActuvuty, net.dv8tion.jda.api.entities.Guild guild, Guild internalGuild, boolean isStreamerMode, String lang) {
-        if (internalGuild.getStreamChannelId(guild, author) != 0) {
-            var tc = guild.getTextChannelById(internalGuild.getStreamChannelId(guild, author));
-            if (tc != null) tc.sendMessage(getNotifyMessage(author, newActuvuty, new moderation.user.User(author.getIdLong()), isStreamerMode, lang, guild)).queue();
+    public static void sendNotification(User author, Activity newActuvuty, net.dv8tion.jda.api.entities.Guild guild, Server internalGuild, boolean isStreamerMode, String lang) {
+        if (internalGuild.getStreamChannelId() != 0) {
+            var tc = guild.getTextChannelById(internalGuild.getStreamChannelId());
+            if (tc != null) tc.sendMessage(getNotifyMessage(author, newActuvuty, new Master(author), isStreamerMode, lang, guild)).queue();
         }
     }
 
-    public static Message getNotifyMessage(User author, Activity newActivity, moderation.user.User internalUser, boolean isStreamerMode, String lang, net.dv8tion.jda.api.entities.Guild guild) {
+    public static Message getNotifyMessage(User author, Activity newActivity, Master internalUser, boolean isStreamerMode, String lang, net.dv8tion.jda.api.entities.Guild guild) {
         MessageBuilder mb = new MessageBuilder();
         EmbedBuilder eb = new EmbedBuilder();
         if (isStreamerMode) mb.setContent("@here");
-        eb.setColor(Color.decode(internalUser.getColorCode(guild, author)));
+        eb.setColor(Color.decode(internalUser.getColorCode()));
         eb.setAuthor(LanguageHandler.get(lang, "livestream_announcement_title"), newActivity.getUrl(), "https://i.imgur.com/BkMsIdz.png"); // Twitch Logo
         eb.setTitle(newActivity.getName());
         eb.setDescription(String.format(LanguageHandler.get(lang, "livestream_announcement"), author.getAsMention(), newActivity.getUrl()));

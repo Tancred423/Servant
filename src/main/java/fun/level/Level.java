@@ -1,6 +1,8 @@
 package fun.level;
 
 import files.language.LanguageHandler;
+import moderation.guild.Server;
+import moderation.user.Master;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
@@ -19,21 +21,21 @@ import java.util.Map;
 public class Level {
     public static Map<Guild, Map<User, ZonedDateTime>> guildCds = new HashMap<>();
 
-    public static int getLevel(long userId, long guildId, Guild guild, User user) {
-        return Parser.getLevelFromExp(new moderation.user.User(userId).getExp(guildId, guild, user));
+    public static int getLevel(User user, long guildId) {
+        return Parser.getLevelFromExp(new Master(user).getExp(guildId));
     }
 
     public static List<String> checkForNewRole(int level, MessageReceivedEvent event, String lang) {
         var guild = event.getGuild();
-        var internalGuild = new moderation.guild.Guild(guild.getIdLong());
-        var roleIds = internalGuild.getLevelRole(level, event.getGuild(), event.getAuthor());
+        var server = new Server(guild);
+        var roleIds = server.getLevelRole(level);
         var roles = new ArrayList<String>();
         var member = event.getMember();
-        var selfMember = event.getGuild().getMemberById(event.getJDA().getSelfUser().getIdLong());
-        if (member != null && selfMember != null)
+        var botMember = event.getGuild().getMemberById(event.getJDA().getSelfUser().getIdLong());
+        if (member != null && botMember != null)
             for (var roleId : roleIds)
                 if (guild.getRoleById(roleId) != null
-                        && selfMember.hasPermission(Permission.MANAGE_ROLES)) {
+                        && botMember.hasPermission(Permission.MANAGE_ROLES)) {
                     try {
                         var rolesToAdd = new ArrayList<Role>();
                         rolesToAdd.add(guild.getRoleById(roleId));
@@ -51,100 +53,100 @@ public class Level {
 
     public static void checkForAchievements(int level, MessageReceivedEvent event) {
         var guild = event.getGuild();
-        var author = event.getAuthor();
-        var internalAuthor = new moderation.user.User(author.getIdLong());
+        var user = event.getAuthor();
+        var master = new Master(user);
         var message = event.getMessage();
 
         if (level >= 10) {
-            if (!internalAuthor.hasAchievement("level10", guild, author) && !hasHigherLevelAchievement(internalAuthor, 10, guild, author)) {
-                internalAuthor.setAchievement("level10", 10, guild, author);
+            if (!master.hasAchievement("level10") && !hasHigherLevelAchievement(master, 10)) {
+                master.setAchievement("level10", 10);
                 new MessageHandler().reactAchievement(message);
             }
         }
 
         if (level >= 20) {
-            if (!internalAuthor.hasAchievement("level20", guild, author) && !hasHigherLevelAchievement(internalAuthor, 20, guild, author)) {
-                internalAuthor.setAchievement("level20", 20, guild, author);
-                deleteLowerAchievements(internalAuthor, 20, guild, author);
+            if (!master.hasAchievement("level20") && !hasHigherLevelAchievement(master, 20)) {
+                master.setAchievement("level20", 20);
+                deleteLowerAchievements(master, 20);
                 new MessageHandler().reactAchievement(message);
             }
         }
 
         if (level >= 30) {
-            if (!internalAuthor.hasAchievement("level30", guild, author) && !hasHigherLevelAchievement(internalAuthor, 30, guild, author)) {
-                internalAuthor.setAchievement("level30", 30, guild, author);
-                deleteLowerAchievements(internalAuthor, 30, guild, author);
+            if (!master.hasAchievement("level30") && !hasHigherLevelAchievement(master, 30)) {
+                master.setAchievement("level30", 30);
+                deleteLowerAchievements(master, 30);
                 new MessageHandler().reactAchievement(message);
             }
         }
 
         if (level >= 40) {
-            if (!internalAuthor.hasAchievement("level40", guild, author) && !hasHigherLevelAchievement(internalAuthor, 40, guild, author)) {
-                internalAuthor.setAchievement("level40", 40, guild, author);
-                deleteLowerAchievements(internalAuthor, 40, guild, author);
+            if (!master.hasAchievement("level40") && !hasHigherLevelAchievement(master, 40)) {
+                master.setAchievement("level40", 40);
+                deleteLowerAchievements(master, 40);
                 new MessageHandler().reactAchievement(message);
             }
         }
 
         if (level >= 50) {
-            if (!internalAuthor.hasAchievement("level50", guild, author) && !hasHigherLevelAchievement(internalAuthor, 50, guild, author)) {
-                internalAuthor.setAchievement("level50", 50, guild, author);
-                deleteLowerAchievements(internalAuthor, 50, guild, author);
+            if (!master.hasAchievement("level50") && !hasHigherLevelAchievement(master, 50)) {
+                master.setAchievement("level50", 50);
+                deleteLowerAchievements(master, 50);
                 new MessageHandler().reactAchievement(message);
             }
         }
 
         if (level >= 60) {
-            if (!internalAuthor.hasAchievement("level60", guild, author) && !hasHigherLevelAchievement(internalAuthor, 60, guild, author)) {
-                internalAuthor.setAchievement("level60", 60, guild, author);
-                deleteLowerAchievements(internalAuthor, 60, guild, author);
+            if (!master.hasAchievement("level60") && !hasHigherLevelAchievement(master, 60)) {
+                master.setAchievement("level60", 60);
+                deleteLowerAchievements(master, 60);
                 new MessageHandler().reactAchievement(message);
             }
         }
 
         if (level >= 69) {
-            if (!internalAuthor.hasAchievement("nicelevel", guild, author) && !hasHigherLevelAchievement(internalAuthor, 69, guild, author)) {
-                internalAuthor.setAchievement("nicelevel", 69, guild, author);
+            if (!master.hasAchievement("nicelevel") && !hasHigherLevelAchievement(master, 69)) {
+                master.setAchievement("nicelevel", 69);
                 new MessageHandler().reactAchievement(message);
             }
         }
 
         if (level >= 70) {
-            if (!internalAuthor.hasAchievement("level70", guild, author) && !hasHigherLevelAchievement(internalAuthor, 70, guild, author)) {
-                internalAuthor.setAchievement("level70", 70, guild, author);
-                deleteLowerAchievements(internalAuthor, 70, guild, author);
+            if (!master.hasAchievement("level70") && !hasHigherLevelAchievement(master, 70)) {
+                master.setAchievement("level70", 70);
+                deleteLowerAchievements(master, 70);
                 new MessageHandler().reactAchievement(message);
             }
         }
 
         if (level >= 80) {
-            if (!internalAuthor.hasAchievement("level80", guild, author) && !hasHigherLevelAchievement(internalAuthor, 80, guild, author)) {
-                internalAuthor.setAchievement("level80", 80, guild, author);
-                deleteLowerAchievements(internalAuthor, 80, guild, author);
+            if (!master.hasAchievement("level80") && !hasHigherLevelAchievement(master, 80)) {
+                master.setAchievement("level80", 80);
+                deleteLowerAchievements(master, 80);
                 new MessageHandler().reactAchievement(message);
             }
         }
 
         if (level >= 90) {
-            if (!internalAuthor.hasAchievement("level90", guild, author) && !hasHigherLevelAchievement(internalAuthor, 90, guild, author)) {
-                internalAuthor.setAchievement("level90", 90, guild, author);
-                deleteLowerAchievements(internalAuthor, 90, guild, author);
+            if (!master.hasAchievement("level90") && !hasHigherLevelAchievement(master, 90)) {
+                master.setAchievement("level90", 90);
+                deleteLowerAchievements(master, 90);
                 new MessageHandler().reactAchievement(message);
             }
         }
 
         if (level >= 100) {
-            if (!internalAuthor.hasAchievement("level100", guild, author) && !hasHigherLevelAchievement(internalAuthor, 100, guild, author)) {
-                internalAuthor.setAchievement("level100", 100, guild, author);
-                deleteLowerAchievements(internalAuthor, 100, guild, author);
+            if (!master.hasAchievement("level100") && !hasHigherLevelAchievement(master, 100)) {
+                master.setAchievement("level100", 100);
+                deleteLowerAchievements(master, 100);
                 new MessageHandler().reactAchievement(message);
             }
         }
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    public static boolean hasHigherLevelAchievement(moderation.user.User internalUser, int level, Guild guild, User user) {
-        var achievements = internalUser.getLevelAchievements(guild, user);
+    public static boolean hasHigherLevelAchievement(Master internalUser, int level) {
+        var achievements = internalUser.getLevelAchievements();
         String highestLevelAchievement = (achievements.isEmpty() ? null : achievements.get(0));
 
         if (highestLevelAchievement != null) {
@@ -153,15 +155,15 @@ public class Level {
         } else return false;
     }
 
-    public static void deleteLowerAchievements(moderation.user.User internalUser, int level, Guild guild, User user) {
-        if (level > 90) internalUser.unsetAchievement("level90", guild, user);
-        if (level > 80) internalUser.unsetAchievement("level80", guild, user);
-        if (level > 70) internalUser.unsetAchievement("level70", guild, user);
-        if (level > 60) internalUser.unsetAchievement("level60", guild, user);
-        if (level > 50) internalUser.unsetAchievement("level50", guild, user);
-        if (level > 40) internalUser.unsetAchievement("level40", guild, user);
-        if (level > 30) internalUser.unsetAchievement("level30", guild, user);
-        if (level > 20) internalUser.unsetAchievement("level20", guild, user);
-        if (level > 10) internalUser.unsetAchievement("level10", guild, user);
+    public static void deleteLowerAchievements(Master internalUser, int level) {
+        if (level > 90) internalUser.unsetAchievement("level90");
+        if (level > 80) internalUser.unsetAchievement("level80");
+        if (level > 70) internalUser.unsetAchievement("level70");
+        if (level > 60) internalUser.unsetAchievement("level60");
+        if (level > 50) internalUser.unsetAchievement("level50");
+        if (level > 40) internalUser.unsetAchievement("level40");
+        if (level > 30) internalUser.unsetAchievement("level30");
+        if (level > 20) internalUser.unsetAchievement("level20");
+        if (level > 10) internalUser.unsetAchievement("level10");
     }
 }

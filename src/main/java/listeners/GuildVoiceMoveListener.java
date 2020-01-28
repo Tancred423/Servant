@@ -1,6 +1,6 @@
 package listeners;
 
-import moderation.guild.Guild;
+import moderation.guild.Server;
 import moderation.toggle.Toggle;
 import moderation.voicelobby.VoiceLobby;
 import net.dv8tion.jda.api.entities.Member;
@@ -35,18 +35,18 @@ public class GuildVoiceMoveListener extends ListenerAdapter {
 
         CompletableFuture.runAsync(() -> {
             var channel = event.getChannelJoined();
-            var internalGuild = new Guild(guild.getIdLong());
-            var channels = internalGuild.getLobbies(guild, user);
-            var lang = internalGuild.getLanguage(guild, user);
+            var server = new Server(guild);
+            var channels = server.getLobbies();
+            var lang = server.getLanguage();
 
             // Voice Lobby
             if (Toggle.isEnabled(event, "voicelobby")) {
-                if (channels.contains(channel.getIdLong())) processVoiceLobby(event, guild, internalGuild, user, member, lang);
+                if (channels.contains(channel.getIdLong())) processVoiceLobby(event, guild, server, user, member, lang);
             }
         }, Servant.threadPool);
     }
 
-    private static void processVoiceLobby(GuildVoiceMoveEvent event, net.dv8tion.jda.api.entities.Guild guild, Guild internalGuild, User user, Member member, String lang) {
+    private static void processVoiceLobby(GuildVoiceMoveEvent event, net.dv8tion.jda.api.entities.Guild guild, Server internalGuild, User user, Member member, String lang) {
         var active = new LinkedList<VoiceChannel>();
         // Join
         var joinedChannel = event.getChannelJoined();
@@ -55,7 +55,7 @@ public class GuildVoiceMoveListener extends ListenerAdapter {
                         newChannel.getManager().setParent(joinedChannel.getParent()).queue(parent ->
                                 guild.modifyVoiceChannelPositions().selectPosition(newChannel).moveTo(joinedChannel.getPosition() + 1).queue(position ->
                                         guild.moveVoiceMember(member, newChannel).queue(move -> {
-                                            internalGuild.setActiveLobby(newChannel.getIdLong(), guild, user);
+                                            internalGuild.setActiveLobby(newChannel.getIdLong());
 
                                             try {
                                                 TimeUnit.MILLISECONDS.sleep(2000);
@@ -63,12 +63,12 @@ public class GuildVoiceMoveListener extends ListenerAdapter {
                                                 e.printStackTrace();
                                             }
 
-                                            var activeIds = internalGuild.getActiveLobbies(guild, user);
+                                            var activeIds = internalGuild.getActiveLobbies();
 
                                             for (var activeId : activeIds) {
                                                 if (event.getJDA().getVoiceChannelById(activeId) != null)
                                                     active.add(event.getJDA().getVoiceChannelById(activeId));
-                                                else internalGuild.unsetActiveLobby(activeId, guild, user);
+                                                else internalGuild.unsetActiveLobby(activeId);
                                             }
 
                                             for (int i = 0; i < active.size(); i++) {

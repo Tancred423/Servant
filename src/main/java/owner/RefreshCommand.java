@@ -1,7 +1,7 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package owner;
 
-import moderation.user.User;
+import moderation.user.Master;
 import net.dv8tion.jda.api.Permission;
 import servant.Servant;
 import utilities.Constants;
@@ -51,22 +51,22 @@ public class RefreshCommand extends Command {
             if (guild.getIdLong() == 264445053596991498L) continue;
             var members = guild.getMembers();
             for (var member : members) {
-                var internalUser = new User(member.getUser().getIdLong());
+                var internalUser = new Master(member.getUser());
 
-                var level = Parser.getLevelFromExp(internalUser.getExp(guild.getIdLong(), guild, member.getUser()));
-                if (level >= 100) internalUser.setAchievement("level100", 100, guild, member.getUser());
-                else if (level >= 90) internalUser.setAchievement("level90", 90, guild, member.getUser());
-                else if (level >= 80) internalUser.setAchievement("level80", 80, guild, member.getUser());
-                else if (level >= 70) internalUser.setAchievement("level70", 70, guild, member.getUser());
-                else if (level >= 60) internalUser.setAchievement("level60", 60, guild, member.getUser());
-                else if (level >= 50) internalUser.setAchievement("level50", 50, guild, member.getUser());
-                else if (level >= 40) internalUser.setAchievement("level40", 40, guild, member.getUser());
-                else if (level >= 30) internalUser.setAchievement("level30", 30, guild, member.getUser());
-                else if (level >= 20) internalUser.setAchievement("level20", 20, guild, member.getUser());
-                else if (level >= 10) internalUser.setAchievement("level10", 10, guild, member.getUser());
+                var level = Parser.getLevelFromExp(internalUser.getExp(guild.getIdLong()));
+                if (level >= 100) internalUser.setAchievement("level100", 100);
+                else if (level >= 90) internalUser.setAchievement("level90", 90);
+                else if (level >= 80) internalUser.setAchievement("level80", 80);
+                else if (level >= 70) internalUser.setAchievement("level70", 70);
+                else if (level >= 60) internalUser.setAchievement("level60", 60);
+                else if (level >= 50) internalUser.setAchievement("level50", 50);
+                else if (level >= 40) internalUser.setAchievement("level40", 40);
+                else if (level >= 30) internalUser.setAchievement("level30", 30);
+                else if (level >= 20) internalUser.setAchievement("level20", 20);
+                else if (level >= 10) internalUser.setAchievement("level10", 10);
 
                 // Extra
-                if (level >= 69) internalUser.setAchievement("nicelevel", 69, guild, member.getUser());
+                if (level >= 69) internalUser.setAchievement("nicelevel", 69);
             }
         }
     }
@@ -74,24 +74,23 @@ public class RefreshCommand extends Command {
     private void clearLevelAchievements(CommandEvent event) {
         var users = event.getJDA().getUsers();
         for (var user : users) {
-            var guild = event.getGuild();
-            var internalUser = new User(user.getIdLong());
-            var levelAchievements = internalUser.getLevelAchievements(guild, user);
+            var master = new Master(user);
+            var levelAchievements = master.getLevelAchievements();
             if (!levelAchievements.isEmpty()) {
                 List<Integer> levels = new LinkedList<>();
                 for (var achievement : levelAchievements) levels.add(Integer.parseInt(achievement.substring(5)));
                 switch (Collections.max(levels)) {
                     // Falls through the cases and deletes all the lower levels.
                     // Level 69 stays as a joke.
-                    case 100: internalUser.unsetAchievement("level90", guild, user);
-                    case 90: internalUser.unsetAchievement("level80", guild, user);
-                    case 80: internalUser.unsetAchievement("level70", guild, user);
-                    case 70: internalUser.unsetAchievement("level60", guild, user);
-                    case 60: internalUser.unsetAchievement("level50", guild, user);
-                    case 50: internalUser.unsetAchievement("level40", guild, user);
-                    case 40: internalUser.unsetAchievement("level30", guild, user);
-                    case 30: internalUser.unsetAchievement("level20", guild, user);
-                    case 20: internalUser.unsetAchievement("level10", guild, user);
+                    case 100: master.unsetAchievement("level90");
+                    case 90: master.unsetAchievement("level80");
+                    case 80: master.unsetAchievement("level70");
+                    case 70: master.unsetAchievement("level60");
+                    case 60: master.unsetAchievement("level50");
+                    case 50: master.unsetAchievement("level40");
+                    case 40: master.unsetAchievement("level30");
+                    case 30: master.unsetAchievement("level20");
+                    case 20: master.unsetAchievement("level10");
                 }
             }
         }

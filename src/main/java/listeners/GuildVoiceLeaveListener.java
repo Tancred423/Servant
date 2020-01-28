@@ -1,8 +1,7 @@
 package listeners;
 
-import moderation.guild.Guild;
+import moderation.guild.Server;
 import moderation.toggle.Toggle;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -34,21 +33,21 @@ public class GuildVoiceLeaveListener extends ListenerAdapter {
 
         CompletableFuture.runAsync(() -> {
             var channel = event.getChannelJoined();
-            var internalGuild = new Guild(guild.getIdLong());
-            var activeIds = internalGuild.getActiveLobbies(guild, owner == null ? null : owner.getUser());
+            var server = new Server(guild);
+            var activeIds = server.getActiveLobbies();
 
             // Voice Lobby
             if (Toggle.isEnabled(event, "voicelobby")) {
-                processVoiceLobby(event, guild, internalGuild, activeIds, user, channel);
+                processVoiceLobby(event, guild, server, activeIds, channel);
             }
         }, Servant.threadPool);
     }
 
-    private static void processVoiceLobby(GuildVoiceLeaveEvent event, net.dv8tion.jda.api.entities.Guild guild, Guild internalGuild, List<Long> activeIds, User user, VoiceChannel channel) {
+    private static void processVoiceLobby(GuildVoiceLeaveEvent event, net.dv8tion.jda.api.entities.Guild guild, Server internalGuild, List<Long> activeIds, VoiceChannel channel) {
         var active = new LinkedList<VoiceChannel>();
         for (var activeId : activeIds) {
             if (event.getJDA().getVoiceChannelById(activeId) != null) active.add(event.getJDA().getVoiceChannelById(activeId));
-            else internalGuild.unsetActiveLobby(activeId, guild, user);
+            else internalGuild.unsetActiveLobby(activeId);
         }
 
         if (active.contains(channel) && channel.getMembers().size() == 0) {

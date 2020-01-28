@@ -2,20 +2,14 @@
 package useful.giveaway;
 
 import files.language.LanguageHandler;
-import moderation.guild.Guild;
 import moderation.guild.GuildHandler;
-import moderation.toggle.Toggle;
-import moderation.user.User;
+import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import owner.blacklist.Blacklist;
-import servant.Servant;
 import utilities.Constants;
 import utilities.UsageEmbed;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
-
-import java.util.concurrent.CompletableFuture;
 
 public class GiveawayCommand extends Command {
     public GiveawayCommand() {
@@ -38,46 +32,33 @@ public class GiveawayCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        CompletableFuture.runAsync(() -> {
-            try {
-                if (!Toggle.isEnabled(event, name)) return;
-                if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
+        var lang = LanguageHandler.getLanguage(event);
+        var p = GuildHandler.getPrefix(event);
 
-                var lang = LanguageHandler.getLanguage(event);
-                var p = GuildHandler.getPrefix(event);
+        var guild = event.getGuild();
+        var author = event.getAuthor();
 
-                var guild = event.getGuild();
-                var author = event.getAuthor();
+        if (event.getArgs().isEmpty()) {
+            var description = LanguageHandler.get(lang, "giveaway_description");
+            var usage = String.format(LanguageHandler.get(lang, "giveaway_usage"), p, p, p, p, p, p, p);
+            var hint = String.format(LanguageHandler.get(lang, "giveaway_hint"), p);
+            event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+            return;
+        }
 
-                if (event.getArgs().isEmpty()) {
-                    var description = LanguageHandler.get(lang, "giveaway_description");
-                    var usage = String.format(LanguageHandler.get(lang, "giveaway_usage"), p, p, p, p, p, p, p);
-                    var hint = String.format(LanguageHandler.get(lang, "giveaway_hint"), p);
-                    event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
-                    return;
-                }
+        var args = event.getArgs().trim().split(" ");
+        var message = event.getMessage();
 
-                var args = event.getArgs().trim().split(" ");
-                var message = event.getMessage();
-
-                if (args[0].equalsIgnoreCase("list")) {
-                    var currentGiveaways = GiveawayHandler.getCurrentGiveaways(event.getJDA(), message, lang, guild, author);
-                    var eb = new EmbedBuilder();
-                    eb.setColor(new User(message.getAuthor().getIdLong()).getColor(guild, author));
-                    eb.setAuthor(LanguageHandler.get(lang, "giveaway_current"), null, message.getGuild().getIconUrl());
-                    eb.setDescription(currentGiveaways);
-                    event.reply(eb.build());
-                } else {
-                    if (args[0].startsWith("\"")) GiveawayHandler.startGiveaway(event, args, lang);
-                    else GiveawayHandler.sendWrongArgumentError(message, lang);
-                }
-
-                // Statistics.
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-                new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }, Servant.threadPool);
+        if (args[0].equalsIgnoreCase("list")) {
+            var currentGiveaways = GiveawayHandler.getCurrentGiveaways(event.getJDA(), message, lang, guild, author);
+            var eb = new EmbedBuilder();
+            eb.setColor(new Master(message.getAuthor()).getColor());
+            eb.setAuthor(LanguageHandler.get(lang, "giveaway_current"), null, message.getGuild().getIconUrl());
+            eb.setDescription(currentGiveaways);
+            event.reply(eb.build());
+        } else {
+            if (args[0].startsWith("\"")) GiveawayHandler.startGiveaway(event, args, lang);
+            else GiveawayHandler.sendWrongArgumentError(message, lang);
+        }
     }
 }

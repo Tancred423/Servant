@@ -2,9 +2,9 @@
 package listeners;
 
 import files.language.LanguageHandler;
-import moderation.guild.Guild;
+import moderation.guild.Server;
 import moderation.toggle.Toggle;
-import moderation.user.User;
+import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberLeaveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -34,27 +34,26 @@ public class GuildMemberLeaveListener extends ListenerAdapter {
         if (Blacklist.isBlacklisted(user, guild)) return;
 
         CompletableFuture.runAsync(() -> {
-            var internalGuild = new Guild(guild.getIdLong());
-            var internalUser = new User(user.getIdLong());
-            var member = event.getMember();
+            var server = new Server(guild);
+            var master = new Master(user);
             var selfMember = guild.getMemberById(event.getJDA().getSelfUser().getIdLong());
             if (selfMember == null) return; // To eliminate errors. Will never occur.
 
             // Leave
             if (Toggle.isEnabled(event, "leave")) {
-                var lang = new Guild(event.getGuild().getIdLong()).getLanguage(guild, user);
-                var leaveNotifierChannel = internalGuild.getLeaveNotifierChannel(guild, user);
+                var lang = new Server(event.getGuild()).getLanguage();
+                var leaveNotifierChannel = server.getLeaveNotifierChannel();
 
                 if (leaveNotifierChannel != null && leaveNotifierChannel.canTalk(selfMember)) {
-                    var description = internalGuild.getLeaveMessage(guild, user);
+                    var description = server.getLeaveMessage();
                     leaveNotifierChannel.sendMessage(
                             new EmbedBuilder()
-                                    .setColor(internalUser.getColor(guild, user))
+                                    .setColor(master.getColor())
                                     .setAuthor(String.format(LanguageHandler.get(lang, "leave_author"), user.getName(), user.getDiscriminator()), null, guild.getIconUrl())
                                     .setDescription(description == null ? LanguageHandler.get(lang, "leave_embeddescription") : description)
                                     .setThumbnail(user.getEffectiveAvatarUrl())
                                     .setFooter(LanguageHandler.get(lang, "leave_footer"), Image.getImageUrl("clock", guild, user))
-                                    .setTimestamp(OffsetDateTime.now(ZoneOffset.of(internalGuild.getOffset(guild, user))))
+                                    .setTimestamp(OffsetDateTime.now(ZoneOffset.of(server.getOffset())))
                                     .build()
                     ).queue();
                 }

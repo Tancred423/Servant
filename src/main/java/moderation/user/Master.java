@@ -2,32 +2,40 @@
 package moderation.user;
 
 import files.language.LanguageHandler;
-import net.dv8tion.jda.api.entities.Guild;
+import interaction.Interaction;
+import net.dv8tion.jda.api.entities.User;
 import patreon.PatreonHandler;
 import servant.Log;
 import servant.Servant;
+import utilities.MyEntry;
 
 import java.awt.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 import static utilities.DatabaseConn.closeQuietly;
 
-public class User {
+public class Master {
+    private User user;
     private long userId;
 
-    public User(long userId) {
-        this.userId = userId;
+    public Master(User user) {
+        this.user = user;
+        this.userId = user.getIdLong();
     }
 
+    public User getUser() { return user; }
+    public long getUserId() { return userId; }
+
+    // Methods
     // Alarm
-    public boolean setAlarm(Timestamp alarmTime, String title, Guild guild, net.dv8tion.jda.api.entities.User user) {
+    public boolean setAlarm(Timestamp alarmTime, String title) {
         var wasSet = false;
 
-        if (!alarmHasEntry(alarmTime, guild, user)) {
+        if (!alarmHasEntry(alarmTime)) {
             Connection connection = null;
 
             try {
@@ -39,7 +47,7 @@ public class User {
                 insert.executeUpdate();
                 wasSet = true;
             } catch (SQLException e) {
-                new Log(e, guild, user, "alarm", null).sendLog(false);
+                new Log(e, null, user, "alarm", null).sendLog(false);
             } finally {
                 closeQuietly(connection);
             }
@@ -48,7 +56,7 @@ public class User {
         return wasSet;
     }
 
-    public void unsetAlarm(Timestamp alarmTime, net.dv8tion.jda.api.entities.User user) {
+    public void unsetAlarm(Timestamp alarmTime) {
         Connection connection = null;
 
         try {
@@ -62,9 +70,10 @@ public class User {
         } finally {
             closeQuietly(connection);
         }
+
     }
 
-    private boolean alarmHasEntry(Timestamp alarmTime, Guild guild, net.dv8tion.jda.api.entities.User user) {
+    private boolean alarmHasEntry(Timestamp alarmTime) {
         Connection connection = null;
         var hasEntry = false;
 
@@ -76,7 +85,7 @@ public class User {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new Log(e, guild, user, "alarm", null).sendLog(false);
+            new Log(e, null, user, "alarm", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -84,28 +93,9 @@ public class User {
         return hasEntry;
     }
 
-    public String getAlarmTitle(net.dv8tion.jda.api.entities.User user) {
+    public Map<Timestamp, String> getAlarms() {
         Connection connection = null;
-        String title = null;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT title FROM alarm WHERE user_id=?");
-            select.setLong(1, userId);
-            var resultSet = select.executeQuery();
-            if (resultSet.first()) title = resultSet.getString("title");
-        } catch (SQLException e) {
-            new Log(e, null, user, "alarm", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-
-        return title;
-    }
-
-    public List<Timestamp> getAlarms(net.dv8tion.jda.api.entities.User user) {
-        Connection connection = null;
-        var alarms = new ArrayList<Timestamp>();
+        var alarms = new HashMap<Timestamp, String>();
 
         try {
             connection = Servant.db.getHikari().getConnection();
@@ -113,7 +103,7 @@ public class User {
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
             if (resultSet.first())
-                do alarms.add(resultSet.getTimestamp("alarm_time"));
+                do alarms.put(resultSet.getTimestamp("alarm_time"), resultSet.getString("title"));
                 while (resultSet.next());
         } catch (SQLException e) {
             new Log(e, null, user, "alarm", null).sendLog(false);
@@ -125,12 +115,12 @@ public class User {
     }
 
     // Reminder
-    public boolean setReminder(Timestamp reminderTime, String topic, Guild guild, net.dv8tion.jda.api.entities.User user) {
+    public boolean setReminder(Timestamp reminderTime, String topic) {
         Connection connection = null;
         var wasSet = false;
 
         try {
-            if (!reminderHasEntry(reminderTime, guild, user)) {
+            if (!reminderHasEntry(reminderTime)) {
                 connection = Servant.db.getHikari().getConnection();
                 var insert = connection.prepareStatement("INSERT INTO reminder (user_id,reminder_time,topic) VALUES (?,?,?)");
                 insert.setLong(1, userId);
@@ -140,7 +130,7 @@ public class User {
                 wasSet = true;
             }
         } catch (SQLException e) {
-            new Log(e, guild, user, "levelrole", null).sendLog(false);
+            new Log(e, null, user, "levelrole", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -148,7 +138,7 @@ public class User {
         return wasSet;
     }
 
-    public void unsetReminder(Timestamp reminderTime, net.dv8tion.jda.api.entities.User user) {
+    public void unsetReminder(Timestamp reminderTime) {
         Connection connection = null;
 
         try {
@@ -164,7 +154,7 @@ public class User {
         }
     }
 
-    private boolean reminderHasEntry(Timestamp reminderTime, Guild guild, net.dv8tion.jda.api.entities.User user) {
+    private boolean reminderHasEntry(Timestamp reminderTime) {
         Connection connection = null;
         var hasEntry = false;
 
@@ -176,7 +166,7 @@ public class User {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new Log(e, guild, user, "levelrole", null).sendLog(false);
+            new Log(e, null, user, "levelrole", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -184,7 +174,7 @@ public class User {
         return hasEntry;
     }
 
-    public Map<Timestamp, String> getReminders(net.dv8tion.jda.api.entities.User user) {
+    public Map<Timestamp, String> getReminders() {
         Connection connection = null;
         var reminders = new HashMap<Timestamp, String>();
 
@@ -206,7 +196,7 @@ public class User {
     }
 
     // Bio
-    public String getBio(Guild guild, net.dv8tion.jda.api.entities.User user) {
+    public String getBio() {
         Connection connection = null;
         var text = "";
 
@@ -217,7 +207,7 @@ public class User {
             var resultSet = select.executeQuery();
             if (resultSet.first()) text = resultSet.getString("text");
         } catch (SQLException e) {
-            new Log(e, guild, user, "bio", null).sendLog(false);
+            new Log(e, null, user, "bio", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -225,7 +215,7 @@ public class User {
         return text;
     }
 
-    private boolean bioHasEntry(Guild guild, net.dv8tion.jda.api.entities.User user) {
+    private boolean bioHasEntry() {
         Connection connection = null;
         var hasEntry = false;
 
@@ -236,7 +226,7 @@ public class User {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new Log(e, guild, user, "bio", null).sendLog(false);
+            new Log(e, null, user, "bio", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -244,12 +234,12 @@ public class User {
         return hasEntry;
     }
 
-    public void setBio(String text, Guild guild, net.dv8tion.jda.api.entities.User user) {
+    public void setBio(String text) {
         Connection connection = null;
 
         try {
             connection = Servant.db.getHikari().getConnection();
-            if (bioHasEntry(guild, user)) {
+            if (bioHasEntry()) {
                 var update = connection.prepareStatement("UPDATE bio SET text=? WHERE user_id=?");
                 update.setString(1, text);
                 update.setLong(2, userId);
@@ -261,25 +251,26 @@ public class User {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, guild, user, "bio", null).sendLog(false);
+            new Log(e, null, user, "bio", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
     }
 
     // Baguette
-    public Map<Integer, Integer> getBaguette(Guild guild, net.dv8tion.jda.api.entities.User user) {
+    public MyEntry<Integer, Integer> getBaguette() {
         Connection connection = null;
-        var baguette = new HashMap<Integer, Integer>();
+        MyEntry<Integer, Integer> baguette = null;
 
         try {
             connection = Servant.db.getHikari().getConnection();
             var select = connection.prepareStatement("SELECT * FROM baguette_counter WHERE user_id=?");
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) baguette.put(resultSet.getInt("baguette_size"), resultSet.getInt("size_counter"));
+            if (resultSet.first())
+                baguette = new MyEntry<>(resultSet.getInt("baguette_size"), resultSet.getInt("size_counter"));
         } catch (SQLException e) {
-            new Log(e, guild, user, "baguette", null).sendLog(false);
+            new Log(e, null, user, "baguette", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -287,7 +278,7 @@ public class User {
         return baguette;
     }
 
-    private boolean baguetteHasEntry(Guild guild, net.dv8tion.jda.api.entities.User user) {
+    private boolean baguetteHasEntry() {
         Connection connection = null;
         var hasEntry = false;
 
@@ -298,7 +289,7 @@ public class User {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new Log(e, guild, user, "baguette", null).sendLog(false);
+            new Log(e, null, user, "baguette", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -306,12 +297,12 @@ public class User {
         return hasEntry;
     }
 
-    public void setBaguette(int baguetteSize, int sizeCounter, Guild guild, net.dv8tion.jda.api.entities.User user) {
+    public void setBaguette(int baguetteSize, int sizeCounter) {
         Connection connection = null;
 
         try {
             connection = Servant.db.getHikari().getConnection();
-            if (baguetteHasEntry(guild, user)) {
+            if (baguetteHasEntry()) {
                 var update = connection.prepareStatement("UPDATE baguette_counter SET baguette_size=?, size_counter=? WHERE user_id=?");
                 update.setInt(1, baguetteSize);
                 update.setInt(2, sizeCounter);
@@ -325,14 +316,14 @@ public class User {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, guild, user, "baguette", null).sendLog(false);
+            new Log(e, null, user, "baguette", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
     }
 
     // Achievement
-    public boolean hasAchievement(String achievement, Guild guild, net.dv8tion.jda.api.entities.User user) {
+    public boolean hasAchievement(String achievement) {
         Connection connection = null;
         var hasAchievement = false;
 
@@ -344,7 +335,7 @@ public class User {
             var resultSet = select.executeQuery();
             hasAchievement = resultSet.first();
         } catch (SQLException e) {
-            new Log(e, guild, user, "achievement", null).sendLog(false);
+            new Log(e, null, user, "achievement", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -352,7 +343,7 @@ public class User {
         return hasAchievement;
     }
 
-    public Map<String, Integer> getAchievements(Guild guild, net.dv8tion.jda.api.entities.User user) {
+    public Map<String, Integer> getAchievements() {
         Connection connection = null;
         var achievements = new TreeMap<String, Integer>();
 
@@ -366,7 +357,7 @@ public class User {
                 while (resultSet.next());
             }
         } catch (SQLException e) {
-            new Log(e, guild, user, "achievement", null).sendLog(false);
+            new Log(e, null, user, "achievement", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -374,7 +365,7 @@ public class User {
         return achievements;
     }
 
-    public List<String> getLevelAchievements(Guild guild, net.dv8tion.jda.api.entities.User user) {
+    public List<String> getLevelAchievements() {
         Connection connection = null;
         var achievements = new LinkedList<String>();
 
@@ -389,7 +380,7 @@ public class User {
                     if (achievement.startsWith("level")) achievements.add(achievement);
                 } while (resultSet.next());
         } catch (SQLException e) {
-            new Log(e, guild, user, "achievement", null).sendLog(false);
+            new Log(e, null, user, "achievement", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -397,7 +388,7 @@ public class User {
         return achievements;
     }
 
-    public int getTotalAP(Guild guild, net.dv8tion.jda.api.entities.User user) {
+    public int getTotalAP() {
         Connection connection = null;
         var ap = 0;
 
@@ -408,7 +399,7 @@ public class User {
             var resultSet = select.executeQuery();
             if (resultSet.first()) do ap += resultSet.getInt("ap"); while (resultSet.next());
         } catch (SQLException e) {
-            new Log(e, guild, user, "achievement", null).sendLog(false);
+            new Log(e, null, user, "achievement", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -416,11 +407,11 @@ public class User {
         return ap;
     }
 
-    public void setAchievement(String achievement, int ap, Guild guild, net.dv8tion.jda.api.entities.User user) {
+    public void setAchievement(String achievement, int ap) {
         Connection connection = null;
 
         try {
-            if (!hasAchievement(achievement, guild, user)) {
+            if (!hasAchievement(achievement)) {
                 connection = Servant.db.getHikari().getConnection();
                 var insert = connection.prepareStatement("INSERT INTO achievement (user_id,achievement,ap) VALUES (?,?,?)");
                 insert.setLong(1, userId);
@@ -429,17 +420,17 @@ public class User {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, guild, user, "achievement", null).sendLog(false);
+            new Log(e, null, user, "achievement", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
     }
 
-    public void unsetAchievement(String achievement, Guild guild, net.dv8tion.jda.api.entities.User user) {
+    public void unsetAchievement(String achievement) {
         Connection connection = null;
 
         try {
-            if (hasAchievement(achievement, guild, user)) {
+            if (hasAchievement(achievement)) {
                 connection = Servant.db.getHikari().getConnection();
                 var delete = connection.prepareStatement("DELETE FROM achievement WHERE user_id=? AND achievement=?");
                 delete.setLong(1, userId);
@@ -447,14 +438,14 @@ public class User {
                 delete.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, guild, user, "achievement", null).sendLog(false);
+            new Log(e, null, user, "achievement", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
     }
 
     // Offset
-    public String getOffset(Guild guild, net.dv8tion.jda.api.entities.User user) {
+    public String getOffset() {
         Connection connection = null;
         var offset = Servant.config.getDefaultOffset();
 
@@ -466,7 +457,7 @@ public class User {
             if (resultSet.first()) offset = resultSet.getString("offset");
             offset = offset.equals("00:00") ? "Z" : offset;
         } catch (SQLException e) {
-            new Log(e, guild, user, "offset", null).sendLog(false);
+            new Log(e, null, user, "offset", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -474,7 +465,7 @@ public class User {
         return offset;
     }
 
-    private boolean offsetHasEntry(Guild guild, net.dv8tion.jda.api.entities.User user) {
+    private boolean offsetHasEntry() {
         Connection connection = null;
         var hasEntry = false;
 
@@ -485,7 +476,7 @@ public class User {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new Log(e, guild, user, "offset", null).sendLog(false);
+            new Log(e, null, user, "offset", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -493,12 +484,12 @@ public class User {
         return hasEntry;
     }
 
-    void setOffset(String offset, Guild guild, net.dv8tion.jda.api.entities.User user) {
+    void setOffset(String offset) {
         Connection connection = null;
 
         try {
             connection = Servant.db.getHikari().getConnection();
-            if (offsetHasEntry(guild, user)) {
+            if (offsetHasEntry()) {
                 var update = connection.prepareStatement("UPDATE user SET offset=? WHERE user_id=?");
                 update.setString(1, offset);
                 update.setLong(2, userId);
@@ -512,18 +503,18 @@ public class User {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, guild, user, "offset", null).sendLog(false);
+            new Log(e, null, user, "offset", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
     }
 
-    void unsetOffset(Guild guild, net.dv8tion.jda.api.entities.User user) {
-        setOffset(Servant.config.getDefaultOffset(), guild, user);
+    void unsetOffset() {
+        setOffset(Servant.config.getDefaultOffset());
     }
 
     // Prefix
-    public String getPrefix(Guild guild, net.dv8tion.jda.api.entities.User user) {
+    public String getPrefix() {
         Connection connection = null;
         String prefix = Servant.config.getDefaultPrefix();
 
@@ -534,7 +525,7 @@ public class User {
             var resultSet = select.executeQuery();
             if (resultSet.first()) prefix = resultSet.getString("prefix");
         } catch (SQLException e) {
-            new Log(e, guild, user, "prefix", null).sendLog(false);
+            new Log(e, null, user, "prefix", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -542,7 +533,7 @@ public class User {
         return prefix;
     }
 
-    private boolean prefixHasEntry(Guild guild, net.dv8tion.jda.api.entities.User user) {
+    private boolean prefixHasEntry() {
         Connection connection = null;
         var hasEntry = false;
 
@@ -553,7 +544,7 @@ public class User {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new Log(e, guild, user, "prefix", null).sendLog(false);
+            new Log(e, null, user, "prefix", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -561,12 +552,12 @@ public class User {
         return hasEntry;
     }
 
-    void setPrefix(String prefix, Guild guild, net.dv8tion.jda.api.entities.User user) {
+    void setPrefix(String prefix) {
         Connection connection = null;
 
         try {
             connection = Servant.db.getHikari().getConnection();
-            if (prefixHasEntry(guild, user)) {
+            if (prefixHasEntry()) {
                 var update = connection.prepareStatement("UPDATE user SET prefix=? WHERE user_id=?");
                 update.setString(1, prefix);
                 update.setLong(2, userId);
@@ -580,18 +571,18 @@ public class User {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, guild, user, "prefix", null).sendLog(false);
+            new Log(e, null, user, "prefix", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
     }
 
-    void unsetPrefix(Guild guild, net.dv8tion.jda.api.entities.User user) {
-        setPrefix(Servant.config.getDefaultPrefix(), guild, user);
+    void unsetPrefix() {
+        setPrefix(Servant.config.getDefaultPrefix());
     }
 
     // Language
-    public String getLanguage(Guild guild, net.dv8tion.jda.api.entities.User user) {
+    public String getLanguage() {
         Connection connection = null;
         String language = null;
 
@@ -604,7 +595,7 @@ public class User {
             if (language == null) language = Servant.config.getDefaultLanguage();
             else if (language.isEmpty()) language = Servant.config.getDefaultLanguage();
         } catch (SQLException e) {
-            new Log(e, guild, user, "language", null).sendLog(false);
+            new Log(e, null, user, "language", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -612,7 +603,7 @@ public class User {
         return language;
     }
 
-    private boolean languageHasEntry(Guild guild, net.dv8tion.jda.api.entities.User user) {
+    private boolean languageHasEntry() {
         Connection connection = null;
         var hasEntry = false;
 
@@ -623,7 +614,7 @@ public class User {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new Log(e, guild, user, "language", null).sendLog(false);
+            new Log(e, null, user, "language", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -631,12 +622,12 @@ public class User {
         return hasEntry;
     }
 
-    void setLanguage(String language, Guild guild, net.dv8tion.jda.api.entities.User user) {
+    void setLanguage(String language) {
         Connection connection = null;
 
         try {
             connection = Servant.db.getHikari().getConnection();
-            if (languageHasEntry(guild, user)) {
+            if (languageHasEntry()) {
                 var update = connection.prepareStatement("UPDATE user SET language=? WHERE user_id=?");
                 update.setString(1, language);
                 update.setLong(2, userId);
@@ -650,18 +641,18 @@ public class User {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, guild, user, "language", null).sendLog(false);
+            new Log(e, null, user, "language", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
     }
 
-    void unsetLanguage(Guild guild, net.dv8tion.jda.api.entities.User user) {
-        setLanguage(Servant.config.getDefaultLanguage(), guild, user);
+    void unsetLanguage() {
+        setLanguage(Servant.config.getDefaultLanguage());
     }
 
     // Stream Hidden
-    public boolean isStreamHidden(long guildId, Guild guild, net.dv8tion.jda.api.entities.User user) {
+    public boolean isStreamHidden(long guildId) {
         Connection connection = null;
         var isStreamHidden = false;
 
@@ -673,7 +664,7 @@ public class User {
             var resultSet = select.executeQuery();
             if (resultSet.first()) isStreamHidden = true;
         } catch (SQLException e) {
-            new Log(e, guild, user, "livestream", null).sendLog(false);
+            new Log(e, null, user, "livestream", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -681,7 +672,7 @@ public class User {
         return isStreamHidden;
     }
 
-    List<Long> getStreamHiddenGuilds(Guild guild, net.dv8tion.jda.api.entities.User user) {
+    public List<Long> getStreamHiddenGuilds() {
         Connection connection = null;
         var streamHiddenGuilds = new ArrayList<Long>();
 
@@ -692,7 +683,7 @@ public class User {
             var resultSet = select.executeQuery();
             if (resultSet.first()) do streamHiddenGuilds.add(resultSet.getLong("guild_id")); while (resultSet.next());
         } catch (SQLException e) {
-            new Log(e, guild, user, "livestream", null).sendLog(false);
+            new Log(e, null, user, "livestream", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -700,24 +691,24 @@ public class User {
         return streamHiddenGuilds;
     }
 
-    boolean toggleStreamHidden(long guildId, Guild guild, net.dv8tion.jda.api.entities.User user) {
+    boolean toggleStreamHidden(long guildId) {
         Connection connection = null;
         var isStreamHidden = false;
 
         try {
             connection = Servant.db.getHikari().getConnection();
-            if (!isStreamHidden(guildId, guild, user)) {
+            if (!isStreamHidden(guildId)) {
                 var insert = connection.prepareStatement("INSERT INTO streamhidden (guild_id,user_id) VALUES (?,?)");
                 insert.setLong(1, guildId);
                 insert.setLong(2, userId);
                 insert.executeUpdate();
                 isStreamHidden = true;
             } else {
-                unsetStreamHidden(guildId, guild, user);
+                unsetStreamHidden(guildId);
                 isStreamHidden = false;
             }
         } catch (SQLException e) {
-            new Log(e, guild, user, "livestream", null).sendLog(false);
+            new Log(e, null, user, "livestream", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -725,7 +716,7 @@ public class User {
         return isStreamHidden;
     }
 
-    private void unsetStreamHidden(long guildId, Guild guild, net.dv8tion.jda.api.entities.User user) {
+    private void unsetStreamHidden(long guildId) {
         Connection connection = null;
 
         try {
@@ -735,14 +726,14 @@ public class User {
             delete.setLong(2, userId);
             delete.executeUpdate();
         } catch (SQLException e) {
-            new Log(e, guild, user, "livestream", null).sendLog(false);
+            new Log(e, null, user, "livestream", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
     }
 
     // Color
-    public String getColorCode(Guild guild, net.dv8tion.jda.api.entities.User user) {
+    public String getColorCode() {
         Connection connection = null;
         var colorCode = Servant.config.getDefaultColorCode();
 
@@ -789,7 +780,7 @@ public class User {
                 if (color != null) colorCode = String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
             }
         } catch (SQLException e) {
-            new Log(e, guild, user, "color", null).sendLog(false);
+            new Log(e, null, user, "color", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -797,11 +788,9 @@ public class User {
         return colorCode;
     }
 
-    public Color getColor(Guild guild, net.dv8tion.jda.api.entities.User author) {
+    public Color getColor() {
         Connection connection = null;
         var color = Color.decode(Servant.config.getDefaultColorCode());
-        var user = author.getJDA().getUserById(userId);
-        if (user == null) return color;
 
         try {
             connection = Servant.db.getHikari().getConnection();
@@ -843,7 +832,7 @@ public class User {
                 }
             }
         } catch (SQLException e) {
-            new Log(e, guild, author, "color", null).sendLog(false);
+            new Log(e, null, user, "color", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -851,12 +840,12 @@ public class User {
         return color;
     }
 
-    public void setColor(String colorCode, Guild guild, net.dv8tion.jda.api.entities.User user) {
+    public void setColor(String colorCode) {
         Connection connection = null;
 
         try {
             connection = Servant.db.getHikari().getConnection();
-            if (hasEntry("user_settings", "setting", "color", false, guild, user)) {
+            if (hasEntry("user_settings", "setting", "color", false)) {
                 var update = connection.prepareStatement("UPDATE user_settings SET value=? WHERE user_id=? AND setting=?");
                 update.setString(1, colorCode);
                 update.setLong(2, userId);
@@ -870,18 +859,18 @@ public class User {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, guild, user, "color", null).sendLog(false);
+            new Log(e, null, user, "color", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
     }
 
-    boolean unsetColor(Guild guild, net.dv8tion.jda.api.entities.User user) {
+    boolean unsetColor() {
         Connection connection = null;
         var wasUnset = false;
 
         try {
-            if (hasEntry("user_settings", "setting", "color", false, guild, user)) {
+            if (hasEntry("user_settings", "setting", "color", false)) {
                 connection = Servant.db.getHikari().getConnection();
                 var delete = connection.prepareStatement("DELETE FROM user_settings WHERE user_id=? AND setting=?");
                 delete.setLong(1, userId);
@@ -890,7 +879,7 @@ public class User {
                 wasUnset = true;
             }
         } catch (SQLException e) {
-            new Log(e, guild, user, "color", null).sendLog(false);
+            new Log(e, null, user, "color", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -899,8 +888,7 @@ public class User {
     }
 
     // DB
-    private boolean hasEntry(String tableName, String column, String key, boolean isFeatureCount,
-                             Guild guild, net.dv8tion.jda.api.entities.User user) {
+    private boolean hasEntry(String tableName, String column, String key, boolean isFeatureCount) {
         Connection connection = null;
         var hasEntry = false;
 
@@ -912,7 +900,7 @@ public class User {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new Log(e, guild, user, "db", null).sendLog(false);
+            new Log(e, null, user, "db", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -921,7 +909,32 @@ public class User {
     }
 
     // Interaction.
-    public int getInteractionCount(String interaction, boolean isShared, Guild guild, net.dv8tion.jda.api.entities.User user) {
+    public List<Interaction> getInteractions() {
+        Connection connection = null;
+        var interactions = new ArrayList<Interaction>();
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement("SELECT * FROM interaction_count WHERE user_id=?");
+            select.setLong(1, userId);
+            var resultSet = select.executeQuery();
+            if (resultSet.first())
+                do interactions.add(new Interaction(
+                        resultSet.getString("interaction"),
+                        resultSet.getInt("shared"),
+                        resultSet.getInt("received")
+                ));
+                while (resultSet.next());
+        } catch (SQLException e) {
+            new Log(e, null, user, "interaction", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return interactions;
+    }
+
+    public int getInteractionCount(String interaction, boolean isShared) {
         Connection connection = null;
         var commandCount = 0;
 
@@ -933,7 +946,7 @@ public class User {
             var resultSet = select.executeQuery();
             if (resultSet.first()) commandCount = resultSet.getInt(isShared ? "shared" : "received");
         } catch (SQLException e) {
-            new Log(e, guild, user, "interaction", null).sendLog(false);
+            new Log(e, null, user, "interaction", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -941,13 +954,13 @@ public class User {
         return commandCount;
     }
 
-    public void incrementInteractionCount(String interaction, boolean isShared, Guild guild, net.dv8tion.jda.api.entities.User user) {
+    public void incrementInteractionCount(String interaction, boolean isShared) {
         Connection connection = null;
-        var count = getInteractionCount(interaction, isShared, guild, user);
+        var count = getInteractionCount(interaction, isShared);
 
         try {
             connection = Servant.db.getHikari().getConnection();
-            if (hasEntry("interaction_count", "interaction", interaction, false, guild, user)) {
+            if (hasEntry("interaction_count", "interaction", interaction, false)) {
                 var update = connection.prepareStatement("UPDATE interaction_count SET " + (isShared ? "shared" : "received") + "=? WHERE user_id=? AND interaction=?");
                 update.setInt(1, count + 1);
                 update.setLong(2, userId);
@@ -967,14 +980,33 @@ public class User {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, guild, user, "interaction", null).sendLog(false);
+            new Log(e, null, user, "interaction", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
     }
 
     // Feature counter
-    private int getFeatureCount(String feature, Guild guild, net.dv8tion.jda.api.entities.User user) {
+    public Map<String, Integer> getFeatureCounts() {
+        Connection connection = null;
+        var featureCounts = new HashMap<String, Integer>();
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement("SELECT count FROM feature_count WHERE id=?");
+            select.setLong(1, userId);
+            var resultSet = select.executeQuery();
+            if (resultSet.first()) featureCounts.put(resultSet.getString("feature"), resultSet.getInt("count"));
+        } catch (SQLException e) {
+            new Log(e, null, user, "featurecount", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return featureCounts;
+    }
+
+    private int getFeatureCount(String feature) {
         Connection connection = null;
         var featureCount = 0;
 
@@ -986,7 +1018,7 @@ public class User {
             var resultSet = select.executeQuery();
             if (resultSet.first()) featureCount = resultSet.getInt("count");
         } catch (SQLException e) {
-            new Log(e, guild, user, "featurecount", null).sendLog(false);
+            new Log(e, null, user, "featurecount", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -994,13 +1026,13 @@ public class User {
         return featureCount;
     }
 
-    public void incrementFeatureCount(String feature, Guild guild, net.dv8tion.jda.api.entities.User user) {
+    public void incrementFeatureCount(String feature) {
         Connection connection = null;
 
         try {
             connection = Servant.db.getHikari().getConnection();
-            if (hasEntry("feature_count", "feature", feature, true, guild, user)) {
-                var count = getFeatureCount(feature, guild, user);
+            if (hasEntry("feature_count", "feature", feature, true)) {
+                var count = getFeatureCount(feature);
                 var update = connection.prepareStatement("UPDATE feature_count SET count=? WHERE id=? AND feature=?");
                 update.setInt(1, count + 1);
                 update.setLong(2, userId);
@@ -1014,14 +1046,35 @@ public class User {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, guild, user, "featurecount", null).sendLog(false);
+            new Log(e, null, user, "featurecount", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
     }
 
     // Level
-    public int getExp(long guildId, Guild guild, net.dv8tion.jda.api.entities.User user) {
+    public Map<Long, Integer> getExpOnGuilds() {
+        Connection connection = null;
+        var expOnGuilds = new HashMap<Long, Integer>();
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement("SELECT * FROM user_exp WHERE user_id=?");
+            select.setLong(1, userId);
+            var resultSet = select.executeQuery();
+            if (resultSet.first())
+                do expOnGuilds.put(resultSet.getLong("guild_id"), resultSet.getInt("exp"));
+                while (resultSet.next());
+        } catch (SQLException e) {
+            new Log(e, null, user, "level", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return expOnGuilds;
+    }
+
+    public int getExp(long guildId) {
         Connection connection = null;
         var exp = 0;
 
@@ -1033,7 +1086,7 @@ public class User {
             var resultSet = select.executeQuery();
             if (resultSet.first()) exp = resultSet.getInt("exp");
         } catch (SQLException e) {
-            new Log(e, guild, user, "level", null).sendLog(false);
+            new Log(e, null, user, "level", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -1041,19 +1094,19 @@ public class User {
         return exp;
     }
 
-    public void setExp(long guildId, int exp, Guild guild, net.dv8tion.jda.api.entities.User user) {
+    public void setExp(long guildId, int exp) {
         Connection connection = null;
 
         try {
             connection = Servant.db.getHikari().getConnection();
-            if (getExp(guildId, guild, user) == 0) {
+            if (getExp(guildId) == 0) {
                 var insert = connection.prepareStatement("INSERT INTO user_exp(user_id,guild_id,exp) VALUES(?,?,?)");
                 insert.setLong(1, userId);
                 insert.setLong(2, guildId);
                 insert.setInt(3, exp);
                 insert.executeUpdate();
             } else {
-                var currentExp = getExp(guildId, guild, user);
+                var currentExp = getExp(guildId);
                 exp += currentExp;
                 var update = connection.prepareStatement("UPDATE user_exp SET exp=? WHERE user_id=? AND guild_id=?");
                 update.setInt(1, exp);
@@ -1062,14 +1115,14 @@ public class User {
                 update.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, guild, user, "level", null).sendLog(false);
+            new Log(e, null, user, "level", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
     }
 
     // Feature Count
-    public int getTotalFeatureCount(Guild guild, net.dv8tion.jda.api.entities.User user) {
+    public int getTotalFeatureCount() {
         Connection connection = null;
         var feature = 0;
 
@@ -1081,7 +1134,7 @@ public class User {
             if (resultSet.first())
             do feature += resultSet.getInt("count"); while (resultSet.next());
         } catch (SQLException e) {
-            new Log(e, guild, user, "featurecount", null).sendLog(false);
+            new Log(e, null, user, "featurecount", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
@@ -1089,47 +1142,7 @@ public class User {
         return feature;
     }
 
-    public Map<String, Integer> getTop10MostUsedFeatures(Guild guild, net.dv8tion.jda.api.entities.User user, String lang) {
-        Connection connection = null;
-        var features = new LinkedHashMap<String, Integer>();
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT * FROM feature_count WHERE id=?");
-            select.setLong(1, userId);
-            var resultSet = select.executeQuery();
-            if (resultSet.first()) {
-                do {
-                    var feature = resultSet.getString("feature");
-                    var count = resultSet.getInt("count");
-
-                    features.put(feature, count);
-                } while (resultSet.next());
-            }
-        } catch (SQLException e) {
-            new Log(e, guild, user, "featurecount", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-
-        if (!features.isEmpty()) {
-            var sortedFeatures = new LinkedHashMap<String, Integer>();
-            sortedFeatures.put(LanguageHandler.get(lang, "profile_total_muc"), getTotalFeatureCount(guild, user));
-            var counter = 0;
-
-            List<Map.Entry<String, Integer>> entries = new ArrayList<>(features.entrySet());
-            entries.sort(Map.Entry.comparingByValue());
-            Collections.reverse(entries);
-            for (Map.Entry<String, Integer> entry : entries) {
-                if (counter >= 9) break;
-                sortedFeatures.put(entry.getKey(), entry.getValue());
-                counter++;
-            }
-            return sortedFeatures;
-        } else return features;
-    }
-
-    public String getFavouriteAnimal(Guild guild, net.dv8tion.jda.api.entities.User user, String lang) {
+    public String getFavouriteAnimal(String lang) {
         Connection connection = null;
         var bird = 0;
         var cat = 0;
@@ -1149,7 +1162,7 @@ public class User {
                 } while (resultSet.next());
             }
         } catch (SQLException e) {
-            new Log(e, guild, user, "featurecount", null).sendLog(false);
+            new Log(e, null, user, "featurecount", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }

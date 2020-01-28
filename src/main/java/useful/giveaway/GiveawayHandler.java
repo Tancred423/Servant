@@ -2,7 +2,8 @@
 package useful.giveaway;
 
 import files.language.LanguageHandler;
-import moderation.guild.Guild;
+import moderation.guild.Server;
+import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Message;
@@ -99,8 +100,8 @@ public class GiveawayHandler {
                         var thisGuild = jda.getGuildById(guildId);
                         if (thisGuild == null) return;
                         var giveaway = resultSet.getTimestamp("time").toLocalDateTime()
-                                .atZone(ZoneId.of(new Guild(thisGuild.getIdLong())
-                                        .getOffset(jda.getGuildById(guildId), jda.getSelfUser())));
+                                .atZone(ZoneId.of(new Server(thisGuild)
+                                        .getOffset()));
                         var amountWinners = resultSet.getInt("amount_winners");
 
                         var tc = thisGuild.getTextChannelById(channelId);
@@ -112,8 +113,8 @@ public class GiveawayHandler {
                                 var guild = message.getGuild();
                                 var author = jda.getUserById(hostId);
                                 if (author == null) return;
-                                var lang = new Guild(guild.getIdLong()).getLanguage(guild, jda.getSelfUser());
-                                var now = ZonedDateTime.now(ZoneOffset.of(new Guild(message.getGuild().getIdLong()).getOffset(guild, author)));
+                                var lang = new Server(guild).getLanguage();
+                                var now = ZonedDateTime.now(ZoneOffset.of(new Server(message.getGuild()).getOffset()));
 
                                 var remainingTimeMillis = zonedDateTimeDifference(now, giveaway);
 
@@ -122,7 +123,7 @@ public class GiveawayHandler {
                                     var remainingTimeString = formatDifference(remainingTimeMillis, lang);
 
                                     var eb = new EmbedBuilder();
-                                    eb.setColor(new moderation.user.User(hostId).getColor(guild, author));
+                                    eb.setColor(new Master(hostUser).getColor());
                                     eb.setAuthor(String.format(LanguageHandler.get(lang, "giveaway_from"), author.getName()), null, author.getEffectiveAvatarUrl());
                                     eb.setDescription(String.format(LanguageHandler.get(lang, "giveaway_description_running"), prize, amountWinners, remainingTimeString, Emote.getEmoji("tada")));
                                     eb.appendDescription("\n\n" + String.format(LanguageHandler.get(lang, "giveaway_end_manually"), author.getAsMention()));
@@ -147,7 +148,8 @@ public class GiveawayHandler {
 
     public static void announceWinners(Message message, int amountWinners, String prize, String lang, User author) {
         if (message.getReactions().size() == 0) {
-            message.getChannel().sendMessage(LanguageHandler.get(lang, "giveaway_noreactions")).queue();
+            message.getChannel().sendMessage(String.format(LanguageHandler.get(lang, "giveaway_noreactions"), message.getIdLong())).queue();
+            GiveawayHandler.deleteGiveawayFromDb(message.getGuild().getIdLong(), message.getChannel().getIdLong(), message.getIdLong(), message.getGuild(), author);
             return;
         }
 
@@ -159,11 +161,11 @@ public class GiveawayHandler {
                     participantsList.remove(message.getJDA().getSelfUser()); // Remove bot
                     var winners = new StringBuilder();
                     var amountParticipants = participantsList.size();
-                    var now = ZonedDateTime.now(ZoneOffset.of(new Guild(message.getGuild().getIdLong()).getOffset(guild, author)));
+                    var now = ZonedDateTime.now(ZoneOffset.of(new Server(message.getGuild()).getOffset()));
 
                     if (amountParticipants == 0) {
                         var eb = new EmbedBuilder();
-                        eb.setColor(new moderation.user.User(author.getIdLong()).getColor(guild, author));
+                        eb.setColor(new Master(author).getColor());
                         eb.setAuthor(String.format(LanguageHandler.get(lang, "giveaway_from"), author.getName()), null, author.getEffectiveAvatarUrl());
                         eb.setDescription(String.format(LanguageHandler.get(lang, "giveaway_description_nowinner"), prize, amountWinners));
                         eb.setFooter(LanguageHandler.get(lang, "giveaway_endedat"), Image.getImageUrl("clock", guild, author));
@@ -178,13 +180,13 @@ public class GiveawayHandler {
                             }
                         } else for (var participant : participantsList) winners.append(" - ").append(participant.getAsMention()).append("\n");
 
-                        var eb = new EmbedBuilder();
-                        eb.setColor(new moderation.user.User(author.getIdLong()).getColor(guild, author));
-                        eb.setAuthor(String.format(LanguageHandler.get(lang, "giveaway_from"), author.getName()), null, author.getEffectiveAvatarUrl());
-                        eb.setDescription(String.format(LanguageHandler.get(lang, "giveaway_description_end"), prize, amountWinners, winners));
-                        eb.setFooter(LanguageHandler.get(lang, "giveaway_endedat"), null);
-                        eb.setTimestamp(now);
-                        message.editMessage(eb.build()).queue();
+                        message.editMessage(new EmbedBuilder()
+                                .setColor(new Master(author).getColor())
+                                .setAuthor(String.format(LanguageHandler.get(lang, "giveaway_from"), author.getName()), null, author.getEffectiveAvatarUrl())
+                                .setDescription(String.format(LanguageHandler.get(lang, "giveaway_description_end"), prize, amountWinners, winners))
+                                .setFooter(LanguageHandler.get(lang, "giveaway_endedat"), null)
+                                .setTimestamp(now).build()
+                        ).queue();
                     }
 
                     message.clearReactions().queue();
@@ -385,7 +387,7 @@ public class GiveawayHandler {
             }
         }
 
-        var now = ZonedDateTime.now(ZoneOffset.of(new Guild(message.getGuild().getIdLong()).getOffset(guild, author)));
+        var now = ZonedDateTime.now(ZoneOffset.of(new Server(message.getGuild()).getOffset()));
         ZonedDateTime dateGiveaway;
         try {
             dateGiveaway = getDate(now, sb.toString().trim());
@@ -403,7 +405,7 @@ public class GiveawayHandler {
         var remainingTimeString = formatDifference(remainingTimeMillis, lang);
 
         var eb = new EmbedBuilder();
-        eb.setColor(new moderation.user.User(message.getAuthor().getIdLong()).getColor(guild, author));
+        eb.setColor(new Master(message.getAuthor()).getColor());
         eb.setAuthor(String.format(LanguageHandler.get(lang, "giveaway_from"), message.getAuthor().getName()), null, message.getAuthor().getEffectiveAvatarUrl());
         eb.setDescription(String.format(LanguageHandler.get(lang, "giveaway_description_running"), prize, amountWinners, remainingTimeString, Emote.getEmoji("tada")));
         eb.appendDescription("\n\n" + String.format(LanguageHandler.get(lang, "giveaway_end_manually"), author.getAsMention()));

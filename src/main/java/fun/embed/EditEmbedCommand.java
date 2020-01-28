@@ -2,9 +2,8 @@
 package fun.embed;
 
 import files.language.LanguageHandler;
-import moderation.guild.Guild;
 import moderation.guild.GuildHandler;
-import moderation.toggle.Toggle;
+import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
@@ -13,7 +12,6 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
-import servant.Servant;
 import utilities.Constants;
 import utilities.Parser;
 import utilities.UsageEmbed;
@@ -28,7 +26,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 public class EditEmbedCommand extends Command {
@@ -58,100 +55,87 @@ public class EditEmbedCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        CompletableFuture.runAsync(() -> {
-            try {
-                if (!Toggle.isEnabled(event, name)) return;
+        var guild = event.getGuild();
+        var user = event.getAuthor();
+        var master = new Master(user);
 
-                var lang = LanguageHandler.getLanguage(event);
-                var p = GuildHandler.getPrefix(event);
+        var lang = LanguageHandler.getLanguage(event);
+        var p = GuildHandler.getPrefix(event);
 
-                if (event.getArgs().isEmpty()) {
-                    var description = String.format(LanguageHandler.get(lang, "editembed_description"), event.getSelfUser().getName());
-                    var usage = String.format(LanguageHandler.get(lang, "editembed_usage"), p, name, p, name);
-                    var hint = LanguageHandler.get(lang, "editembed_hint");
-                    event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
-                    return;
-                }
+        if (event.getArgs().isEmpty()) {
+            var description = String.format(LanguageHandler.get(lang, "editembed_description"), event.getSelfUser().getName());
+            var usage = String.format(LanguageHandler.get(lang, "editembed_usage"), p, name, p, name);
+            var hint = LanguageHandler.get(lang, "editembed_hint");
+            event.reply(new UsageEmbed(name, user, description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+            return;
+        }
 
-                if (event.getMessage().getMentionedChannels().isEmpty()) {
-                    event.reactError();
-                    event.reply(String.format(LanguageHandler.get(lang, "editembed_missing_channel"), p));
-                    return;
-                }
+        if (event.getMessage().getMentionedChannels().isEmpty()) {
+            event.reactError();
+            event.reply(String.format(LanguageHandler.get(lang, "editembed_missing_channel"), p));
+            return;
+        }
 
-                if (event.getArgs().split(" ").length < 2) {
-                    event.reactError();
-                    event.reply(String.format(LanguageHandler.get(lang, "editembed_missing_message_id"), p));
-                    return;
-                }
+        if (event.getArgs().split(" ").length < 2) {
+            event.reactError();
+            event.reply(String.format(LanguageHandler.get(lang, "editembed_missing_message_id"), p));
+            return;
+        }
 
-                var mentionedChannel = event.getMessage().getMentionedChannels().get(0);
-                var messageId = event.getArgs().split(" ")[1];
+        var mentionedChannel = event.getMessage().getMentionedChannels().get(0);
+        var messageId = event.getArgs().split(" ")[1];
 
-                if (!Parser.isValidMessageId(mentionedChannel, messageId)) {
-                    event.reactError();
-                    event.reply(String.format(LanguageHandler.get(lang, "editembed_invalid_message_id"), p));
-                    return;
-                }
+        if (!Parser.isValidMessageId(mentionedChannel, messageId)) {
+            event.reactError();
+            event.reply(String.format(LanguageHandler.get(lang, "editembed_invalid_message_id"), p));
+            return;
+        }
 
-                if (!mentionedChannel.canTalk(Objects.requireNonNull(event.getGuild().getMember(event.getAuthor())))) {
-                    event.replyError(LanguageHandler.get(lang, "editembed_missingpermission"));
-                    return;
-                }
+        if (!mentionedChannel.canTalk(Objects.requireNonNull(event.getGuild().getMember(event.getAuthor())))) {
+            event.replyError(LanguageHandler.get(lang, "editembed_missingpermission"));
+            return;
+        }
 
-                mentionedChannel.retrieveMessageById(messageId).queue(embedMessage -> {
-                    if (!embedMessage.getAuthor().equals(event.getSelfUser())) {
-                        event.reactError();
-                        event.reply(LanguageHandler.get(lang, "editembed_notbyme"));
-                        return;
-                    }
-
-                    if (embedMessage.getEmbeds().isEmpty()) {
-                        event.reactError();
-                        event.reply(LanguageHandler.get(lang, "editembed_noembed"));
-                        return;
-                    }
-
-                    var messageEmbed = embedMessage.getEmbeds().get(0);
-
-                    var guild = event.getGuild();
-                    var author = event.getAuthor();
-                    var internalAuthor = new moderation.user.User(author.getIdLong());
-                    var eb = new EmbedBuilder();
-
-                    eb.setColor(internalAuthor.getColor(guild, author));
-                    if (messageEmbed.getAuthor() == null) eb.setAuthor(null, null, null);
-                    else
-                        eb.setAuthor(messageEmbed.getAuthor().getName(), messageEmbed.getAuthor().getUrl(), messageEmbed.getAuthor().getIconUrl());
-                    eb.setThumbnail(messageEmbed.getThumbnail() == null ? null : messageEmbed.getThumbnail().getUrl());
-                    eb.setTitle(messageEmbed.getTitle(), messageEmbed.getUrl());
-                    eb.setDescription(messageEmbed.getDescription());
-                    List<MessageEmbed.Field> fields = messageEmbed.getFields();
-                    for (MessageEmbed.Field field : fields)
-                        eb.addField(field.getName(), field.getValue(), field.isInline());
-                    eb.setImage(messageEmbed.getImage() == null ? null : messageEmbed.getImage().getUrl());
-                    if (messageEmbed.getFooter() == null) eb.setFooter(null, null);
-                    else eb.setFooter(messageEmbed.getFooter().getText(), messageEmbed.getFooter().getIconUrl());
-                    eb.setTimestamp(messageEmbed.getTimestamp());
-
-
-                    var channel = event.getChannel();
-                    channel.sendMessage(eb.build()).queue(message -> {
-                        var embedUser = new EmbedUser(message, message.getEmbeds().get(0));
-                        processIntroduction(channel, author, embedUser, event, embedMessage, lang);
-                    });
-                }, failure -> {
-                    event.reply(LanguageHandler.get(lang, "editembed_notfound"));
-                    event.reactError();
-                });
-
-                // Statistics.
-                new moderation.user.User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), event.getGuild(), event.getAuthor());
-                new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), event.getGuild(), event.getAuthor());
-            } catch (Exception e) {
-                e.printStackTrace();
+        mentionedChannel.retrieveMessageById(messageId).queue(embedMessage -> {
+            if (!embedMessage.getAuthor().equals(event.getSelfUser())) {
+                event.reactError();
+                event.reply(LanguageHandler.get(lang, "editembed_notbyme"));
+                return;
             }
-        }, Servant.threadPool);
+
+            if (embedMessage.getEmbeds().isEmpty()) {
+                event.reactError();
+                event.reply(LanguageHandler.get(lang, "editembed_noembed"));
+                return;
+            }
+
+            var messageEmbed = embedMessage.getEmbeds().get(0);
+            var eb = new EmbedBuilder();
+
+            eb.setColor(master.getColor());
+            if (messageEmbed.getAuthor() == null) eb.setAuthor(null, null, null);
+            else eb.setAuthor(messageEmbed.getAuthor().getName(), messageEmbed.getAuthor().getUrl(), messageEmbed.getAuthor().getIconUrl());
+            eb.setThumbnail(messageEmbed.getThumbnail() == null ? null : messageEmbed.getThumbnail().getUrl());
+            eb.setTitle(messageEmbed.getTitle(), messageEmbed.getUrl());
+            eb.setDescription(messageEmbed.getDescription());
+            List<MessageEmbed.Field> fields = messageEmbed.getFields();
+            for (MessageEmbed.Field field : fields)
+                eb.addField(field.getName(), field.getValue(), field.isInline());
+            eb.setImage(messageEmbed.getImage() == null ? null : messageEmbed.getImage().getUrl());
+            if (messageEmbed.getFooter() == null) eb.setFooter(null, null);
+            else eb.setFooter(messageEmbed.getFooter().getText(), messageEmbed.getFooter().getIconUrl());
+            eb.setTimestamp(messageEmbed.getTimestamp());
+
+
+            var channel = event.getChannel();
+            channel.sendMessage(eb.build()).queue(message -> {
+                var embedUser = new EmbedUser(message, message.getEmbeds().get(0));
+                processIntroduction(channel, user, embedUser, event, embedMessage, lang);
+            });
+        }, failure -> {
+            event.reply(LanguageHandler.get(lang, "editembed_notfound"));
+            event.reactError();
+        });
     }
 
     // Timeout

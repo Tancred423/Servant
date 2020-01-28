@@ -2,21 +2,15 @@
 package moderation.livestream;
 
 import files.language.LanguageHandler;
-import moderation.guild.Guild;
 import moderation.guild.GuildHandler;
-import moderation.toggle.Toggle;
-import moderation.user.User;
+import moderation.guild.Server;
+import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import owner.blacklist.Blacklist;
-import servant.Servant;
 import utilities.Constants;
 import utilities.UsageEmbed;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
-
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 public class LivestreamCommand extends Command {
     public LivestreamCommand() {
@@ -39,141 +33,127 @@ public class LivestreamCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        CompletableFuture.runAsync(() -> {
-            try {
-                if (!Toggle.isEnabled(event, name)) return;
-                if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
+        var lang = LanguageHandler.getLanguage(event);
+        var p = GuildHandler.getPrefix(event);
 
-                var lang = LanguageHandler.getLanguage(event);
-                var p = GuildHandler.getPrefix(event);
+        var arg = event.getArgs();
+        if (arg.isEmpty()) {
+            var description = LanguageHandler.get(lang, "livestream_description");
+            var usage = String.format(LanguageHandler.get(lang, "livestream_usage"),
+                    p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name);
+            var hint = LanguageHandler.get(lang, "livestream_hint");
+            event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+            return;
+        }
 
-                String arg = event.getArgs();
-                if (arg.isEmpty()) {
-                    var description = LanguageHandler.get(lang, "livestream_description");
-                    var usage = String.format(LanguageHandler.get(lang, "livestream_usage"),
-                            p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name);
-                    var hint = LanguageHandler.get(lang, "livestream_hint");
-                    event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
-                    return;
+        var message = event.getMessage();
+        var guild = event.getGuild();
+        var server = new Server(guild);
+        var args = arg.split(" ");
+        switch (args[0].toLowerCase()) {
+            case "toggle":
+            case "t":
+                server.toggleStreamerMode();
+                event.reactSuccess();
+                break;
+
+            case "set":
+            case "s":
+            case "add":
+            case "a":
+                if (message.getMentionedChannels().isEmpty()
+                        && message.getMentionedMembers().isEmpty()
+                        && message.getMentionedRoles().isEmpty()) {
+                    event.reply(LanguageHandler.get(lang, "livestream_missingmention"));
+                    event.reactError();
+                } else if (message.getMentionedMembers().isEmpty() && message.getMentionedRoles().isEmpty()) {
+                    server.setStreamChannel(message.getMentionedChannels().get(0));
+                    event.reactSuccess();
+                } else if (message.getMentionedChannels().isEmpty() && message.getMentionedRoles().isEmpty()) {
+                    server.setStreamer(message.getMentionedMembers().get(0).getUser().getIdLong());
+                    event.reactSuccess();
+                } else if (message.getMentionedMembers().isEmpty() && message.getMentionedChannels().isEmpty()) {
+                    server.setStreamingRole(message.getMentionedRoles().get(0).getIdLong());
+                    event.reactSuccess();
+                } else {
+                    event.reply(LanguageHandler.get(lang, "livestream_toomanymentions"));
+                    event.reactError();
                 }
+                break;
 
-                var message = event.getMessage();
-                var author = event.getAuthor();
-                var guild = event.getGuild();
-                var internalGuild = new Guild(guild.getIdLong());
-                var args = arg.split(" ");
-                switch (args[0].toLowerCase()) {
-                    case "toggle":
-                    case "t":
-                        internalGuild.toggleStreamerMode(guild, author);
+            case "unset":
+            case "u":
+            case "remove":
+            case "r":
+                if (message.getMentionedChannels().isEmpty()
+                        && message.getMentionedMembers().isEmpty()
+                        && message.getMentionedRoles().isEmpty()) {
+                    event.reply(LanguageHandler.get(lang, "livestream_missingmention"));
+                    event.reactError();
+                } else if (message.getMentionedMembers().isEmpty() && message.getMentionedRoles().isEmpty()) {
+                    if (server.unsetStreamChannel()) event.reactSuccess();
+                    else {
+                        event.reply(LanguageHandler.get(lang, "livestream_nochannel"));
+                        event.reactWarning();
+                    }
+                } else if (message.getMentionedChannels().isEmpty() && message.getMentionedRoles().isEmpty()) {
+                    if (server.unsetStreamer(message.getMentionedMembers().get(0).getUser().getIdLong()))
                         event.reactSuccess();
-                        break;
+                    else {
+                        event.reply(LanguageHandler.get(lang, "livestream_nostreamer"));
+                        event.reactWarning();
+                    }
+                } else if (message.getMentionedMembers().isEmpty() && message.getMentionedChannels().isEmpty()) {
+                    if (server.unsetStreamingRole())
+                        event.reactSuccess();
+                    else {
+                        event.reply(LanguageHandler.get(lang, "livestream_norole"));
+                        event.reactWarning();
+                    }
+                } else {
+                    event.reply(LanguageHandler.get(lang, "livestream_toomanymentions"));
+                    event.reactError();
+                }
+                break;
 
-                    case "set":
-                    case "s":
-                    case "add":
-                    case "a":
-                        if (message.getMentionedChannels().isEmpty()
-                                && message.getMentionedMembers().isEmpty()
-                                && message.getMentionedRoles().isEmpty()) {
-                            event.reply(LanguageHandler.get(lang, "livestream_missingmention"));
-                            event.reactError();
-                        } else if (message.getMentionedMembers().isEmpty() && message.getMentionedRoles().isEmpty()) {
-                            internalGuild.setStreamChannel(message.getMentionedChannels().get(0), guild, author);
-                            event.reactSuccess();
-                        } else if (message.getMentionedChannels().isEmpty() && message.getMentionedRoles().isEmpty()) {
-                            internalGuild.setStreamer(message.getMentionedMembers().get(0).getUser().getIdLong(), guild, author);
-                            event.reactSuccess();
-                        } else if (message.getMentionedMembers().isEmpty() && message.getMentionedChannels().isEmpty()) {
-                            internalGuild.setStreamingRole(message.getMentionedRoles().get(0).getIdLong(), guild, author);
-                            event.reactSuccess();
-                        } else {
-                            event.reply(LanguageHandler.get(lang, "livestream_toomanymentions"));
-                            event.reactError();
-                        }
-                        break;
+            case "show":
+            case "sh":
+                var master = new Master(event.getAuthor());
+                var eb = new EmbedBuilder();
+                var sb = new StringBuilder();
+                var streamers = server.getStreamers();
 
-                    case "unset":
-                    case "u":
-                    case "remove":
-                    case "r":
-                        if (message.getMentionedChannels().isEmpty()
-                                && message.getMentionedMembers().isEmpty()
-                                && message.getMentionedRoles().isEmpty()) {
-                            event.reply(LanguageHandler.get(lang, "livestream_missingmention"));
-                            event.reactError();
-                        } else if (message.getMentionedMembers().isEmpty() && message.getMentionedRoles().isEmpty()) {
-                            if (internalGuild.unsetStreamChannel(guild, author)) event.reactSuccess();
-                            else {
-                                event.reply(LanguageHandler.get(lang, "livestream_nochannel"));
-                                event.reactWarning();
-                            }
-                        } else if (message.getMentionedChannels().isEmpty() && message.getMentionedRoles().isEmpty()) {
-                            if (internalGuild.unsetStreamer(message.getMentionedMembers().get(0).getUser().getIdLong(), guild, author))
-                                event.reactSuccess();
-                            else {
-                                event.reply(LanguageHandler.get(lang, "livestream_nostreamer"));
-                                event.reactWarning();
-                            }
-                        } else if (message.getMentionedMembers().isEmpty() && message.getMentionedChannels().isEmpty()) {
-                            if (internalGuild.unsetStreamingRole(guild, author))
-                                event.reactSuccess();
-                            else {
-                                event.reply(LanguageHandler.get(lang, "livestream_norole"));
-                                event.reactWarning();
-                            }
-                        } else {
-                            event.reply(LanguageHandler.get(lang, "livestream_toomanymentions"));
-                            event.reactError();
-                        }
-                        break;
+                var roleId = server.getStreamingRoleId();
 
-                    case "show":
-                    case "sh":
-                        var internalUser = new User(event.getAuthor().getIdLong());
-                        var eb = new EmbedBuilder();
-                        var sb = new StringBuilder();
-                        List<Long> streamers = internalGuild.getStreamers(guild, author);
-
-                        long roleId = internalGuild.getStreamingRoleId(guild, author);
-
-                        long channelId = internalGuild.getStreamChannelId(guild, author);
-                        for (Long streamer : streamers) {
-                            var streamerMember = guild.getMemberById(streamer);
-                            if (streamerMember != null)
-                                sb.append(streamerMember.getAsMention()).append("\n");
-                        }
-
-                        boolean streamerMode = internalGuild.isStreamerMode(guild, author);
-
-                        eb.setColor(internalUser.getColor(guild, author));
-                        eb.setAuthor(LanguageHandler.get(lang, "livestream_settings"), null, guild.getIconUrl());
-                        var tc = guild.getTextChannelById(channelId);
-                        eb.addField(LanguageHandler.get(lang, "livestream_notificationchannel"),
-                                (tc == null ? LanguageHandler.get(lang, "livestream_nochannelset") : tc.getAsMention()), true);
-                        var role = guild.getRoleById(roleId);
-                        eb.addField(LanguageHandler.get(lang, "livestream_role"),
-                                (role == null ? LanguageHandler.get(lang, "livestream_noroleset") : role.getAsMention()), true);
-                        eb.addField(LanguageHandler.get(lang, "livestream_mode"),
-                                (streamerMode ? LanguageHandler.get(lang, "livestream_mode") : LanguageHandler.get(lang, "livestream_publicmode")), true);
-                        eb.addField(LanguageHandler.get(lang, "livestream_streamers"),
-                                (streamers.isEmpty() ? LanguageHandler.get(lang, "livestream_nostreamersset") : sb.toString()), false);
-
-                        event.reply(eb.build());
-                        break;
-
-                    default:
-                        event.reactError();
-                        event.reply(LanguageHandler.get(lang, "livestream_firstarg"));
-                        break;
+                var channelId = server.getStreamChannelId();
+                for (Long streamer : streamers) {
+                    var streamerMember = guild.getMemberById(streamer);
+                    if (streamerMember != null)
+                        sb.append(streamerMember.getAsMention()).append("\n");
                 }
 
-                // Statistics.
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-                new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }, Servant.threadPool);
+                var streamerMode = server.isStreamerMode();
+
+                eb.setColor(master.getColor());
+                eb.setAuthor(LanguageHandler.get(lang, "livestream_settings"), null, guild.getIconUrl());
+                var tc = guild.getTextChannelById(channelId);
+                eb.addField(LanguageHandler.get(lang, "livestream_notificationchannel"),
+                        (tc == null ? LanguageHandler.get(lang, "livestream_nochannelset") : tc.getAsMention()), true);
+                var role = guild.getRoleById(roleId);
+                eb.addField(LanguageHandler.get(lang, "livestream_role"),
+                        (role == null ? LanguageHandler.get(lang, "livestream_noroleset") : role.getAsMention()), true);
+                eb.addField(LanguageHandler.get(lang, "livestream_mode"),
+                        (streamerMode ? LanguageHandler.get(lang, "livestream_mode") : LanguageHandler.get(lang, "livestream_publicmode")), true);
+                eb.addField(LanguageHandler.get(lang, "livestream_streamers"),
+                        (streamers.isEmpty() ? LanguageHandler.get(lang, "livestream_nostreamersset") : sb.toString()), false);
+
+                event.reply(eb.build());
+                break;
+
+            default:
+                event.reactError();
+                event.reply(LanguageHandler.get(lang, "livestream_firstarg"));
+                break;
+        }
     }
 }

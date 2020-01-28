@@ -2,7 +2,7 @@
 package listeners;
 
 import files.language.LanguageHandler;
-import moderation.guild.Guild;
+import moderation.guild.Server;
 import moderation.toggle.Toggle;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -36,9 +36,8 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
         if (Blacklist.isBlacklisted(user, guild)) return;
 
         CompletableFuture.runAsync(() -> {
-            var internalGuild = new Guild(guild.getIdLong());
+            var server = new Server(guild);
             var messageId = event.getMessageIdLong();
-            var lang = new Guild(event.getGuild().getIdLong()).getLanguage(guild, user);
 
             // Quickpoll
             if (PollsDatabase.isQuickvote(messageId, guild, user)) {
@@ -52,7 +51,7 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 
             // Reaction Role
             if (Toggle.isEnabled(event, "reactionrole")) {
-                processReactionRole(event, guild, user, internalGuild);
+                processReactionRole(event, guild, user, server);
             }
         }, Servant.threadPool);
     }
@@ -111,7 +110,7 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
         });
     }
 
-    private static void processReactionRole(GuildMessageReactionRemoveEvent event, net.dv8tion.jda.api.entities.Guild guild, User user, Guild internalGuild) {
+    private static void processReactionRole(GuildMessageReactionRemoveEvent event, net.dv8tion.jda.api.entities.Guild guild, User user, Server internalGuild) {
         var guildId = guild.getIdLong();
         var channelId = event.getChannel().getIdLong();
         var messageId = event.getMessageIdLong();
@@ -128,14 +127,14 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
             emoji = reactionEmote.getName();
         }
 
-        if (internalGuild.reactionRoleHasEntry(guildId, channelId, messageId, emoji, emoteGuildId, emoteId, guild, user)) {
-            long roleId = internalGuild.getRoleId(guildId, channelId, messageId, emoji, emoteGuildId, emoteId, guild, user);
+        if (internalGuild.reactionRoleHasEntry(guildId, channelId, messageId, emoji, emoteGuildId, emoteId)) {
+            long roleId = internalGuild.getRoleId(guildId, channelId, messageId, emoji, emoteGuildId, emoteId);
             try {
                 var rolesToRemove = new ArrayList<Role>();
                 rolesToRemove.add(event.getGuild().getRoleById(roleId));
                 event.getGuild().modifyMemberRoles(event.getMember(), null, rolesToRemove).queue();
             } catch (InsufficientPermissionException | HierarchyException e) {
-                event.getChannel().sendMessage(LanguageHandler.get(new Guild(event.getGuild().getIdLong()).getLanguage(guild, user), "reactionrole_insufficient")).queue();
+                event.getChannel().sendMessage(LanguageHandler.get(new Server(event.getGuild()).getLanguage(), "reactionrole_insufficient")).queue();
             }
         }
     }

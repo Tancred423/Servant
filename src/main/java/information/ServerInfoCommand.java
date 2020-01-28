@@ -2,12 +2,10 @@
 package information;
 
 import files.language.LanguageHandler;
-import moderation.toggle.Toggle;
-import moderation.user.User;
+import moderation.guild.Server;
+import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.*;
-import owner.blacklist.Blacklist;
 import servant.Servant;
 import utilities.Constants;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
@@ -17,7 +15,6 @@ import zJdaUtilsLib.com.jagrosh.jdautilities.examples.doc.Author;
 import java.time.DateTimeException;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
-import java.util.concurrent.CompletableFuture;
 
 @Author("John Grosh (jagrosh)")
 public class ServerInfoCommand extends Command {
@@ -41,28 +38,18 @@ public class ServerInfoCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        CompletableFuture.runAsync(() -> {
-            try {
-                if (!Toggle.isEnabled(event, name)) return;
-                if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
+        var lang = LanguageHandler.getLanguage(event);
 
-                var lang = LanguageHandler.getLanguage(event);
-                var guild = event.getGuild();
-                var author = event.getAuthor();
-
-                processInfo(event, guild, guild.getVanityUrl(), lang);
-
-                // Statistics.
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-                new moderation.guild.Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }, Servant.threadPool);
+        processInfo(event, lang);
     }
 
-    private void processInfo(CommandEvent event, Guild guild, String vanityUrl, String lang) {
-        var author = event.getAuthor();
+    private void processInfo(CommandEvent event, String lang) {
+        var user = event.getAuthor();
+        var master = new Master(user);
+        var guild = event.getGuild();
+        var server = new Server(guild);
+
+        var vanityUrl = guild.getVanityUrl();
 
         var name = guild.getName();
         var id = guild.getIdLong();
@@ -79,7 +66,6 @@ public class ServerInfoCommand extends Command {
         var categoryCount = guild.getCategories().size();
         var emoteCount = guild.getEmotes().size();
 
-
         var afkChannel = guild.getAfkChannel();
         var afkTimeout = guild.getAfkTimeout().getSeconds();
 
@@ -90,18 +76,21 @@ public class ServerInfoCommand extends Command {
         var region = guild.getRegionRaw();
         var systemChannel = guild.getSystemChannel(); // New member announcement.
 
-        var eb = new EmbedBuilder();
-        eb.setColor(new User(event.getAuthor().getIdLong()).getColor(guild, author));
-        eb.setAuthor(String.format(LanguageHandler.get(lang, "serverinfo_owner"), owner.getEffectiveName()), null, owner.getUser().getEffectiveAvatarUrl());
-        eb.setThumbnail(icon);
-        eb.setTitle(String.format(LanguageHandler.get(lang, "serverinfo_name"), name, id));
-        eb.setImage(splash);
-        eb.setFooter(String.format(LanguageHandler.get(lang, "serverinfo_region"), region), null);
+        OffsetDateTime timestamp;
         try {
-            eb.setTimestamp(OffsetDateTime.now(ZoneId.of(new moderation.guild.Guild(event.getGuild().getIdLong()).getOffset(guild, author))));
+            timestamp = OffsetDateTime.now(ZoneId.of(server.getOffset()));
         } catch (DateTimeException e) {
-            eb.setTimestamp(OffsetDateTime.now(ZoneId.of(Servant.config.getDefaultOffset())).getOffset());
+            timestamp = OffsetDateTime.now(ZoneId.of(Servant.config.getDefaultOffset()));
         }
+
+        var eb = new EmbedBuilder()
+                .setColor(master.getColor())
+                .setAuthor(String.format(LanguageHandler.get(lang, "serverinfo_owner"), owner.getEffectiveName()), null, owner.getUser().getEffectiveAvatarUrl())
+                .setThumbnail(icon)
+                .setTitle(String.format(LanguageHandler.get(lang, "serverinfo_name"), name, id))
+                .setImage(splash)
+                .setFooter(String.format(LanguageHandler.get(lang, "serverinfo_region"), region), null)
+                .setTimestamp(timestamp);
 
         // Counts
         eb.addField(LanguageHandler.get(lang, "serverinfo_textcount"), String.valueOf(textChannelCount), true);
@@ -125,25 +114,24 @@ public class ServerInfoCommand extends Command {
 
         // Bot Settings
         eb.addField("", String.format(LanguageHandler.get(lang, "serverinfo_botsettings"), event.getSelfUser().getName()), false);
-        var internalGuild = new moderation.guild.Guild(guild.getIdLong());
-        eb.addField(LanguageHandler.get(lang, "serverinfo_prefix"), internalGuild.getPrefix(guild, author), true);
-        eb.addField(LanguageHandler.get(lang, "serverinfo_offset"), internalGuild.getOffset(guild, author).equalsIgnoreCase("z") ? "UTC" : internalGuild.getOffset(guild, author), true);
-        eb.addField(LanguageHandler.get(lang, "serverinfo_language"), internalGuild.getLanguage(guild, author), true);
-        var birthdayChannel = guild.getTextChannelById(internalGuild.getBirthdayChannelId(guild, author));
+        eb.addField(LanguageHandler.get(lang, "serverinfo_prefix"), server.getPrefix(), true);
+        eb.addField(LanguageHandler.get(lang, "serverinfo_offset"), server.getOffset().equalsIgnoreCase("z") ? "UTC" : server.getOffset(), true);
+        eb.addField(LanguageHandler.get(lang, "serverinfo_language"), server.getLanguage(), true);
+        var birthdayChannel = guild.getTextChannelById(server.getBirthdayChannelId());
         eb.addField(LanguageHandler.get(lang, "serverinfo_bdaychannel"), birthdayChannel == null ?
                 LanguageHandler.get(lang, "serverinfo_nobdaychannel") : birthdayChannel.getAsMention(), true);
-        var roleIntegerEntry = internalGuild.getAutorole(guild, author);
+        var roleIntegerEntry = server.getAutorole();
         eb.addField(LanguageHandler.get(lang, "serverinfo_autorole"), roleIntegerEntry == null ?
                 LanguageHandler.get(lang, "serverinfo_noautorole") :
                 String.format(LanguageHandler.get(lang, "serverinfo_autorole_value"), roleIntegerEntry.getKey().getAsMention(), roleIntegerEntry.getValue()), true);
-        var streamChannel = guild.getTextChannelById(internalGuild.getStreamChannelId(guild, author));
-        var streamRole = guild.getRoleById(internalGuild.getStreamingRoleId(guild, author));
+        var streamChannel = guild.getTextChannelById(server.getStreamChannelId());
+        var streamRole = guild.getRoleById(server.getStreamingRoleId());
         eb.addField(LanguageHandler.get(lang, "serverinfo_livestream"),
                 (streamChannel == null ? LanguageHandler.get(lang, "serverinfo_nolivestream_channel") : streamChannel.getAsMention()) + "\n" +
                         (streamRole == null ? LanguageHandler.get(lang, "serverinfo_nolivestream_role") : streamRole.getAsMention()) + "\n" +
-                        (internalGuild.isStreamerMode(guild, author) ? LanguageHandler.get(lang, "serverinfo_streamermode") : LanguageHandler.get(lang, "serverinfo_publicmode")), true);
+                        (server.isStreamerMode() ? LanguageHandler.get(lang, "serverinfo_streamermode") : LanguageHandler.get(lang, "serverinfo_publicmode")), true);
 
-        var lobbies = internalGuild.getLobbies(guild, author);
+        var lobbies = server.getLobbies();
         var sb = new StringBuilder();
         if (!lobbies.isEmpty())
             for (Long lobbyId : lobbies) {
@@ -153,7 +141,7 @@ public class ServerInfoCommand extends Command {
         eb.addField(LanguageHandler.get(lang, "serverinfo_voicelobbies"), sb.toString().isEmpty() ?
                 LanguageHandler.get(lang, "serverinfo_novoicelobbies") : sb.toString(), true);
 
-        var mediaOnlyChannels = internalGuild.getMediaOnlyChannels(guild, author);
+        var mediaOnlyChannels = server.getMediaOnlyChannels();
         sb = new StringBuilder();
         if (mediaOnlyChannels != null)
             for (var mediaChannel : mediaOnlyChannels) {
@@ -163,13 +151,13 @@ public class ServerInfoCommand extends Command {
         eb.addField(LanguageHandler.get(lang, "serverinfo_mediaonlychannels"), sb.toString().isEmpty() ?
                 LanguageHandler.get(lang, "serverinfo_nomediaonlychannels") : sb.toString(), true);
 
-        var internalChannel = internalGuild.getJoinNotifierChannel(guild, author);
+        var internalChannel = server.getJoinNotifierChannel();
         var joinNotifierChannel = internalChannel == null ? null : guild.getTextChannelById(internalChannel.getIdLong());
         eb.addField(LanguageHandler.get(lang, "serverinfo_join"), joinNotifierChannel == null ?
                 LanguageHandler.get(lang, "serverinfo_nojoin") :
                 joinNotifierChannel.getAsMention(), true);
 
-        internalChannel = internalGuild.getLeaveNotifierChannel(guild, author);
+        internalChannel = server.getLeaveNotifierChannel();
         var leaveNotifierChannel = internalChannel == null ? null : guild.getTextChannelById(internalChannel.getIdLong());
         eb.addField(LanguageHandler.get(lang, "serverinfo_leave"), leaveNotifierChannel == null ?
                 LanguageHandler.get(lang, "serverinfo_noleave") :

@@ -2,8 +2,8 @@
 package listeners;
 
 import files.language.LanguageHandler;
-import moderation.guild.Guild;
-import moderation.user.User;
+import moderation.guild.Server;
+import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
@@ -56,15 +56,15 @@ public class GuildJoinListener extends ListenerAdapter {
         }
 
         guildOwnerUser.openPrivateChannel().queue(privateChannel -> {
-            var internalGuildOwner = new User(guildOwnerUser.getIdLong());
-            var language = new Guild(guild.getIdLong()).getLanguage(guild, guildOwnerUser);
+            var guildOwnerMaster = new Master(guildOwnerUser);
+            var language = new Server(guild).getLanguage();
             var p = Servant.config.getDefaultPrefix();
             var botOwner = event.getJDA().getUserById(Servant.config.getBotOwnerId());
             if (botOwner == null) return;
             var bot = event.getJDA().getSelfUser();
             var eb = new EmbedBuilder();
 
-            eb.setColor(internalGuildOwner.getColor(guild, guildOwnerUser));
+            eb.setColor(guildOwnerMaster.getColor());
             eb.setAuthor(String.format(LanguageHandler.get(language, "invite_author"), bot.getName()), null, guild.getIconUrl());
             eb.setDescription(String.format(LanguageHandler.get(language, "invite_description"), p, p, p, Servant.config.getSupportGuildInv(), botOwner.getName(), botOwner.getDiscriminator()));
             eb.setImage(Image.getImageUrl("invite", guild, guildOwnerUser));

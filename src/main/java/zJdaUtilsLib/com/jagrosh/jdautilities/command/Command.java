@@ -167,8 +167,8 @@ public abstract class Command {
     }
 
     public boolean isCommandFor(String input) {
-        if(name.equalsIgnoreCase(input)) return true;
-        for(String alias: aliases) if(alias.equalsIgnoreCase(input)) return true;
+        if(name.equals(input)) return true;
+        for (var alias : aliases) if (alias.equalsIgnoreCase(input)) return true;
         return false;
     }
 

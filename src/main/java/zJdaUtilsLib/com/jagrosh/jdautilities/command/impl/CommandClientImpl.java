@@ -19,6 +19,9 @@
 package zJdaUtilsLib.com.jagrosh.jdautilities.command.impl;
 
 import files.language.LanguageHandler;
+import moderation.guild.Server;
+import moderation.toggle.Toggle;
+import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -41,6 +44,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import owner.blacklist.Blacklist;
 import servant.Servant;
 import utilities.Constants;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.*;
@@ -53,6 +57,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
@@ -142,7 +147,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
                     "User: " + event.getAuthor().getName() + "#" + event.getAuthor().getDiscriminator() + " (" + event.getAuthor().getIdLong() + ").");
 
             var eb = new EmbedBuilder();
-            eb.setColor(new moderation.user.User(event.getAuthor().getIdLong()).getColor(event.getGuild(), event.getAuthor()));
+            eb.setColor(new Master(event.getAuthor()).getColor());
             var g = event.getJDA().getGuildById(436925371577925642L);
             eb.setThumbnail(g == null ? null : g.getIconUrl());
             eb.setAuthor(event.getSelfUser().getName() + " Commands\n", null, event.getSelfUser().getAvatarUrl());
@@ -165,8 +170,8 @@ public class CommandClientImpl implements CommandClient, EventListener {
                     }
 
                     var userPrefix = event.getGuild() == null ?
-                            new moderation.user.User(event.getAuthor().getIdLong()).getPrefix(event.getGuild(), event.getAuthor()) :
-                            new moderation.guild.Guild(event.getGuild().getIdLong()).getPrefix(event.getGuild(), event.getAuthor());
+                            new Master(event.getAuthor()).getPrefix() :
+                            new Server(event.getGuild()).getPrefix();
 
                     builder.append("\n`").append(userPrefix).append(prefix == null ? " " : "").append(command.getName())
                             .append(command.getArguments() == null ? "`" : " " + command.getArguments() + "`")
@@ -190,7 +195,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
             }
 
             event.replyInDm(eb.build(), unused -> {
-            }, t -> event.replyWarning(LanguageHandler.get(new moderation.user.User(event.getAuthor().getIdLong()).getLanguage(event.getGuild(), event.getAuthor()), "blocking_dm")));
+            }, t -> event.replyWarning(LanguageHandler.get(new Master(event.getAuthor()).getLanguage(), "blocking_dm")));
         } : helpConsumer;
 
         // Load commands
@@ -467,18 +472,19 @@ public class CommandClientImpl implements CommandClient, EventListener {
     }
 
     private void onMessageReceived(MessageReceivedEvent event) {
-        // Return if it's a bot
+        // No bots, Nothing from Discord Bot List and No Blacklisted Guilds or Users
         if (event.getAuthor().isBot()) return;
-        if (event.isFromGuild() && event.getGuild().getIdLong() == 264445053596991498L) return; // Discord Bot List
+        if (event.isFromGuild() && event.getGuild().getIdLong() == 264445053596991498L) return;
+        if (Blacklist.isBlacklisted(event.getAuthor(), event.isFromGuild() ? event.getGuild() : null)) return;
 
         String[] parts = null;
-        String rawContent = event.getMessage().getContentRaw();
+        var rawContent = event.getMessage().getContentRaw();
 
-        GuildSettingsProvider settings = event.isFromType(ChannelType.TEXT)? provideSettings(event.getGuild()) : null;
+        var settings = event.isFromType(ChannelType.TEXT)? provideSettings(event.getGuild()) : null;
         if (settings != null) if (settings.getPrefixes() != null && settings.getPrefixes().isEmpty()) settings = null;
 
         if (settings == null) {
-            var userPrefix = new moderation.user.User(event.getAuthor().getIdLong()).getPrefix(event.isFromGuild() ? event.getGuild() : null, event.getAuthor());
+            var userPrefix = new Master(event.getAuthor()).getPrefix();
             // Check for default prefix.
             if(rawContent.toLowerCase().startsWith(userPrefix.toLowerCase()))
                 parts = splitOnPrefixLength(rawContent, userPrefix.length());
@@ -487,9 +493,9 @@ public class CommandClientImpl implements CommandClient, EventListener {
                 parts = splitOnPrefixLength(rawContent, altprefix.length());
         } else {
             // Check for guild specific prefix.
-            Collection<String> prefixes = settings.getPrefixes();
+            var prefixes = settings.getPrefixes();
             if(prefixes != null) {
-                for(String prefix : prefixes)
+                for(var prefix : prefixes)
                     if (parts == null && rawContent.toLowerCase().startsWith(prefix.toLowerCase()))
                         parts = splitOnPrefixLength(rawContent, prefix.length());
             }
@@ -504,38 +510,53 @@ public class CommandClientImpl implements CommandClient, EventListener {
         }
 
         if (parts != null) { // Starts with valid prefix.
-            if(useHelp && (parts[0].equalsIgnoreCase(helpWord) || parts[0].equalsIgnoreCase(helpWorldAlias))) {
-                CommandEvent cevent = new CommandEvent(event, parts[1]==null ? "" : parts[1], this);
-                if(listener!=null)
-                    listener.onCommand(cevent, null);
+            if (useHelp && (parts[0].equalsIgnoreCase(helpWord) || parts[0].equalsIgnoreCase(helpWorldAlias))) {
+                var cevent = new CommandEvent(event, parts[1]==null ? "" : parts[1], this);
+                if (listener != null) listener.onCommand(cevent, null);
                 helpConsumer.accept(cevent); // Fire help consumer
-                if(listener!=null)
-                    listener.onCompletedCommand(cevent, null);
+                if (listener != null) listener.onCompletedCommand(cevent, null);
                 return; // Help Consumer is done
-            } else if(event.isFromType(ChannelType.PRIVATE) || event.getTextChannel().canTalk()) {
-                String name = parts[0];
-                String args = parts[1] == null ? "" : parts[1];
+            } else if (event.isFromType(ChannelType.PRIVATE) || event.getTextChannel().canTalk()) {
+                var name = parts[0].toLowerCase();
+                var args = parts[1] == null ? "" : parts[1];
                 final Command command; // this will be null if it's not a command
                 if (commands.size() < INDEX_LIMIT + 1)
                     command = commands.stream().filter(cmd -> cmd.isCommandFor(name)).findAny().orElse(null);
                 else {
                     synchronized (commandIndex) {
-                        int i = commandIndex.getOrDefault(name.toLowerCase(), -1);
+                        int i = commandIndex.getOrDefault(name, -1);
                         command = i != -1 ? commands.get(i) : null;
                     }
                 }
 
+                var toggleName = Toggle.getToggleName(name);
                 if (command != null) {
-                    System.out.println("[" + OffsetDateTime.now(ZoneId.of(Constants.LOG_OFFSET)).toString().replaceAll("T", " ").substring(0, 19) + "] " +
-                            "Command executed: " + event.getMessage().getContentDisplay() + ". " +
-                            "Guild: " + (event.isFromGuild() ? event.getGuild().getName() + " (" + event.getGuild().getIdLong() + ")" : "DM") + ". "  +
-                            "User: " + event.getAuthor().getName() + "#" + event.getAuthor().getDiscriminator() + " (" + event.getAuthor().getIdLong() + ").");
-                    CommandEvent cevent = new CommandEvent(event, args, this);
-                    if (listener != null)
-                        listener.onCommand(cevent, command);
-                    uses.put(command.getName(), uses.getOrDefault(command.getName(), 0) + 1);
-                    command.run(cevent);
-                    return; // Command is done
+                    // Execute Command
+                    // todo: y the fuk dis not workin
+                    CompletableFuture.runAsync(() -> {
+                        try {
+                            // Logging Command
+                            System.out.println("[" + OffsetDateTime.now(ZoneId.of(Constants.LOG_OFFSET)).toString().replaceAll("T", " ").substring(0, 19) + "] " +
+                                    "Command executed: " + event.getMessage().getContentDisplay() + ". " +
+                                    "Guild: " + (event.isFromGuild() ? event.getGuild().getName() + " (" + event.getGuild().getIdLong() + ")" : "DM") + ". " +
+                                    "User: " + event.getAuthor().getName() + "#" + event.getAuthor().getDiscriminator() + " (" + event.getAuthor().getIdLong() + ").");
+
+                            var cevent = new CommandEvent(event, args, this);
+
+                            if (Toggle.isEnabled(cevent, toggleName)) {
+                                if (listener != null) listener.onCommand(cevent, command);
+                                uses.put(command.getName(), uses.getOrDefault(command.getName(), 0) + 1);
+                                command.run(cevent);
+
+                                // Statistics
+                                new Master(event.getAuthor()).incrementFeatureCount(name);
+                                if (event.isFromGuild()) new Server(event.getGuild()).incrementFeatureCount(name);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }, toggleName.equals("profile") ? Servant.profilePool : Servant.threadPool);
+                    return;
                 }
             }
         }

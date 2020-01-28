@@ -2,17 +2,11 @@
 package fun;
 
 import files.language.LanguageHandler;
-import moderation.toggle.Toggle;
 import net.dv8tion.jda.api.Permission;
-import moderation.guild.Guild;
-import owner.blacklist.Blacklist;
-import moderation.user.User;
-import servant.Servant;
 import utilities.Constants;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class CoinflipCommand extends Command {
@@ -36,26 +30,10 @@ public class CoinflipCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        CompletableFuture.runAsync(() -> {
-            try {
-                if (!Toggle.isEnabled(event, name)) return;
-                if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
+        var lang = LanguageHandler.getLanguage(event);
 
-                var lang = LanguageHandler.getLanguage(event);
-                var guild = event.getGuild();
-                var author = event.getAuthor();
-
-                var coinflip = ThreadLocalRandom.current().nextInt(0, 2); // 0 or 1.
-                if (coinflip == 0) event.reply(LanguageHandler.get(lang, "coinflip_head"));
-                else event.reply(LanguageHandler.get(lang, "coinflip_tail"));
-
-                // Statistics.
-                new User(event.getAuthor().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-                if (event.getGuild() != null)
-                    new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }, Servant.threadPool);
+        var coinflip = ThreadLocalRandom.current().nextInt(2); // 0 - 1.
+        if (coinflip == 0) event.reply(LanguageHandler.get(lang, "coinflip_head"));
+        else event.reply(LanguageHandler.get(lang, "coinflip_tail"));
     }
 }

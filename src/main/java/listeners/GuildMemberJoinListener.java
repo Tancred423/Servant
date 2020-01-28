@@ -2,9 +2,9 @@
 package listeners;
 
 import files.language.LanguageHandler;
-import moderation.guild.Guild;
+import moderation.guild.Server;
 import moderation.toggle.Toggle;
-import moderation.user.User;
+import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
@@ -37,15 +37,15 @@ public class GuildMemberJoinListener extends ListenerAdapter {
         if (Blacklist.isBlacklisted(user, guild)) return;
 
         CompletableFuture.runAsync(() -> {
-            var internalGuild = new Guild(guild.getIdLong());
-            var internalUser = new User(user.getIdLong());
+            var server = new Server(guild);
+            var master = new Master(user);
             var member = event.getMember();
             var selfMember = guild.getMemberById(event.getJDA().getSelfUser().getIdLong());
             if (selfMember == null) return; // To eliminate errors. Will never occur.
 
             // AutoRole
-            if (Toggle.isEnabled(event, "autorole") && internalGuild.hasAutorole(guild, user)) {
-                var roleAndDelay = internalGuild.getAutorole(guild, user); // Map.Entry<Role, Integer>
+            if (Toggle.isEnabled(event, "autorole") && server.hasAutorole()) {
+                var roleAndDelay = server.getAutorole(); // Map.Entry<Role, Integer>
                 if (roleAndDelay != null) {
                     var role = roleAndDelay.getKey();
                     var delay = roleAndDelay.getValue() * 60 * 1000; // Milliseconds
@@ -56,19 +56,19 @@ public class GuildMemberJoinListener extends ListenerAdapter {
 
             // Join
             if (Toggle.isEnabled(event, "join")) {
-                var lang = new Guild(event.getGuild().getIdLong()).getLanguage(guild, user);
-                var joinNotifierChannel = internalGuild.getJoinNotifierChannel(guild, user);
+                var lang = new Server(event.getGuild()).getLanguage();
+                var joinNotifierChannel = server.getJoinNotifierChannel();
 
                 if (joinNotifierChannel != null && joinNotifierChannel.canTalk(selfMember)) {
-                    var description = internalGuild.getJoinMessage(guild, user);
+                    var description = server.getJoinMessage();
                     joinNotifierChannel.sendMessage(
                             new EmbedBuilder()
-                                    .setColor(internalUser.getColor(guild, user))
+                                    .setColor(master.getColor())
                                     .setAuthor(String.format(LanguageHandler.get(lang, "join_author"), user.getName(), user.getDiscriminator(), guild.getName()), null, guild.getIconUrl())
                                     .setDescription(description == null ? LanguageHandler.get(lang, "join_embeddescription") : description)
                                     .setThumbnail(user.getEffectiveAvatarUrl())
                                     .setFooter(LanguageHandler.get(lang, "join_footer"), Image.getImageUrl("clock", guild, user))
-                                    .setTimestamp(OffsetDateTime.now(ZoneOffset.of(internalGuild.getOffset(guild, user))))
+                                    .setTimestamp(OffsetDateTime.now(ZoneOffset.of(server.getOffset())))
                                     .build()
                     ).queue();
                 }

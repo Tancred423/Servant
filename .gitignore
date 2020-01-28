@@ -30,12 +30,8 @@ hs_err_pid*
 /src/main/resources/*
 
 # Runtime files
-/resources/*.ini
-/resources/*.properties
+/resources/*
 /server_log/*
 
-# Image Files
-/images/*
-
-# Backup (Database, Logs, Server Logs, Old Versions)
-/backup/*
+# Documents (Logs, Concepts, etc.)
+/documents/*

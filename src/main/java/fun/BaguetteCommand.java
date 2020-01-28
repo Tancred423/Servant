@@ -2,18 +2,13 @@
 package fun;
 
 import files.language.LanguageHandler;
-import moderation.user.User;
-import moderation.guild.Guild;
+import moderation.user.Master;
 import net.dv8tion.jda.api.Permission;
-import owner.blacklist.Blacklist;
-import servant.Servant;
-import utilities.Emote;
 import utilities.Constants;
-import moderation.toggle.Toggle;
+import utilities.Emote;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class BaguetteCommand extends Command {
@@ -37,63 +32,39 @@ public class BaguetteCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        CompletableFuture.runAsync(() -> {
-            try {
-                if (!Toggle.isEnabled(event, name)) return;
-                if (Blacklist.isBlacklisted(event.getAuthor(), event.getGuild())) return;
+        var random = ThreadLocalRandom.current().nextInt(1, 100 + 1); // 1-100
 
-                var random = ThreadLocalRandom.current().nextInt(1, 100 + 1); // 1-100
+        if      (random > 30) random = ThreadLocalRandom.current().nextInt( 1,  5 + 1); //  1- 5 | 70% Chance
+        else if (random > 25) random = 0;                                                             //  0    |  5% Chance
+        else if (random > 20) random = ThreadLocalRandom.current().nextInt( 6, 10 + 1); //  6-10 |  5% Chance (1% chance each)
+        else if (random > 15) random = ThreadLocalRandom.current().nextInt(11, 20 + 1); // 11-20 |  5% Chance (0,555% chance each)
+        else if (random > 10) random = ThreadLocalRandom.current().nextInt(21, 30 + 1); // 21-30 |  5% Chance (0,555% chance each)
+        else if (random >  5) random = ThreadLocalRandom.current().nextInt(31, 40 + 1); // 31-40 |  5% Chance (0,555% chance each)
+        else                  random = ThreadLocalRandom.current().nextInt(41, 50 + 1); // 41-50 |  5% Chance (0,555% chance each)
 
-                if (random > 30) random = ThreadLocalRandom.current().nextInt(1, 5 + 1); // 1-5 | 70% Chance
-                else if (random > 25) random = 0;  // 0 | 5% Chance
-                else if (random > 20)
-                    random = ThreadLocalRandom.current().nextInt(6, 10 + 1); // 6-10 | 5% Chance (1% chance each)
-                else if (random > 15)
-                    random = ThreadLocalRandom.current().nextInt(11, 20 + 1); // 11-20 | 5% Chance (0,555% chance each)
-                else if (random > 10)
-                    random = ThreadLocalRandom.current().nextInt(21, 30 + 1); // 21-30 | 5% Chance (0,555% chance each)
-                else if (random > 5)
-                    random = ThreadLocalRandom.current().nextInt(31, 40 + 1); // 31-40 | 5% Chance (0,555% chance each)
-                else random = ThreadLocalRandom.current().nextInt(41, 50 + 1); // 41-50 | 5% Chance (0,555% chance each)
+        var jda = event.getJDA();
+        var guild = event.getGuild();
+        var user = event.getAuthor();
 
-                var guild = event.getGuild();
-                var author = event.getAuthor();
-                var jda = event.getJDA();
+        var baguette1 = Emote.getEmoteMention(jda, "baguette1", guild, user);
+        var baguette2 = Emote.getEmoteMention(jda, "baguette2", guild, user);
+        var baguette3 = Emote.getEmoteMention(jda, "baguette3", guild, user);
 
-                var baguette1 = Emote.getEmoteMention(jda, "baguette1", guild, author);
-                var baguette2 = Emote.getEmoteMention(jda, "baguette2", guild, author);
-                var baguette3 = Emote.getEmoteMention(jda, "baguette3", guild, author);
+        var lang = LanguageHandler.getLanguage(event);
+        var baguettes = baguette1 +
+                String.valueOf(baguette2).repeat(random) +
+                baguette3 +
+                "\n(" + random + (random == 50 ? " - " + LanguageHandler.get(lang, "baguette_50") : (random == 49 ? " - " + LanguageHandler.get(lang, "baguette_49") : "")) + ")";
 
-                var lang = LanguageHandler.getLanguage(event);
-                var baguettes = baguette1 +
-                        String.valueOf(baguette2).repeat(random) +
-                        baguette3 +
-                        "\n(" + random + (random == 50 ? " - " + LanguageHandler.get(lang, "baguette_50") : (random == 49 ? " - " + LanguageHandler.get(lang, "baguette_49") : "")) + ")";
+        event.reply(baguettes);
 
-                event.reply(baguettes);
-
-
-                // Baguette Counter
-                var internalUser = new User(event.getAuthor().getIdLong());
-                var baguette = internalUser.getBaguette(guild, author);
-                if (baguette.isEmpty()) {
-                    internalUser.setBaguette(random, 1, guild, author);
-                } else {
-                    var currentBaguette = baguette.entrySet().iterator().next();
-                    if (random > currentBaguette.getKey()) {
-                        internalUser.setBaguette(random, 1, guild, author);
-                    } else if (random == currentBaguette.getKey()) {
-                        internalUser.setBaguette(random, currentBaguette.getValue() + 1, guild, author);
-                    }
-                }
-
-                // Statistics.
-                internalUser.incrementFeatureCount(name.toLowerCase(), guild, author);
-                if (event.getGuild() != null)
-                    new Guild(event.getGuild().getIdLong()).incrementFeatureCount(name.toLowerCase(), guild, author);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }, Servant.threadPool);
+        // Baguette Counter
+        var internalUser = new Master(event.getAuthor());
+        var baguette = internalUser.getBaguette();
+        if (baguette == null) internalUser.setBaguette(random, 1);
+        else {
+            if (random > baguette.getKey()) internalUser.setBaguette(random, 1);
+            else if (random == baguette.getKey()) internalUser.setBaguette(random, baguette.getValue() + 1);
+        }
     }
 }

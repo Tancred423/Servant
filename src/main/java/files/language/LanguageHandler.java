@@ -1,8 +1,8 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package files.language;
 
-import moderation.guild.Guild;
-import moderation.user.User;
+import moderation.guild.Server;
+import moderation.user.Master;
 import servant.Servant;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
@@ -54,7 +54,7 @@ public class LanguageHandler {
     public static String getLanguage(CommandEvent event) {
         if (event == null) return Servant.config.getDefaultLanguage();
         else return event.getGuild() == null ?
-                new User(event.getAuthor().getIdLong()).getLanguage(event.getGuild(), event.getAuthor()) :
-                new Guild(event.getGuild().getIdLong()).getLanguage(event.getGuild(), event.getAuthor());
+                new Master(event.getAuthor()).getLanguage() :
+                new Server(event.getGuild()).getLanguage();
     }
 }

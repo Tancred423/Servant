@@ -1,6 +1,7 @@
 package useful.polls;
 
 import files.language.LanguageHandler;
+import moderation.guild.Server;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
@@ -48,7 +49,7 @@ public class Poll {
                             if (textChannel == null) {
                                 removePoll(messageId, finalGuild, user);
                             } else {
-                                var lang = new moderation.guild.Guild(guildId).getLanguage(finalGuild, user);
+                                var lang = new Server(guild).getLanguage();
                                 switch (type) {
                                     case "quick":
                                         textChannel.retrieveMessageById(messageId).queue(message ->

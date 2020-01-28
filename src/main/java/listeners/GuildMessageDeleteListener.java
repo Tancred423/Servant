@@ -1,6 +1,6 @@
 package listeners;
 
-import moderation.guild.Guild;
+import moderation.guild.Server;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageDeleteEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -29,24 +29,24 @@ public class GuildMessageDeleteListener extends ListenerAdapter {
         if (Blacklist.isBlacklisted(user, guild)) return;
 
         CompletableFuture.runAsync(() -> {
-            var internalGuild = new Guild(guild.getIdLong());
+            var server = new Server(guild);
             var messageId = event.getMessageIdLong();
 
             // Birthday
-            if (internalGuild.getBirthdayMessageMessageId(guild, user) == messageId)
-                internalGuild.unsetBirthdayMessage(guild, user);
+            if (server.getBirthdayMessageMessageId() == messageId)
+                server.unsetBirthdayMessage();
 
             // Giveaway
             if (GiveawayHandler.isGiveaway(guild.getIdLong(), event.getChannel().getIdLong(), event.getMessageIdLong(), guild, user))
                 GiveawayHandler.deleteGiveawayFromDb(guild.getIdLong(), event.getChannel().getIdLong(), messageId, guild, user);
 
             // Signup
-            if (internalGuild.isSignupMessage(messageId, guild, user))
-                internalGuild.unsetSignup(messageId, guild, user);
+            if (server.isSignupMessage(messageId))
+                server.unsetSignup(messageId);
 
             // Poll
-            if (internalGuild.isPoll(messageId, guild, user))
-                internalGuild.unsetPoll(messageId, guild, user);
+            if (server.isPoll(messageId))
+                server.unsetPoll(messageId);
         }, Servant.threadPool);
     }
 }

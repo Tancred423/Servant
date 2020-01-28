@@ -2,9 +2,9 @@ package listeners;
 
 import files.language.LanguageHandler;
 import fun.level.Level;
-import moderation.guild.Guild;
+import moderation.guild.Server;
 import moderation.toggle.Toggle;
-import moderation.user.User;
+import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -61,14 +61,14 @@ public class MessageReceivedListener extends ListenerAdapter {
         String lang;
 
         if (event.isFromGuild()) {
-            var internalGuild = new Guild(event.getGuild().getIdLong());
+            var server = new Server(event.getGuild());
             var guild = event.getGuild();
-            prefix = internalGuild.getPrefix(guild, user);
-            lang = internalGuild.getLanguage(guild, user);
+            prefix = server.getPrefix();
+            lang = server.getLanguage();
         } else {
-            var internalAuthor = new User(user.getIdLong());
-            prefix = internalAuthor.getPrefix(null, user);
-            lang = internalAuthor.getLanguage(null, user);
+            var master = new Master(user);
+            prefix = master.getPrefix();
+            lang = master.getLanguage();
         }
 
         event.getChannel().sendMessage(String.format(LanguageHandler.get(lang, "current_prefix"), prefix)).queue();
@@ -76,12 +76,12 @@ public class MessageReceivedListener extends ListenerAdapter {
 
     private static void processEasterEggs(MessageReceivedEvent event, net.dv8tion.jda.api.entities.User user) {
         var guild = event.isFromGuild() ? event.getGuild() : null;
-        var internalAuthor = new User(user.getIdLong());
+        var master = new Master(user);
         var message = event.getMessage();
         var contentRaw = message.getContentRaw().toLowerCase();
         Color color;
         try {
-            color = internalAuthor.getColor(event.getGuild(), user);
+            color = master.getColor();
         } catch (NullPointerException e) { // Only happens on boot up
             color = Color.decode(Servant.config.getDefaultColorCode());
         }
@@ -91,8 +91,8 @@ public class MessageReceivedListener extends ListenerAdapter {
             case "its name's":
                 logEasterEggFound(event, contentRaw);
                 event.getChannel().sendMessage(new EmbedBuilder().setColor(color).setImage("https://i.imgur.com/ohcdKgU.gif").build()).queue(sentMessage -> {
-                    if (!internalAuthor.hasAchievement("excalibur", guild, user)) {
-                        internalAuthor.setAchievement("excalibur", 50, guild, user);
+                    if (!master.hasAchievement("excalibur")) {
+                        master.setAchievement("excalibur", 50);
                         new MessageHandler().reactAchievement(message);
                     }
                 }, failure -> logEasterEggError(event));
@@ -102,8 +102,8 @@ public class MessageReceivedListener extends ListenerAdapter {
             case "i'm the bone of my sword":
                 logEasterEggFound(event, contentRaw);
                 event.getChannel().sendMessage(new EmbedBuilder().setColor(color).setImage("https://i.imgur.com/XZ7q5Xg.gif").build()).queue(sentMessage -> {
-                    if (!internalAuthor.hasAchievement("unlimited_blade_works", guild, user)) {
-                        internalAuthor.setAchievement("unlimited_blade_works", 50, guild, user);
+                    if (!master.hasAchievement("unlimited_blade_works")) {
+                        master.setAchievement("unlimited_blade_works", 50);
                         new MessageHandler().reactAchievement(message);
                     }
                 }, failure -> logEasterEggError(event));
@@ -112,8 +112,8 @@ public class MessageReceivedListener extends ListenerAdapter {
             case "gae bolg":
                 logEasterEggFound(event, contentRaw);
                 event.getChannel().sendMessage(new EmbedBuilder().setColor(color).setImage("https://i.imgur.com/Mu1vw26.gif").build()).queue(sentMessage -> {
-                    if (!internalAuthor.hasAchievement("gae_bolg", guild, user)) {
-                        internalAuthor.setAchievement("gae_bolg", 50, guild, user);
+                    if (!master.hasAchievement("gae_bolg")) {
+                        master.setAchievement("gae_bolg", 50);
                         new MessageHandler().reactAchievement(message);
                     }
                 }, failure -> logEasterEggError(event));
@@ -122,8 +122,8 @@ public class MessageReceivedListener extends ListenerAdapter {
             case "hey listen":
                 logEasterEggFound(event, contentRaw);
                 event.getChannel().sendMessage(new EmbedBuilder().setColor(color).setImage("https://i.imgur.com/w4S5NIt.gif").build()).queue(sentMessage -> {
-                    if (!internalAuthor.hasAchievement("navi", guild, user)) {
-                        internalAuthor.setAchievement("navi", 50, guild, user);
+                    if (!master.hasAchievement("navi")) {
+                        master.setAchievement("navi", 50);
                         new MessageHandler().reactAchievement(message);
                     }
                 }, failure -> logEasterEggError(event));
@@ -132,8 +132,8 @@ public class MessageReceivedListener extends ListenerAdapter {
             case "deus vult":
                 logEasterEggFound(event, contentRaw);
                 event.getChannel().sendMessage(new EmbedBuilder().setColor(color).setImage("https://i.kym-cdn.com/photos/images/newsfeed/001/176/858/c69.gif").build()).queue(sentMessage -> {
-                    if (!internalAuthor.hasAchievement("deusvult", guild, user)) {
-                        internalAuthor.setAchievement("deusvult", 10, guild, user);
+                    if (!master.hasAchievement("deusvult")) {
+                        master.setAchievement("deusvult", 10);
                         new MessageHandler().reactAchievement(message);
                     }
                 }, failure -> logEasterEggError(event));
@@ -149,8 +149,8 @@ public class MessageReceivedListener extends ListenerAdapter {
             case "<@550309058251456512> fight me":
                 logEasterEggFound(event, contentRaw);
                 event.getChannel().sendMessage(new EmbedBuilder().setColor(color).setImage("https://i.imgur.com/wINPdOJ.gif").build()).queue(sentMessage -> {
-                    if (!internalAuthor.hasAchievement("fiteme", guild, user)) {
-                        internalAuthor.setAchievement("fiteme", 10, guild, user);
+                    if (!master.hasAchievement("fiteme")) {
+                        master.setAchievement("fiteme", 10);
                         new MessageHandler().reactAchievement(message);
                     }
                 }, failure -> logEasterEggError(event));
@@ -162,8 +162,8 @@ public class MessageReceivedListener extends ListenerAdapter {
             case "merry xmas":
                 logEasterEggFound(event, contentRaw);
                 event.getChannel().sendMessage(Emote.getEmoteMention(event.getJDA(), "servant_padoru", guild, user)).queue(sentMessage -> {
-                    if (!internalAuthor.hasAchievement("xmas", guild, user)) {
-                        internalAuthor.setAchievement("xmas", 10, guild, user);
+                    if (!master.hasAchievement("xmas")) {
+                        master.setAchievement("xmas", 10);
                         new MessageHandler().reactAchievement(message);
                     }
                 }, failure -> logEasterEggError(event));
@@ -171,9 +171,9 @@ public class MessageReceivedListener extends ListenerAdapter {
 
             case "padoru":
                 logEasterEggFound(event, contentRaw);
-                event.getChannel().sendMessage(new EmbedBuilder().setColor(internalAuthor.getColor(guild, user)).setImage(Image.getImageUrl("padoru", guild, user)).build()).queue(success -> {
-                    if (!internalAuthor.hasAchievement("padoru", guild, user)) {
-                        internalAuthor.setAchievement("padoru", 10, guild, user);
+                event.getChannel().sendMessage(new EmbedBuilder().setColor(master.getColor()).setImage(Image.getImageUrl("padoru", guild, user)).build()).queue(success -> {
+                    if (!master.hasAchievement("padoru")) {
+                        master.setAchievement("padoru", 10);
                         new MessageHandler().reactAchievement(message);
                     }
                 }, failure -> logEasterEggError(event));
@@ -198,9 +198,9 @@ public class MessageReceivedListener extends ListenerAdapter {
             // Is message in mo-channel?
             var channel = event.getChannel();
             var guild = event.getGuild();
-            var internalGuild = new moderation.guild.Guild(guild.getIdLong());
-            var lang = internalGuild.getLanguage(guild, user);
-            if (internalGuild.mediaOnlyChannelHasEntry(channel, guild, user)) {
+            var server = new Server(guild);
+            var lang = server.getLanguage();
+            if (server.mediaOnlyChannelHasEntry(channel)) {
                 // Has to have an attachment or a valid url.
                 var validMessage = true;
                 var message = event.getMessage();
@@ -235,7 +235,7 @@ public class MessageReceivedListener extends ListenerAdapter {
     private static void processLevel(MessageReceivedEvent event, net.dv8tion.jda.api.entities.User user) {
         if (Toggle.isEnabled(event, "level") && event.isFromGuild()) {
             var guild = event.getGuild();
-            var lang = new moderation.guild.Guild(event.getGuild().getIdLong()).getLanguage(guild, user);
+            var lang = new Server(event.getGuild()).getLanguage();
             var userCd = Level.guildCds.get(guild);
 
             if (userCd != null) {
@@ -256,10 +256,10 @@ public class MessageReceivedListener extends ListenerAdapter {
             var authorId = user.getIdLong();
             var guildId = guild.getIdLong();
 
-            var currentLevel = Level.getLevel(authorId, guildId, guild, user);
-            var randomExp = ThreadLocalRandom.current().nextInt(15, 26); // Between 15 and 25 inclusively.
-            new moderation.user.User(authorId).setExp(guildId, randomExp, guild, user);
-            var updatedLevel = Level.getLevel(authorId, guildId, guild, user);
+            var currentLevel = Level.getLevel(user, guildId);
+            var randomExp = ThreadLocalRandom.current().nextInt(15, 25 + 1); // 15 - 25
+            new Master(user).setExp(guildId, randomExp);
+            var updatedLevel = Level.getLevel(user, guildId);
 
             if (updatedLevel > currentLevel) {
                 Level.checkForAchievements(updatedLevel, event);
@@ -271,7 +271,7 @@ public class MessageReceivedListener extends ListenerAdapter {
                     var selfMember = event.getGuild().getMemberById(event.getJDA().getSelfUser().getIdLong());
                     if (selfMember != null && selfMember.hasPermission(Permission.MESSAGE_EMBED_LINKS)) {
                         var eb = new EmbedBuilder();
-                        eb.setColor(new moderation.user.User(authorId).getColor(guild, user));
+                        eb.setColor(new Master(user).getColor());
                         eb.setAuthor(LanguageHandler.get(lang, "levelrole_levelup"), null, null);
                         eb.setThumbnail(user.getEffectiveAvatarUrl());
                         eb.setDescription(String.format(LanguageHandler.get(lang, "level_up"), user.getAsMention(), updatedLevel));

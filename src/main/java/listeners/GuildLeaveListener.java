@@ -2,8 +2,8 @@
 package listeners;
 
 import files.language.LanguageHandler;
-import moderation.guild.Guild;
-import moderation.user.User;
+import moderation.guild.Server;
+import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
@@ -38,10 +38,10 @@ public class GuildLeaveListener extends ListenerAdapter {
         if (Blacklist.isBlacklisted(user, guild)) return;
 
         CompletableFuture.runAsync(() -> {
-            var internalGuild = new Guild(guild.getIdLong());
+            var internalGuild = new Server(guild);
 
             // Birthday
-            internalGuild.purgeBirthday(guild, guildOwner.getUser());
+            internalGuild.purgeBirthday();
 
             // Giveaway
             GiveawayHandler.purgeGiveaways(guild.getIdLong(), guild, user);
@@ -50,13 +50,13 @@ public class GuildLeaveListener extends ListenerAdapter {
             processKick(event, guild, guildOwner, user);
 
             // MediaOnlyChannel
-            internalGuild.purgeMediaOnlyChannels(guild, user);
+            internalGuild.purgeMediaOnlyChannels();
 
             // Signup
-            internalGuild.purgeSignups(guild, user);
+            internalGuild.purgeSignups();
 
             // Poll
-            internalGuild.purgePolls(guild, user);
+            internalGuild.purgePolls();
         }, Servant.threadPool);
     }
 
@@ -65,13 +65,13 @@ public class GuildLeaveListener extends ListenerAdapter {
                 "Servant was kicked from " + guild.getName() + " (" + guild.getIdLong() + "). Owner: " + guildOwnerUser.getName() + "#" + guildOwnerUser.getDiscriminator() + " (" + guildOwner.getIdLong() + ").");
 
         guildOwnerUser.openPrivateChannel().queue(privateChannel -> {
-            var internalGuildOwner = new User(guildOwnerUser.getIdLong());
-            var language = new Guild(guild.getIdLong()).getLanguage(guild, guildOwnerUser);
+            var guildOwnerMaster = new Master(guildOwnerUser);
+            var language = new Server(guild).getLanguage();
             var botOwner = event.getJDA().getUserById(Servant.config.getBotOwnerId());
             if (botOwner == null) return;
             var eb = new EmbedBuilder();
 
-            eb.setColor(internalGuildOwner.getColor(guild, guildOwnerUser));
+            eb.setColor(guildOwnerMaster.getColor());
             eb.setAuthor(LanguageHandler.get(language, "kick_author"), null, guild.getIconUrl());
             eb.setDescription(String.format(LanguageHandler.get(language, "kick_description"), Servant.config.getSupportGuildInv(), botOwner.getName(), botOwner.getDiscriminator()));
             eb.setImage(Image.getImageUrl("kick", guild, guildOwnerUser));
