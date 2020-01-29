@@ -600,6 +600,7 @@ public class ProfileImage {
             add("kiss");
             add("lick");
             add("pat");
+            add("poke");
             add("slap");
             add("wave");
             add("wink");

@@ -161,6 +161,7 @@ public class Servant {
                 new KissCommand(),
                 new LickCommand(),
                 new PatCommand(),
+                new PokeCommand(),
                 new SlapCommand(),
                 new WaveCommand(),
                 new WinkCommand(),

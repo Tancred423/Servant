@@ -67,7 +67,6 @@ public class ToggleCommand extends Command {
             return;
         }
 
-        var user = event.getAuthor();
         var guild = event.getGuild();
         var server = new Server(guild);
 
