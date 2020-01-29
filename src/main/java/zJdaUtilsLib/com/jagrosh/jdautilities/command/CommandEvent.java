@@ -256,15 +256,15 @@ public class CommandEvent {
     private void react(String reaction) {
         if(reaction == null || reaction.isEmpty()) return;
         try {
-            long id = SafeIdUtil.safeConvert(reaction.replaceAll("<a?:.+:(\\d+)>", "$1"));
-            Emote emote = event.getJDA().getEmoteById(id);
-            if (emote == null) event.getMessage().addReaction(reaction).queue();
-            else event.getMessage().addReaction(emote).queue();
+            var id = SafeIdUtil.safeConvert(reaction.replaceAll("<a?:.+:(\\d+)>", "$1"));
+            var emote = event.getJDA().getEmoteById(id);
+            if (emote == null) event.getMessage().addReaction(reaction).queue(s -> {}, f -> {});
+            else event.getMessage().addReaction(emote).queue(s -> {}, f -> {});
         } catch(PermissionException ignored) {}
     }
     
     private void sendMessage(MessageChannel chan, String message) {
-        ArrayList<String> messages = splitMessage(message);
+        var messages = splitMessage(message);
         for(int i=0; i<MAX_MESSAGES && i<messages.size(); i++) {
             chan.sendMessage(messages.get(i)).queue(m -> {
                 if(event.isFromType(ChannelType.TEXT)) linkId(m);

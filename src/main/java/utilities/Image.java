@@ -23,7 +23,7 @@ public class Image {
             var resultSet = select.executeQuery();
             if (resultSet.first()) imageUrl = resultSet.getString("image_url");
         } catch (SQLException e) {
-            new Log(e, guild, user, "levelrole", null).sendLog(false);
+            new Log(e, guild, user, "Image.java", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }

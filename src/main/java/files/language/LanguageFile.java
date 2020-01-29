@@ -1019,6 +1019,7 @@ public class LanguageFile {
         en_gb.setProperty("profile_baguette_value", "%s (%s times)");
         en_gb.setProperty("profile_total_muc", "Commands Used");
         en_gb.setProperty("profile_total_ap", "Achivement Points");
+        en_gb.setProperty("profile_title_creator", "The Creator");
         en_gb.setProperty("profile_title_vip", "The VIP");
         en_gb.setProperty("profile_title_$10", "The Saber");
         en_gb.setProperty("profile_title_$5", "The Archer");
@@ -2070,6 +2071,7 @@ public class LanguageFile {
         de_de.setProperty("profile_baguette_value", "%s (%s mal)");
         de_de.setProperty("profile_total_muc", "Genutzte Befehle");
         de_de.setProperty("profile_total_ap", "Erfolgspunkte");
+        de_de.setProperty("profile_title_creator", "Der Erschaffer");
         de_de.setProperty("profile_title_vip", "VIP");
         de_de.setProperty("profile_title_$10", "Saber");
         de_de.setProperty("profile_title_$5", "Bogenschütze");

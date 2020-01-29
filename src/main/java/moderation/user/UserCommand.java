@@ -88,7 +88,7 @@ public class UserCommand extends Command {
                     case "color":
                     case "colour":
                         // Has to be $10 Patron.
-                        if (!PatreonHandler.is$10Patron(event.getAuthor())) {
+                        if (!master.is$10Patron()) {
                             PatreonHandler.sendWarning(event.getChannel(), "$10", lang);
                             return;
                         }
@@ -150,7 +150,7 @@ public class UserCommand extends Command {
                     case "color":
                     case "colour":
                         // Has to be $10 Patron.
-                        if (!PatreonHandler.is$10Patron(event.getAuthor())) {
+                        if (!master.is$10Patron()) {
                             PatreonHandler.sendWarning(event.getChannel(), "$10", lang);
                             return;
                         }

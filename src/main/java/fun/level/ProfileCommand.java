@@ -50,8 +50,11 @@ public class ProfileCommand extends Command {
         var p = GuildHandler.getPrefix(event);
 
         event.getChannel().sendTyping().queue();
+        event.getMessage().addReaction("\uD83D\uDD51").queue();
 
-        var image = new File(OffsetDateTime.now(ZoneOffset.UTC).toEpochSecond() + "_" + ThreadLocalRandom.current().nextInt(100) + ".png");
+        var path = "profile_tmp/";
+
+        var image = new File(path + OffsetDateTime.now(ZoneOffset.UTC).toEpochSecond() + "_" + ThreadLocalRandom.current().nextInt(100) + ".png");
 
         try {
             var profileImage = new ProfileImage(profileUser, event.getGuild(), lang).generateImage();
@@ -73,7 +76,9 @@ public class ProfileCommand extends Command {
                                 String.format(LanguageHandler.get(lang, "profile_footer2"), p, name),
                         event.getSelfUser().getEffectiveAvatarUrl());
 
-        event.getChannel().sendFile(image, image.getName() + ".png").embed(eb.build()).queue();
+        event.getChannel().sendFile(image, image.getName() + ".png").embed(eb.build()).queue(m -> {
+            event.getMessage().clearReactions().queue();
+        });
 
         // Delete File.
         new Timer().schedule(Time.wrap(image::delete), 10 * 1000);

@@ -32,6 +32,7 @@ hs_err_pid*
 # Runtime files
 /resources/*
 /server_log/*
+/profile_tmp/*
 
 # Documents (Logs, Concepts, etc.)
 /documents/*

@@ -4,7 +4,6 @@ package moderation.user;
 import files.language.LanguageHandler;
 import interaction.Interaction;
 import net.dv8tion.jda.api.entities.User;
-import patreon.PatreonHandler;
 import servant.Log;
 import servant.Servant;
 import utilities.MyEntry;
@@ -15,6 +14,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static utilities.DatabaseConn.closeQuietly;
 
@@ -362,7 +362,11 @@ public class Master {
             closeQuietly(connection);
         }
 
-        return achievements;
+        // Sort By Value
+        return achievements.entrySet()
+                .stream()
+                .sorted((Map.Entry.<String, Integer>comparingByValue().reversed()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
     }
 
     public List<String> getLevelAchievements() {
@@ -748,31 +752,31 @@ public class Master {
                 var servantsKingdom = user.getJDA().getGuildById(436925371577925642L);
                 if (servantsKingdom == null) return colorCode;
                 Color color = null;
-                if (PatreonHandler.isVIP(user)) {
+                if (isVIP()) {
                     var role = servantsKingdom.getRoleById(510204269568458753L);
                     if (role != null) color = role.getColor();
                 }
-                else if (PatreonHandler.is$10Patron(user)) {
+                else if (is$10Patron()) {
                     var role = servantsKingdom.getRoleById(502472869234868224L);
                     if (role != null) color = role.getColor();
                 }
-                else if (PatreonHandler.is$5Patron(user)) {
+                else if (is$5Patron()) {
                     var role = servantsKingdom.getRoleById(502472823638458380L);
                     if (role != null) color = role.getColor();
                 }
-                else if (PatreonHandler.is$3Patron(user)) {
+                else if (is$3Patron()) {
                     var role = servantsKingdom.getRoleById(502472546600353796L);
                     if (role != null) color = role.getColor();
                 }
-                else if (PatreonHandler.is$1Patron(user)) {
+                else if (is$1Patron()) {
                     var role = servantsKingdom.getRoleById(502472440455233547L);
                     if (role != null) color = role.getColor();
                 }
-                else if (PatreonHandler.isDonator(user)) {
+                else if (isDonator()) {
                     var role = servantsKingdom.getRoleById(489738762838867969L);
                     if (role != null) color = role.getColor();
                 }
-                else if (PatreonHandler.isServerBooster(user)) {
+                else if (isServerBooster()) {
                     var role = servantsKingdom.getRoleById(639128857747652648L);
                     if (role != null) color = role.getColor();
                 }
@@ -802,31 +806,31 @@ public class Master {
             else {
                 var servantsKingdom = user.getJDA().getGuildById(436925371577925642L);
                 if (servantsKingdom == null) return color;
-                if (PatreonHandler.isVIP(user)) {
+                if (isVIP()) {
                     var role = servantsKingdom.getRoleById(510204269568458753L);
                     if (role != null) color = role.getColor();
                 }
-                else if (PatreonHandler.is$10Patron(user)) {
+                else if (is$10Patron()) {
                     var role = servantsKingdom.getRoleById(502472869234868224L);
                     if (role != null) color = role.getColor();
                 }
-                else if (PatreonHandler.is$5Patron(user)) {
+                else if (is$5Patron()) {
                     var role = servantsKingdom.getRoleById(502472823638458380L);
                     if (role != null) color = role.getColor();
                 }
-                else if (PatreonHandler.is$3Patron(user)) {
+                else if (is$3Patron()) {
                     var role = servantsKingdom.getRoleById(502472546600353796L);
                     if (role != null) color = role.getColor();
                 }
-                else if (PatreonHandler.is$1Patron(user)) {
+                else if (is$1Patron()) {
                     var role = servantsKingdom.getRoleById(502472440455233547L);
                     if (role != null) color = role.getColor();
                 }
-                else if (PatreonHandler.isDonator(user)) {
+                else if (isDonator()) {
                     var role = servantsKingdom.getRoleById(489738762838867969L);
                     if (role != null) color = role.getColor();
                 }
-                else if (PatreonHandler.isServerBooster(user)) {
+                else if (isServerBooster()) {
                     var role = servantsKingdom.getRoleById(639128857747652648L);
                     if (role != null) color = role.getColor();
                 }
@@ -993,17 +997,30 @@ public class Master {
 
         try {
             connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT count FROM feature_count WHERE id=?");
+            var select = connection.prepareStatement("SELECT * FROM feature_count WHERE id=?");
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) featureCounts.put(resultSet.getString("feature"), resultSet.getInt("count"));
+            if (resultSet.first()) {
+                do {
+                    var feature = resultSet.getString("feature");
+                    if (!feature.equals("addgif") && !feature.equals("blacklist")
+                            && !feature.equals("eval") && !feature.equals("refresh")
+                            && !feature.equals("serverlist") && !feature.equals("shutdown")
+                            && !feature.equals("thread"))
+                        featureCounts.put(feature, resultSet.getInt("count"));
+                } while (resultSet.next());
+            }
         } catch (SQLException e) {
             new Log(e, null, user, "featurecount", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
 
-        return featureCounts;
+        // Sort By Value
+        return featureCounts.entrySet()
+                .stream()
+                .sorted((Map.Entry.<String, Integer>comparingByValue().reversed()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
     }
 
     private int getFeatureCount(String feature) {
@@ -1171,5 +1188,132 @@ public class Master {
         else if (cat > bird && cat > dog) return LanguageHandler.get(lang, "profile_cat");
         else if (dog > bird && dog > cat) return LanguageHandler.get(lang, "profile_dog");
         else return LanguageHandler.get(lang, "profile_nofavourite");
+    }
+
+    // Patreon, Ranks and stuff
+    public boolean isCreator() {
+        return String.valueOf(userId).equals(Servant.config.getBotOwnerId());
+    }
+
+    public boolean isServerBooster() {
+        var servantsKingdom = user.getJDA().getGuildById(436925371577925642L);
+        var mistlockSanctuary = user.getJDA().getGuildById(237575963439923200L);
+        var isServerBooster = false;
+
+        // Servant's Kingdom Booster
+        if (servantsKingdom != null) {
+            var members = servantsKingdom.getMembers();
+            for (var member : members)
+                if (member.getUser().equals(user))
+                    isServerBooster = member.getRoles().contains(servantsKingdom.getRoleById(639128857747652648L));
+        }
+
+        // Mistlock Sanctuary Booster
+        if (mistlockSanctuary != null) {
+            var members = mistlockSanctuary.getMembers();
+            for (var member : members)
+                if (member.getUser().equals(user))
+                    isServerBooster = member.getRoles().contains(mistlockSanctuary.getRoleById(585536192691568681L));
+        }
+
+        return isServerBooster;
+    }
+
+    public boolean isDonator() {
+        var servantsKingdom = user.getJDA().getGuildById(436925371577925642L);
+        var isDonator = false;
+
+        if (servantsKingdom != null) {
+            var members = servantsKingdom.getMembers();
+            for (var member : members)
+                if (member.getUser().equals(user))
+                    isDonator = member.getRoles().contains(servantsKingdom.getRoleById(489738762838867969L));
+        }
+
+        return isDonator;
+    }
+
+    // Example: $10 Patron is also a $1 Patron!
+    public boolean is$1Patron() {
+        var servantsKingdom = user.getJDA().getGuildById(436925371577925642L);
+        var is$1Patron = false;
+
+        if (servantsKingdom != null) {
+            if (is$3Patron()) is$1Patron = true;
+            else {
+                var members = servantsKingdom.getMembers();
+                for (var member : members)
+                    if (member.getUser().equals(user))
+                        is$1Patron = member.getRoles().contains(servantsKingdom.getRoleById(502472440455233547L));
+            }
+        }
+
+        return is$1Patron;
+    }
+
+    public boolean is$3Patron() {
+        var servantsKingdom = user.getJDA().getGuildById(436925371577925642L);
+        var is$3Patron = false;
+
+        if (servantsKingdom != null) {
+            if (is$5Patron()) is$3Patron = true;
+            else {
+                var members = servantsKingdom.getMembers();
+                for (var member : members)
+                    if (member.getUser().equals(user))
+                        is$3Patron = member.getRoles().contains(servantsKingdom.getRoleById(502472546600353796L));
+            }
+        }
+
+        return is$3Patron;
+    }
+
+    public boolean is$5Patron() {
+        var servantsKingdom = user.getJDA().getGuildById(436925371577925642L);
+        var is$5Patron = false;
+
+        if (servantsKingdom != null) {
+            if (is$10Patron()) is$5Patron = true;
+            else {
+                var members = servantsKingdom.getMembers();
+                for (var member : members)
+                    if (member.getUser().equals(user))
+                        is$5Patron = member.getRoles().contains(servantsKingdom.getRoleById(502472823638458380L));
+            }
+        }
+
+        return is$5Patron;
+    }
+
+    public boolean is$10Patron() {
+        var servantsKingdom = user.getJDA().getGuildById(436925371577925642L);
+        var is$10Patron = false;
+
+        if (servantsKingdom != null) {
+            if (user.equals(servantsKingdom.getJDA().getSelfUser())) is$10Patron = true; // Servant should always be Saber
+            else if (isVIP()) is$10Patron = true;
+            else {
+                var members = servantsKingdom.getMembers();
+                for (var member : members)
+                    if (member.getUser().equals(user))
+                        is$10Patron = member.getRoles().contains(servantsKingdom.getRoleById(502472869234868224L));
+            }
+        }
+
+        return is$10Patron;
+    }
+
+    public boolean isVIP() {
+        var servantsKingdom = user.getJDA().getGuildById(436925371577925642L);
+        var isVIP = false;
+
+        if (servantsKingdom != null) {
+            var members = servantsKingdom.getMembers();
+            for (var member : members)
+                if (member.getUser().equals(user))
+                    isVIP = member.getRoles().contains(servantsKingdom.getRoleById(510204269568458753L));
+        }
+
+        return isVIP;
     }
 }

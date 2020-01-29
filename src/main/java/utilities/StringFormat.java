@@ -1,9 +1,6 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package utilities;
 
-import java.text.NumberFormat;
-import java.util.Locale;
-
 public class StringFormat {
     public static String fillWithWhitespace(String text, int desiredStringLength) {
         if (desiredStringLength <= text.length()) return text;
@@ -34,9 +31,5 @@ public class StringFormat {
         }
 
         return flipped.reverse().toString();
-    }
-
-    public static String formatDecimal(Locale locale, int i) {
-        return NumberFormat.getInstance(locale).format(i);
     }
 }
