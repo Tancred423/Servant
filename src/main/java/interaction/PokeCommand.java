@@ -7,7 +7,7 @@ import utilities.Constants;
 public class PokeCommand extends InteractionCommand {
     public PokeCommand() {
         this.name = "poke";
-        this.aliases = new String[0];
+        this.aliases = new String[] { "boop" };
         this.help = "Poke someone!";
         this.category = new Category("Interaction");
         this.arguments = "@user";
