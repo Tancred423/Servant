@@ -156,6 +156,7 @@ public class Servant {
                 new CopCommand(),
                 new DabCommand(),
                 new FlexCommand(),
+                new HappyBirthdayCommand(),
                 new HighfiveCommand(),
                 new HugCommand(),
                 new KissCommand(),

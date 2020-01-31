@@ -595,6 +595,7 @@ public class ProfileImage {
             add("cop");
             add("dab");
             add("flex");
+            add("happybirthday");
             add("highfive");
             add("hug");
             add("kiss");

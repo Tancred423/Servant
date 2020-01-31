@@ -13,6 +13,7 @@ public class ConfigFile {
     private String defaultPrefix;
     private String expCdMillis;
     private String botOwnerId;
+    private String botOwnerColorCode;
     private String supportGuildId;
     private String supportGuildInv;
 
@@ -46,6 +47,7 @@ public class ConfigFile {
         config.setProperty("defaultPrefix", "!");
         config.setProperty("expCdMillis", "60000"); // 1 minute.
         config.setProperty("botOwnerId", "");
+        config.setProperty("botOwnerColorCode", "0xd963a0");
         config.setProperty("supportGuildId", "");
         config.setProperty("supportGuildInv", "");
 
@@ -69,6 +71,7 @@ public class ConfigFile {
         this.defaultPrefix = config.getProperty("defaultPrefix");
         this.expCdMillis = config.getProperty("expCdMillis");
         this.botOwnerId = config.getProperty("botOwnerId");
+        this.botOwnerColorCode = config.getProperty("botOwnerColorCode");
         this.supportGuildId = config.getProperty("supportGuildId");
         this.supportGuildInv = config.getProperty("supportGuildInv");
     }
@@ -81,6 +84,7 @@ public class ConfigFile {
     public String getDefaultPrefix() { return defaultPrefix; }
     public String getExpCdMillis() { return expCdMillis; }
     public String getBotOwnerId() { return botOwnerId; }
+    public String getBotOwnerColorCode() { return botOwnerColorCode; }
     public String getSupportGuildId() { return supportGuildId; }
     public String getSupportGuildInv() { return supportGuildInv; }
 
@@ -105,6 +109,7 @@ public class ConfigFile {
         if (getDefaultPrefix() == null) corrupted = true;
         if (getExpCdMillis() == null) corrupted = true;
         if (getBotOwnerId() == null) corrupted = true;
+        if (getBotOwnerColorCode() == null) corrupted = true;
         if (getSupportGuildId() == null) corrupted = true;
         if (getSupportGuildInv() == null) corrupted = true;
 
@@ -142,6 +147,11 @@ public class ConfigFile {
 
             if (getBotOwnerId().isEmpty()) {
                 System.out.println(String.format(errorMessage, "bot owner (user) ID"));
+                missing = true;
+            }
+
+            if (getBotOwnerColorCode().isEmpty()) {
+                System.out.println(String.format(errorMessage, "bot owner color code"));
                 missing = true;
             }
 
