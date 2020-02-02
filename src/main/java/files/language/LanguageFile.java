@@ -1049,6 +1049,8 @@ public class LanguageFile {
 
         // Random
         en_gb.setProperty("random_empty", "I couldn't find anything with this keyword.");
+        en_gb.setProperty("random_photo", "Photo");
+        en_gb.setProperty("random_by", "by");
 
         /// Unflip
         en_gb.setProperty("unflip_description", "Unlip a user.");
@@ -2111,6 +2113,8 @@ public class LanguageFile {
 
         // Random
         de_de.setProperty("random_empty", "Ich konnte unter diesem Suchwort nichts finden.");
+        de_de.setProperty("random_photo", "Foto");
+        de_de.setProperty("random_by", "von");
 
         /// Unflip
         de_de.setProperty("unflip_description", "Unlip a user.");

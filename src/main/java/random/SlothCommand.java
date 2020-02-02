@@ -1,6 +1,7 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package random;
 
+import files.language.LanguageHandler;
 import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -37,6 +38,7 @@ public class SlothCommand extends Command {
         event.getChannel().sendTyping().queue();
 
         try {
+            var lang = LanguageHandler.getLanguage(event);
             var json = JsonReader.readJsonFromUrl("https://api.unsplash.com/photos/random?query=sloth&client_id=" + Servant.config.getUnsplashClientId());
             var eb = new EmbedBuilder()
                     .setColor(new Master(event.getAuthor()).getColor());
@@ -64,7 +66,7 @@ public class SlothCommand extends Command {
             var userTwitterProfileUrl = userTwitterUsername.equals("null") ? null : "https://twitter.com/" + userTwitterUsername;
 
             // Building the credits
-            eb.setDescription("[Photo](" + imageLink + ") by [" + userName + "](" + userProfile + ")" +
+            eb.setDescription("[" + LanguageHandler.get(lang, "random_photo") + "](" + imageLink + ") " + LanguageHandler.get(lang, "random_by") + " [" + userName + "](" + userProfile + ")" +
                     " (" +
                     (portfolioUrl.equals("null") ? "" : " [Portfolio](" + portfolioUrl + ")") +
                     (userInstagramProfileUrl == null ? "" : " [Instagram](" + userInstagramProfileUrl + ")") +
