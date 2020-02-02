@@ -29,7 +29,7 @@ public class Parser {
     }
 
     public static boolean isValidLanguage(String language) {
-        return language.equalsIgnoreCase("de_de") || language.equalsIgnoreCase("en_Gb");
+        return language.equalsIgnoreCase("de_de") || language.equalsIgnoreCase("en_gb");
     }
 
     public static boolean isValidDateTime(String input) {

@@ -1,3 +1,4 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package fun.level;
 
 import files.language.LanguageHandler;
@@ -578,6 +579,7 @@ public class ProfileImage {
             add("timezone");
 
             // fun
+            add("achievements");
             add("avatar");
             add("baguette");
             add("bio");
@@ -586,6 +588,7 @@ public class ProfileImage {
             add("editembed");
             add("flip");
             add("love");
+            add("mostusedcommands");
             add("profile");
             add("unflip");
 
@@ -617,6 +620,7 @@ public class ProfileImage {
             add("panda");
             add("pikachu");
             add("redpanda");
+            add("sloth");
         }};
     }
 

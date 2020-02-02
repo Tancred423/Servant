@@ -91,6 +91,12 @@ public class GuildCommand extends Command {
                         break;
 
                     case "language":
+                        if (!Parser.isValidLanguage(value)) {
+                            event.reply(LanguageHandler.get(lang, "server_language"));
+                            event.reactError();
+                            return;
+                        }
+
                         server.setLanguage(value);
                         event.reactSuccess();
                         break;

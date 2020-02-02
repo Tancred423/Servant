@@ -51,7 +51,6 @@ public class BirthdayCommand extends Command {
         var args = event.getArgs();
         var guild = event.getGuild();
         var server = new Server(guild);
-        var author = event.getAuthor();
         var bot = event.getSelfUser();
 
         try {

@@ -76,9 +76,7 @@ public class ProfileCommand extends Command {
                                 String.format(LanguageHandler.get(lang, "profile_footer2"), p, name),
                         event.getSelfUser().getEffectiveAvatarUrl());
 
-        event.getChannel().sendFile(image, image.getName() + ".png").embed(eb.build()).queue(m -> {
-            event.getMessage().clearReactions().queue();
-        });
+        event.getChannel().sendFile(image, image.getName() + ".png").embed(eb.build()).queue(m -> event.getMessage().clearReactions().queue());
 
         // Delete File.
         new Timer().schedule(Time.wrap(image::delete), 10 * 1000);

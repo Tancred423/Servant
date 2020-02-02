@@ -55,7 +55,6 @@ public class EditEmbedCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        var guild = event.getGuild();
         var user = event.getAuthor();
         var master = new Master(user);
 

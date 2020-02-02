@@ -12,9 +12,7 @@ import fun.embed.CreateEmbedCommand;
 import fun.embed.EditEmbedCommand;
 import fun.flip.FlipCommand;
 import fun.flip.UnflipCommand;
-import fun.level.BioCommand;
-import fun.level.LevelRoleCommand;
-import fun.level.ProfileCommand;
+import fun.level.*;
 import information.BotInfoCommand;
 import information.PatreonCommand;
 import information.PingCommand;
@@ -139,6 +137,7 @@ public class Servant {
                 new PollCommand(waiter),
 
                 // Fun
+                new AchievementsCommand(),
                 new AvatarCommand(),
                 new BaguetteCommand(),
                 new BioCommand(),
@@ -146,7 +145,9 @@ public class Servant {
                 new CreateEmbedCommand(waiter),
                 new EditEmbedCommand(waiter),
                 new FlipCommand(),
+                new LeaderboardCommand(),
                 new LoveCommand(),
+                new MostUsedCommandsCommand(),
                 new ProfileCommand(),
                 new UnflipCommand(),
 
@@ -178,6 +179,7 @@ public class Servant {
                 new PandaCommand(),
                 new PikachuCommand(),
                 new RedPandaCommand(),
+                new SlothCommand(),
 
                 // Easter Eggs
                 new ThanksCommand()

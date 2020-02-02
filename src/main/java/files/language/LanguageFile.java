@@ -16,6 +16,9 @@ public class LanguageFile {
         en_gb.setProperty("invalid_mention", "Invalid mention.");
         en_gb.setProperty("current_prefix", "Current prefix: %s");
         en_gb.setProperty("unknown_message", "Unknown message.");
+        en_gb.setProperty("apostrophe", "'");
+        en_gb.setProperty("apostrophe_s", "'s");
+        en_gb.setProperty("times", "times");
 
         // Features
         /// Achievement
@@ -51,9 +54,10 @@ public class LanguageFile {
                 "\n" +
                 "To get started, I recommend you to use my `%shelp` command.\n" +
                 "To get detailed help, you simply can type the command name without any arguments. E.g. `%savatar`\n" +
+                "Alternatively you can visit [the website](https://servant.tanc.red) which has a list of all commands and an FAQ.\n" +
                 "\n" +
                 "If you need further help, you can join my support server or contact my creator directly.\n" +
-                "Support Server: [Click to join](https://%s)\n" +
+                "Support Server: [Join Servant's Kingdom](https://%s)\n" +
                 "Creator Name: %s#%s\n" +
                 "Email: `servant@tanc.red`\n" +
                 "\n" +
@@ -66,7 +70,7 @@ public class LanguageFile {
                 "If there is anything to improve, I am always open for feedback.\n" +
                 "\n" +
                 "To submit feedback, you can join my support server or contact my creator directly.\n" +
-                "Support Server: [Click to join](https://%s)\n" +
+                "Support Server: [Join Servant's Kingdom](https://%s)\n" +
                 "Creator Name: %s#%s\n" +
                 "Email: `servant@tanc.red`\n");
         en_gb.setProperty("kick_footer", "You are receiving this message, because someone kicked me from your server (%s) or your server was deleted.");
@@ -436,6 +440,7 @@ public class LanguageFile {
                 "... set [setting] [value]");
         en_gb.setProperty("server_offset", "Invalid offset.");
         en_gb.setProperty("server_prefix", "Invalid prefix.");
+        en_gb.setProperty("server_language", "Invalid language.");
         en_gb.setProperty("server_invalidsetting", "This setting does not exist.");
         en_gb.setProperty("server_args_unset", "To unset a setting, there have to be 2 arguments.\n" +
                 "... unset [setting]");
@@ -591,8 +596,6 @@ public class LanguageFile {
         en_gb.setProperty("voicelobby_current", "Current Lobbies");
         en_gb.setProperty("voicelobby_footer", "Type `%slobby` to get help.");
         en_gb.setProperty("voicelobby_firstarg", "Invalid argument. Either `set`, `unset`, `show` or `toggletext`.");
-        en_gb.setProperty("voicelobby_apostrophe", "'");
-        en_gb.setProperty("voicelobby_apostrophe_s", "'s");
         en_gb.setProperty("voicelobby_already_set", "This channel was already set as an voice lobby.");
 
         // Information
@@ -775,7 +778,7 @@ public class LanguageFile {
         en_gb.setProperty("reminder_success", "Added. Your message was removed for privacy.");
         en_gb.setProperty("reminder_success_dm", "Added.");
         en_gb.setProperty("reminder_fail", "You already have a reminder at this time.");
-        en_gb.setProperty("reminder_invalidinput", "Invalid input.");
+        en_gb.setProperty("reminder_invalidinput", "Invalid input. Your message was removed for privacy.");
         en_gb.setProperty("reminder_remind_notopic", "Hi master, I should remind you at this time.");
         en_gb.setProperty("reminder_remind_topic", "Hi master, I should remind you at this time about:\n**%s**");
 
@@ -858,6 +861,9 @@ public class LanguageFile {
         en_gb.setProperty("vote_forbidden", "Forbidden");
 
         // Fun
+        /// Achievements
+        en_gb.setProperty("achievements_title", "%s%s Achievements");
+
         /// Avatar
         en_gb.setProperty("avatar_description", "Steal someone's avatar.");
         en_gb.setProperty("avatar_usage", "Command: `%s%s @user`\n");
@@ -960,6 +966,9 @@ public class LanguageFile {
         en_gb.setProperty("flip_usage", "Command: `%s%s @user`");
         en_gb.setProperty("flip_hint", "Check out `%sunflip @user`");
 
+        /// Leaderboard
+        en_gb.setProperty("leaderboard_title", "%s%s Leaderboard");
+
         /// Level
         en_gb.setProperty("level_leaderboard_empty", "Leaderboard is empty");
         en_gb.setProperty("level_leaderboard_authorname", "%s Leaderboard");
@@ -1001,6 +1010,9 @@ public class LanguageFile {
         en_gb.setProperty("love_noself_10", "Dats pretty low, tho.");
         en_gb.setProperty("love_noself_0", "Well, that won't work out.");
         en_gb.setProperty("love_fallback", "Urgh!");
+
+        /// MostUsedCommands
+        en_gb.setProperty("mostusedcommands_title", "%s%s Most Used Commands");
 
         /// Profile
         en_gb.setProperty("profile_noachievements", "No achievements");
@@ -1071,6 +1083,9 @@ public class LanguageFile {
         de_de.setProperty("invalid_mention", "Ungültige Erwähnung.");
         de_de.setProperty("current_prefix", "Aktueller Prefix: %s");
         de_de.setProperty("unknown_message", "Unbekannte Nachricht.");
+        de_de.setProperty("apostrophe", "'");
+        de_de.setProperty("apostrophe_s", "s");
+        de_de.setProperty("times", "mal");
 
         // Features
         /// Achievement
@@ -1486,6 +1501,7 @@ public class LanguageFile {
                 "... set [Einstellung] [Wert]");
         de_de.setProperty("server_offset", "Ungültiger Offset.");
         de_de.setProperty("server_prefix", "Ungültiger Prefix.");
+        de_de.setProperty("server_language", "Ungültigee Sprache.");
         de_de.setProperty("server_invalidsetting", "Diese Einstellung existiert nicht.");
         de_de.setProperty("server_args_unset", "Um eine Einstellung zurückuzsetzen, müssen 2 Argumente mitgegeben werden.\n" +
                 "... unset [Einstellung]");
@@ -1641,8 +1657,6 @@ public class LanguageFile {
         de_de.setProperty("voicelobby_current", "Current Lobbies");
         de_de.setProperty("voicelobby_footer", "Type `%slobby` to get help.");
         de_de.setProperty("voicelobby_firstarg", "Invalid argument. Either `set`, `unset`, `show` or `toggletext`.");
-        de_de.setProperty("voicelobby_apostrophe", "'");
-        de_de.setProperty("voicelobby_apostrophe_s", "s");
         de_de.setProperty("voicelobby_already_set", "This channel was already set as an voice lobby.");
 
         // Information
@@ -1825,7 +1839,7 @@ public class LanguageFile {
         de_de.setProperty("reminder_success", "Added. Your message was removed for privacy.");
         de_de.setProperty("reminder_success_dm", "Added.");
         de_de.setProperty("reminder_fail", "You already have a reminder at this time.");
-        de_de.setProperty("reminder_invalidinput", "Invalid input.");
+        de_de.setProperty("reminder_invalidinput", "Invalid input. Your message was removed for privacy.");
         de_de.setProperty("reminder_remind_notopic", "Hi master, I should remind you at this time.");
         de_de.setProperty("reminder_remind_topic", "Hi master, I should remind you at this time about:\n**%s**");
 
@@ -1908,6 +1922,9 @@ public class LanguageFile {
         de_de.setProperty("vote_forbidden", "Verboten");
 
         // Fun
+        /// Achievements
+        de_de.setProperty("achievements_title", "%s%s Erfolge");
+
         /// Avatar
         de_de.setProperty("avatar_description", "Steal someone's avatar.");
         de_de.setProperty("avatar_usage", "Command: `%s%s @user`\n");
@@ -2010,6 +2027,9 @@ public class LanguageFile {
         de_de.setProperty("flip_usage", "Command: `%s%s @user`");
         de_de.setProperty("flip_hint", "Check out `%sunflip @user`");
 
+        /// Leaderboard
+        de_de.setProperty("leaderboard_title", "%s%s Rangliste");
+
         /// Level
         de_de.setProperty("level_leaderboard_empty", "Leaderboard is empty");
         de_de.setProperty("level_leaderboard_authorname", "%s Leaderboard");
@@ -2053,6 +2073,9 @@ public class LanguageFile {
         de_de.setProperty("love_noself_10", "Dats pretty low, tho.");
         de_de.setProperty("love_noself_0", "Well, that won't work out.");
         de_de.setProperty("love_fallback", "Urgh!");
+
+        /// MostUsedCommands
+        de_de.setProperty("mostusedcommands_title", "%s%s Meist genutzte Befehle");
 
         /// Profile
         de_de.setProperty("profile_noachievements", "No achievements");

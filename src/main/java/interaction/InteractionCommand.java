@@ -4,7 +4,6 @@ package interaction;
 import files.language.LanguageHandler;
 import moderation.guild.GuildHandler;
 import moderation.user.Master;
-import servant.Log;
 import utilities.JsonReader;
 import utilities.Parser;
 import utilities.UsageEmbed;
@@ -48,8 +47,7 @@ public abstract class InteractionCommand extends Command {
             try {
                 gif = JsonReader.readJsonFromUrl("https://some-random-api.ml/animu/" + name).get("link").toString();
             } catch (IOException e) {
-                new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
-                return;
+                gif = InteractionDatabase.getGifUrl(name.toLowerCase(), guild, user);
             }
         } else gif = InteractionDatabase.getGifUrl(name.toLowerCase(), guild, user);
 

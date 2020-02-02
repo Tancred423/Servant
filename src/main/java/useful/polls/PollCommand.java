@@ -88,7 +88,7 @@ public class PollCommand extends Command {
                             processVote(event, question, answers, lang, true);
                         else processVote(event, question, answers, lang, false);
 
-                        message.delete().queue();
+                        message.delete().queue(s -> {}, f -> {});
                         event.getMessage().delete().queue();
                     }, 15, TimeUnit.MINUTES, () -> timeout(message, event, lang));
         });

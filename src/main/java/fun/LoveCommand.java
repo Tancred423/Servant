@@ -59,22 +59,14 @@ public class LoveCommand extends Command {
         } else {
             var splitContentRaw = event.getArgs().split(" ");
             if (splitContentRaw.length > 1) {
-                if (splitContentRaw[0].trim().equals(splitContentRaw[1].trim())) {
-                    first = mentioned.get(0);
-                    second = mentioned.get(0);
-                } else {
-                    first = event.getGuild().getMemberById(event.getAuthor().getIdLong());
-                    second = mentioned.get(0);
-                }
-            } else {
-                first = event.getGuild().getMemberById(event.getAuthor().getIdLong());
-                second = mentioned.get(0);
-            }
+                if (splitContentRaw[0].trim().equals(splitContentRaw[1].trim())) first = mentioned.get(0);
+                else first = event.getGuild().getMemberById(event.getAuthor().getIdLong());
+            } else first = event.getGuild().getMemberById(event.getAuthor().getIdLong());
+            second = mentioned.get(0);
         }
 
         if (first == second) isSelfLove = true;
 
-        var guild = event.getGuild();
         var author = event.getAuthor();
         var master = new Master(author);
 

@@ -268,7 +268,7 @@ public class CommandEvent {
         for(int i=0; i<MAX_MESSAGES && i<messages.size(); i++) {
             chan.sendMessage(messages.get(i)).queue(m -> {
                 if(event.isFromType(ChannelType.TEXT)) linkId(m);
-            });
+            }, f -> {});
         }
     }
     

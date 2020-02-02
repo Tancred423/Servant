@@ -57,13 +57,18 @@ public class ReadyListener extends ListenerAdapter {
     }
 
     private void startExecutor(JDA jda) {
-        var service = Executors.newSingleThreadScheduledExecutor();
+        var executor1minute = Executors.newSingleThreadScheduledExecutor();
+        var executor5minutes = Executors.newSingleThreadScheduledExecutor();
+        var executor15minutes = Executors.newSingleThreadScheduledExecutor();
+        var executor24hours = Executors.newSingleThreadScheduledExecutor();
 
         var delayToNextMinute = Time.getDelayToNextMinuteInMillis();
+        var delayToNext5Minutes = Time.getDelayToNext5MinutesInMillis();
+        var delayToNextQuarter = Time.getDelayToNextQuarterInMillis();
         var delayToNextDay = Time.getDelayToNextDayInMillis();
 
         // 1 Minute Period
-        service.scheduleAtFixedRate(() -> {
+        executor1minute.scheduleAtFixedRate(() -> {
             Alarm.check(jda);
             GiveawayHandler.checkGiveaways(jda);
             Reminder.check(jda);
@@ -72,17 +77,17 @@ public class ReadyListener extends ListenerAdapter {
         }, delayToNextMinute, 60 * 1000, TimeUnit.MILLISECONDS);
 
         // 5 Minute Period
-        service.scheduleAtFixedRate(() -> settingPresence(jda), delayToNextMinute, 5 * 60 * 1000, TimeUnit.MILLISECONDS);
+        executor5minutes.scheduleAtFixedRate(() -> settingPresence(jda), delayToNext5Minutes, 5 * 60 * 1000, TimeUnit.MILLISECONDS);
 
         // 15 Minute Period
-        service.scheduleAtFixedRate(() -> {
+        executor15minutes.scheduleAtFixedRate(() -> {
             // Birthday
             BirthdayHandler.checkBirthdays(jda);
             BirthdayHandler.updateLists(jda);
-        }, delayToNextMinute, 15 * 60 * 1000, TimeUnit.MILLISECONDS);
+        }, delayToNextQuarter, 15 * 60 * 1000, TimeUnit.MILLISECONDS);
 
         // 24 Hour Period
-        service.scheduleAtFixedRate(() -> {
+        executor24hours.scheduleAtFixedRate(() -> {
             try {
                 logServerAmount(jda);
             } catch (IOException | ParseException e) {

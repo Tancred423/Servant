@@ -73,9 +73,11 @@ public class ServerSetupCommand extends Command {
 
     // Timeout
     private void timeout(CommandEvent event, Message botMessage, String lang) {
-        event.reactWarning();
-        botMessage.delete().queue();
-        event.reply(LanguageHandler.get(lang, "setupwizard_timeout"));
+        if (event.getGuild() != null) {
+            event.reactWarning();
+            botMessage.delete().queue();
+            event.reply(LanguageHandler.get(lang, "setupwizard_timeout"));
+        }
     }
 
     // Language
@@ -132,7 +134,7 @@ public class ServerSetupCommand extends Command {
                             } catch (NumberFormatException ex) {
                                 processOffset(channel, author, previous, event, lang, true, internalGuild, guild);
                             }
-                        }, 15, TimeUnit.MINUTES, () -> timeout(event, message, lang)));
+                        }, 15, TimeUnit.MINUTES, () -> timeout(event, message, lang)), f -> {});
     }
 
     // Finish

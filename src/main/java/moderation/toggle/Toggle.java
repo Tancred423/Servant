@@ -156,7 +156,6 @@ public class Toggle {
             // fun
             case "easteregg":
             case "eastereggs":
-            case "achievement":
                 return "easteregg";
             case "avatar":
             case "ava":
@@ -214,6 +213,10 @@ public class Toggle {
                 return "pikachu";
             case "redpanda":
                 return "redpanda";
+            case "sloth":
+            case "hiriko":
+            case "hirik0":
+                return "sloth";
 
             default:
                 return null;
@@ -281,6 +284,7 @@ public class Toggle {
             add("panda");
             add("pikachu");
             add("redpanda");
+            add("sloth");
         }};
     }
 
@@ -292,6 +296,8 @@ public class Toggle {
 
             // Profile also toggles Bio
             case "bio":
+            case "achievements":
+            case "mostusedcommands":
                 return "profile";
 
             // All interactions will be toggled at once

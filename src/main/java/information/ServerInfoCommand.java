@@ -39,7 +39,6 @@ public class ServerInfoCommand extends Command {
     @Override
     protected void execute(CommandEvent event) {
         var lang = LanguageHandler.getLanguage(event);
-
         processInfo(event, lang);
     }
 

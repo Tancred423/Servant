@@ -7,6 +7,6 @@ public class VoiceLobby {
     public static String getLobbyName(Member member, String lang) {
         return "⤷ " + member.getEffectiveName() +
                 (member.getEffectiveName().toLowerCase().endsWith("s") ?
-                        LanguageHandler.get(lang, "voicelobby_apostrophe") :
-                        LanguageHandler.get(lang, "voicelobby_apostropge_s")) + " Lobby"; }
+                        LanguageHandler.get(lang, "apostrophe") :
+                        LanguageHandler.get(lang, "apostropge_s")) + " Lobby"; }
 }
