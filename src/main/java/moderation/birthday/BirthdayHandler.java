@@ -39,7 +39,8 @@ public class BirthdayHandler {
                 tc.retrieveMessageById(messageId).queue(message -> {
                     try {
                         var list = createList(guild, authorMember.getUser(), tc, true);
-                        message.editMessage(list == null ? new EmbedBuilder().build() : list).queue();
+                        if (list == null) server.unsetBirthdayMessage();
+                        else message.editMessage(list).queue();
                     } catch (ParseException e) {
                         new Log(e, guild, authorMember.getUser(), "BirthdayHandler - Update Lists", null).sendLog(false);
                     }
@@ -89,7 +90,6 @@ public class BirthdayHandler {
     private static void gratulate(Guild guild, long userId) {
         var guildOwner = guild.getOwner();
         if (guildOwner == null) return;
-        var guildOwnerUser = guildOwner.getUser();
         var server = new Server(guild);
         var birthdayChannel = guild.getTextChannelById(server.getBirthdayChannelId());
         var birthdayMember = guild.getMemberById(userId);
@@ -119,7 +119,7 @@ public class BirthdayHandler {
 
         // birthCountdowns: <Long UserId, Long Countdown>
         var birthCountdowns = new HashMap<Long, Long>();
-        for (var entry : birthDates.entrySet()) birthCountdowns.put(entry.getKey(), getCooldown(entry.getValue()));
+        for (var entry : birthDates.entrySet()) birthCountdowns.put(entry.getKey(), getCountdown(entry.getValue()));
         // birthCountdownsSorted: Sorted by value (countdown)
         var birthCountdownsSorted = birthCountdowns.entrySet()
                 .stream()
@@ -178,7 +178,7 @@ public class BirthdayHandler {
         return eb.build();
     }
 
-    private static long getCooldown(String date) throws ParseException {
+    private static long getCountdown(String date) throws ParseException {
         Date today = new Date();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(today);

@@ -46,6 +46,7 @@ public class ToggleFile {
     private boolean createembed;
     private boolean editembed;
     private boolean flip;
+    private boolean leaderboard;
     private boolean level;
     private boolean levelupmessage;
     private boolean love;
@@ -65,6 +66,7 @@ public class ToggleFile {
     private boolean panda;
     private boolean pikachu;
     private boolean redpanda;
+    private boolean sloth;
 
     // Constructor.
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -135,6 +137,7 @@ public class ToggleFile {
         toggle.setProperty("createembed", "on");
         toggle.setProperty("editembed", "on");
         toggle.setProperty("flip", "on");
+        toggle.setProperty("leaderboard", "on");
         toggle.setProperty("level", "off");
         toggle.setProperty("levelupmessage", "on");
         toggle.setProperty("love", "on");
@@ -154,6 +157,7 @@ public class ToggleFile {
         toggle.setProperty("panda", "on");
         toggle.setProperty("pikachu", "on");
         toggle.setProperty("redpanda", "on");
+        toggle.setProperty("sloth", "on");
 
         toggle.store(os,
                 "Project: Servant\n" +
@@ -208,6 +212,7 @@ public class ToggleFile {
         this.createembed = toggle.getProperty("createembed").equals("on");
         this.editembed = toggle.getProperty("editembed").equals("on");
         this.flip = toggle.getProperty("flip").equals("on");
+        this.leaderboard = toggle.getProperty("leaderboard").equals("on");
         this.level = toggle.getProperty("level").equals("on");
         this.levelupmessage = toggle.getProperty("levelupmessage").equals("on");
         this.love = toggle.getProperty("love").equals("on");
@@ -227,6 +232,7 @@ public class ToggleFile {
         this.panda = toggle.getProperty("panda").equals("on");
         this.pikachu = toggle.getProperty("pikachu").equals("on");
         this.redpanda = toggle.getProperty("redpanda").equals("on");
+        this.sloth = toggle.getProperty("sloth").equals("on");
     }
 
     // Getter.
@@ -272,6 +278,7 @@ public class ToggleFile {
             case "createembed": return createembed;
             case "editembed": return editembed;
             case "flip": return flip;
+            case "leaderboard": return leaderboard;
             case "level": return level;
             case "levelupmessage": return levelupmessage;
             case "love": return love;
@@ -291,6 +298,7 @@ public class ToggleFile {
             case "panda": return panda;
             case "pikachu": return pikachu;
             case "redpanda": return redpanda;
+            case "sloth": return sloth;
 
             default: return true;
         }

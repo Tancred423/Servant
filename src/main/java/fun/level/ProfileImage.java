@@ -321,7 +321,7 @@ public class ProfileImage {
         g2d.fill(shape);
         g2d.translate(animalX * -1, animalY * -1); // Reset
 
-        var animalValue = master.getFavouriteAnimal(lang);
+        var animalValue = master.getFavoriteAnimal(lang);
         var animalActualWidth = g2d.getFontMetrics().stringWidth(animalValue);
         animalX = commandsStatsWidth - animalActualWidth;
 

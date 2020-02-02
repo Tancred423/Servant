@@ -36,7 +36,13 @@ public class AchievementsCommand extends Command {
         var jda = event.getJDA();
         var user = event.getAuthor();
         var master = new Master(user);
+        var message = event.getMessage();
         var lang = master.getLanguage();
+
+        if (message.getMentionedMembers().size() > 0) {
+            user = message.getMentionedMembers().get(0).getUser();
+            master = new Master(user);
+        }
 
         var achievementEmotes = Image.getAchievementsEmotes(jda);
         var achievementsMap = master.getAchievements();

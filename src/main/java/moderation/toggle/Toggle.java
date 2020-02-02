@@ -173,6 +173,9 @@ public class Toggle {
             case "flip":
             case "unflip":
                 return "flip";
+            case "leaderboard":
+            case "levelranking":
+                return "leaderboard";
             case "level":
                 return "level";
             case "levelupmessage":
@@ -192,15 +195,19 @@ public class Toggle {
 
             // random
             case "random":
+            case "imgur":
                 return "random";
             case "bird":
             case "birb":
                 return "bird";
             case "cat":
+            case "catto":
                 return "cat";
             case "dog":
+            case "doggo":
                 return "dog";
             case "fox":
+            case "fennec":
                 return "fox";
             case "koala":
                 return "koala";
@@ -265,6 +272,7 @@ public class Toggle {
             add("createembed");
             add("editembed");
             add("flip");
+            add("leaderboard");
             add("level");
             add("levelupmessage");
             add("love");

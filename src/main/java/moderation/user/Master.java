@@ -1151,11 +1151,9 @@ public class Master {
         return feature;
     }
 
-    public String getFavouriteAnimal(String lang) {
+    public String getFavoriteAnimal(String lang) {
         Connection connection = null;
-        var bird = 0;
-        var cat = 0;
-        var dog = 0;
+        var animals = new HashMap<String, Integer>();
 
         try {
             connection = Servant.db.getHikari().getConnection();
@@ -1165,9 +1163,18 @@ public class Master {
             if (resultSet.first()) {
                 do {
                     var feature = resultSet.getString("feature");
-                    if (feature.equals("bird")) bird = resultSet.getInt("count");
-                    if (feature.equals("cat")) cat = resultSet.getInt("count");
-                    if (feature.equals("dog")) dog = resultSet.getInt("count");
+                    switch (feature) {
+                        case "bird":
+                        case "cat":
+                        case "dog":
+                        case "fox":
+                        case "koala":
+                        case "panda":
+                        case "redpanda":
+                        case "sloth":
+                            animals.put(feature, resultSet.getInt("count"));
+                            break;
+                    }
                 } while (resultSet.next());
             }
         } catch (SQLException e) {
@@ -1176,10 +1183,36 @@ public class Master {
             closeQuietly(connection);
         }
 
-        if (bird > cat && bird > dog) return LanguageHandler.get(lang, "profile_bird");
-        else if (cat > bird && cat > dog) return LanguageHandler.get(lang, "profile_cat");
-        else if (dog > bird && dog > cat) return LanguageHandler.get(lang, "profile_dog");
-        else return LanguageHandler.get(lang, "profile_nofavourite");
+        if (!animals.isEmpty()) {
+            var hasFavoriteAnimal = true;
+
+            var sortedAnimals = animals.entrySet()
+                    .stream()
+                    .sorted((Map.Entry.<String, Integer>comparingByValue().reversed()))
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+
+            if (animals.size() > 1) {
+                Map.Entry<String, Integer> firstAnimal = null;
+                Map.Entry<String, Integer> secondAnimal = null;
+
+                var i = 0;
+                for (var animal : sortedAnimals.entrySet()) {
+                    if (i == 0) firstAnimal = animal;
+                    else {
+                        secondAnimal = animal;
+                        break;
+                    }
+                    i++;
+                }
+
+                if (firstAnimal != null && secondAnimal != null && firstAnimal.getValue().equals(secondAnimal.getValue()))
+                    hasFavoriteAnimal = false;
+            }
+
+            if (hasFavoriteAnimal) return sortedAnimals.entrySet().iterator().next().getKey();
+        }
+
+        return LanguageHandler.get(lang, "profile_nofavourite");
     }
 
     // Patreon, Ranks and stuff

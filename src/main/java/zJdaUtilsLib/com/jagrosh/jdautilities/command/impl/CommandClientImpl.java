@@ -529,10 +529,10 @@ public class CommandClientImpl implements CommandClient, EventListener {
                     }
                 }
 
-                var toggleName = Toggle.getToggleName(name);
                 if (command != null) {
                     // Execute Command
-                    // todo: y the fuk dis not workin
+                    var toggleName = Toggle.getToggleName(command.getName());
+
                     CompletableFuture.runAsync(() -> {
                         try {
                             // Logging Command
@@ -548,9 +548,10 @@ public class CommandClientImpl implements CommandClient, EventListener {
                                 uses.put(command.getName(), uses.getOrDefault(command.getName(), 0) + 1);
                                 command.run(cevent);
 
+
                                 // Statistics
-                                new Master(event.getAuthor()).incrementFeatureCount(name);
-                                if (event.isFromGuild()) new Server(event.getGuild()).incrementFeatureCount(name);
+                                new Master(event.getAuthor()).incrementFeatureCount(command.getName());
+                                if (event.isFromGuild()) new Server(event.getGuild()).incrementFeatureCount(command.getName());
                             }
                         } catch (Exception e) {
                             e.printStackTrace();

@@ -1,7 +1,10 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package utilities;
 
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.ISnowflake;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageChannel;
 
 import java.awt.*;
 import java.io.IOException;
@@ -42,6 +45,8 @@ public class Parser {
     }
 
     public static boolean isValidDate(String input) {
+        if (input.length() != 10) return false;
+
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         sdf.setLenient(false);
 

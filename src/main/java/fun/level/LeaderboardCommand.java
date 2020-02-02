@@ -52,34 +52,38 @@ public class LeaderboardCommand extends Command {
         var sb = new StringBuilder();
         var fieldValues = new ArrayList<String>();
 
-        var ranking = 1; // Ranking placement
-        for (var entry : leaderboard.entrySet()) {
-            /* Max length for a field is 1024. 100 is the max length of one row.
-             * In case this list is getting too long, we will make a new one.
-             */
-            if (sb.length() >= 1024 - 100) {
-                fieldValues.add(sb.toString());
-                sb = new StringBuilder();
+        if  (leaderboard.isEmpty()) {
+            eb.setDescription(LanguageHandler.get(lang, "leaderboard_noentry"));
+        } else {
+            var ranking = 1; // Ranking placement
+            for (var entry : leaderboard.entrySet()) {
+                /* Max length for a field is 1024. 100 is the max length of one row.
+                 * In case this list is getting too long, we will make a new one.
+                 */
+                if (sb.length() >= 1024 - 100) {
+                    fieldValues.add(sb.toString());
+                    sb = new StringBuilder();
+                }
+
+                var member = guild.getMemberById(entry.getKey());
+                if (member != null) {
+                    var currentExp = entry.getValue();
+                    var currentLevel = Parser.getLevelFromExp(currentExp);
+                    var neededExp = Parser.getLevelExp(currentLevel);
+                    var currentExpOnThisLevel = currentExp - Parser.getTotalLevelExp(currentLevel - 1);
+                    sb.append(ranking).append(". ").append(member.getAsMention()).append(": ").append(LanguageHandler.get(lang, "profile_level")).append(" ").append(currentLevel).append(" (").append(currentExpOnThisLevel).append("/").append(neededExp).append(")\n");
+                    ranking++;
+                }
             }
 
-            var member = guild.getMemberById(entry.getKey());
-            if (member != null) {
-                var currentExp = entry.getValue();
-                var currentLevel = Parser.getLevelFromExp(currentExp);
-                var neededExp = Parser.getLevelExp(currentLevel);
-                var currentExpOnThisLevel = currentExp - Parser.getTotalLevelExp(currentLevel - 1);
-                sb.append(ranking).append(". ").append(member.getAsMention()).append(": ").append(LanguageHandler.get(lang, "profile_level")).append(" ").append(currentLevel).append(" (").append(currentExpOnThisLevel).append("/").append(neededExp).append(")\n");
-                ranking++;
+            fieldValues.add(sb.toString());
+
+            var i = 0;
+            for (var fieldValue : fieldValues) {
+                if (i == 24) break; // Max 25 fields
+                eb.addField(" ", fieldValue, true);
+                i++;
             }
-        }
-
-        fieldValues.add(sb.toString());
-
-        var i = 0;
-        for (var fieldValue : fieldValues) {
-            if (i == 24) break; // Max 25 fields
-            eb.addField(" ", fieldValue, true);
-            i++;
         }
 
         event.reply(eb.build());

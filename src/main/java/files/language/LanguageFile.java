@@ -968,6 +968,7 @@ public class LanguageFile {
 
         /// Leaderboard
         en_gb.setProperty("leaderboard_title", "%s%s Leaderboard");
+        en_gb.setProperty("leaderboard_noentry", "No entries!");
 
         /// Level
         en_gb.setProperty("level_leaderboard_empty", "Leaderboard is empty");
@@ -2031,6 +2032,7 @@ public class LanguageFile {
 
         /// Leaderboard
         de_de.setProperty("leaderboard_title", "%s%s Rangliste");
+        de_de.setProperty("leaderboard_noentry", "Keine Einträge!");
 
         /// Level
         de_de.setProperty("level_leaderboard_empty", "Leaderboard is empty");
