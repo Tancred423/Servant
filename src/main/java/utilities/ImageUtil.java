@@ -13,9 +13,9 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static utilities.DatabaseConn.closeQuietly;
+import static servant.Database.closeQuietly;
 
-public class Image {
+public class ImageUtil {
     public static String getImageUrl(String imageName, Guild guild, User user) {
         Connection connection = null;
         String imageUrl = null;

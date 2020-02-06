@@ -6,7 +6,7 @@ import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import utilities.Constants;
-import utilities.Image;
+import utilities.ImageUtil;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 import zJdaUtilsLib.com.jagrosh.jdautilities.examples.doc.Author;
@@ -53,7 +53,7 @@ public class BotInfoCommand extends Command {
                 .addField(LanguageHandler.get(lang, "botinfo_stats"), totalGuilds + " Servers\nShard " + (jda.getShardInfo().getShardId() + 1) + "/" + jda.getShardInfo().getShardTotal(), true)
                 .addField(LanguageHandler.get(lang, "botinfo_shard"), jda.getUsers().size() + " Users\n" + jda.getGuilds().size() + " Servers", true)
                 .addField(LanguageHandler.get(lang, "botinfo_channels"), jda.getTextChannels().size() + " Text Channels\n" + jda.getVoiceChannels().size() + " Voice Channels", true)
-                .setFooter(LanguageHandler.get(lang, "botinfo_restart"), Image.getImageUrl("clock", guild, user))
+                .setFooter(LanguageHandler.get(lang, "botinfo_restart"), ImageUtil.getImageUrl("clock", guild, user))
                 .setTimestamp(event.getClient().getStartTime())
                 .build()
         );

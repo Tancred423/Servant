@@ -8,7 +8,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
-import static utilities.DatabaseConn.closeQuietly;
+import static servant.Database.closeQuietly;
 
 public class Giveaway {
     private long guildId;   // key

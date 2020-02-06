@@ -3,14 +3,15 @@ package useful.polls;
 
 import files.language.LanguageHandler;
 import moderation.guild.GuildHandler;
+import moderation.guild.Server;
 import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import utilities.Constants;
-import utilities.Emote;
-import utilities.UsageEmbed;
+import utilities.EmoteUtil;
+import utilities.MessageUtil;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 import zJdaUtilsLib.com.jagrosh.jdautilities.commons.waiter.EventWaiter;
@@ -59,7 +60,7 @@ public class PollCommand extends Command {
             var description = LanguageHandler.get(lang, "vote_description");
             var usage = String.format(LanguageHandler.get(lang, "vote_usage"), p, name, p, name);
             var hint = LanguageHandler.get(lang, "vote_hint");
-            event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+            event.reply(MessageUtil.createUsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint));
             return;
         }
 
@@ -96,6 +97,7 @@ public class PollCommand extends Command {
 
     private void processVote(CommandEvent event, String question, List<String> answers, String lang, boolean allowsMultipleAnswers) {
         var guild = event.getGuild();
+        var server = new Server(guild);
         var user = event.getAuthor();
         var author = event.getAuthor();
         var eb = new EmbedBuilder();
@@ -111,17 +113,17 @@ public class PollCommand extends Command {
         eb.setTimestamp(dateIn7DaysOtd);
 
         var sb = new StringBuilder();
-        String[] emoji = Emote.getVoteEmotes(guild, user);
+        String[] emoji = EmoteUtil.getVoteEmotes(guild, user);
         for (int i = 0; i < answers.size(); i++) sb.append("\n").append(emoji[i]).append(" ").append(answers.get(i));
 
         eb.addField(question, sb.toString(), false);
 
         event.getChannel().sendMessage(eb.build()).queue(message -> {
-            if (allowsMultipleAnswers) PollsDatabase.setVote(guild.getIdLong(), message.getChannel().getIdLong(), message.getIdLong(), author.getIdLong(), "vote", dateIn7Days, guild, user);
-            else  PollsDatabase.setVote(guild.getIdLong(), message.getChannel().getIdLong(), message.getIdLong(), author.getIdLong(), "radio", dateIn7Days, guild, user);
+            if (allowsMultipleAnswers) server.setVote(message.getChannel().getIdLong(), message.getIdLong(), author.getIdLong(), "vote", dateIn7Days);
+            else  server.setVote(message.getChannel().getIdLong(), message.getIdLong(), author.getIdLong(), "radio", dateIn7Days);
             for (int i = 0; i < answers.size(); i++) message.addReaction(emoji[i]).queue();
 
-            var end = Emote.getEmoji("end");
+            var end = EmoteUtil.getEmoji("end");
             if (end != null) message.addReaction(end).queue();
         });
     }

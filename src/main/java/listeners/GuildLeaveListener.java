@@ -11,9 +11,8 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import owner.blacklist.Blacklist;
 import servant.Servant;
-import useful.giveaway.GiveawayHandler;
 import utilities.Constants;
-import utilities.Image;
+import utilities.ImageUtil;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -38,25 +37,25 @@ public class GuildLeaveListener extends ListenerAdapter {
         if (Blacklist.isBlacklisted(user, guild)) return;
 
         CompletableFuture.runAsync(() -> {
-            var internalGuild = new Server(guild);
+            var server = new Server(guild);
 
             // Birthday
-            internalGuild.purgeBirthday();
+            server.purgeBirthday();
 
             // Giveaway
-            GiveawayHandler.purgeGiveaways(guild.getIdLong(), guild, user);
+            server.purgeGiveaways();
 
             // Kick
             processKick(event, guild, guildOwner, user);
 
             // MediaOnlyChannel
-            internalGuild.purgeMediaOnlyChannels();
+            server.purgeMediaOnlyChannels();
 
             // Signup
-            internalGuild.purgeSignups();
+            server.purgeSignups();
 
             // Poll
-            internalGuild.purgePolls();
+            server.purgePolls();
         }, Servant.threadPool);
     }
 
@@ -69,12 +68,14 @@ public class GuildLeaveListener extends ListenerAdapter {
             var language = new Server(guild).getLanguage();
             var botOwner = event.getJDA().getUserById(Servant.config.getBotOwnerId());
             if (botOwner == null) return;
-            var eb = new EmbedBuilder();
+            var bot = event.getJDA().getSelfUser();
 
+            var eb = new EmbedBuilder();
             eb.setColor(guildOwnerMaster.getColor());
-            eb.setAuthor(LanguageHandler.get(language, "kick_author"), null, guild.getIconUrl());
+            eb.setAuthor(LanguageHandler.get(language, "kick_author"), null, bot.getEffectiveAvatarUrl());
+            eb.setThumbnail(guild.getIconUrl());
             eb.setDescription(String.format(LanguageHandler.get(language, "kick_description"), Servant.config.getSupportGuildInv(), botOwner.getName(), botOwner.getDiscriminator()));
-            eb.setImage(Image.getImageUrl("kick", guild, guildOwnerUser));
+            eb.setImage(ImageUtil.getImageUrl("kick", guild, guildOwnerUser));
             eb.setFooter(String.format(LanguageHandler.get(language, "kick_footer"), guild.getName()), null);
 
             privateChannel.sendMessage(eb.build()).queue(success -> { /* ignore */ }, failure -> { /* ignore */ });

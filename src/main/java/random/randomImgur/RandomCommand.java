@@ -64,7 +64,7 @@ public class RandomCommand extends Command {
         var galleryLinks = new ArrayList<String>();
 
         // Get gallery links from imgur search
-        var urlObject = new URL("https://imgur.com/search?q=" + keyword);
+        var urlObject = new URL("https://imgur.com/search?q=title:" + keyword);
         var doc = Jsoup.parse(urlObject, 10 * 60 * 1000);
         var content = doc.getElementById("content");
         var links = content.getElementsByTag("a");

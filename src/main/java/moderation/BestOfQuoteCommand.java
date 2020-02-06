@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import servant.Servant;
 import utilities.Constants;
-import utilities.UsageEmbed;
+import utilities.MessageUtil;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
@@ -47,7 +47,7 @@ public class BestOfQuoteCommand extends Command {
             var usage = String.format(LanguageHandler.get(lang, "bestof_usage"),
                     p, name, p, name, p, name, usageEmote.getAsMention(), p, name, p, name, p, name, p, name, "%", p, name, "%", p, name);
             var hint = LanguageHandler.get(lang, "bestof_hint");
-            event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+            event.reply(MessageUtil.createUsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint));
             return;
         }
 

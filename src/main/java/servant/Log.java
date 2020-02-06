@@ -9,14 +9,14 @@ public class Log {
     private Exception e;
     private Guild guild;
     private User user;
-    private String name;
+    private String function;
     private CommandEvent commandEvent;
 
-    public Log(Exception e, Guild guild, User user, String featureName, CommandEvent commandEvent) {
+    public Log(Exception e, Guild guild, User user, String function, CommandEvent commandEvent) {
         this.e = e;
         this.guild = guild;
         this.user = user;
-        this.name = featureName;
+        this.function = function;
         this.commandEvent = commandEvent;
     }
 
@@ -35,7 +35,7 @@ public class Log {
                                 "-----\n" +
                                 (guild == null ? "" : "Guild: " + guild.getName() + " (" + guild.getIdLong() + ")\n") +
                                 (user == null ? "" : "User: " + user.getName() + " (" + user.getIdLong() + ")\n") +
-                                (name == null ? "" : "Command: " + name + "\n") +
+                                (function == null ? "" : "Function: " + function + "\n") +
                                 (e == null ? "" : "Error: " + e.getMessage() + "\n") +
                                 "```").queue());
             }

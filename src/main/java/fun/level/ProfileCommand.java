@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import servant.Log;
 import utilities.Constants;
-import utilities.Time;
+import utilities.TimeUtil;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
@@ -78,6 +78,6 @@ public class ProfileCommand extends Command {
         event.getChannel().sendFile(image, image.getName() + ".png").embed(eb.build()).queue();
 
         // Delete File.
-        new Timer().schedule(Time.wrap(image::delete), 10 * 1000);
+        new Timer().schedule(TimeUtil.wrap(image::delete), 10 * 1000);
     }
 }

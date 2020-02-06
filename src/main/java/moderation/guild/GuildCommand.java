@@ -45,7 +45,7 @@ public class GuildCommand extends Command {
                     p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name);
             var hint = String.format(LanguageHandler.get(lang, "server_hint"),
                     Servant.config.getDefaultOffset(), Servant.config.getDefaultPrefix());
-            event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+            event.reply(MessageUtil.createUsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint));
             return;
         }
 
@@ -154,7 +154,7 @@ public class GuildCommand extends Command {
                 fields.put(LanguageHandler.get(lang, "server_prefix_text"), new MyEntry<>(showPrefix, true));
                 fields.put(LanguageHandler.get(lang, "server_language_text"), new MyEntry<>(showLanguage, true));
 
-                new MessageHandler().sendEmbed(event.getChannel(),
+                new MessageUtil().sendEmbed(event.getChannel(),
                         internalUser.getColor(),
                         LanguageHandler.get(lang, "server_settings"),
                         null,

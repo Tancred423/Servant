@@ -13,13 +13,13 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import servant.Servant;
-import useful.alarm.Alarm;
+import useful.remindme.RemindMeSenderTask;
 import useful.giveaway.GiveawayHandler;
 import useful.polls.Poll;
-import useful.reminder.Reminder;
+import useful.remindme.RemindMe;
 import useful.signup.Signup;
 import utilities.Constants;
-import utilities.Time;
+import utilities.TimeUtil;
 
 import java.io.File;
 import java.io.FileReader;
@@ -32,7 +32,7 @@ import java.time.ZoneId;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static utilities.DatabaseConn.closeQuietly;
+import static servant.Database.closeQuietly;
 
 public class ReadyListener extends ListenerAdapter {
     private int counter = 0;
@@ -52,26 +52,35 @@ public class ReadyListener extends ListenerAdapter {
         var jda = event.getJDA();
 
         startExecutor(jda);
+        startRemindMe(jda);
 
         System.out.println(jda.getSelfUser().getName() + " ready.");
     }
 
-    private void startExecutor(JDA jda) {
-        var executor1minute = Executors.newSingleThreadScheduledExecutor();
-        var executor5minutes = Executors.newSingleThreadScheduledExecutor();
-        var executor15minutes = Executors.newSingleThreadScheduledExecutor();
-        var executor24hours = Executors.newSingleThreadScheduledExecutor();
+    private void startRemindMe(JDA jda) {
+        var remindMeList = RemindMe.getRemindMeList();
+        for (var remindMe : remindMeList) {
+            long delayInMillis = remindMe.getEventTime().toInstant().toEpochMilli() - System.currentTimeMillis();
+            Servant.remindMeService.schedule(new RemindMeSenderTask(jda, remindMe), delayInMillis, TimeUnit.MILLISECONDS);
+        }
+    }
 
-        var delayToNextMinute = Time.getDelayToNextMinuteInMillis();
-        var delayToNext5Minutes = Time.getDelayToNext5MinutesInMillis();
-        var delayToNextQuarter = Time.getDelayToNextQuarterInMillis();
-        var delayToNextDay = Time.getDelayToNextDayInMillis();
+    private void startExecutor(JDA jda) {
+        var threadFactory = Executors.defaultThreadFactory();
+
+        var executor1minute = Executors.newSingleThreadScheduledExecutor(threadFactory);
+        var executor5minutes = Executors.newSingleThreadScheduledExecutor(threadFactory);
+        var executor15minutes = Executors.newSingleThreadScheduledExecutor(threadFactory);
+        var executor24hours = Executors.newSingleThreadScheduledExecutor(threadFactory);
+
+        var delayToNextMinute = TimeUtil.getDelayToNextMinuteInMillis();
+        var delayToNext5Minutes = TimeUtil.getDelayToNext5MinutesInMillis();
+        var delayToNextQuarter = TimeUtil.getDelayToNextQuarterInMillis();
+        var delayToNextDay = TimeUtil.getDelayToNextDayInMillis();
 
         // 1 Minute Period
         executor1minute.scheduleAtFixedRate(() -> {
-            Alarm.check(jda);
             GiveawayHandler.checkGiveaways(jda);
-            Reminder.check(jda);
             Signup.checkSignups(jda);
             Poll.check(jda);
         }, delayToNextMinute, 60 * 1000, TimeUnit.MILLISECONDS);

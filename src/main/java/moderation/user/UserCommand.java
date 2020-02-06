@@ -42,7 +42,7 @@ public class UserCommand extends Command {
             var usage = String.format(LanguageHandler.get(lang, "user_usage"),
                     p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name);
             var hint = String.format(LanguageHandler.get(lang, "user_hint"), p);
-            event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+            event.reply(MessageUtil.createUsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint));
             return;
         }
 
@@ -210,7 +210,7 @@ public class UserCommand extends Command {
                 }
                 fields.put(LanguageHandler.get(lang, "user_streamhideservers"), new MyEntry<>(sb.toString(), true));
 
-                new MessageHandler().sendEmbed(event.getChannel(),
+                new MessageUtil().sendEmbed(event.getChannel(),
                         master.getColor(),
                         LanguageHandler.get(lang, "user_settings"),
                         null,

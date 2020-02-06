@@ -3,11 +3,12 @@ package useful.giveaway;
 
 import files.language.LanguageHandler;
 import moderation.guild.GuildHandler;
+import moderation.guild.Server;
 import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import utilities.Constants;
-import utilities.UsageEmbed;
+import utilities.MessageUtil;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
@@ -36,13 +37,13 @@ public class GiveawayCommand extends Command {
         var p = GuildHandler.getPrefix(event);
 
         var guild = event.getGuild();
-        var author = event.getAuthor();
+        var server = new Server(guild);
 
         if (event.getArgs().isEmpty()) {
             var description = LanguageHandler.get(lang, "giveaway_description");
             var usage = String.format(LanguageHandler.get(lang, "giveaway_usage"), p, p, p, p, p, p, p);
             var hint = String.format(LanguageHandler.get(lang, "giveaway_hint"), p);
-            event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+            event.reply(MessageUtil.createUsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint));
             return;
         }
 
@@ -50,7 +51,7 @@ public class GiveawayCommand extends Command {
         var message = event.getMessage();
 
         if (args[0].equalsIgnoreCase("list")) {
-            var currentGiveaways = GiveawayHandler.getCurrentGiveaways(event.getJDA(), message, lang, guild, author);
+            var currentGiveaways = server.getCurrentGiveaways(event.getJDA(), lang);
             var eb = new EmbedBuilder();
             eb.setColor(new Master(message.getAuthor()).getColor());
             eb.setAuthor(LanguageHandler.get(lang, "giveaway_current"), null, message.getGuild().getIconUrl());

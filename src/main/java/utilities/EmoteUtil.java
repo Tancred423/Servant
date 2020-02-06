@@ -11,9 +11,9 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import static utilities.DatabaseConn.closeQuietly;
+import static servant.Database.closeQuietly;
 
-public class Emote {
+public class EmoteUtil {
     public static String getEmoteMention(JDA jda, String emoteName, Guild guild, User user) {
         Connection connection = null;
         var emoteMention = "";

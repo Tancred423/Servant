@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import owner.blacklist.Blacklist;
 import servant.Servant;
 import useful.polls.PollsDatabase;
-import utilities.Emote;
+import utilities.EmoteUtil;
 
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
@@ -40,7 +40,7 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
             var messageId = event.getMessageIdLong();
 
             // Quickpoll
-            if (PollsDatabase.isQuickvote(messageId, guild, user)) {
+            if (PollsDatabase.isQuickpoll(messageId, guild, user)) {
                 processQuickpollMultipleVote(event, guild, user, messageId);
             }
 
@@ -59,9 +59,9 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
     private static void processQuickpollMultipleVote(GuildMessageReactionRemoveEvent event, net.dv8tion.jda.api.entities.Guild guild, User user, long messageId) {
         // Just react to Upvote, Shrug and Downvote.
         var reactionEmote = event.getReactionEmote();
-        if (!reactionEmote.getName().equals(Emote.getEmoji("upvote"))
-                && !reactionEmote.getName().equals(Emote.getEmoji("shrug"))
-                && !reactionEmote.getName().equals(Emote.getEmoji("downvote")))
+        if (!reactionEmote.getName().equals(EmoteUtil.getEmoji("upvote"))
+                && !reactionEmote.getName().equals(EmoteUtil.getEmoji("shrug"))
+                && !reactionEmote.getName().equals(EmoteUtil.getEmoji("downvote")))
             return;
 
         event.getChannel().retrieveMessageById(messageId).queue(message -> {
@@ -73,31 +73,19 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
     private static void processRadiovoteMultipleVote(GuildMessageReactionRemoveEvent event, net.dv8tion.jda.api.entities.Guild guild, User user, long messageId) {
         // Just react to Upvote, Shrug and Downvote.
         var reactionEmote = event.getReactionEmote();
-        if (reactionEmote.isEmote()) {
-            if (!reactionEmote.getEmote().equals(Emote.getEmote("one", guild, user))
-                    && !reactionEmote.getEmote().equals(Emote.getEmote("two", guild, user))
-                    && !reactionEmote.getEmote().equals(Emote.getEmote("three", guild, user))
-                    && !reactionEmote.getEmote().equals(Emote.getEmote("four", guild, user))
-                    && !reactionEmote.getEmote().equals(Emote.getEmote("five", guild, user))
-                    && !reactionEmote.getEmote().equals(Emote.getEmote("six", guild, user))
-                    && !reactionEmote.getEmote().equals(Emote.getEmote("seven", guild, user))
-                    && !reactionEmote.getEmote().equals(Emote.getEmote("eight", guild, user))
-                    && !reactionEmote.getEmote().equals(Emote.getEmote("nine", guild, user))
-                    && !reactionEmote.getEmote().equals(Emote.getEmote("ten", guild, user))
+        if (!reactionEmote.isEmote()) {
+            if (!reactionEmote.getName().equals(EmoteUtil.getEmoji("one"))
+                    && !reactionEmote.getName().equals(EmoteUtil.getEmoji("two"))
+                    && !reactionEmote.getName().equals(EmoteUtil.getEmoji("three"))
+                    && !reactionEmote.getName().equals(EmoteUtil.getEmoji("four"))
+                    && !reactionEmote.getName().equals(EmoteUtil.getEmoji("five"))
+                    && !reactionEmote.getName().equals(EmoteUtil.getEmoji("six"))
+                    && !reactionEmote.getName().equals(EmoteUtil.getEmoji("seven"))
+                    && !reactionEmote.getName().equals(EmoteUtil.getEmoji("eight"))
+                    && !reactionEmote.getName().equals(EmoteUtil.getEmoji("nine"))
+                    && !reactionEmote.getName().equals(EmoteUtil.getEmoji("ten"))
             ) return;
-        } else {
-            if (!reactionEmote.getName().equals(Emote.getEmoji("one"))
-                    && !reactionEmote.getName().equals(Emote.getEmoji("two"))
-                    && !reactionEmote.getName().equals(Emote.getEmoji("three"))
-                    && !reactionEmote.getName().equals(Emote.getEmoji("four"))
-                    && !reactionEmote.getName().equals(Emote.getEmoji("five"))
-                    && !reactionEmote.getName().equals(Emote.getEmoji("six"))
-                    && !reactionEmote.getName().equals(Emote.getEmoji("seven"))
-                    && !reactionEmote.getName().equals(Emote.getEmoji("eight"))
-                    && !reactionEmote.getName().equals(Emote.getEmoji("nine"))
-                    && !reactionEmote.getName().equals(Emote.getEmoji("ten"))
-            ) return;
-        }
+        } else return;
 
         event.getChannel().retrieveMessageById(messageId).queue(message -> {
             if (reactionEmote.isEmote()) {

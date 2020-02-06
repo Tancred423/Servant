@@ -1,7 +1,7 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package utilities;
 
-public class StringFormat {
+public class StringUtil {
     public static String fillWithWhitespace(String text, int desiredStringLength) {
         if (desiredStringLength <= text.length()) return text;
         else return text + " ".repeat(desiredStringLength - text.length());

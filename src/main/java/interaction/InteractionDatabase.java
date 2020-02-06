@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static utilities.DatabaseConn.closeQuietly;
+import static servant.Database.closeQuietly;
 
 class InteractionDatabase {
     static String getGifUrl(String commandName, Guild guild, User user) {

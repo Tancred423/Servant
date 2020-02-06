@@ -37,8 +37,8 @@ public class GuildMessageDeleteListener extends ListenerAdapter {
                 server.unsetBirthdayMessage();
 
             // Giveaway
-            if (GiveawayHandler.isGiveaway(guild.getIdLong(), event.getChannel().getIdLong(), event.getMessageIdLong(), guild, user))
-                GiveawayHandler.deleteGiveawayFromDb(guild.getIdLong(), event.getChannel().getIdLong(), messageId, guild, user);
+            if (server.isGiveaway(event.getChannel().getIdLong(), event.getMessageIdLong()))
+                server.deleteGiveawayFromDb(event.getChannel().getIdLong(), messageId);
 
             // Signup
             if (server.isSignupMessage(messageId))

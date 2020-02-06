@@ -8,8 +8,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import utilities.Constants;
-import utilities.MessageHandler;
-import utilities.UsageEmbed;
+import utilities.MessageUtil;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
@@ -45,7 +44,7 @@ public class LoveCommand extends Command {
             var description = LanguageHandler.get(lang, "love_description");
             var usage = String.format(LanguageHandler.get(lang, "love_usage"), p, name, p, name);
             var hint = LanguageHandler.get(lang, "love_hint");
-            event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+            event.reply(MessageUtil.createUsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint));
             return;
         }
 
@@ -78,7 +77,7 @@ public class LoveCommand extends Command {
 
         checkLoveAchievements(master, message, love);
 
-        new MessageHandler().sendEmbed(event.getChannel(),
+        new MessageUtil().sendEmbed(event.getChannel(),
                 master.getColor(),
                 quote,
                 null,
@@ -166,12 +165,12 @@ public class LoveCommand extends Command {
         if (love == 69) {
             if (!master.hasAchievement("love69")) {
                 master.setAchievement("love69", 69);
-                new MessageHandler().reactAchievement(message);
+                new MessageUtil().reactAchievement(message);
             }
         } else if (love == 42) {
             if (!master.hasAchievement("love42")) {
                 master.setAchievement("love42", 42);
-                new MessageHandler().reactAchievement(message);
+                new MessageUtil().reactAchievement(message);
             }
         }
     }

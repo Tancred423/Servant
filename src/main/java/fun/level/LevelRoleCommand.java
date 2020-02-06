@@ -11,9 +11,9 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
 import utilities.Constants;
+import utilities.MessageUtil;
 import utilities.Parser;
-import utilities.StringFormat;
-import utilities.UsageEmbed;
+import utilities.StringUtil;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
@@ -49,7 +49,7 @@ public class LevelRoleCommand extends Command {
             var usage = String.format(LanguageHandler.get(lang, "levelrole_usage"),
                     p, name, p, name, p, name, p, name, p, name, p, name);
             var hint = LanguageHandler.get(lang, "levelrole_hint");
-            event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+            event.reply(MessageUtil.createUsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint));
             return;
         }
 
@@ -118,7 +118,7 @@ public class LevelRoleCommand extends Command {
                     else {
                         var levelRole = guild.getRoleById(levelRoleEntry.getValue());
                         if (levelRole != null)
-                            sb.append(StringFormat.pushWithWhitespace(String.valueOf(levelRoleEntry.getKey()), 5))
+                            sb.append(StringUtil.pushWithWhitespace(String.valueOf(levelRoleEntry.getKey()), 5))
                                     .append(" ")
                                     .append(levelRole.getName()).append(" (ID: ")
                                     .append(levelRoleEntry.getValue()).append(")\n");

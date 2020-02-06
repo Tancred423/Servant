@@ -47,6 +47,7 @@ import org.slf4j.LoggerFactory;
 import owner.blacklist.Blacklist;
 import servant.Servant;
 import utilities.Constants;
+import utilities.NameAliasUtil;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.*;
 import zJdaUtilsLib.com.jagrosh.jdautilities.commons.utils.FixedSizeCache;
 import zJdaUtilsLib.com.jagrosh.jdautilities.commons.utils.SafeIdUtil;
@@ -531,7 +532,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
 
                 if (command != null) {
                     // Execute Command
-                    var toggleName = Toggle.getToggleName(command.getName());
+                    var toggleName = NameAliasUtil.getToggleName(command.getName());
 
                     CompletableFuture.runAsync(() -> {
                         try {
@@ -548,6 +549,8 @@ public class CommandClientImpl implements CommandClient, EventListener {
                                 uses.put(command.getName(), uses.getOrDefault(command.getName(), 0) + 1);
                                 command.run(cevent);
 
+                                if (Toggle.isEnabled(cevent, "deletecommands") && !command.getName().equals("toggle"))
+                                    event.getMessage().delete().queue();
 
                                 // Statistics
                                 new Master(event.getAuthor()).incrementFeatureCount(command.getName());

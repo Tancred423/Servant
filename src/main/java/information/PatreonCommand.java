@@ -6,7 +6,7 @@ import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import utilities.Constants;
-import utilities.Image;
+import utilities.ImageUtil;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 import zJdaUtilsLib.com.jagrosh.jdautilities.examples.doc.Author;
@@ -42,7 +42,7 @@ public class PatreonCommand extends Command {
                 .setColor(master.getColor())
                 .setAuthor(LanguageHandler.get(lang, "patreon_supportserver"), null, "https://i.imgur.com/rCnhGKA.jpg") // Patreon Icon
                 .setDescription(LanguageHandler.get(lang, "patreon_description"))
-                .setThumbnail(Image.getImageUrl("love", guild, user))
+                .setThumbnail(ImageUtil.getImageUrl("love", guild, user))
                 .addField("1. " + LanguageHandler.get(lang, "patreon_patreontitle"), LanguageHandler.get(lang, "patreon_subscription"), false)
                 .addField("$1+/month", LanguageHandler.get(lang, "patreon_$1"), true)
                 .addField("$3+/month", LanguageHandler.get(lang, "patreon_$3"), true)

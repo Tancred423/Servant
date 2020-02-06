@@ -6,6 +6,8 @@ import moderation.guild.Server;
 import moderation.user.Master;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
+import utilities.ImageUtil;
+import utilities.NameAliasUtil;
 import utilities.Parser;
 
 import javax.imageio.ImageIO;
@@ -414,23 +416,23 @@ public class ProfileImage {
     private Image getBg(Master master) {
         try {
             if (master.isCreator())
-                return ImageIO.read(new URL(utilities.Image.getImageUrl("profile_bg_creator", guild, user)));
+                return ImageIO.read(new URL(ImageUtil.getImageUrl("profile_bg_creator", guild, user)));
             else if (master.isVIP())
-                return ImageIO.read(new URL(utilities.Image.getImageUrl("profile_bg_vip", guild, user)));
+                return ImageIO.read(new URL(ImageUtil.getImageUrl("profile_bg_vip", guild, user)));
             else if (master.is$10Patron())
-                return ImageIO.read(new URL(utilities.Image.getImageUrl("profile_bg_$10", guild, user)));
+                return ImageIO.read(new URL(ImageUtil.getImageUrl("profile_bg_$10", guild, user)));
             else if (master.is$5Patron())
-                return ImageIO.read(new URL(utilities.Image.getImageUrl("profile_bg_$5", guild, user)));
+                return ImageIO.read(new URL(ImageUtil.getImageUrl("profile_bg_$5", guild, user)));
             else if (master.is$3Patron())
-                return ImageIO.read(new URL(utilities.Image.getImageUrl("profile_bg_$3", guild, user)));
+                return ImageIO.read(new URL(ImageUtil.getImageUrl("profile_bg_$3", guild, user)));
             else if (master.is$1Patron())
-                return ImageIO.read(new URL(utilities.Image.getImageUrl("profile_bg_$1", guild, user)));
+                return ImageIO.read(new URL(ImageUtil.getImageUrl("profile_bg_$1", guild, user)));
             else if (master.isDonator())
-                return ImageIO.read(new URL(utilities.Image.getImageUrl("profile_bg_donator", guild, user)));
+                return ImageIO.read(new URL(ImageUtil.getImageUrl("profile_bg_donator", guild, user)));
             else if (master.isServerBooster())
-                return ImageIO.read(new URL(utilities.Image.getImageUrl("profile_bg_booster", guild, user)));
+                return ImageIO.read(new URL(ImageUtil.getImageUrl("profile_bg_booster", guild, user)));
             else
-                return ImageIO.read(new URL(utilities.Image.getImageUrl("profile_bg_normal", guild, user)));
+                return ImageIO.read(new URL(ImageUtil.getImageUrl("profile_bg_normal", guild, user)));
         } catch (IOException e) {
             return null;
         }
@@ -438,7 +440,7 @@ public class ProfileImage {
 
     private Image getOverlay() {
         try {
-            return ImageIO.read(new URL(utilities.Image.getImageUrl("profile_overlay", guild, user)));
+            return ImageIO.read(new URL(ImageUtil.getImageUrl("profile_overlay", guild, user)));
         } catch (IOException e) {
             return null;
         }
@@ -534,101 +536,17 @@ public class ProfileImage {
 
     private Map<String, String> getFeatureIcons(Guild guild, User user) {
         var featureIcons = new HashMap<String, String>();
-        var featureNames = getValidFeatures();
+        var featureNames = NameAliasUtil.getValidFeatures();
         for (var featureName : featureNames)
-            featureIcons.put(featureName, utilities.Image.getImageUrl("f_" + featureName, guild, user));
+            featureIcons.put(featureName, ImageUtil.getImageUrl("f_" + featureName, guild, user));
         return featureIcons;
-    }
-
-    public static List<String> getValidFeatures() {
-        return new ArrayList<>() {{
-            // moderation
-            add("autorole");
-            add("bestofimage");
-            add("bestofquote");
-            add("birthday");
-            add("clear");
-            add("join");
-            add("joinmessage");
-            add("leave");
-            add("leavemessage");
-            add("levelrole");
-            add("livestream");
-            add("mediaonlychannel");
-            add("reactionrole");
-            add("role");
-            add("server");
-            add("serversetup");
-            add("toggle");
-            add("user");
-            add("voicelobby");
-
-            // information
-            add("botinfo");
-            add("patreon");
-            add("ping");
-            add("serverinfo");
-
-            // useful
-            add("alarm");
-            add("giveaway");
-            add("poll");
-            add("quickpoll");
-            add("reminder");
-            add("signup");
-            add("timezone");
-
-            // fun
-            add("achievements");
-            add("avatar");
-            add("baguette");
-            add("bio");
-            add("coinflip");
-            add("createembed");
-            add("editembed");
-            add("flip");
-            add("love");
-            add("mostusedcommands");
-            add("profile");
-            add("unflip");
-
-            // interaction
-            add("beg");
-            add("cookie");
-            add("cop");
-            add("dab");
-            add("flex");
-            add("happybirthday");
-            add("highfive");
-            add("hug");
-            add("kiss");
-            add("lick");
-            add("pat");
-            add("poke");
-            add("slap");
-            add("wave");
-            add("wink");
-
-            // random
-            add("random");
-            add("bird");
-            add("cat");
-            add("dog");
-            add("fox");
-            add("koala");
-            add("meme");
-            add("panda");
-            add("pikachu");
-            add("redpanda");
-            add("sloth");
-        }};
     }
 
     private Map<String, String> getAchievementIcons(Guild guild, User user) {
         var achievementIcons = new HashMap<String, String>();
         var achievementNames = getValidAchievements();
         for (var achievementName : achievementNames)
-            achievementIcons.put(achievementName, utilities.Image.getImageUrl("a_" + achievementName, guild, user));
+            achievementIcons.put(achievementName, ImageUtil.getImageUrl("a_" + achievementName, guild, user));
         return achievementIcons;
     }
 

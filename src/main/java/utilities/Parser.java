@@ -18,7 +18,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Parser {
@@ -151,6 +150,7 @@ public class Parser {
         return true;
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean isValidDirectUrl(String urlString) {
         URLConnection connection;
         try {
@@ -176,14 +176,6 @@ public class Parser {
         if (someHardcodedStuff.contains(prefix)) isValidPrefix = false;
 
         return isValidPrefix;
-    }
-
-    // I will handle this properly in the future.
-    public static boolean isSqlInjection(String text) {
-        var isSqlInjection = false;
-        var hardcodedShit = new String[]{"select", "drop", "delete", "insert", "update"};
-        if (Arrays.stream(hardcodedShit).parallel().anyMatch(text::contains)) isSqlInjection = true;
-        return isSqlInjection;
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")

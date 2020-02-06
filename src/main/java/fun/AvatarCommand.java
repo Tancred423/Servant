@@ -6,9 +6,8 @@ import moderation.guild.GuildHandler;
 import moderation.user.Master;
 import net.dv8tion.jda.api.Permission;
 import utilities.Constants;
-import utilities.MessageHandler;
+import utilities.MessageUtil;
 import utilities.Parser;
-import utilities.UsageEmbed;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
@@ -38,7 +37,7 @@ public class AvatarCommand extends Command {
         if (event.getArgs().isEmpty()) {
             var description = LanguageHandler.get(lang, "avatar_description");
             var usage = String.format(LanguageHandler.get(lang, "avatar_usage"), p, name);
-            event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, null).getEmbed());
+            event.reply(MessageUtil.createUsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, null));
             return;
         }
 
@@ -55,7 +54,7 @@ public class AvatarCommand extends Command {
         var channel = message.getChannel();
         var mentioned = message.getMentionedUsers().get(0);
 
-        new MessageHandler().sendEmbed(
+        new MessageUtil().sendEmbed(
                 channel,
                 master.getColor(),
                 "Avatar", null, null,

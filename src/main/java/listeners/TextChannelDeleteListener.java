@@ -36,7 +36,7 @@ public class TextChannelDeleteListener extends ListenerAdapter {
                 server.unsetBirthdayMessage();
 
             // Giveaway
-            GiveawayHandler.purgeGiveawaysFromChannel(guild.getIdLong(),channel.getIdLong(), guild, user);
+            server.purgeGiveawaysFromChannel(channel.getIdLong());
 
             // MediaOnlyChannel
             if (server.mediaOnlyChannelHasEntry(channel))

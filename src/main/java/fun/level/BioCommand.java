@@ -5,7 +5,6 @@ import files.language.LanguageHandler;
 import moderation.user.Master;
 import net.dv8tion.jda.api.Permission;
 import utilities.Constants;
-import utilities.Parser;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
@@ -34,11 +33,6 @@ public class BioCommand extends Command {
         var user = event.getAuthor();
         var master = new Master(user);
         var lang = LanguageHandler.getLanguage(event);
-
-        if (Parser.isSqlInjection(args)) {
-            event.reactError();
-            return;
-        }
 
         if (args.length() > 30) {
             event.replyError(LanguageHandler.get(lang, "bio_maxlength"));

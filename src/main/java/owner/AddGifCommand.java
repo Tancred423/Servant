@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.Permission;
 import servant.Log;
 import servant.Servant;
 import utilities.Constants;
-import utilities.UsageEmbed;
+import utilities.MessageUtil;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
@@ -18,7 +18,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
 
-import static utilities.DatabaseConn.closeQuietly;
+import static servant.Database.closeQuietly;
 
 public class AddGifCommand extends Command {
     public AddGifCommand() {
@@ -50,7 +50,7 @@ public class AddGifCommand extends Command {
                     var usage = String.format(LanguageHandler.get(lang, "addgif_usage"), p, name, p, name);
                     var hint = LanguageHandler.get(lang, "addgif_hint");
 
-                    event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+                    event.reply(MessageUtil.createUsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint));
                     return;
                 }
 

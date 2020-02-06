@@ -6,17 +6,19 @@ import interaction.Interaction;
 import net.dv8tion.jda.api.entities.User;
 import servant.Log;
 import servant.Servant;
+import useful.remindme.RemindMe;
 import utilities.MyEntry;
 
 import java.awt.*;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static utilities.DatabaseConn.closeQuietly;
+import static servant.Database.closeQuietly;
 
 public class Master {
     private User user;
@@ -27,91 +29,75 @@ public class Master {
         this.userId = user.getIdLong();
     }
 
-    public User getUser() { return user; }
-    public long getUserId() { return userId; }
+    public User getUser() {
+        return user;
+    }
+
+    public long getUserId() {
+        return userId;
+    }
 
     // Methods
-    // Alarm
-    public boolean setAlarm(Timestamp alarmTime, String title) {
-        var wasSet = false;
-
-        if (!alarmHasEntry(alarmTime)) {
-            Connection connection = null;
-
-            try {
-                connection = Servant.db.getHikari().getConnection();
-                var insert = connection.prepareStatement("INSERT INTO alarm (user_id,alarm_time,title) VALUES (?,?,?)");
-                insert.setLong(1, userId);
-                insert.setTimestamp(2, alarmTime);
-                insert.setString(3, title);
-                insert.executeUpdate();
-                wasSet = true;
-            } catch (SQLException e) {
-                new Log(e, null, user, "alarm", null).sendLog(false);
-            } finally {
-                closeQuietly(connection);
-            }
-        }
-
-        return wasSet;
-    }
-
-    public void unsetAlarm(Timestamp alarmTime) {
+    // RemindMe
+    public RemindMe getRemindMe(int aiNumber) {
         Connection connection = null;
+        RemindMe remindMe = null;
 
         try {
             connection = Servant.db.getHikari().getConnection();
-            var insert = connection.prepareStatement("DELETE FROM alarm WHERE user_id=? AND alarm_time=?");
-            insert.setLong(1, userId);
-            insert.setTimestamp(2, alarmTime);
-            insert.executeUpdate();
-        } catch (SQLException e) {
-            new Log(e, null, user, "alarm", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-
-    }
-
-    private boolean alarmHasEntry(Timestamp alarmTime) {
-        Connection connection = null;
-        var hasEntry = false;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT * FROM alarm WHERE user_id=? AND alarm_time=?");
-            select.setLong(1, userId);
-            select.setTimestamp(2, alarmTime);
-            var resultSet = select.executeQuery();
-            hasEntry = resultSet.first();
-        } catch (SQLException e) {
-            new Log(e, null, user, "alarm", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-
-        return hasEntry;
-    }
-
-    public Map<Timestamp, String> getAlarms() {
-        Connection connection = null;
-        var alarms = new HashMap<Timestamp, String>();
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT * FROM alarm WHERE user_id=?");
-            select.setLong(1, userId);
+            var select = connection.prepareStatement("SELECT * FROM remindme WHERE ai_number=? AND user_id=?");
+            select.setInt(1, aiNumber);
+            select.setLong(2, userId);
             var resultSet = select.executeQuery();
             if (resultSet.first())
-                do alarms.put(resultSet.getTimestamp("alarm_time"), resultSet.getString("title"));
-                while (resultSet.next());
+                remindMe = new RemindMe(aiNumber, userId, resultSet.getTimestamp("event_time"), resultSet.getString("topic"));
         } catch (SQLException e) {
-            new Log(e, null, user, "alarm", null).sendLog(false);
+            new Log(e, null, null, "RemindMes.java", null).sendLog(false);
         } finally {
             closeQuietly(connection);
         }
 
-        return alarms;
+        return remindMe;
+    }
+
+    public int setRemindMe(Timestamp eventTime, String topic) {
+        Connection connection = null;
+        var aiNumber = 0;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var insert = connection.prepareStatement("INSERT INTO remindme (user_id,event_time,topic) VALUES (?,?,?)", Statement.RETURN_GENERATED_KEYS);
+            insert.setLong(1, userId);
+            insert.setTimestamp(2, eventTime);
+            insert.setString(3, topic);
+            insert.executeUpdate();
+
+            var resultSet = insert.getGeneratedKeys();
+            if (resultSet.first()) aiNumber = resultSet.getInt(1);
+        } catch (SQLException e) {
+            new Log(e, null, user, "Master.java - setRemindMe(Timestamp, String)", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return aiNumber;
+    }
+
+    public void unsetRemindMe(int aiNumber) {
+        Connection connection = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var insert = connection.prepareStatement("DELETE FROM remindme WHERE ai_number=? AND user_id=?");
+            insert.setInt(1, aiNumber);
+            insert.setLong(2, userId);
+            insert.executeUpdate();
+        } catch (SQLException e) {
+            new Log(e, null, user, "Master.java - unsetRemindMe(int, long)", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+
     }
 
     // Reminder

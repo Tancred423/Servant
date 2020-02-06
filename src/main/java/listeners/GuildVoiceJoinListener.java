@@ -14,7 +14,6 @@ import servant.Servant;
 
 import java.util.LinkedList;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 public class GuildVoiceJoinListener extends ListenerAdapter {
     // This event will be thrown if a user joins a voice channel.
@@ -49,41 +48,42 @@ public class GuildVoiceJoinListener extends ListenerAdapter {
     private static void processVoiceLobby(GuildVoiceJoinEvent event, net.dv8tion.jda.api.entities.Guild guild, Server internalGuild, User user, Member member, VoiceChannel channel, String lang) {
         var active = new LinkedList<VoiceChannel>();
         channel.createCopy().queue(newChannel ->
-                newChannel.getManager().setName(VoiceLobby.getLobbyName(member, lang)).queue(name ->
-                        newChannel.getManager().setParent(channel.getParent()).queue(parent ->
+                newChannel.getManager().setParent(channel.getParent()).queue(parent ->
+                        newChannel.getManager().setName(VoiceLobby.getLobbyName(member, lang)).queue(name ->
                                 guild.modifyVoiceChannelPositions().selectPosition(newChannel).moveTo(channel.getPosition() + 1).queue(position ->
                                         guild.moveVoiceMember(member, newChannel).queue(move -> {
                                             internalGuild.setActiveLobby(newChannel.getIdLong());
+                                            new java.util.Timer().schedule(
+                                                    new java.util.TimerTask() {
+                                                        @Override
+                                                        public void run() {
+                                                            var activeIds = internalGuild.getActiveLobbies();
 
-                                            try {
-                                                TimeUnit.MILLISECONDS.sleep(2000);
-                                            } catch (InterruptedException e) {
-                                                e.printStackTrace();
-                                            }
+                                                            for (var activeId : activeIds) {
+                                                                if (event.getJDA().getVoiceChannelById(activeId) != null)
+                                                                    active.add(event.getJDA().getVoiceChannelById(activeId));
+                                                                else internalGuild.unsetActiveLobby(activeId);
+                                                            }
 
-                                            var activeIds = internalGuild.getActiveLobbies();
-
-                                            for (var activeId : activeIds) {
-                                                if (event.getJDA().getVoiceChannelById(activeId) != null)
-                                                    active.add(event.getJDA().getVoiceChannelById(activeId));
-                                                else internalGuild.unsetActiveLobby(activeId);
-                                            }
-
-                                            for (int i = 0; i < active.size(); i++) {
-                                                if (active.get(i).getMembers().size() == 0) {
-                                                    var vc = event.getJDA().getVoiceChannelById(active.get(i).getIdLong());
-                                                    if (vc != null) {
-                                                        vc.delete().queue(success -> {
-                                                        }, failure -> {
-                                                        });
-                                                        active.remove(active.get(i));
-                                                    }
-                                                }
-                                            }
+                                                            for (int i = 0; i < active.size(); i++) {
+                                                                if (active.get(i).getMembers().size() == 0) {
+                                                                    var vc = event.getJDA().getVoiceChannelById(active.get(i).getIdLong());
+                                                                    if (vc != null) {
+                                                                        vc.delete().queue(success -> {
+                                                                        }, failure -> {
+                                                                        });
+                                                                        active.remove(active.get(i));
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }, 2000
+                                            );
                                         })
                                 )
-                        )
-                ), failure -> System.out.println("Couldn't create new voice channel. User: " + user.getName() + "#" + user.getDiscriminator() + " (" + user.getIdLong() + ") Guild: " + guild.getName() + " (" + guild.getIdLong() + ")")
+                        ), failure -> System.out.println("Couldn't create new voice channel. User: " + user.getName() + "#" + user.getDiscriminator() + " (" + user.getIdLong() + ") Guild: " + guild.getName() + " (" + guild.getIdLong() + ")")
+                )
+
         );
     }
 }

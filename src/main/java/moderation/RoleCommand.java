@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
 import utilities.Constants;
-import utilities.UsageEmbed;
+import utilities.MessageUtil;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
@@ -42,7 +42,7 @@ public class RoleCommand extends Command {
             var description = LanguageHandler.get(lang, "role_description");
             var usage = String.format(LanguageHandler.get(lang, "role_usage"), p, name, p, name);
             var hint = LanguageHandler.get(lang, "role_hint");
-            event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+            event.reply(MessageUtil.createUsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint));
             return;
         }
 

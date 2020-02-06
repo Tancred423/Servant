@@ -5,7 +5,7 @@ import files.language.LanguageHandler;
 import moderation.user.Master;
 import net.dv8tion.jda.api.Permission;
 import utilities.Constants;
-import utilities.Emote;
+import utilities.EmoteUtil;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
@@ -46,9 +46,9 @@ public class BaguetteCommand extends Command {
         var guild = event.getGuild();
         var user = event.getAuthor();
 
-        var baguette1 = Emote.getEmoteMention(jda, "baguette1", guild, user);
-        var baguette2 = Emote.getEmoteMention(jda, "baguette2", guild, user);
-        var baguette3 = Emote.getEmoteMention(jda, "baguette3", guild, user);
+        var baguette1 = EmoteUtil.getEmoteMention(jda, "baguette1", guild, user);
+        var baguette2 = EmoteUtil.getEmoteMention(jda, "baguette2", guild, user);
+        var baguette3 = EmoteUtil.getEmoteMention(jda, "baguette3", guild, user);
 
         var lang = LanguageHandler.getLanguage(event);
         var baguettes = baguette1 +

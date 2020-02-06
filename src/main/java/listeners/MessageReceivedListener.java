@@ -13,7 +13,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import owner.blacklist.Blacklist;
 import servant.Servant;
-import utilities.Image;
+import utilities.ImageUtil;
 import utilities.*;
 
 import java.awt.*;
@@ -93,7 +93,7 @@ public class MessageReceivedListener extends ListenerAdapter {
                 event.getChannel().sendMessage(new EmbedBuilder().setColor(color).setImage("https://i.imgur.com/ohcdKgU.gif").build()).queue(sentMessage -> {
                     if (!master.hasAchievement("excalibur")) {
                         master.setAchievement("excalibur", 50);
-                        new MessageHandler().reactAchievement(message);
+                        new MessageUtil().reactAchievement(message);
                     }
                 }, failure -> logEasterEggError(event));
                 break;
@@ -104,7 +104,7 @@ public class MessageReceivedListener extends ListenerAdapter {
                 event.getChannel().sendMessage(new EmbedBuilder().setColor(color).setImage("https://i.imgur.com/XZ7q5Xg.gif").build()).queue(sentMessage -> {
                     if (!master.hasAchievement("unlimited_blade_works")) {
                         master.setAchievement("unlimited_blade_works", 50);
-                        new MessageHandler().reactAchievement(message);
+                        new MessageUtil().reactAchievement(message);
                     }
                 }, failure -> logEasterEggError(event));
                 break;
@@ -114,7 +114,7 @@ public class MessageReceivedListener extends ListenerAdapter {
                 event.getChannel().sendMessage(new EmbedBuilder().setColor(color).setImage("https://i.imgur.com/Mu1vw26.gif").build()).queue(sentMessage -> {
                     if (!master.hasAchievement("gae_bolg")) {
                         master.setAchievement("gae_bolg", 50);
-                        new MessageHandler().reactAchievement(message);
+                        new MessageUtil().reactAchievement(message);
                     }
                 }, failure -> logEasterEggError(event));
                 break;
@@ -124,7 +124,7 @@ public class MessageReceivedListener extends ListenerAdapter {
                 event.getChannel().sendMessage(new EmbedBuilder().setColor(color).setImage("https://i.imgur.com/w4S5NIt.gif").build()).queue(sentMessage -> {
                     if (!master.hasAchievement("navi")) {
                         master.setAchievement("navi", 50);
-                        new MessageHandler().reactAchievement(message);
+                        new MessageUtil().reactAchievement(message);
                     }
                 }, failure -> logEasterEggError(event));
                 break;
@@ -134,7 +134,7 @@ public class MessageReceivedListener extends ListenerAdapter {
                 event.getChannel().sendMessage(new EmbedBuilder().setColor(color).setImage("https://i.kym-cdn.com/photos/images/newsfeed/001/176/858/c69.gif").build()).queue(sentMessage -> {
                     if (!master.hasAchievement("deusvult")) {
                         master.setAchievement("deusvult", 10);
-                        new MessageHandler().reactAchievement(message);
+                        new MessageUtil().reactAchievement(message);
                     }
                 }, failure -> logEasterEggError(event));
                 break;
@@ -151,7 +151,7 @@ public class MessageReceivedListener extends ListenerAdapter {
                 event.getChannel().sendMessage(new EmbedBuilder().setColor(color).setImage("https://i.imgur.com/wINPdOJ.gif").build()).queue(sentMessage -> {
                     if (!master.hasAchievement("fiteme")) {
                         master.setAchievement("fiteme", 10);
-                        new MessageHandler().reactAchievement(message);
+                        new MessageUtil().reactAchievement(message);
                     }
                 }, failure -> logEasterEggError(event));
                 break;
@@ -161,20 +161,20 @@ public class MessageReceivedListener extends ListenerAdapter {
             case "merry christmas":
             case "merry xmas":
                 logEasterEggFound(event, contentRaw);
-                event.getChannel().sendMessage(Emote.getEmoteMention(event.getJDA(), "servant_padoru", guild, user)).queue(sentMessage -> {
+                event.getChannel().sendMessage(EmoteUtil.getEmoteMention(event.getJDA(), "servant_padoru", guild, user)).queue(sentMessage -> {
                     if (!master.hasAchievement("xmas")) {
                         master.setAchievement("xmas", 10);
-                        new MessageHandler().reactAchievement(message);
+                        new MessageUtil().reactAchievement(message);
                     }
                 }, failure -> logEasterEggError(event));
                 break;
 
             case "padoru":
                 logEasterEggFound(event, contentRaw);
-                event.getChannel().sendMessage(new EmbedBuilder().setColor(master.getColor()).setImage(Image.getImageUrl("padoru", guild, user)).build()).queue(success -> {
+                event.getChannel().sendMessage(new EmbedBuilder().setColor(master.getColor()).setImage(ImageUtil.getImageUrl("padoru", guild, user)).build()).queue(success -> {
                     if (!master.hasAchievement("padoru")) {
                         master.setAchievement("padoru", 10);
-                        new MessageHandler().reactAchievement(message);
+                        new MessageUtil().reactAchievement(message);
                     }
                 }, failure -> logEasterEggError(event));
                 break;
@@ -223,7 +223,7 @@ public class MessageReceivedListener extends ListenerAdapter {
                     event.getMessage().delete().queue();
                     var mb = new MessageBuilder();
                     mb.setContent(String.format(LanguageHandler.get(lang, "mediaonlychannel_warning"), user.getAsMention()));
-                    new MessageHandler().sendAndExpire(channel, mb.build(), 30 * 1000); // 30 seconds.
+                    new MessageUtil().sendAndExpire(channel, mb.build(), 30 * 1000); // 30 seconds.
                     return true;
                 }
             }

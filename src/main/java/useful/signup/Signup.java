@@ -10,8 +10,8 @@ import net.dv8tion.jda.api.entities.MessageReaction;
 import servant.Log;
 import servant.Servant;
 import useful.giveaway.GiveawayHandler;
-import utilities.Emote;
-import utilities.Image;
+import utilities.EmoteUtil;
+import utilities.ImageUtil;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -19,7 +19,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
-import static utilities.DatabaseConn.closeQuietly;
+import static servant.Database.closeQuietly;
 
 public class Signup {
     public static void checkSignups(JDA jda) {
@@ -70,7 +70,7 @@ public class Signup {
         if (!server.isSignupMessage(messageId)) return;
         var amount = server.getSignupAmount(messageId);
         var reactionList = message.getReactions();
-        var upvoteEmoji = Emote.getEmoji("upvote");
+        var upvoteEmoji = EmoteUtil.getEmoji("upvote");
         MessageReaction signupReaction = null;
         for (var reaction : reactionList)
             if (reaction.getReactionEmote().getName().equals(upvoteEmoji))
@@ -101,7 +101,7 @@ public class Signup {
                 eb.setFooter(server.signupIsCustomDate(messageId) ?
                                 LanguageHandler.get(lang, "signup_event") :
                                 LanguageHandler.get(lang, "signup_timeout_finish"),
-                        Image.getImageUrl("clock", guild, author));
+                        ImageUtil.getImageUrl("clock", guild, author));
                 eb.setTimestamp(expiration.toInstant());
                 message.editMessage(eb.build()).queue();
                 message.clearReactions().queue();

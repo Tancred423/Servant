@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
-import utilities.MessageHandler;
+import utilities.MessageUtil;
 import utilities.Parser;
 
 import java.time.ZonedDateTime;
@@ -53,7 +53,6 @@ public class Level {
     }
 
     public static void checkForAchievements(int level, MessageReceivedEvent event) {
-        var guild = event.getGuild();
         var user = event.getAuthor();
         var master = new Master(user);
         var message = event.getMessage();
@@ -61,7 +60,7 @@ public class Level {
         if (level >= 10) {
             if (!master.hasAchievement("level10") && !hasHigherLevelAchievement(master, 10)) {
                 master.setAchievement("level10", 10);
-                new MessageHandler().reactAchievement(message);
+                new MessageUtil().reactAchievement(message);
             }
         }
 
@@ -69,7 +68,7 @@ public class Level {
             if (!master.hasAchievement("level20") && !hasHigherLevelAchievement(master, 20)) {
                 master.setAchievement("level20", 20);
                 deleteLowerAchievements(master, 20);
-                new MessageHandler().reactAchievement(message);
+                new MessageUtil().reactAchievement(message);
             }
         }
 
@@ -77,7 +76,7 @@ public class Level {
             if (!master.hasAchievement("level30") && !hasHigherLevelAchievement(master, 30)) {
                 master.setAchievement("level30", 30);
                 deleteLowerAchievements(master, 30);
-                new MessageHandler().reactAchievement(message);
+                new MessageUtil().reactAchievement(message);
             }
         }
 
@@ -85,7 +84,7 @@ public class Level {
             if (!master.hasAchievement("level40") && !hasHigherLevelAchievement(master, 40)) {
                 master.setAchievement("level40", 40);
                 deleteLowerAchievements(master, 40);
-                new MessageHandler().reactAchievement(message);
+                new MessageUtil().reactAchievement(message);
             }
         }
 
@@ -93,7 +92,7 @@ public class Level {
             if (!master.hasAchievement("level50") && !hasHigherLevelAchievement(master, 50)) {
                 master.setAchievement("level50", 50);
                 deleteLowerAchievements(master, 50);
-                new MessageHandler().reactAchievement(message);
+                new MessageUtil().reactAchievement(message);
             }
         }
 
@@ -101,14 +100,14 @@ public class Level {
             if (!master.hasAchievement("level60") && !hasHigherLevelAchievement(master, 60)) {
                 master.setAchievement("level60", 60);
                 deleteLowerAchievements(master, 60);
-                new MessageHandler().reactAchievement(message);
+                new MessageUtil().reactAchievement(message);
             }
         }
 
         if (level >= 69) {
             if (!master.hasAchievement("nicelevel") && !hasHigherLevelAchievement(master, 69)) {
                 master.setAchievement("nicelevel", 69);
-                new MessageHandler().reactAchievement(message);
+                new MessageUtil().reactAchievement(message);
             }
         }
 
@@ -116,7 +115,7 @@ public class Level {
             if (!master.hasAchievement("level70") && !hasHigherLevelAchievement(master, 70)) {
                 master.setAchievement("level70", 70);
                 deleteLowerAchievements(master, 70);
-                new MessageHandler().reactAchievement(message);
+                new MessageUtil().reactAchievement(message);
             }
         }
 
@@ -124,7 +123,7 @@ public class Level {
             if (!master.hasAchievement("level80") && !hasHigherLevelAchievement(master, 80)) {
                 master.setAchievement("level80", 80);
                 deleteLowerAchievements(master, 80);
-                new MessageHandler().reactAchievement(message);
+                new MessageUtil().reactAchievement(message);
             }
         }
 
@@ -132,7 +131,7 @@ public class Level {
             if (!master.hasAchievement("level90") && !hasHigherLevelAchievement(master, 90)) {
                 master.setAchievement("level90", 90);
                 deleteLowerAchievements(master, 90);
-                new MessageHandler().reactAchievement(message);
+                new MessageUtil().reactAchievement(message);
             }
         }
 
@@ -140,7 +139,7 @@ public class Level {
             if (!master.hasAchievement("level100") && !hasHigherLevelAchievement(master, 100)) {
                 master.setAchievement("level100", 100);
                 deleteLowerAchievements(master, 100);
-                new MessageHandler().reactAchievement(message);
+                new MessageUtil().reactAchievement(message);
             }
         }
     }

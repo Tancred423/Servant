@@ -6,6 +6,8 @@ import com.zaxxer.hikari.HikariDataSource;
 import files.HikariFile;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 public class Database {
     private HikariDataSource hikari;
@@ -25,5 +27,13 @@ public class Database {
 
     public HikariDataSource getHikari() {
         return hikari;
+    }
+
+    public static void closeQuietly(Connection connection) {
+        try {
+            if (connection != null) connection.close();
+        } catch (SQLException e) {
+            System.out.println("Closing DB connection failed.");
+        }
     }
 }

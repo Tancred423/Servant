@@ -40,11 +40,10 @@ import owner.*;
 import owner.blacklist.BlacklistCommand;
 import random.*;
 import random.randomImgur.RandomCommand;
-import useful.alarm.AlarmCommand;
 import useful.giveaway.GiveawayCommand;
 import useful.polls.PollCommand;
 import useful.polls.QuickpollCommand;
-import useful.reminder.ReminderCommand;
+import useful.remindme.RemindMeCommand;
 import useful.signup.SignupCommand;
 import useful.timezone.TimezoneCommand;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandClientBuilder;
@@ -54,6 +53,7 @@ import javax.security.auth.login.LoginException;
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class Servant {
     public static ConfigFile config;
@@ -62,20 +62,29 @@ public class Servant {
 
     public static ExecutorService threadPool;
     public static ExecutorService profilePool;
+    public static ScheduledExecutorService remindMeService;
 
     public static void main(String[] args) throws IOException, LoginException {
+        // Config File
         config = new ConfigFile();
         if (config.isMissing()) {
             System.out.println("The bot was shut down.");
             return;
         }
 
+        // Language File
+        LanguageHandler.initialize();
+
+        // Toggle File
+        toggle = new ToggleFile();
+
+        // Database
         db = new Database();
         if (!db.connectToDatabase()) return;
 
-        LanguageHandler.initialize();
+        // RemindMe Service
+        remindMeService = Executors.newScheduledThreadPool(1);
 
-        toggle = new ToggleFile();
 
         var availProcessors = Runtime.getRuntime().availableProcessors();
         System.out.println("Available Processors: " + availProcessors);
@@ -128,10 +137,9 @@ public class Servant {
                 new ServerInfoCommand(),
 
                 // Useful
-                new AlarmCommand(),
                 new GiveawayCommand(),
                 new QuickpollCommand(),
-                new ReminderCommand(),
+                new RemindMeCommand(),
                 new SignupCommand(),
                 new TimezoneCommand(),
                 new PollCommand(waiter),

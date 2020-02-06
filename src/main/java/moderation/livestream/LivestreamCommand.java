@@ -8,7 +8,7 @@ import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import utilities.Constants;
-import utilities.UsageEmbed;
+import utilities.MessageUtil;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
@@ -42,7 +42,7 @@ public class LivestreamCommand extends Command {
             var usage = String.format(LanguageHandler.get(lang, "livestream_usage"),
                     p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name);
             var hint = LanguageHandler.get(lang, "livestream_hint");
-            event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+            event.reply(MessageUtil.createUsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint));
             return;
         }
 

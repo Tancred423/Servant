@@ -42,13 +42,13 @@ public class ConfigFile {
         var os = new FileOutputStream(resourcesDir + "/config.ini");
 
         config.setProperty("botToken", "");
-        config.setProperty("defaultLanguage", "en_gb"); // British English.
-        config.setProperty("defaultOffset", "00:00"); // UTC.
-        config.setProperty("defaultColorCode", "0x6c86d5"); // Discord-themed blue.
+        config.setProperty("defaultLanguage", "en_gb"); // British English
+        config.setProperty("defaultOffset", "00:00"); // UTC
+        config.setProperty("defaultColorCode", "0x6c86d5"); // Discord-themed blue
         config.setProperty("defaultPrefix", "!");
-        config.setProperty("expCdMillis", "60000"); // 1 minute.
+        config.setProperty("expCdMillis", "60000"); // 1 minute
         config.setProperty("botOwnerId", "");
-        config.setProperty("botOwnerColorCode", "0xd963a0");
+        config.setProperty("botOwnerColorCode", "0xb132a4"); // Luna eye-colour
         config.setProperty("supportGuildId", "");
         config.setProperty("supportGuildInv", "");
         config.setProperty("unsplashClientId", "");

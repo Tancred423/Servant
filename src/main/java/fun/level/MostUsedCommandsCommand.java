@@ -5,7 +5,7 @@ import files.language.LanguageHandler;
 import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import utilities.Image;
+import utilities.ImageUtil;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
@@ -43,7 +43,7 @@ public class MostUsedCommandsCommand extends Command {
             master = new Master(user);
         }
 
-        var featureEmotes = Image.getFeatureEmotes(jda);
+        var featureEmotes = ImageUtil.getFeatureEmotes(jda);
         var featuresMap = master.getFeatureCounts();
 
         var eb = new EmbedBuilder()

@@ -7,7 +7,7 @@ import moderation.guild.Server;
 import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import useful.InvalidTitleException;
+import useful.InvalidTopicException;
 import utilities.*;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
@@ -45,7 +45,7 @@ public class SignupCommand extends Command {
             var description = LanguageHandler.get(lang, "signup_description");
             var usage = String.format(LanguageHandler.get(lang, "signup_usage"), p, name, p, name, p, name, p, name, p, name);
             var hint = LanguageHandler.get(lang, "signup_hint");
-            event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+            event.reply(MessageUtil.createUsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint));
             return;
         }
 
@@ -54,7 +54,7 @@ public class SignupCommand extends Command {
         String title;
         try {
             title = parseTitle(event, contentSplit);
-        } catch (InvalidTitleException e) {
+        } catch (InvalidTopicException e) {
             event.replyError(e.getMessage());
             return;
         }
@@ -91,15 +91,15 @@ public class SignupCommand extends Command {
         eb.setTitle(title.isEmpty() ? LanguageHandler.get(lang, "signup_embedtitle_empty") :
                 String.format(LanguageHandler.get(lang, "signup_embedtitle_notempty"), title));
         eb.setDescription(String.format(LanguageHandler.get(lang, "signup_embeddescription"),
-                Emote.getEmoji("upvote"), amount,
+                EmoteUtil.getEmoji("upvote"), amount,
                 (isCustomDate ? LanguageHandler.get(lang, "signup_embeddescription_custom") : ""),
                 author.getAsMention()));
         eb.setFooter(isCustomDate ? LanguageHandler.get(lang, "signup_event") : LanguageHandler.get(lang, "signup_timeout"),
-                Image.getImageUrl("clock", guild, author));
+                ImageUtil.getImageUrl("clock", guild, author));
         eb.setTimestamp(eventDate.toInstant());
 
-        var upvote = Emote.getEmoji("upvote");
-        var downvote = Emote.getEmoji("end");
+        var upvote = EmoteUtil.getEmoji("upvote");
+        var downvote = EmoteUtil.getEmoji("end");
         if (upvote == null || downvote == null) return;
 
         var finalEventDate = eventDate;
@@ -112,13 +112,13 @@ public class SignupCommand extends Command {
         });
     }
 
-    private String parseTitle(CommandEvent event, String[] contentSplit) throws InvalidTitleException {
+    private String parseTitle(CommandEvent event, String[] contentSplit) throws InvalidTopicException {
         var lang = LanguageHandler.getLanguage(event);
         if (contentSplit[0].startsWith("\"")) {
             if (contentSplit[0].endsWith("\"") && !contentSplit[0].equals("\"")) {
                 // One Word Title
                 var title = contentSplit[0].replace("\"", "");
-                if (title.length() > 256) throw new InvalidTitleException(LanguageHandler.get(lang, "signup_titlelength"));
+                if (title.length() > 256) throw new InvalidTopicException(LanguageHandler.get(lang, "signup_titlelength"));
                 else return title;
             } else {
                 // Multiple Word title
@@ -132,7 +132,7 @@ public class SignupCommand extends Command {
             }
         } else return null;
 
-        throw new InvalidTitleException(LanguageHandler.get(lang, "signup_invalidtitle"));
+        throw new InvalidTopicException(LanguageHandler.get(lang, "signup_invalidtitle"));
     }
 
     private int parseAmount(CommandEvent event, String[] contentSplit, String title) throws InvalidAmountException {

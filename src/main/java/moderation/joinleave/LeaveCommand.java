@@ -7,7 +7,7 @@ import moderation.guild.Server;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import utilities.Constants;
-import utilities.UsageEmbed;
+import utilities.MessageUtil;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
@@ -41,7 +41,7 @@ public class LeaveCommand extends Command {
         if (event.getArgs().isEmpty()) {
             var description = LanguageHandler.get(lang, "leave_description");
             var usage = String.format(LanguageHandler.get(lang, "leave_usage"), p, name, p, name, p, name, p, name);
-            event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, null).getEmbed());
+            event.reply(MessageUtil.createUsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, null));
             return;
         }
 

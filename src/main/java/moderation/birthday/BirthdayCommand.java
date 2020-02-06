@@ -7,8 +7,8 @@ import moderation.guild.Server;
 import net.dv8tion.jda.api.Permission;
 import servant.Log;
 import utilities.Constants;
+import utilities.MessageUtil;
 import utilities.Parser;
-import utilities.UsageEmbed;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
@@ -43,7 +43,7 @@ public class BirthdayCommand extends Command {
             var usage = String.format(LanguageHandler.get(lang, "birthday_usage"),
                     p, name, p, name, p, name, p, name, p, name, p, name, p, name, event.getJDA().getSelfUser().getName(), p, name, event.getJDA().getSelfUser().getName());
             var hint = LanguageHandler.get(lang, "birthday_hint");
-            event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+            event.reply(MessageUtil.createUsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint));
             return;
         }
 

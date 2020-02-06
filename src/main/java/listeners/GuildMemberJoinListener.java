@@ -11,8 +11,8 @@ import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import owner.blacklist.Blacklist;
 import servant.Servant;
-import utilities.Image;
-import utilities.Time;
+import utilities.ImageUtil;
+import utilities.TimeUtil;
 
 import javax.annotation.Nonnull;
 import java.time.OffsetDateTime;
@@ -50,7 +50,7 @@ public class GuildMemberJoinListener extends ListenerAdapter {
                     var role = roleAndDelay.getKey();
                     var delay = roleAndDelay.getValue() * 60 * 1000; // Milliseconds
                     if (selfMember.hasPermission(Permission.MANAGE_ROLES) && role != null && selfMember.canInteract(role))
-                        new Timer().schedule(Time.wrap(() -> guild.addRoleToMember(member, role).queue(success -> { /* ignored */ }, failure -> { /* ignored */ })), delay);
+                        new Timer().schedule(TimeUtil.wrap(() -> guild.addRoleToMember(member, role).queue(success -> { /* ignored */ }, failure -> { /* ignored */ })), delay);
                 }
             }
 
@@ -67,7 +67,7 @@ public class GuildMemberJoinListener extends ListenerAdapter {
                                     .setAuthor(String.format(LanguageHandler.get(lang, "join_author"), user.getName(), user.getDiscriminator(), guild.getName()), null, guild.getIconUrl())
                                     .setDescription(description == null ? LanguageHandler.get(lang, "join_embeddescription") : description)
                                     .setThumbnail(user.getEffectiveAvatarUrl())
-                                    .setFooter(LanguageHandler.get(lang, "join_footer"), Image.getImageUrl("clock", guild, user))
+                                    .setFooter(LanguageHandler.get(lang, "join_footer"), ImageUtil.getImageUrl("clock", guild, user))
                                     .setTimestamp(OffsetDateTime.now(ZoneOffset.of(server.getOffset())))
                                     .build()
                     ).queue();

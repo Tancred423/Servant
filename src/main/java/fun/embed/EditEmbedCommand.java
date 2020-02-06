@@ -13,8 +13,8 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import utilities.Constants;
+import utilities.MessageUtil;
 import utilities.Parser;
-import utilities.UsageEmbed;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 import zJdaUtilsLib.com.jagrosh.jdautilities.commons.waiter.EventWaiter;
@@ -65,7 +65,7 @@ public class EditEmbedCommand extends Command {
             var description = String.format(LanguageHandler.get(lang, "editembed_description"), event.getSelfUser().getName());
             var usage = String.format(LanguageHandler.get(lang, "editembed_usage"), p, name, p, name);
             var hint = LanguageHandler.get(lang, "editembed_hint");
-            event.reply(new UsageEmbed(name, user, description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+            event.reply(MessageUtil.createUsageEmbed(name, user, description, ownerCommand, userPermissions, aliases, usage, hint));
             return;
         }
 

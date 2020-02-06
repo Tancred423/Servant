@@ -45,7 +45,7 @@ public class VoiceLobbyCommand extends Command {
             var usage = String.format(LanguageHandler.get(lang, "voicelobby_usage"),
                     p, name, p, name, p, name, p, name, p, name);
             var hint = LanguageHandler.get(lang, "voicelobby_hint");
-            event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+            event.reply(MessageUtil.createUsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint));
             return;
         }
 
@@ -116,7 +116,7 @@ public class VoiceLobbyCommand extends Command {
                 var fields = new HashMap<String, Map.Entry<String, Boolean>>();
                 fields.put(LanguageHandler.get(lang, "voicelobby_current"), new MyEntry<>(builder.toString(), false));
 
-                new MessageHandler().sendEmbed(event.getChannel(),
+                new MessageUtil().sendEmbed(event.getChannel(),
                         master.getColor(),
                         guild.getName(),
                         null,

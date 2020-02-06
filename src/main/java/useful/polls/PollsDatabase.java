@@ -8,34 +8,12 @@ import servant.Servant;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 
-import static utilities.DatabaseConn.closeQuietly;
+import static servant.Database.closeQuietly;
 
 public class PollsDatabase {
     // Votes
-    // todo: in guild class
-    public static void setVote(long guildId, long channelId, long messageId, long authorId, String type, Timestamp endingDate, Guild guild, User user) {
-        Connection connection = null;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var insert = connection.prepareStatement("INSERT INTO votes (guild_id,channel_id,message_id,author_id,type,ending_date) VALUES (?,?,?,?,?,?)");
-            insert.setLong(1, guildId);
-            insert.setLong(2, channelId);
-            insert.setLong(3, messageId);
-            insert.setLong(4, authorId);
-            insert.setString(5, type);
-            insert.setTimestamp(6, endingDate);
-            insert.executeUpdate();
-        } catch (SQLException e) {
-            new Log(e, guild, user, "poll", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-    }
-
-    static void unsetVote(long messageId, Guild guild, User user) {
+    static void unsetPoll(long messageId, Guild guild, User user) {
         Connection connection = null;
 
         try {
@@ -50,8 +28,7 @@ public class PollsDatabase {
         }
     }
 
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    public static boolean isQuickvote(long messageId, Guild guild, User user) {
+    public static boolean isQuickpoll(long messageId, Guild guild, User user) {
         Connection connection = null;
         var isQuickvote = false;
 
@@ -89,7 +66,6 @@ public class PollsDatabase {
         return isVote;
     }
 
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean isRadioVote(long messageId, Guild guild, User user) {
         Connection connection = null;
         var isRadiovote = false;

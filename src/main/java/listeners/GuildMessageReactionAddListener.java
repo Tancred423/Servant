@@ -22,8 +22,8 @@ import useful.giveaway.GiveawayHandler;
 import useful.polls.Poll;
 import useful.polls.PollsDatabase;
 import useful.signup.Signup;
-import utilities.Emote;
-import utilities.Time;
+import utilities.EmoteUtil;
+import utilities.TimeUtil;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -76,8 +76,8 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 
             // Giveaway
             if (Toggle.isEnabled(event, "giveaway")
-                    && GiveawayHandler.isGiveaway(guild.getIdLong(), channel.getIdLong(), messageId, guild, user)
-                    && (event.getReactionEmote().isEmoji() && event.getReactionEmote().getName().equals(Emote.getEmoji("end")))) {
+                    && server.isGiveaway(channel.getIdLong(), messageId)
+                    && (event.getReactionEmote().isEmoji() && event.getReactionEmote().getName().equals(EmoteUtil.getEmoji("end")))) {
                 channel.retrieveMessageById(messageId).queue(message -> {
                     var giveaway = new Giveaway(guild.getIdLong(), channel.getIdLong(), messageId, jda.getSelfUser());
                     if (giveaway.getHostId() == user.getIdLong())
@@ -86,7 +86,7 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
             }
 
             // Quickpoll
-            if (Toggle.isEnabled(event, "quickvote") && PollsDatabase.isQuickvote(messageId, guild, user)) {
+            if (Toggle.isEnabled(event, "quickvote") && PollsDatabase.isQuickpoll(messageId, guild, user)) {
                 processQuickpollEnd(event, guild, user, messageId, lang);
                 processQuickpollMultipleVote(event, guild, user, messageId);
             }
@@ -197,7 +197,7 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
             } else temporaryBlacklist.remove(messageId);
         }, failure -> { /* Ignored */ });
 
-        new Timer().schedule(Time.wrap(() -> temporaryBlacklist.remove(messageId)), 10 * 1000);
+        new Timer().schedule(TimeUtil.wrap(() -> temporaryBlacklist.remove(messageId)), 10 * 1000);
     }
 
     private static void sendBestOfImage(Message message, net.dv8tion.jda.api.entities.Guild guild, User user,
@@ -328,25 +328,24 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
     private static void processQuickpollEnd(GuildMessageReactionAddEvent event, net.dv8tion.jda.api.entities.Guild guild,
                                             User user, long messageId, String lang) {
         var reactionEmote = event.getReactionEmote();
-        if (reactionEmote.isEmote()) {
-            if (!reactionEmote.getEmote().equals(Emote.getEmote("end", guild, user))) return; // Has to be the end emote ...
-        } else {
-            if (!reactionEmote.getName().equals(Emote.getEmoji("end"))) return; // ... or the end emoji.
+        if (!reactionEmote.isEmote()) {
+            if (!reactionEmote.getName().equals(EmoteUtil.getEmoji("end"))) return; // Has to be the end emoji.
+            if (user.getIdLong() != PollsDatabase.getAuthorId(messageId, guild, user)) return; // Has to be done by author.
+
+            // The author has reacted with an ending emote on their quickpoll.
+            event.getChannel().retrieveMessageById(messageId).queue(message -> Poll.endQuickpoll(guild, user, message, lang, event.getJDA()));
         }
 
-        if (user.getIdLong() != PollsDatabase.getAuthorId(messageId, guild, user)) return; // Has to be done by author.
 
-        // The author has reacted with an ending emote on their quickpoll.
-        event.getChannel().retrieveMessageById(messageId).queue(message -> Poll.endQuickpoll(guild, user, message, lang, event.getJDA()));
     }
 
     private static void processQuickpollMultipleVote(GuildMessageReactionAddEvent event, net.dv8tion.jda.api.entities.Guild guild,
                                                      User user, long messageId) {
         // Just react to Upvote, Shrug and Downvote.
         var reactionEmote = event.getReactionEmote();
-        if (!reactionEmote.getName().equals(Emote.getEmoji("upvote"))
-                && !reactionEmote.getName().equals(Emote.getEmoji("shrug"))
-                && !reactionEmote.getName().equals(Emote.getEmoji("downvote"))) return;
+        if (!reactionEmote.getName().equals(EmoteUtil.getEmoji("upvote"))
+                && !reactionEmote.getName().equals(EmoteUtil.getEmoji("shrug"))
+                && !reactionEmote.getName().equals(EmoteUtil.getEmoji("downvote"))) return;
 
         event.getChannel().retrieveMessageById(messageId).queue(message -> {
             var userId = user.getIdLong();
@@ -358,7 +357,7 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
     private static void processPollEnd(GuildMessageReactionAddEvent event, net.dv8tion.jda.api.entities.Guild guild, User user, long messageId, String lang) {
         var reactionEmote = event.getReactionEmote();
         if (!reactionEmote.isEmote()) {
-            if (!reactionEmote.getName().equals(Emote.getEmoji("end"))) return;
+            if (!reactionEmote.getName().equals(EmoteUtil.getEmoji("end"))) return;
         } else return;
 
         if (user.getIdLong() != PollsDatabase.getAuthorId(messageId, guild, user)) return; // Has to be done by author.
@@ -371,31 +370,19 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
                                                      User user, long messageId) {
         // Just react to One - Ten.
         var reactionEmote = event.getReactionEmote();
-        if (reactionEmote.isEmote()) {
-            if (!reactionEmote.getEmote().equals(Emote.getEmote("one", guild, user))
-                    && !reactionEmote.getEmote().equals(Emote.getEmote("two", guild, user))
-                    && !reactionEmote.getEmote().equals(Emote.getEmote("three", guild, user))
-                    && !reactionEmote.getEmote().equals(Emote.getEmote("four", guild, user))
-                    && !reactionEmote.getEmote().equals(Emote.getEmote("five", guild, user))
-                    && !reactionEmote.getEmote().equals(Emote.getEmote("six", guild, user))
-                    && !reactionEmote.getEmote().equals(Emote.getEmote("seven", guild, user))
-                    && !reactionEmote.getEmote().equals(Emote.getEmote("eight", guild, user))
-                    && !reactionEmote.getEmote().equals(Emote.getEmote("nine", guild, user))
-                    && !reactionEmote.getEmote().equals(Emote.getEmote("ten", guild, user))
+        if (!reactionEmote.isEmote()) {
+            if (!reactionEmote.getName().equals(EmoteUtil.getEmoji("one"))
+                    && !reactionEmote.getName().equals(EmoteUtil.getEmoji("two"))
+                    && !reactionEmote.getName().equals(EmoteUtil.getEmoji("three"))
+                    && !reactionEmote.getName().equals(EmoteUtil.getEmoji("four"))
+                    && !reactionEmote.getName().equals(EmoteUtil.getEmoji("five"))
+                    && !reactionEmote.getName().equals(EmoteUtil.getEmoji("six"))
+                    && !reactionEmote.getName().equals(EmoteUtil.getEmoji("seven"))
+                    && !reactionEmote.getName().equals(EmoteUtil.getEmoji("eight"))
+                    && !reactionEmote.getName().equals(EmoteUtil.getEmoji("nine"))
+                    && !reactionEmote.getName().equals(EmoteUtil.getEmoji("ten"))
             ) return;
-        } else {
-            if (!reactionEmote.getName().equals(Emote.getEmoji("one"))
-                    && !reactionEmote.getName().equals(Emote.getEmoji("two"))
-                    && !reactionEmote.getName().equals(Emote.getEmoji("three"))
-                    && !reactionEmote.getName().equals(Emote.getEmoji("four"))
-                    && !reactionEmote.getName().equals(Emote.getEmoji("five"))
-                    && !reactionEmote.getName().equals(Emote.getEmoji("six"))
-                    && !reactionEmote.getName().equals(Emote.getEmoji("seven"))
-                    && !reactionEmote.getName().equals(Emote.getEmoji("eight"))
-                    && !reactionEmote.getName().equals(Emote.getEmoji("nine"))
-                    && !reactionEmote.getName().equals(Emote.getEmoji("ten"))
-            ) return;
-        }
+        } else return;
 
         event.getChannel().retrieveMessageById(messageId).queue(message -> {
             var userId = user.getIdLong();
@@ -436,7 +423,7 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 
     private static void processSignup(GuildMessageReactionAddEvent event, net.dv8tion.jda.api.entities.Guild guild, User user, Server internalGuild, long messageId) {
         var forceEnd = false;
-        var endEmoji = Emote.getEmoji("end");
+        var endEmoji = EmoteUtil.getEmoji("end");
         if (!event.getReactionEmote().isEmote() && event.getReactionEmote().getName().equals(endEmoji)) {
             if (event.getUser().getIdLong() != internalGuild.getSignupAuthorId(event.getMessageIdLong()))
                 event.getReaction().removeReaction(user).queue();

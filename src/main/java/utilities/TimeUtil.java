@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimerTask;
 
-public class Time {
+public class TimeUtil {
     public static long getDelayToNextMinuteInMillis() {
         var now = new Date();
         var calendar = Calendar.getInstance();

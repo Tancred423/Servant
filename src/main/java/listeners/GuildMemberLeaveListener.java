@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import owner.blacklist.Blacklist;
 import servant.Servant;
-import utilities.Image;
+import utilities.ImageUtil;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -52,7 +52,7 @@ public class GuildMemberLeaveListener extends ListenerAdapter {
                                     .setAuthor(String.format(LanguageHandler.get(lang, "leave_author"), user.getName(), user.getDiscriminator()), null, guild.getIconUrl())
                                     .setDescription(description == null ? LanguageHandler.get(lang, "leave_embeddescription") : description)
                                     .setThumbnail(user.getEffectiveAvatarUrl())
-                                    .setFooter(LanguageHandler.get(lang, "leave_footer"), Image.getImageUrl("clock", guild, user))
+                                    .setFooter(LanguageHandler.get(lang, "leave_footer"), ImageUtil.getImageUrl("clock", guild, user))
                                     .setTimestamp(OffsetDateTime.now(ZoneOffset.of(server.getOffset())))
                                     .build()
                     ).queue();

@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import owner.blacklist.Blacklist;
 import servant.Servant;
 import utilities.Constants;
-import utilities.Image;
+import utilities.ImageUtil;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -65,9 +65,10 @@ public class GuildJoinListener extends ListenerAdapter {
             var eb = new EmbedBuilder();
 
             eb.setColor(guildOwnerMaster.getColor());
-            eb.setAuthor(String.format(LanguageHandler.get(language, "invite_author"), bot.getName()), null, guild.getIconUrl());
+            eb.setAuthor(String.format(LanguageHandler.get(language, "invite_author"), bot.getName()), null, bot.getEffectiveAvatarUrl());
+            eb.setThumbnail(guild.getIconUrl());
             eb.setDescription(String.format(LanguageHandler.get(language, "invite_description"), p, p, p, Servant.config.getSupportGuildInv(), botOwner.getName(), botOwner.getDiscriminator()));
-            eb.setImage(Image.getImageUrl("invite", guild, guildOwnerUser));
+            eb.setImage(ImageUtil.getImageUrl("invite", guild, guildOwnerUser));
             eb.setFooter(String.format(LanguageHandler.get(language, "invite_footer"), guild.getName()), null);
 
             privateChannel.sendMessage(eb.build()).queue();

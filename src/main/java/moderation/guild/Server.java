@@ -1,6 +1,7 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package moderation.guild;
 
+import files.language.LanguageHandler;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
 import servant.Log;
@@ -11,7 +12,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
 
-import static utilities.DatabaseConn.*;
+import static servant.Database.closeQuietly;
 
 public class Server {
     private Guild guild;
@@ -26,6 +27,26 @@ public class Server {
     public long getGuildId() { return guildId; }
 
     // Poll
+    public void setVote(long channelId, long messageId, long authorId, String type, Timestamp endingDate) {
+        Connection connection = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var insert = connection.prepareStatement("INSERT INTO votes (guild_id,channel_id,message_id,author_id,type,ending_date) VALUES (?,?,?,?,?,?)");
+            insert.setLong(1, guildId);
+            insert.setLong(2, channelId);
+            insert.setLong(3, messageId);
+            insert.setLong(4, authorId);
+            insert.setString(5, type);
+            insert.setTimestamp(6, endingDate);
+            insert.executeUpdate();
+        } catch (SQLException e) {
+            new Log(e, guild, null, "poll", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+    }
+
     public void purgePollsFromChannel(long channelId) {
         Connection connection = null;
 
@@ -123,7 +144,6 @@ public class Server {
         }
     }
 
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isSignupMessage(long messageId) {
         Connection connection = null;
         var isSignupMessage = false;
@@ -1763,15 +1783,9 @@ public class Server {
             var select = connection.prepareStatement("SELECT * FROM user_exp WHERE guild_id=? ORDER BY exp DESC");
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) {
-                var counter = 0;
-                do {
-                    if (counter >= 10) break;
-                    userExp.put(resultSet.getLong("user_id"), resultSet.getInt("exp"));
-                    counter++;
-                } while (resultSet.next());
-            }
-            if (userExp.isEmpty()) userExp = null;
+            if (resultSet.first())
+                do userExp.put(resultSet.getLong("user_id"), resultSet.getInt("exp"));
+                while (resultSet.next());
         } catch (SQLException e) {
             new Log(e, guild, null, "level", null).sendLog(false);
         } finally {
@@ -2808,5 +2822,131 @@ public class Server {
         }
 
         return hasEntry;
+    }
+
+    // Giveaway
+    public boolean isGiveaway(long channelId, long messageId) {
+        Connection connection = null;
+        var isGiveaway = false;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var preparedStatement = connection.prepareStatement("SELECT * FROM giveawaylist WHERE guild_id=? AND channel_id=? AND message_id=?");
+            preparedStatement.setLong(1, guildId);
+            preparedStatement.setLong(2, channelId);
+            preparedStatement.setLong(3, messageId);
+            var resultSet = preparedStatement.executeQuery();
+            isGiveaway = resultSet.first();
+        } catch (SQLException e) {
+            new Log(e, guild, null, "giveaway", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return isGiveaway;
+    }
+
+    public void insertGiveawayToDb(long channelId, long messageId, long hostId, String prize, Timestamp time, int amountWinners) {
+        Connection connection = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var preparedStatement = connection.prepareStatement("INSERT INTO giveawaylist(guild_id,channel_id,message_id,host_id,prize,time,amount_winners) VALUES(?,?,?,?,?,?,?)");
+            preparedStatement.setLong(1, guildId);
+            preparedStatement.setLong(2, channelId);
+            preparedStatement.setLong(3, messageId);
+            preparedStatement.setLong(4, hostId);
+            preparedStatement.setString(5, prize);
+            preparedStatement.setTimestamp(6, time);
+            preparedStatement.setInt(7, amountWinners);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            new Log(e, guild, null, "giveaway", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+    }
+
+    public void deleteGiveawayFromDb(long channelId, long messageId) {
+        Connection connection = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var delete = connection.prepareStatement("DELETE FROM giveawaylist WHERE guild_id=? AND channel_id=? AND message_id=?");
+            delete.setLong(1, guildId);
+            delete.setLong(2, channelId);
+            delete.setLong(3, messageId);
+            delete.executeUpdate();
+        } catch (SQLException e) {
+            new Log(e, guild, null, "giveaway", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+    }
+
+    public void purgeGiveawaysFromChannel(long channelId) {
+        Connection connection = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var delete = connection.prepareStatement("DELETE FROM giveawaylist WHERE guild_id=? AND channel_id=?");
+            delete.setLong(1, guildId);
+            delete.setLong(2, channelId);
+            delete.executeUpdate();
+        } catch (SQLException e) {
+            new Log(e, guild, null, "giveaway", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+    }
+
+    public void purgeGiveaways() {
+        Connection connection = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var delete = connection.prepareStatement("DELETE FROM giveawaylist WHERE guild_id=?");
+            delete.setLong(1, guildId);
+            delete.executeUpdate();
+        } catch (SQLException e) {
+            new Log(e, guild, null, "giveaway", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+    }
+
+    public String getCurrentGiveaways(JDA jda, String lang) {
+        Connection connection = null;
+        var currentGiveaways = LanguageHandler.get(lang, "giveaway_nocurrent");
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement("SELECT * FROM giveawaylist WHERE guild_id=?");
+            select.setLong(1, guildId);
+            var resultSet = select.executeQuery();
+            if (resultSet.first()) currentGiveaways = getRunningGiveaways(jda, resultSet, lang);
+        } catch (SQLException e) {
+            new Log(e, guild, null, "giveaway", null).sendLog(false);
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return currentGiveaways;
+    }
+
+    private String getRunningGiveaways(JDA jda, ResultSet resultSet, String lang) throws SQLException {
+        var giveawayList = new StringBuilder();
+        var guild = jda.getGuildById(resultSet.getLong("guild_id"));
+        if (guild == null) return giveawayList.toString();
+        var tc = guild.getTextChannelById(resultSet.getLong("channel_id"));
+        if (tc == null) return giveawayList.toString();
+        do giveawayList.append("- ")
+                .append(tc.getAsMention())
+                .append(" ").append(LanguageHandler.get(lang, "giveaway_messageid")).append(" ").append(resultSet.getLong("message_id"))
+                .append(" ").append(LanguageHandler.get(lang, "giveaway_prize")).append(" ").append(resultSet.getString("prize"))
+                .append("\n");
+        while (resultSet.next());
+
+        return giveawayList.toString();
     }
 }

@@ -8,8 +8,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageHistory;
 import utilities.Constants;
-import utilities.MessageHandler;
-import utilities.UsageEmbed;
+import utilities.MessageUtil;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
@@ -45,7 +44,7 @@ public class ClearCommand extends Command {
             var description = LanguageHandler.get(lang, "clear_description");
             var usage = String.format(LanguageHandler.get(lang, "clear_usage"), p, name, p, name, p, name);
             var hint = LanguageHandler.get(lang, "clear_hint");
-            event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+            event.reply(MessageUtil.createUsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint));
             return;
         }
 
@@ -72,7 +71,7 @@ public class ClearCommand extends Command {
             event.getMessage().delete().queue(success -> new MessageHistory(channel).retrievePast(clearValue).queue(messages -> {
                 channel.purgeMessages(messages);
 
-                new MessageHandler().sendAndExpire(
+                new MessageUtil().sendAndExpire(
                         channel,
                         new MessageBuilder().setContent(String.format(LanguageHandler.get(lang, "clear_cleared"), clearValue)).build(),
                         5 * 1000 // 5 seconds.
@@ -85,7 +84,7 @@ public class ClearCommand extends Command {
                 for (Message message : messages) if (message.getAuthor().equals(user)) deleteList.add(message);
                 var deletedMessages = channel.purgeMessages(deleteList);
 
-                deletedMessages.get(0).thenRunAsync(() -> new MessageHandler().sendAndExpire(
+                deletedMessages.get(0).thenRunAsync(() -> new MessageUtil().sendAndExpire(
                         channel,
                         new MessageBuilder().setContent(String.format(LanguageHandler.get(lang, "clear_cleared"), deleteList.size())).build(),
                         5 * 1000 // 5 seconds.

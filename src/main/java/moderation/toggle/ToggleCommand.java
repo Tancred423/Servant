@@ -6,7 +6,8 @@ import moderation.guild.GuildHandler;
 import moderation.guild.Server;
 import net.dv8tion.jda.api.Permission;
 import utilities.Constants;
-import utilities.UsageEmbed;
+import utilities.MessageUtil;
+import utilities.NameAliasUtil;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
@@ -39,11 +40,11 @@ public class ToggleCommand extends Command {
             var usage = String.format(LanguageHandler.get(lang, "toggle_usage"), p, name, p, name, p, name, p, name, p, name, p, name, p, name, p, name);
             var hint = LanguageHandler.get(lang, "toggle_hint");
 
-            event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+            event.reply(MessageUtil.createUsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint));
             return;
         }
 
-        var validFeatures = Toggle.getValidFeatures();
+        var validFeatures = NameAliasUtil.getValidToggles();
 
         var args = event.getArgs().split(" ");
         if (args.length < 2) {
@@ -51,7 +52,7 @@ public class ToggleCommand extends Command {
             return;
         }
 
-        var feature = Toggle.getAlias(args[0]);
+        var feature = NameAliasUtil.getToggleAlias(args[0]);
         // Has to be improved. Redundant text.
         if (feature == null) {
             event.reply(LanguageHandler.get(lang, "toggle_invalid_feature"));

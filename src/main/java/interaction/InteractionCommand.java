@@ -4,9 +4,10 @@ package interaction;
 import files.language.LanguageHandler;
 import moderation.guild.GuildHandler;
 import moderation.user.Master;
+import utilities.EmoteUtil;
 import utilities.JsonReader;
+import utilities.MessageUtil;
 import utilities.Parser;
-import utilities.UsageEmbed;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
@@ -24,7 +25,7 @@ public abstract class InteractionCommand extends Command {
             var usage = name.equalsIgnoreCase("dab") || name.equalsIgnoreCase("flex") ?
                     String.format(LanguageHandler.get(lang, "interaction_usage_on"), name.substring(0, 1).toUpperCase(), name.substring(1).toLowerCase(), p, name, p, name) :
                     String.format(LanguageHandler.get(lang, "interaction_usage"), name.substring(0, 1).toUpperCase(), name.substring(1).toLowerCase(), p, name, p, name);
-            event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, null).getEmbed());
+            event.reply(MessageUtil.createUsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, null));
             return;
         }
 
@@ -57,7 +58,7 @@ public abstract class InteractionCommand extends Command {
 
         var authorCount = master.getInteractionCount(name, true);
         var mentionedCount = mentionedMaster.getInteractionCount(name, false);
-        var emote = utilities.Emote.getEmote(name, guild, user);
+        var emote = EmoteUtil.getEmote(name, guild, user);
         var embed = new InteractionEmbed(name, emote, emoji, gif, user, mentionedUser, authorCount, mentionedCount, guild);
 
         event.reply(embed.getEmbed());

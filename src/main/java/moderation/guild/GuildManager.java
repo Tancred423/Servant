@@ -14,12 +14,8 @@ public class GuildManager implements GuildSettingsManager<GuildSettings> {
     }
 
     @Override
-    public void init() {
-
-    }
+    public void init() { }
 
     @Override
-    public void shutdown() {
-
-    }
+    public void shutdown() { }
 }

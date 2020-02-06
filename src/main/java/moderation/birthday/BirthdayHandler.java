@@ -10,8 +10,8 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import servant.Log;
-import utilities.Image;
-import utilities.StringFormat;
+import utilities.ImageUtil;
+import utilities.StringUtil;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.text.ParseException;
@@ -104,9 +104,9 @@ public class BirthdayHandler {
         var master = new Master(author);
 
         var lang = server.getLanguage();
-        var countdown = StringFormat.fillWithWhitespace(LanguageHandler.get(lang, "birthday_countdown"),
+        var countdown = StringUtil.fillWithWhitespace(LanguageHandler.get(lang, "birthday_countdown"),
                 String.format(LanguageHandler.get(lang, "birthday_countdown_value"), 999).length());
-        var date = StringFormat.fillWithWhitespace(LanguageHandler.get(lang, "birthday_date"), 10);
+        var date = StringUtil.fillWithWhitespace(LanguageHandler.get(lang, "birthday_date"), 10);
         var name = LanguageHandler.get(lang, "birthday_name");
 
         // birthDates: <Long UserId, String BirthDate>
@@ -149,7 +149,7 @@ public class BirthdayHandler {
                 }
 
                 // in %s days
-                sb.append(String.format(LanguageHandler.get(lang, "birthday_countdown_value"), StringFormat.pushWithWhitespace(String.valueOf(entry.getValue()), 3)))
+                sb.append(String.format(LanguageHandler.get(lang, "birthday_countdown_value"), StringUtil.pushWithWhitespace(String.valueOf(entry.getValue()), 3)))
                     .append(" ")
                     // date
                     .append(birthDates.get(entry.getKey()))
@@ -165,7 +165,7 @@ public class BirthdayHandler {
         var eb = new EmbedBuilder()
                 .setColor(master.getColor())
                 .setAuthor(String.format(LanguageHandler.get(lang, "birthday_guild"), guild.getName() + (guild.getName().toLowerCase().endsWith("s") ? "'" : "'s")), null, guild.getIconUrl())
-                .setDescription(LanguageHandler.get(lang, "birthday_howtoadd")).setFooter(LanguageHandler.get(lang, "birthday_as_of"), isAutoUpdate ? Image.getImageUrl("clock", guild, author) : null)
+                .setDescription(LanguageHandler.get(lang, "birthday_howtoadd")).setFooter(LanguageHandler.get(lang, "birthday_as_of"), isAutoUpdate ? ImageUtil.getImageUrl("clock", guild, author) : null)
                 .setTimestamp(OffsetDateTime.now());
 
         var i = 0;

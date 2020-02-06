@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import servant.Log;
 import servant.Servant;
-import utilities.Emote;
+import utilities.EmoteUtil;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -17,7 +17,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
 
-import static utilities.DatabaseConn.closeQuietly;
+import static servant.Database.closeQuietly;
 
 public class Poll {
     public static void check(JDA jda) {
@@ -81,7 +81,7 @@ public class Poll {
     }
 
     private static void removePoll(long messageId, Guild guild, User user) {
-        PollsDatabase.unsetVote(messageId, guild, user);
+        PollsDatabase.unsetPoll(messageId, guild, user);
         PollsDatabase.unsetUserVotes(messageId, guild, user);
     }
 
@@ -89,55 +89,22 @@ public class Poll {
         Map<Integer, Integer> count = new HashMap<>();
         for (int i = 0; i < 10; i++) count.put(i + 1, 0);
 
-        net.dv8tion.jda.api.entities.Emote oneEmote;
-        net.dv8tion.jda.api.entities.Emote twoEmote;
-        net.dv8tion.jda.api.entities.Emote threeEmote;
-        net.dv8tion.jda.api.entities.Emote fourEmote;
-        net.dv8tion.jda.api.entities.Emote fiveEmote;
-        net.dv8tion.jda.api.entities.Emote sixEmote;
-        net.dv8tion.jda.api.entities.Emote sevenEmote;
-        net.dv8tion.jda.api.entities.Emote eightEmote;
-        net.dv8tion.jda.api.entities.Emote nineEmote;
-        net.dv8tion.jda.api.entities.Emote tenEmote;
-
-        oneEmote = Emote.getEmote("one", guild, user);
-        twoEmote = Emote.getEmote("two", guild, user);
-        threeEmote = Emote.getEmote("three", guild, user);
-        fourEmote = Emote.getEmote("four", guild, user);
-        fiveEmote = Emote.getEmote("five", guild, user);
-        sixEmote = Emote.getEmote("six", guild, user);
-        sevenEmote = Emote.getEmote("seven", guild, user);
-        eightEmote = Emote.getEmote("eight", guild, user);
-        nineEmote = Emote.getEmote("nine", guild, user);
-        tenEmote = Emote.getEmote("ten", guild, user);
-
-        var oneEmoji = Emote.getEmoji("one");
-        var twoEmoji = Emote.getEmoji("two");
-        var threeEmoji = Emote.getEmoji("three");
-        var fourEmoji = Emote.getEmoji("four");
-        var fiveEmoji = Emote.getEmoji("five");
-        var sixEmoji = Emote.getEmoji("six");
-        var sevenEmoji = Emote.getEmoji("seven");
-        var eightEmoji = Emote.getEmoji("eight");
-        var nineEmoji = Emote.getEmoji("nine");
-        var tenEmoji = Emote.getEmoji("ten");
+        var oneEmoji = EmoteUtil.getEmoji("one");
+        var twoEmoji = EmoteUtil.getEmoji("two");
+        var threeEmoji = EmoteUtil.getEmoji("three");
+        var fourEmoji = EmoteUtil.getEmoji("four");
+        var fiveEmoji = EmoteUtil.getEmoji("five");
+        var sixEmoji = EmoteUtil.getEmoji("six");
+        var sevenEmoji = EmoteUtil.getEmoji("seven");
+        var eightEmoji = EmoteUtil.getEmoji("eight");
+        var nineEmoji = EmoteUtil.getEmoji("nine");
+        var tenEmoji = EmoteUtil.getEmoji("ten");
 
         var reactions = message.getReactions();
         for (var reaction : reactions) {
             var emote = reaction.getReactionEmote();
 
-            if (emote.isEmote()) {
-                if (emote.getEmote().equals(oneEmote)) count.put(1, reaction.getCount() - 1);
-                if (emote.getEmote().equals(twoEmote)) count.put(2, reaction.getCount() - 1);
-                if (emote.getEmote().equals(threeEmote)) count.put(3, reaction.getCount() - 1);
-                if (emote.getEmote().equals(fourEmote)) count.put(4, reaction.getCount() - 1);
-                if (emote.getEmote().equals(fiveEmote)) count.put(5, reaction.getCount() - 1);
-                if (emote.getEmote().equals(sixEmote)) count.put(6, reaction.getCount() - 1);
-                if (emote.getEmote().equals(sevenEmote)) count.put(7, reaction.getCount() - 1);
-                if (emote.getEmote().equals(eightEmote)) count.put(8, reaction.getCount() - 1);
-                if (emote.getEmote().equals(nineEmote)) count.put(9, reaction.getCount() - 1);
-                if (emote.getEmote().equals(tenEmote)) count.put(10, reaction.getCount() - 1);
-            } else {
+            if (!emote.isEmote()) {
                 if (emote.getName().equals(oneEmoji)) count.put(1, reaction.getCount() - 1);
                 if (emote.getName().equals(twoEmoji)) count.put(2, reaction.getCount() - 1);
                 if (emote.getName().equals(threeEmoji)) count.put(3, reaction.getCount() - 1);
@@ -176,8 +143,8 @@ public class Poll {
         var upvoteCount = 0;
         var downvoteCount = 0;
 
-        var upvoteEmoji = Emote.getEmoji("upvote");
-        var downvoteEmoji = Emote.getEmoji("downvote");
+        var upvoteEmoji = EmoteUtil.getEmoji("upvote");
+        var downvoteEmoji = EmoteUtil.getEmoji("downvote");
 
         var reactions = message.getReactions();
         for (var reaction : reactions) {

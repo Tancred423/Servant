@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Jan 26, 2020 at 06:42 PM
+-- Generation Time: Feb 06, 2020 at 09:58 PM
 -- Server version: 10.1.41-MariaDB-0+deb9u1
 -- PHP Version: 5.5.9-1ubuntu4
 
@@ -282,6 +282,18 @@ CREATE TABLE `interaction_count` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `join_leave_messages`
+--
+
+CREATE TABLE `join_leave_messages` (
+  `guild_id` bigint(18) NOT NULL,
+  `join_message` varchar(2000) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `leave_message` varchar(2000) COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `join_notifier`
 --
 
@@ -354,12 +366,13 @@ CREATE TABLE `reaction_role` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `reminder`
+-- Table structure for table `remindme`
 --
 
-CREATE TABLE `reminder` (
+CREATE TABLE `remindme` (
+  `ai_number` int(11) NOT NULL,
   `user_id` bigint(18) NOT NULL,
-  `reminder_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `event_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `topic` varchar(1000) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -577,6 +590,12 @@ ALTER TABLE `bio`
   ADD PRIMARY KEY (`user_id`);
 
 --
+-- Indexes for table `birthdays`
+--
+ALTER TABLE `birthdays`
+  ADD PRIMARY KEY (`guild_id`,`user_id`);
+
+--
 -- Indexes for table `birthday_gratulation`
 --
 ALTER TABLE `birthday_gratulation`
@@ -631,6 +650,12 @@ ALTER TABLE `interaction_count`
   ADD PRIMARY KEY (`user_id`,`interaction`);
 
 --
+-- Indexes for table `join_leave_messages`
+--
+ALTER TABLE `join_leave_messages`
+  ADD PRIMARY KEY (`guild_id`);
+
+--
 -- Indexes for table `join_notifier`
 --
 ALTER TABLE `join_notifier`
@@ -667,10 +692,10 @@ ALTER TABLE `reaction_role`
   ADD PRIMARY KEY (`guild_id`,`channel_id`,`message_id`,`emoji`,`emote_guild_id`,`emote_id`);
 
 --
--- Indexes for table `reminder`
+-- Indexes for table `remindme`
 --
-ALTER TABLE `reminder`
-  ADD PRIMARY KEY (`user_id`,`reminder_time`);
+ALTER TABLE `remindme`
+  ADD PRIMARY KEY (`ai_number`,`user_id`);
 
 --
 -- Indexes for table `signup`
@@ -743,6 +768,16 @@ ALTER TABLE `user_votes`
 --
 ALTER TABLE `votes`
   ADD PRIMARY KEY (`guild_id`,`channel_id`,`message_id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `remindme`
+--
+ALTER TABLE `remindme`
+  MODIFY `ai_number` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

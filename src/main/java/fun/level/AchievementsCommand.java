@@ -5,8 +5,8 @@ import files.language.LanguageHandler;
 import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import utilities.Achievement;
-import utilities.Image;
+import utilities.AchievementUtil;
+import utilities.ImageUtil;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
@@ -44,7 +44,7 @@ public class AchievementsCommand extends Command {
             master = new Master(user);
         }
 
-        var achievementEmotes = Image.getAchievementsEmotes(jda);
+        var achievementEmotes = ImageUtil.getAchievementsEmotes(jda);
         var achievementsMap = master.getAchievements();
 
         var eb = new EmbedBuilder()
@@ -69,7 +69,7 @@ public class AchievementsCommand extends Command {
             }
 
             var emote = achievementEmotes.get(entry.getKey());
-            if (emote != null) sb.append(emote.getAsMention()).append(" ").append(Achievement.getFancyName(jda, entry.getKey(), lang)).append(": ").append(entry.getValue()).append(" AP\n");
+            if (emote != null) sb.append(emote.getAsMention()).append(" ").append(AchievementUtil.getFancyName(jda, entry.getKey(), lang)).append(": ").append(entry.getValue()).append(" AP\n");
         }
 
         fieldValues.add(sb.toString());

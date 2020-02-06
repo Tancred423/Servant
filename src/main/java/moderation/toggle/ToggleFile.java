@@ -12,6 +12,7 @@ public class ToggleFile {
     private boolean bestofquote;
     private boolean birthday;
     private boolean clear;
+    private boolean deletecommands;
     private boolean join;
     private boolean leave;
     private boolean levelrole;
@@ -103,7 +104,7 @@ public class ToggleFile {
         toggle.setProperty("bestofquote", "on");
         toggle.setProperty("birthday", "on");
         toggle.setProperty("clear", "on");
-        toggle.setProperty("guild", "on");
+        toggle.setProperty("deletecommands", "off");
         toggle.setProperty("join", "on");
         toggle.setProperty("leave", "on");
         toggle.setProperty("levelrole", "on");
@@ -111,6 +112,7 @@ public class ToggleFile {
         toggle.setProperty("mediaonlychannel", "on");
         toggle.setProperty("reactionrole", "on");
         toggle.setProperty("role", "on");
+        toggle.setProperty("server", "on");
         toggle.setProperty("serversetup", "on");
         toggle.setProperty("user", "on");
         toggle.setProperty("voicelobby", "on");
@@ -178,7 +180,7 @@ public class ToggleFile {
         this.bestofquote = toggle.getProperty("bestofquote").equals("on");
         this.birthday = toggle.getProperty("birthday").equals("on");
         this.clear = toggle.getProperty("clear").equals("on");
-        this.server = toggle.getProperty("guild").equals("on");
+        this.deletecommands = toggle.getProperty("deletecommands").equals("on");
         this.join = toggle.getProperty("join").equals("on");
         this.leave = toggle.getProperty("leave").equals("on");
         this.levelrole = toggle.getProperty("levelrole").equals("on");
@@ -186,6 +188,7 @@ public class ToggleFile {
         this.mediaonlychannel = toggle.getProperty("mediaonlychannel").equals("on");
         this.reactionrole = toggle.getProperty("reactionrole").equals("on");
         this.role = toggle.getProperty("role").equals("on");
+        this.server = toggle.getProperty("server").equals("on");
         this.serversetup = toggle.getProperty("serversetup").equals("on");
         this.user = toggle.getProperty("user").equals("on");
         this.voicelobby = toggle.getProperty("voicelobby").equals("on");
@@ -244,7 +247,7 @@ public class ToggleFile {
             case "bestofquote": return bestofquote;
             case "birthday": return birthday;
             case "clear": return clear;
-            case "guild": return server;
+            case "deletecommands": return deletecommands;
             case "join": return join;
             case "leave": return leave;
             case "levelrole": return levelrole;
@@ -252,6 +255,7 @@ public class ToggleFile {
             case "mediaonlychannel": return mediaonlychannel;
             case "reactionrole": return reactionrole;
             case "role": return role;
+            case "server": return server;
             case "serversetup": return serversetup;
             case "user": return user;
             case "voicelobby": return voicelobby;

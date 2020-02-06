@@ -697,30 +697,6 @@ public class LanguageFile {
                 "Must have a verified phone on their Discordd account.");
 
         // Useful
-        /// Alarm
-        en_gb.setProperty("alarm_description", "Set up an alarm to a specific time.\n" +
-                "The date and time will take your timezone into account.\n" +
-                "If you didn't set one up, it will use UTC.\n" +
-                "To set one up, use the `%suser` command.");
-        en_gb.setProperty("alarm_usage", "Command: `%s%s \"Optional Title\" [time]`\n" +
-                "Example 1: `%s%s \"Pat Servant\" 3d 2h 1m`\n" +
-                "Example 2: `%s%s 5m");
-        en_gb.setProperty("alarm_hint", "- Time formats: d = days, h = hours, m = minutes\n" +
-                "   \u200B⤷ Also, you can use as many time-arguments as you want\n" +
-                "   \u200B⤷ Example: `%s%s \"Pat Servant\" 2d 12h 36m 1d`\n" +
-                "   \u200B⤷ Time result: `2d` + `12h` + `36m` + `1d` = 3 days, 12 hours, 36 minutes\n" +
-                "- Minutes are rounded. If you put in `1m`, you will be notifies on the **next** minute.\n" +
-                "- Seconds are not supported.");
-        en_gb.setProperty("alarm_invalidtime", "Invalid Time.");
-        en_gb.setProperty("alarm_wrongargument", "Wrong argument");
-        en_gb.setProperty("alarm_messedupargs", "You messed up your arguments.");
-        en_gb.setProperty("alarm_alreadyset", "You already have an alarm at that time!");
-        en_gb.setProperty("alarm_remind", "Hi master, here is your requested alarm.");
-        en_gb.setProperty("alarm_invalidtitle", "Invalid Title: No ending quotation mark.");
-        en_gb.setProperty("alarm_titlelength", "Invalid Title Length: The title must not be longer than 256 characters.");
-        en_gb.setProperty("alarm_missingtime", "Missing Time: You have to add time arguments.");
-        en_gb.setProperty("alarm_toobig", "Invalid Time: The given value is too big.");
-
         /// Giveaway
         en_gb.setProperty("giveaway_description", "- Start a giveaway that draws a given amount of people as winners after a given time.\n" +
                 "- List all running giveaways of the current server.");
@@ -763,24 +739,36 @@ public class LanguageFile {
                 "Nobody participated. Therefore, nobody won.");
         en_gb.setProperty("giveaway_end_manually", "%s, to end this giveaway manually click on ❌");
 
-        /// Reminder
-        en_gb.setProperty("reminder_description", "Set up a reminder to a specific date and time.\n" +
-                "The date and time will take your timezone into account.\n" +
-                "If you didn't set one up, it will use UTC.\n" +
-                "To set one up, use the `%suser` command.\n" +
-                "You can add a topic about what you want to be reminded.");
-        en_gb.setProperty("reminder_usage", "Command: `%s%s yyyy-MM-dd HH:mm [topic]`\n" +
-                "Example: `%s%s 2020-01-01 00:00 Happy New Year`");
-        en_gb.setProperty("reminder_hint", "You cannot set reminders in the past.");
-        en_gb.setProperty("reminder_missingargs", "Missing arguments! Please add a date and a time.");
-        en_gb.setProperty("reminder_past", "You cannot set up reminders in the past!");
-        en_gb.setProperty("reminder_invalidtopic", "Unsuitable topic");
-        en_gb.setProperty("reminder_success", "Added. Your message was removed for privacy.");
-        en_gb.setProperty("reminder_success_dm", "Added.");
-        en_gb.setProperty("reminder_fail", "You already have a reminder at this time.");
-        en_gb.setProperty("reminder_invalidinput", "Invalid input. Your message was removed for privacy.");
-        en_gb.setProperty("reminder_remind_notopic", "Hi master, I should remind you at this time.");
-        en_gb.setProperty("reminder_remind_topic", "Hi master, I should remind you at this time about:\n**%s**");
+        /// RemindMe
+        en_gb.setProperty("remindme_description", "Set up an RemindMe to a specific time.\n");
+        en_gb.setProperty("remindme_usage", "Command: `%s%s \"Optional Topic\" [time]`\n\n" +
+                "**Example 1 → Using Time Arguments**\n" +
+                "With topic: `%s%s \"Pat Servant\" 3d 2h 1m`\n" +
+                "W/o topic: `%s%s 5m`\n\n" +
+                "**Example 2 → Using a Date and Time**\n" +
+                "With topic: `%s%s \"Pat Servant\" 2020-31-12 23:59`\n" +
+                "W/o topic: `%s%s 2020-31-12 23:59`");
+        en_gb.setProperty("remindme_hint", "**Time Arguments**\n" +
+                "- Time formats: d = days, h = hours, m = minutes\n" +
+                "   \u200B⤷ Also, you can use as many time arguments as you want\n" +
+                "   \u200B⤷ Example: `%s%s \"Pat Servant\" 2d 12h 36m 1d`\n" +
+                "   \u200B⤷ Time result: `2d` + `12h` + `36m` + `1d` = 3 days, 12 hours, 36 minutes\n" +
+                "- Seconds are not supported.\n\n" +
+                "**Date and Time**\n" +
+                "- You cannot set reminders in the past.\n" +
+                "- You have to use the 24-hour system.\n" +
+                "- It take your timezone into account.\n" +
+                "- If you didn't set one up, it will use UTC.\n" +
+                "- To set one up, use the `%suser` command.");
+        en_gb.setProperty("remindme_invalidtime", "Invalid Time.");
+        en_gb.setProperty("remindme_wrongargument", "Wrong argument");
+        en_gb.setProperty("remindme_messedupargs", "You messed up your arguments.");
+        en_gb.setProperty("remindme_remind", "Hi master, here is your requested alarm.");
+        en_gb.setProperty("remindme_invalidtopic", "Invalid Topic: No ending quotation mark.");
+        en_gb.setProperty("remindme_topiclength", "Invalid Topic Length: The topic must not be longer than 1000 characters.");
+        en_gb.setProperty("remindme_missingtime", "Missing Time: You have to add time arguments.");
+        en_gb.setProperty("remindme_toobig", "Invalid Time: The given value is too big.");
+        en_gb.setProperty("remindme_past", "You cannot set up a RemindMe in the past!");
 
         /// Signup
         en_gb.setProperty("signup_description", "Let people sign up for an event (e.g. a raid).\n" +
@@ -1006,7 +994,7 @@ public class LanguageFile {
         en_gb.setProperty("love_noself_50", "I bet you can be friends. :)");
         en_gb.setProperty("love_noself_42", "You found the answer.");
         en_gb.setProperty("love_noself_40", "At least you are trying.");
-        en_gb.setProperty("love_noself_30", "I think this won't work out.");
+        en_gb.setProperty("love_noself_30", "I don't think this will work out.");
         en_gb.setProperty("love_noself_20", "At least a bit, amirite.");
         en_gb.setProperty("love_noself_10", "Dats pretty low, tho.");
         en_gb.setProperty("love_noself_0", "Well, that won't work out.");
@@ -1165,8 +1153,8 @@ public class LanguageFile {
         de_de.setProperty("addgif_direct_link", "Keine gültige GIF URL. Es muss ein direct link sein!");
 
         /// Blacklist
-        de_de.setProperty("blacklist_missingid", "Add an ID");
-        de_de.setProperty("blacklist_empty", "No blacklisted ID's.");
+        de_de.setProperty("blacklist_missingid", "Füge eine ID hinzu");
+        de_de.setProperty("blacklist_empty", "Keine geblacklisteten IDs.");
 
         /// Server List
         de_de.setProperty("guildlist_members", "Mitglieder");
@@ -1761,30 +1749,6 @@ public class LanguageFile {
                 "Must have a verified phone on their Discordd account.");
 
         // Useful
-        /// Alarm
-        de_de.setProperty("alarm_description", "Set up an alarm to a specific time.\n" +
-                "The date and time will take your timezone into account.\n" +
-                "If you didn't set one up, it will use UTC.\n" +
-                "To set one up, use the `%suser` command.");
-        de_de.setProperty("alarm_usage", "Command: `%s%s \"Optional Title\" [time]`\n" +
-                "Example 1: `%s%s \"Pat Servant\" 3d 2h 1m`\n" +
-                "Example 2: `%s%s 5m");
-        de_de.setProperty("alarm_hint", "- Time formats: d = days, h = hours, m = minutes\n" +
-                "   \u200B⤷ Also, you can use as many time-arguments as you want\n" +
-                "   \u200B⤷ Example: `%s%s \"Pat Servant\" 2d 12h 36m 1d`\n" +
-                "   \u200B⤷ Time result: `2d` + `12h` + `36m` + `1d` = 3 days, 12 hours, 36 minutes\n" +
-                "- Minutes are rounded. If you put in `1m`, you will be notifies on the **next** minute.\n" +
-                "- Seconds are not supported.");
-        de_de.setProperty("alarm_invalidtime", "Invalid Time.");
-        de_de.setProperty("alarm_wrongargument", "Wrong argument");
-        de_de.setProperty("alarm_messedupargs", "You messed up your arguments.");
-        de_de.setProperty("alarm_alreadyset", "You already have an alarm at that time!");
-        de_de.setProperty("alarm_remind", "Hi master, here is your requested alarm.");
-        de_de.setProperty("alarm_invalidtitle", "Invalid Title: No ending quotation mark.");
-        de_de.setProperty("alarm_titlelength", "Invalid Title Length: The title must not be longer than 256 characters.");
-        de_de.setProperty("alarm_missingtime", "Missing Time: You have to add time arguments.");
-        de_de.setProperty("alarm_toobig", "Invalid Time: The given value is too big.");
-
         /// Giveaway
         de_de.setProperty("giveaway_description", "- Start a giveaway that draws a given amount of people as winners after a given time.\n" +
                 "- List all running giveaways of the current server.");
@@ -1827,24 +1791,36 @@ public class LanguageFile {
                 "Nobody participated. Therefore, nobody won.");
         de_de.setProperty("giveaway_end_manually", "%s, um dieses Giveaway manuell zu beenden, drücke auf ❌");
 
-        /// Reminder
-        de_de.setProperty("reminder_description", "Set up a reminder to a specific date and time.\n" +
-                "The date and time will take your timezone into account.\n" +
-                "If you didn't set one up, it will use UTC.\n" +
-                "To set one up, use the `%suser` command.\n" +
-                "You can add a topic about what you want to be reminded.");
-        de_de.setProperty("reminder_usage", "Command: `%s%s yyyy-MM-dd HH:mm [topic]`\n" +
-                "Example: `%s%s 2020-01-01 00:00 Happy New Year`");
-        de_de.setProperty("reminder_hint", "You cannot set reminders in the past.");
-        de_de.setProperty("reminder_missingargs", "Missing arguments! Please add a date and a time.");
-        de_de.setProperty("reminder_past", "You cannot set up reminders in the past!");
-        de_de.setProperty("reminder_invalidtopic", "Unsuitable topic");
-        de_de.setProperty("reminder_success", "Added. Your message was removed for privacy.");
-        de_de.setProperty("reminder_success_dm", "Added.");
-        de_de.setProperty("reminder_fail", "You already have a reminder at this time.");
-        de_de.setProperty("reminder_invalidinput", "Invalid input. Your message was removed for privacy.");
-        de_de.setProperty("reminder_remind_notopic", "Hi master, I should remind you at this time.");
-        de_de.setProperty("reminder_remind_topic", "Hi master, I should remind you at this time about:\n**%s**");
+        /// RemindMe
+        de_de.setProperty("remindme_description", "Erstelle eine Erinnerung zu einer spezifischen Zeit.\n");
+        de_de.setProperty("remindme_usage", "Befehl: `%s%s \"Optionale Beschreibung\" [time]`\n\n" +
+                "**Beispiel 1 → Mit Zeitangaben**\n" +
+                "Mit Beschreibung: `%s%s \"Pat Servant\" 3d 2h 1m`\n" +
+                "Ohne Beschreibung: `%s%s 5m`\n\n" +
+                "**Beispiel 2 → Mit Datum und Zeit**\n" +
+                "Mit Beschreibung: `%s%s \"Pat Servant\" 2020-31-12 23:59`\n" +
+                "Ohne Beschreibung: `%s%s 2020-31-12 23:59`");
+        de_de.setProperty("remindme_hint", "**Zeitangaben**\n" +
+                "- Zeit Formate: d = Tage, h = Stunden, m = Minuten\n" +
+                "   \u200B⤷ Außerdem kannst du so viele Zeitangaben setzen wie du willst.t\n" +
+                "   \u200B⤷ Beispiel: `%s%s \"Pat Servant\" 2d 12h 36m 1d`\n" +
+                "   \u200B⤷ Zeitergebnis: `2d` + `12h` + `36m` + `1d` = 3 Tage, 12 Stunden, 36 Minuten\n" +
+                "- Sekunden werden nicht unterstützt.\n\n" +
+                "**Datum und Zeit**\n" +
+                "- Du kannst keine Erinnerungen in der Vergangenheit erstellen.\n" +
+                "- Du musst das 24-Stunden-System benutzen.\n" +
+                "- Es benutzt deine eingestellte Zeitzone.\n" +
+                "- Wenn du keine eingestellt hast, wird UTC benutzt.\n" +
+                "- Um eine einzustellen benutze den `%suser` Befehl.");
+        de_de.setProperty("remindme_invalidtime", "Ungültige Zeit.");
+        de_de.setProperty("remindme_wrongargument", "Falsche Eingabe.");
+        de_de.setProperty("remindme_messedupargs", "Du hast deine Eingaben durcheinander gebracht.");
+        de_de.setProperty("remindme_remind", "Hi Meister, hier ist dein angefordertes RemindMe.");
+        de_de.setProperty("remindme_invalidtopic", "Ungültige Beschreibung: Kein abschließendes Anführungszeichen.");
+        de_de.setProperty("remindme_topiclength", "Ungültige Länge der Beschreibung: Die Beschreibung darf nicht mehr als 1000 Zeichen beinhalten.");
+        de_de.setProperty("remindme_missingtime", "Fehlende Zeitangabe: Du musst Zeitangaben hinzufügen.");
+        de_de.setProperty("remindme_toobig", "Ungültige Zeitangabe: Die gegebenen Zeitangaben sind zu groß.");
+        de_de.setProperty("remindme_past", "Du kannst keinen RemindMe in der Vergangenheit einstellen!");
 
         /// Signup
         de_de.setProperty("signup_description", "Let people sign up for an event (e.g. a raid).\n" +

@@ -9,7 +9,8 @@ import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageReaction;
 import utilities.Constants;
-import utilities.UsageEmbed;
+import utilities.EmoteUtil;
+import utilities.MessageUtil;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
@@ -40,7 +41,7 @@ public class ReactionRoleCommand extends Command {
         var author = event.getAuthor();
         var lang = LanguageHandler.getLanguage(event);
         var p = GuildHandler.getPrefix(event);
-        var tancWave = utilities.Emote.getEmote("tancWave", guild, author);
+        var tancWave = EmoteUtil.getEmote("tancWave", guild, author);
         if (tancWave == null) return;
 
         if (event.getArgs().isEmpty()) {
@@ -48,7 +49,7 @@ public class ReactionRoleCommand extends Command {
             var usage = String.format(LanguageHandler.get(lang, "reactionrole_usage"), p, name, p, name, tancWave.getAsMention(), p, name, p, name, tancWave.getAsMention());
             var hint = LanguageHandler.get(lang, "reactionrole_hint");
 
-            event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+            event.reply(MessageUtil.createUsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint));
             return;
         }
 

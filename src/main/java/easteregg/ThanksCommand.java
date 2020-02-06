@@ -5,8 +5,8 @@ import moderation.user.Master;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
-import utilities.Emote;
-import utilities.MessageHandler;
+import utilities.EmoteUtil;
+import utilities.MessageUtil;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
@@ -31,7 +31,7 @@ public class ThanksCommand extends Command {
         var guild = event.getGuild();
         var user = event.getAuthor();
 
-        event.reply("You're welcome " + Emote.getEmoteMention(event.getJDA(), "love", guild, user));
+        event.reply("You're welcome " + EmoteUtil.getEmoteMention(event.getJDA(), "love", guild, user));
         checkAchievement(user, event.getMessage());
     }
 
@@ -40,7 +40,7 @@ public class ThanksCommand extends Command {
         var achievements = master.getAchievements();
         if (!achievements.containsKey("kind")) {
             master.setAchievement("kind", 10);
-            new MessageHandler().reactAchievement(message);
+            new MessageUtil().reactAchievement(message);
         }
     }
 }

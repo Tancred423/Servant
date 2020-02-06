@@ -5,8 +5,8 @@ import files.language.LanguageHandler;
 import moderation.guild.GuildHandler;
 import net.dv8tion.jda.api.Permission;
 import utilities.Constants;
-import utilities.StringFormat;
-import utilities.UsageEmbed;
+import utilities.MessageUtil;
+import utilities.StringUtil;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
@@ -39,13 +39,13 @@ public class FlipCommand extends Command {
             var description = LanguageHandler.get(lang, "flip_description");
             var usage = String.format(LanguageHandler.get(lang, "flip_usage"), p, name);
             var hint = String.format(LanguageHandler.get(lang, "flip_hint"), p);
-            event.reply(new UsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint).getEmbed());
+            event.reply(MessageUtil.createUsageEmbed(name, event.getAuthor(), description, ownerCommand, userPermissions, aliases, usage, hint));
             return;
         }
 
         var mentioned = message.getMentionedMembers().get(0);
         var effectiveName = mentioned.getEffectiveName();
-        var flipped = StringFormat.flipString(effectiveName);
+        var flipped = StringUtil.flipString(effectiveName);
         event.reply("(╯°□°)╯︵ " + flipped);
         var selfMember = event.getGuild().getMemberById(event.getSelfUser().getIdLong());
         if (selfMember != null && selfMember.canInteract(mentioned))
