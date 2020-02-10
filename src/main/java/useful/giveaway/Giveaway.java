@@ -1,7 +1,7 @@
 package useful.giveaway;
 
-import net.dv8tion.jda.api.entities.User;
-import servant.Log;
+import net.dv8tion.jda.api.JDA;
+import servant.LoggingTask;
 import servant.Servant;
 
 import java.sql.Connection;
@@ -11,6 +11,8 @@ import java.sql.Timestamp;
 import static servant.Database.closeQuietly;
 
 public class Giveaway {
+    private JDA jda;
+
     private long guildId;   // key
     private long channelId; // key
     private long messageId; // key
@@ -19,15 +21,17 @@ public class Giveaway {
     private Timestamp time;
     private int amountWinners;
 
-    public Giveaway(long guildId, long channelId, long messageId, User botUser) {
+    public Giveaway(JDA jda, long guildId, long channelId, long messageId) {
+        this.jda = jda;
+
         this.guildId = guildId;
         this.channelId = channelId;
         this.messageId = messageId;
 
-        setAttributes(botUser);
+        setAttributes();
     }
 
-    private void setAttributes(User botUser) {
+    private void setAttributes() {
         Connection connection = null;
 
         try {
@@ -45,25 +49,14 @@ public class Giveaway {
                 amountWinners = resultSet.getInt("amount_winners");
             }
         } catch (SQLException e) {
-            new Log(e, null, botUser, "giveaway", null).sendLog(false);
+            new LoggingTask(e, jda, "Giveaway#setAttributes");
         } finally {
             closeQuietly(connection);
         }
     }
 
-    public long getHostId() {
-        return hostId;
-    }
-
-    public String getPrize() {
-        return prize;
-    }
-
-    public Timestamp getTime() {
-        return time;
-    }
-
-    public int getAmountWinners() {
-        return amountWinners;
-    }
+    public long getHostId() { return hostId; }
+    public String getPrize() { return prize; }
+    public Timestamp getTime() { return time; }
+    public int getAmountWinners() { return amountWinners; }
 }

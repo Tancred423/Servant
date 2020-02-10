@@ -1,8 +1,7 @@
 // Author: Tancred423 (https://github.com/Tancred423)
-package useful.timezone;
+package utilities;
 
-public class Timezone {
-
+public class TimezoneUtil {
     public static String getOffset(String timezone) {
         switch (timezone.toLowerCase()) {
             case "acdt": return "+10:30";

@@ -130,7 +130,7 @@ public class ServerInfoCommand extends Command {
                         (streamRole == null ? LanguageHandler.get(lang, "serverinfo_nolivestream_role") : streamRole.getAsMention()) + "\n" +
                         (server.isStreamerMode() ? LanguageHandler.get(lang, "serverinfo_streamermode") : LanguageHandler.get(lang, "serverinfo_publicmode")), true);
 
-        var lobbies = server.getLobbies();
+        var lobbies = server.getVoiceLobbies();
         var sb = new StringBuilder();
         if (!lobbies.isEmpty())
             for (Long lobbyId : lobbies) {

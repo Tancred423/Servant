@@ -42,7 +42,7 @@ public class RefreshCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, Servant.threadPool);
+        }, Servant.fixedThreadPool);
     }
 
     private void assignLevelAchievement(CommandEvent event) {

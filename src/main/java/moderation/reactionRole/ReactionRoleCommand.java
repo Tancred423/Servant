@@ -1,9 +1,8 @@
 // Author: Tancred423 (https://github.com/Tancred423)
-package moderation;
+package moderation.reactionRole;
 
 import files.language.LanguageHandler;
 import moderation.guild.GuildHandler;
-import moderation.guild.Server;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -38,10 +37,9 @@ public class ReactionRoleCommand extends Command {
     @Override
     protected void execute(CommandEvent event) {
         var guild = event.getGuild();
-        var author = event.getAuthor();
         var lang = LanguageHandler.getLanguage(event);
         var p = GuildHandler.getPrefix(event);
-        var tancWave = EmoteUtil.getEmote("tancWave", guild, author);
+        var tancWave = EmoteUtil.getEmote(event.getJDA(), "tancWave");
         if (tancWave == null) return;
 
         if (event.getArgs().isEmpty()) {
@@ -58,7 +56,6 @@ public class ReactionRoleCommand extends Command {
         long channelId;
         MessageChannel reactionChannel;
         long messageId;
-        var internalGuild = new Server(guild);
 
         switch (args[0].toLowerCase()) {
             case "set":
@@ -106,14 +103,17 @@ public class ReactionRoleCommand extends Command {
                     else roleId = message.getMentionedRoles().get(0).getIdLong();
                     event.getGuild().getRoleById(roleId);
 
-                    var success = internalGuild.setReactionRole(
-                            event.getGuild().getIdLong(),
+                    var reactionRole = new ReactionRole(
+                            event.getJDA(),
+                            guild.getIdLong(),
                             channelId,
                             messageId,
                             emoji,
                             (emote == null ? 0 : (emote.getGuild() == null ? 0 : emote.getGuild().getIdLong())),
-                            (emote == null ? 0 : emote.getIdLong()),
-                            roleId);
+                            (emote == null ? 0 : emote.getIdLong())
+                    );
+
+                    var success = reactionRole.set(roleId);
 
                     if (success) {
                         event.reactError();
@@ -158,14 +158,17 @@ public class ReactionRoleCommand extends Command {
                     if (emoji == null && emote != null) message.addReaction(emote).queue();
                     else if (emoji != null) message.addReaction(emoji).queue();
 
-                    boolean success;
-                    success = internalGuild.unsetReactionRole(
-                            event.getGuild().getIdLong(),
+                    var reactionRole = new ReactionRole(
+                            event.getJDA(),
+                            guild.getIdLong(),
                             channelId,
                             messageId,
                             emoji,
                             (emote == null ? 0 : (emote.getGuild() == null ? 0 : emote.getGuild().getIdLong())),
-                            (emote == null ? 0 : emote.getIdLong()));
+                            (emote == null ? 0 : emote.getIdLong())
+                    );
+
+                    boolean success = reactionRole.unset();
 
                     if (success) {
                         event.reactError();

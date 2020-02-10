@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import servant.Log;
+import servant.LoggingTask;
 import utilities.ImageUtil;
 import utilities.StringUtil;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
@@ -42,7 +42,7 @@ public class BirthdayHandler {
                         if (list == null) server.unsetBirthdayMessage();
                         else message.editMessage(list).queue();
                     } catch (ParseException e) {
-                        new Log(e, guild, authorMember.getUser(), "BirthdayHandler - Update Lists", null).sendLog(false);
+                        new LoggingTask(e, jda, "BirthdayHandler#updateLists");
                     }
                 });
             }
@@ -165,7 +165,7 @@ public class BirthdayHandler {
         var eb = new EmbedBuilder()
                 .setColor(master.getColor())
                 .setAuthor(String.format(LanguageHandler.get(lang, "birthday_guild"), guild.getName() + (guild.getName().toLowerCase().endsWith("s") ? "'" : "'s")), null, guild.getIconUrl())
-                .setDescription(LanguageHandler.get(lang, "birthday_howtoadd")).setFooter(LanguageHandler.get(lang, "birthday_as_of"), isAutoUpdate ? ImageUtil.getImageUrl("clock", guild, author) : null)
+                .setDescription(LanguageHandler.get(lang, "birthday_howtoadd")).setFooter(LanguageHandler.get(lang, "birthday_as_of"), isAutoUpdate ? ImageUtil.getImageUrl(guild.getJDA(), "clock") : null)
                 .setTimestamp(OffsetDateTime.now());
 
         var i = 0;

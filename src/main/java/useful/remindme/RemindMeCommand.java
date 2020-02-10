@@ -3,16 +3,21 @@ package useful.remindme;
 
 import files.language.LanguageHandler;
 import moderation.guild.GuildHandler;
+import moderation.guild.Server;
 import moderation.user.Master;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import servant.Servant;
 import useful.InvalidTopicException;
 import utilities.Constants;
+import utilities.EmoteUtil;
+import utilities.ImageUtil;
 import utilities.MessageUtil;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.sql.Timestamp;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -28,7 +33,7 @@ public class RemindMeCommand extends Command {
         this.category = new Category("Useful");
         this.arguments = null;
         this.hidden = false;
-        this.guildOnly = false;
+        this.guildOnly = true;
         this.ownerCommand = false;
         this.cooldown = Constants.USER_COOLDOWN;
         this.cooldownScope = CooldownScope.USER;
@@ -41,6 +46,8 @@ public class RemindMeCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
+        var guild = event.getGuild();
+        var server = new Server(guild);
         var user = event.getAuthor();
         var master = new Master(user);
 
@@ -61,22 +68,34 @@ public class RemindMeCommand extends Command {
             var topic = parseTopic(event, contentSplit);
             var eventTime = parseTime(event, contentSplit, topic);
 
-            var aiNumber = master.setRemindMe(eventTime, topic == null ? "" : topic);
-            var remindMe = master.getRemindMe(aiNumber);
+            var upvote = EmoteUtil.getEmoji("upvote");
+            if (upvote == null) return;
 
-            /* Execute new RemindMe to given time.
-             * In case the bot restarts, this service will break.
-             * Therefore we will run any current RemindMe in the database
-             * from listeners.ReadyListener#startExecutorNew.
-             */
-            var delayInMillis = eventTime.toInstant().toEpochMilli() - System.currentTimeMillis();
-            Servant.remindMeService.schedule(
-                    new RemindMeSenderTask(event.getJDA(), remindMe),
-                    delayInMillis,
-                    TimeUnit.MILLISECONDS
-            );
+            event.getChannel().sendMessage(new EmbedBuilder()
+                    .setColor(master.getColor())
+                    .setAuthor(String.format(LanguageHandler.get(lang, "remindme_of"), user.getName()), null, user.getEffectiveAvatarUrl())
+                    .setDescription((topic == null ? "" : String.format(LanguageHandler.get(lang, "remindme_topic"), topic)) + "\n" +
+                           String.format(LanguageHandler.get(lang, "remindme_also"), upvote))
+                    .setFooter(LanguageHandler.get(lang, "remindme_at"), ImageUtil.getImageUrl(event.getJDA(), "clock"))
+                    .setTimestamp(OffsetDateTime.ofInstant(eventTime.toInstant(), ZoneId.ofOffset("", ZoneOffset.of(master.getOffset()))))
+                    .build()).queue(message -> {
+                message.addReaction(upvote).queue();
 
-            event.reactSuccess();
+                var aiNumber = server.setRemindMe(event.getChannel().getIdLong(), message.getIdLong(), user.getIdLong(), eventTime, topic == null ? "" : topic);
+                var remindMe = server.getRemindMe(aiNumber);
+
+                /* Execute new RemindMe to given time.
+                 * In case the bot restarts, this service will break.
+                 * Therefore we will run any current RemindMe in the database
+                 * from listeners.ReadyListener#startExecutorNew.
+                 */
+                var delayInMillis = eventTime.toInstant().toEpochMilli() - System.currentTimeMillis();
+                Servant.remindMeService.schedule(
+                        new RemindMeSenderTask(event.getJDA(), remindMe, lang),
+                        delayInMillis,
+                        TimeUnit.MILLISECONDS
+                );
+            });
         } catch (InvalidTopicException | InvalidTimeException e) {
             event.replyError(e.getMessage());
         }
@@ -115,7 +134,6 @@ public class RemindMeCommand extends Command {
         var remindMe = ZonedDateTime.now(ZoneOffset.of(new Master(event.getAuthor()).getOffset()));
         if (topic == null) {
             // No topic
-
             var isTimeArguments = false;
             var firstArg = contentSplit[0];
             if (firstArg.endsWith("d") || firstArg.endsWith("h") || firstArg.endsWith("m")) isTimeArguments = true;
@@ -171,7 +189,11 @@ public class RemindMeCommand extends Command {
                 }
             }
 
-            return Timestamp.from(remindMe.toInstant());
+            // RemindMe can only be placed within the next month.
+            if (remindMe.toInstant().toEpochMilli() > OffsetDateTime.now(ZoneOffset.UTC).plusMonths(1).toInstant().toEpochMilli()) {
+                event.reactWarning();
+                throw new InvalidTimeException(LanguageHandler.get(lang, "remindme_month"));
+            } else return Timestamp.from(remindMe.toInstant());
         } else {
             // Has a topic
             if (contentSplit.length > 1) {
@@ -179,6 +201,10 @@ public class RemindMeCommand extends Command {
                 for (int i = 0; i < contentSplit.length; i++) {
                     if (contentSplit[i].endsWith("\"") && !(contentSplit[i].equals("\"") && counter == 0)) {
                         var isTimeArguments = false;
+
+                        if (i+1 == contentSplit.length)
+                            throw new InvalidTimeException(LanguageHandler.get(lang, "remindme_missingtime"));
+
                         var firstArg = contentSplit[i + 1];
                         if (firstArg.endsWith("d") || firstArg.endsWith("h") || firstArg.endsWith("m")) isTimeArguments = true;
 
@@ -242,7 +268,11 @@ public class RemindMeCommand extends Command {
                             }
                         }
 
-                        return Timestamp.from(remindMe.toInstant());
+                        // RemindMe can only be placed within the next month.
+                        if (remindMe.toInstant().toEpochMilli() > OffsetDateTime.now(ZoneOffset.UTC).plusMonths(1).toInstant().toEpochMilli()) {
+                            event.reactWarning();
+                            throw new InvalidTimeException(LanguageHandler.get(lang, "remindme_month"));
+                        } else return Timestamp.from(remindMe.toInstant());
                     }
                     counter++;
                 }

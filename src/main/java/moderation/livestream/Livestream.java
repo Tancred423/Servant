@@ -33,11 +33,11 @@ public class Livestream {
     public static void sendNotification(User author, Activity newActuvuty, net.dv8tion.jda.api.entities.Guild guild, Server internalGuild, boolean isStreamerMode, String lang) {
         if (internalGuild.getStreamChannelId() != 0) {
             var tc = guild.getTextChannelById(internalGuild.getStreamChannelId());
-            if (tc != null) tc.sendMessage(getNotifyMessage(author, newActuvuty, new Master(author), isStreamerMode, lang, guild)).queue();
+            if (tc != null) tc.sendMessage(getNotifyMessage(author, newActuvuty, new Master(author), isStreamerMode, lang)).queue();
         }
     }
 
-    public static Message getNotifyMessage(User author, Activity newActivity, Master internalUser, boolean isStreamerMode, String lang, net.dv8tion.jda.api.entities.Guild guild) {
+    public static Message getNotifyMessage(User author, Activity newActivity, Master internalUser, boolean isStreamerMode, String lang) {
         MessageBuilder mb = new MessageBuilder();
         EmbedBuilder eb = new EmbedBuilder();
         if (isStreamerMode) mb.setContent("@here");

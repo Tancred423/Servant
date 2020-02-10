@@ -14,7 +14,6 @@ import servant.Servant;
 
 import java.util.LinkedList;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 public class GuildVoiceMoveListener extends ListenerAdapter {
     // This event will be thrown if a user moves to a voice channel from a vc.
@@ -31,55 +30,58 @@ public class GuildVoiceMoveListener extends ListenerAdapter {
          */
         if (guild.getIdLong() == 264445053596991498L) return; // Discord Bot List
         if (user.isBot()) return;
-        if (Blacklist.isBlacklisted(user, guild)) return;
+        if (Blacklist.isBlacklisted(guild, user)) return;
 
         CompletableFuture.runAsync(() -> {
             var channel = event.getChannelJoined();
             var server = new Server(guild);
-            var channels = server.getLobbies();
+            var channels = server.getVoiceLobbies();
             var lang = server.getLanguage();
 
             // Voice Lobby
             if (Toggle.isEnabled(event, "voicelobby")) {
-                if (channels.contains(channel.getIdLong())) processVoiceLobby(event, guild, server, user, member, lang);
+                if (channels.contains(channel.getIdLong())) processVoiceLobby(event, guild, user, member, lang);
             }
-        }, Servant.threadPool);
+        }, Servant.fixedThreadPool);
     }
 
-    private static void processVoiceLobby(GuildVoiceMoveEvent event, net.dv8tion.jda.api.entities.Guild guild, Server internalGuild, User user, Member member, String lang) {
+    private static void processVoiceLobby(GuildVoiceMoveEvent event, net.dv8tion.jda.api.entities.Guild guild, User user, Member member, String lang) {
         var active = new LinkedList<VoiceChannel>();
         // Join
         var joinedChannel = event.getChannelJoined();
         joinedChannel.createCopy().queue(newChannel ->
-                newChannel.getManager().setName(VoiceLobby.getLobbyName(member, lang)).queue(name ->
+                newChannel.getManager().setName(VoiceLobby.getVoiceLobbyName(member, lang)).queue(name ->
                         newChannel.getManager().setParent(joinedChannel.getParent()).queue(parent ->
                                 guild.modifyVoiceChannelPositions().selectPosition(newChannel).moveTo(joinedChannel.getPosition() + 1).queue(position ->
                                         guild.moveVoiceMember(member, newChannel).queue(move -> {
-                                            internalGuild.setActiveLobby(newChannel.getIdLong());
+                                            new VoiceLobby(event.getJDA(), guild.getIdLong(), newChannel.getIdLong()).setActive();
+                                            new java.util.Timer().schedule(
+                                                    new java.util.TimerTask() {
+                                                        @Override
+                                                        public void run() {
+                                                            var activeIds = VoiceLobby.getActive(event.getJDA());
 
-                                            try {
-                                                TimeUnit.MILLISECONDS.sleep(2000);
-                                            } catch (InterruptedException e) {
-                                                e.printStackTrace();
-                                            }
+                                                            for (var activeId : activeIds) {
+                                                                if (event.getJDA().getVoiceChannelById(activeId) != null)
+                                                                    active.add(event.getJDA().getVoiceChannelById(activeId));
+                                                                else
+                                                                    new VoiceLobby(event.getJDA(), guild.getIdLong(), activeId).unsetActive();
+                                                            }
 
-                                            var activeIds = internalGuild.getActiveLobbies();
-
-                                            for (var activeId : activeIds) {
-                                                if (event.getJDA().getVoiceChannelById(activeId) != null)
-                                                    active.add(event.getJDA().getVoiceChannelById(activeId));
-                                                else internalGuild.unsetActiveLobby(activeId);
-                                            }
-
-                                            for (int i = 0; i < active.size(); i++) {
-                                                if (active.get(i).getMembers().size() == 0) {
-                                                    var vc = event.getJDA().getVoiceChannelById(active.get(i).getIdLong());
-                                                    if (vc != null) {
-                                                        vc.delete().queue();
-                                                        active.remove(active.get(i));
-                                                    }
-                                                }
-                                            }
+                                                            for (int i = 0; i < active.size(); i++) {
+                                                                if (active.get(i).getMembers().size() == 0) {
+                                                                    var vc = event.getJDA().getVoiceChannelById(active.get(i).getIdLong());
+                                                                    if (vc != null) {
+                                                                        vc.delete().queue(success -> {
+                                                                        }, failure -> {
+                                                                        });
+                                                                        active.remove(active.get(i));
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }, 2000
+                                            );
                                         })
                                 )
                         )

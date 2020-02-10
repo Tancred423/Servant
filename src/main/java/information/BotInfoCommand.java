@@ -35,7 +35,6 @@ public class BotInfoCommand extends Command {
     protected void execute(CommandEvent event) {
         var jda = event.getJDA();
         var lang = LanguageHandler.getLanguage(event);
-        var guild = event.getGuild();
         var user = event.getAuthor();
         var master = new Master(user);
         var selfUser = event.getSelfUser();
@@ -53,7 +52,7 @@ public class BotInfoCommand extends Command {
                 .addField(LanguageHandler.get(lang, "botinfo_stats"), totalGuilds + " Servers\nShard " + (jda.getShardInfo().getShardId() + 1) + "/" + jda.getShardInfo().getShardTotal(), true)
                 .addField(LanguageHandler.get(lang, "botinfo_shard"), jda.getUsers().size() + " Users\n" + jda.getGuilds().size() + " Servers", true)
                 .addField(LanguageHandler.get(lang, "botinfo_channels"), jda.getTextChannels().size() + " Text Channels\n" + jda.getVoiceChannels().size() + " Voice Channels", true)
-                .setFooter(LanguageHandler.get(lang, "botinfo_restart"), ImageUtil.getImageUrl("clock", guild, user))
+                .setFooter(LanguageHandler.get(lang, "botinfo_restart"), ImageUtil.getImageUrl(jda, "clock"))
                 .setTimestamp(event.getClient().getStartTime())
                 .build()
         );

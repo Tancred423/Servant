@@ -3,9 +3,7 @@ package utilities;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Emote;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.User;
-import servant.Log;
+import servant.LoggingTask;
 import servant.Servant;
 
 import java.sql.Connection;
@@ -16,7 +14,7 @@ import java.util.Map;
 import static servant.Database.closeQuietly;
 
 public class ImageUtil {
-    public static String getImageUrl(String imageName, Guild guild, User user) {
+    public static String getImageUrl(JDA jda, String imageName) {
         Connection connection = null;
         String imageUrl = null;
 
@@ -27,7 +25,7 @@ public class ImageUtil {
             var resultSet = select.executeQuery();
             if (resultSet.first()) imageUrl = resultSet.getString("image_url");
         } catch (SQLException e) {
-            new Log(e, guild, user, "Image.java", null).sendLog(false);
+            new LoggingTask(e, jda, "ImageUtil#getImageUrl");
         } finally {
             closeQuietly(connection);
         }

@@ -30,39 +30,39 @@ public class GuildVoiceJoinListener extends ListenerAdapter {
          */
         if (guild.getIdLong() == 264445053596991498L) return; // Discord Bot List
         if (user.isBot()) return;
-        if (Blacklist.isBlacklisted(user, guild)) return;
+        if (Blacklist.isBlacklisted(guild, user)) return;
 
         CompletableFuture.runAsync(() -> {
             var channel = event.getChannelJoined();
             var server = new Server(guild);
-            var channels = server.getLobbies();
+            var channels = server.getVoiceLobbies();
             var lang = server.getLanguage();
 
             // Voice Lobby
             if (Toggle.isEnabled(event, "voicelobby")) {
-                if (channels.contains(channel.getIdLong())) processVoiceLobby(event, guild, server, user, member, channel, lang);
+                if (channels.contains(channel.getIdLong())) processVoiceLobby(event, guild, user, member, channel, lang);
             }
-        }, Servant.threadPool);
+        }, Servant.fixedThreadPool);
     }
 
-    private static void processVoiceLobby(GuildVoiceJoinEvent event, net.dv8tion.jda.api.entities.Guild guild, Server internalGuild, User user, Member member, VoiceChannel channel, String lang) {
+    private static void processVoiceLobby(GuildVoiceJoinEvent event, net.dv8tion.jda.api.entities.Guild guild, User user, Member member, VoiceChannel channel, String lang) {
         var active = new LinkedList<VoiceChannel>();
         channel.createCopy().queue(newChannel ->
                 newChannel.getManager().setParent(channel.getParent()).queue(parent ->
-                        newChannel.getManager().setName(VoiceLobby.getLobbyName(member, lang)).queue(name ->
+                        newChannel.getManager().setName(VoiceLobby.getVoiceLobbyName(member, lang)).queue(name ->
                                 guild.modifyVoiceChannelPositions().selectPosition(newChannel).moveTo(channel.getPosition() + 1).queue(position ->
                                         guild.moveVoiceMember(member, newChannel).queue(move -> {
-                                            internalGuild.setActiveLobby(newChannel.getIdLong());
+                                            new VoiceLobby(event.getJDA(), guild.getIdLong(), newChannel.getIdLong()).setActive();
                                             new java.util.Timer().schedule(
                                                     new java.util.TimerTask() {
                                                         @Override
                                                         public void run() {
-                                                            var activeIds = internalGuild.getActiveLobbies();
+                                                            var activeIds = VoiceLobby.getActive(event.getJDA());
 
                                                             for (var activeId : activeIds) {
                                                                 if (event.getJDA().getVoiceChannelById(activeId) != null)
                                                                     active.add(event.getJDA().getVoiceChannelById(activeId));
-                                                                else internalGuild.unsetActiveLobby(activeId);
+                                                                else new VoiceLobby(event.getJDA(), guild.getIdLong(), activeId).unsetActive();
                                                             }
 
                                                             for (int i = 0; i < active.size(); i++) {

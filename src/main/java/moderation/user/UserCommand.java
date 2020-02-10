@@ -16,7 +16,7 @@ import java.util.Map;
 public class UserCommand extends Command {
     public UserCommand() {
         this.name = "user";
-        this.aliases = new String[0];
+        this.aliases = new String[] { "master" };
         this.help = "Bot personalization. (user specific)";
         this.category = new Category("Moderation");
         this.arguments = null;
@@ -46,14 +46,12 @@ public class UserCommand extends Command {
             return;
         }
 
-        var guild = event.getGuild();
         var user = event.getAuthor();
         var master = new Master(event.getAuthor());
 
         var args = event.getArgs().split(" ");
         var type = args[0].toLowerCase();
         String setting;
-        var userId = event.getAuthor().getIdLong();
 
         // Stream Hide
         if (args.length < 3 && args[0].equalsIgnoreCase("streamhide")) {

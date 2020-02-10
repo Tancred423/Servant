@@ -476,7 +476,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
         // No bots, Nothing from Discord Bot List and No Blacklisted Guilds or Users
         if (event.getAuthor().isBot()) return;
         if (event.isFromGuild() && event.getGuild().getIdLong() == 264445053596991498L) return;
-        if (Blacklist.isBlacklisted(event.getAuthor(), event.isFromGuild() ? event.getGuild() : null)) return;
+        if (Blacklist.isBlacklisted(event.isFromGuild() ? event.getGuild() : null, event.getAuthor())) return;
 
         String[] parts = null;
         var rawContent = event.getMessage().getContentRaw();
@@ -549,7 +549,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
                                 uses.put(command.getName(), uses.getOrDefault(command.getName(), 0) + 1);
                                 command.run(cevent);
 
-                                if (Toggle.isEnabled(cevent, "deletecommands") && !command.getName().equals("toggle"))
+                                if (Toggle.isEnabled(cevent, "deletecommands") && !command.getName().equals("toggle") && event.isFromGuild())
                                     event.getMessage().delete().queue();
 
                                 // Statistics
@@ -559,7 +559,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                    }, toggleName.equals("profile") ? Servant.profilePool : Servant.threadPool);
+                    }, toggleName.equals("profile") ? Servant.cachedThreadPool : Servant.fixedThreadPool);
                     return;
                 }
             }

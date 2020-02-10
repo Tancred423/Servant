@@ -46,9 +46,9 @@ public class BaguetteCommand extends Command {
         var guild = event.getGuild();
         var user = event.getAuthor();
 
-        var baguette1 = EmoteUtil.getEmoteMention(jda, "baguette1", guild, user);
-        var baguette2 = EmoteUtil.getEmoteMention(jda, "baguette2", guild, user);
-        var baguette3 = EmoteUtil.getEmoteMention(jda, "baguette3", guild, user);
+        var baguette1 = EmoteUtil.getEmoteMention(jda, "baguette1");
+        var baguette2 = EmoteUtil.getEmoteMention(jda, "baguette2");
+        var baguette3 = EmoteUtil.getEmoteMention(jda, "baguette3");
 
         var lang = LanguageHandler.getLanguage(event);
         var baguettes = baguette1 +

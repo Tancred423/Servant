@@ -68,9 +68,10 @@ public class VoiceLobbyCommand extends Command {
                     return;
                 }
 
-                var channelIdLong = Long.parseLong(args[1]);
-                if (!server.isLobby(channelIdLong)) {
-                    server.setLobby(channelIdLong);
+                var idToSet = Long.parseLong(args[1]);
+                var lobbyToSet = new VoiceLobby(event.getJDA(), guild.getIdLong(), idToSet);
+                if (!lobbyToSet.isVoiceLobby()) {
+                    lobbyToSet.set();
                     event.reactSuccess();
                 } else event.replyWarning(LanguageHandler.get(lang, "voicelobby_already_set"));
                 break;
@@ -89,7 +90,9 @@ public class VoiceLobbyCommand extends Command {
                     return;
                 }
 
-                if (server.unsetLobby(Long.parseLong(args[1]))) event.reactSuccess();
+                var idToUnset = Long.parseLong(args[1]);
+                var lobbyToUnset = new VoiceLobby(event.getJDA(), guild.getIdLong(), idToUnset);
+                if (lobbyToUnset.unset()) event.reactSuccess();
                 else {
                     event.reactError();
                     event.reply(LanguageHandler.get(lang, "voicelobby_unset_fail"));
@@ -98,7 +101,7 @@ public class VoiceLobbyCommand extends Command {
 
             case "show":
             case "sh":
-                var lobbies = server.getLobbies();
+                var lobbies = server.getVoiceLobbies();
 
                 if (lobbies.isEmpty()) {
                     event.reply(LanguageHandler.get(lang, "voicelobby_noneset"));

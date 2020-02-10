@@ -37,7 +37,6 @@ public class MediaOnlyChannelCommand extends Command {
 
         var guild = event.getGuild();
         var server = new Server(guild);
-        var user = event.getAuthor();
 
         if (event.getArgs().isEmpty()) {
             var description = LanguageHandler.get(lang, "mediaonlychannel_description");

@@ -3,7 +3,6 @@ package useful.polls;
 
 import files.language.LanguageHandler;
 import moderation.guild.GuildHandler;
-import moderation.guild.Server;
 import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -96,9 +95,6 @@ public class PollCommand extends Command {
     }
 
     private void processVote(CommandEvent event, String question, List<String> answers, String lang, boolean allowsMultipleAnswers) {
-        var guild = event.getGuild();
-        var server = new Server(guild);
-        var user = event.getAuthor();
         var author = event.getAuthor();
         var eb = new EmbedBuilder();
         eb.setColor(new Master(author).getColor());
@@ -113,14 +109,15 @@ public class PollCommand extends Command {
         eb.setTimestamp(dateIn7DaysOtd);
 
         var sb = new StringBuilder();
-        String[] emoji = EmoteUtil.getVoteEmotes(guild, user);
+        String[] emoji = EmoteUtil.getVoteEmotes(event.getJDA());
         for (int i = 0; i < answers.size(); i++) sb.append("\n").append(emoji[i]).append(" ").append(answers.get(i));
 
         eb.addField(question, sb.toString(), false);
 
         event.getChannel().sendMessage(eb.build()).queue(message -> {
-            if (allowsMultipleAnswers) server.setVote(message.getChannel().getIdLong(), message.getIdLong(), author.getIdLong(), "vote", dateIn7Days);
-            else  server.setVote(message.getChannel().getIdLong(), message.getIdLong(), author.getIdLong(), "radio", dateIn7Days);
+            var poll = new Poll(event.getJDA(), lang, message);
+            if (allowsMultipleAnswers) poll.set(message.getChannel().getIdLong(), message.getIdLong(), author.getIdLong(), "vote", dateIn7Days);
+            else poll.set(message.getChannel().getIdLong(), message.getIdLong(), author.getIdLong(), "radio", dateIn7Days);
             for (int i = 0; i < answers.size(); i++) message.addReaction(emoji[i]).queue();
 
             var end = EmoteUtil.getEmoji("end");

@@ -2,9 +2,7 @@
 package utilities;
 
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.User;
-import servant.Log;
+import servant.LoggingTask;
 import servant.Servant;
 
 import java.sql.Connection;
@@ -14,7 +12,7 @@ import java.util.ArrayList;
 import static servant.Database.closeQuietly;
 
 public class EmoteUtil {
-    public static String getEmoteMention(JDA jda, String emoteName, Guild guild, User user) {
+    public static String getEmoteMention(JDA jda, String emoteName) {
         Connection connection = null;
         var emoteMention = "";
 
@@ -34,7 +32,7 @@ public class EmoteUtil {
             }
             else emoteMention = getEmoji(emoteName);
         } catch (SQLException e) {
-            new Log(e, guild, user, "emote", null).sendLog(false);
+            new LoggingTask(e, jda, "EmoteUtil#getEmoteMention");
         } finally {
             closeQuietly(connection);
         }
@@ -42,7 +40,7 @@ public class EmoteUtil {
         return emoteMention;
     }
 
-    public static net.dv8tion.jda.api.entities.Emote getEmote(String emoteName, Guild guild, User user) {
+    public static net.dv8tion.jda.api.entities.Emote getEmote(JDA jda, String emoteName) {
         Connection connection = null;
         net.dv8tion.jda.api.entities.Emote emote = null;
 
@@ -53,11 +51,11 @@ public class EmoteUtil {
             var resultSet = select.executeQuery();
 
             if (resultSet.first()) {
-                var thisGuild = user.getJDA().getGuildById(resultSet.getLong("guild_id"));
+                var thisGuild = jda.getGuildById(resultSet.getLong("guild_id"));
                 if (thisGuild != null) emote = thisGuild.getEmoteById(resultSet.getLong("emote_id"));
             }
         } catch (SQLException e) {
-            new Log(e, guild, user, "emote", null).sendLog(false);
+            new LoggingTask(e, jda, "EmoteUtil#getEmote");
         } finally {
             closeQuietly(connection);
         }
@@ -117,12 +115,15 @@ public class EmoteUtil {
             case "servant_padoru":
                 return "\uD83C\uDF84"; // 🎄
 
+            case "pinged":
+                return "\uD83D\uDCA2"; // 💢
+
             default:
                 return null;
         }
     }
 
-    public static String[] getVoteEmotes(Guild guild, User user) {
+    public static String[] getVoteEmotes(JDA jda) {
         Connection connection = null;
         var emotes = new ArrayList<String>();
 
@@ -133,7 +134,7 @@ public class EmoteUtil {
             if (resultSet.first())
                 do {
                     if (resultSet.getString("emote_name").startsWith("vote")) {
-                        var thisGuild = user.getJDA().getGuildById(resultSet.getLong("guild_id"));
+                        var thisGuild = jda.getGuildById(resultSet.getLong("guild_id"));
                         if (thisGuild != null) {
                             var emote = thisGuild.getEmoteById(resultSet.getLong("emote_id"));
                             if (emote != null) emotes.add(emote.getAsMention());
@@ -155,7 +156,7 @@ public class EmoteUtil {
                 emotes.add("\uD83D\uDD1F");
             }
         } catch (SQLException e) {
-            new Log(e, guild, user, "emote", null).sendLog(false);
+            new LoggingTask(e, jda, "EmoteUtil#getVoteEmotes");
         } finally {
             closeQuietly(connection);
         }

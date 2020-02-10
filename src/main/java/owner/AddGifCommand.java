@@ -4,7 +4,7 @@ package owner;
 import files.language.LanguageHandler;
 import moderation.guild.GuildHandler;
 import net.dv8tion.jda.api.Permission;
-import servant.Log;
+import servant.LoggingTask;
 import servant.Servant;
 import utilities.Constants;
 import utilities.MessageUtil;
@@ -76,7 +76,7 @@ public class AddGifCommand extends Command {
                     url = new URL(gifUrl);
                     c = url.openConnection();
                 } catch (IOException e) {
-                    new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
+                    new LoggingTask(e, event.getJDA(), name, event);
                     return;
                 }
                 var contentType = c.getContentType();
@@ -86,8 +86,6 @@ public class AddGifCommand extends Command {
                 }
 
                 Connection connection = null;
-                var guild = event.getGuild();
-                var author = event.getAuthor();
 
                 try {
                     connection = Servant.db.getHikari().getConnection();
@@ -95,16 +93,16 @@ public class AddGifCommand extends Command {
                     insert.setString(1, interaction);
                     insert.setString(2, gifUrl);
                     insert.executeUpdate();
+
+                    event.reactSuccess();
                 } catch (SQLException e) {
-                    new Log(e, guild, author, "addgif", null).sendLog(false);
+                    new LoggingTask(e, event.getJDA(), name, event);
                 } finally {
                     closeQuietly(connection);
                 }
-
-                event.reactSuccess();
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, Servant.threadPool);
+        }, Servant.fixedThreadPool);
     }
 }

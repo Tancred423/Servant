@@ -36,6 +36,7 @@ public abstract class InteractionCommand extends Command {
         }
 
         // Get users.
+        var jda = event.getJDA();
         var guild = event.getGuild();
         var user = event.getAuthor();
         var master = new Master(user);
@@ -48,9 +49,9 @@ public abstract class InteractionCommand extends Command {
             try {
                 gif = JsonReader.readJsonFromUrl("https://some-random-api.ml/animu/" + name).get("link").toString();
             } catch (IOException e) {
-                gif = InteractionDatabase.getGifUrl(name.toLowerCase(), guild, user);
+                gif = Interaction.getGifUrl(jda, name.toLowerCase());
             }
-        } else gif = InteractionDatabase.getGifUrl(name.toLowerCase(), guild, user);
+        } else gif = Interaction.getGifUrl(jda, name.toLowerCase());
 
         // Increment author and mentioned command count.
         master.incrementInteractionCount(name, true);
@@ -58,8 +59,8 @@ public abstract class InteractionCommand extends Command {
 
         var authorCount = master.getInteractionCount(name, true);
         var mentionedCount = mentionedMaster.getInteractionCount(name, false);
-        var emote = EmoteUtil.getEmote(name, guild, user);
-        var embed = new InteractionEmbed(name, emote, emoji, gif, user, mentionedUser, authorCount, mentionedCount, guild);
+        var emote = EmoteUtil.getEmote(jda, name);
+        var embed = new InteractionEmbed(name, emote, emoji, gif, user, mentionedUser, authorCount, mentionedCount);
 
         event.reply(embed.getEmbed());
     }

@@ -82,6 +82,7 @@ public class SignupCommand extends Command {
         else eventDate = ZonedDateTime.now(ZoneOffset.of(offset)).plusWeeks(4);
         title = title == null ? "" : title;
 
+        var jda = event.getJDA();
         var guild = event.getGuild();
         var author = event.getAuthor();
         var internalAuthor = new Master(author);
@@ -95,7 +96,7 @@ public class SignupCommand extends Command {
                 (isCustomDate ? LanguageHandler.get(lang, "signup_embeddescription_custom") : ""),
                 author.getAsMention()));
         eb.setFooter(isCustomDate ? LanguageHandler.get(lang, "signup_event") : LanguageHandler.get(lang, "signup_timeout"),
-                ImageUtil.getImageUrl("clock", guild, author));
+                ImageUtil.getImageUrl(jda, "clock"));
         eb.setTimestamp(eventDate.toInstant());
 
         var upvote = EmoteUtil.getEmoji("upvote");
@@ -108,7 +109,9 @@ public class SignupCommand extends Command {
         event.getChannel().sendMessage(eb.build()).queue(sentMessage -> {
             sentMessage.addReaction(upvote).queue();
             sentMessage.addReaction(downvote).queue();
-            server.setSignup(sentMessage.getIdLong(), author.getIdLong(), amount, finalTitle, Timestamp.valueOf(finalEventDate.toLocalDateTime()), sentMessage.getChannel().getIdLong(), finalIsCustomDate);
+
+            var signup = new Signup(jda, sentMessage.getIdLong());
+            signup.set(author.getIdLong(), amount, finalTitle, Timestamp.valueOf(finalEventDate.toLocalDateTime()), guild.getIdLong(), sentMessage.getChannel().getIdLong(), finalIsCustomDate);
         });
     }
 

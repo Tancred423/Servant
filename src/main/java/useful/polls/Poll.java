@@ -1,18 +1,18 @@
+// Author: Tancred423 (https://github.com/Tancred423)
 package useful.polls;
 
 import files.language.LanguageHandler;
 import moderation.guild.Server;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.User;
-import servant.Log;
+import servant.LoggingTask;
 import servant.Servant;
 import utilities.EmoteUtil;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
@@ -20,72 +20,244 @@ import java.util.*;
 import static servant.Database.closeQuietly;
 
 public class Poll {
-    public static void check(JDA jda) {
-        Guild guild = null;
-        User user = jda.getSelfUser();
+    private JDA jda;
+    private String lang;
+    private Message message;
 
+    public Poll(JDA jda, String lang, Message message) {
+        this.jda = jda;
+        this.lang = lang;
+        this.message = message;
+    }
+
+    public void set(long guildId, long channelId, long authorId, String type, Timestamp endingDate) {
         Connection connection = null;
+
         try {
             connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT * FROM votes");
-            var resultSet = select.executeQuery();
-            if (resultSet.first()) {
-                do {
-                    var guildId = resultSet.getLong("guild_id");
-                    var channelId = resultSet.getLong("channel_id");
-                    var messageId = resultSet.getLong("message_id");
-                    var type = resultSet.getString("type");
-                    var endingDate = resultSet.getTimestamp("ending_date");
-                    var endingDateMillis = endingDate.getTime();
-                    var nowMillis = OffsetDateTime.now(ZoneOffset.UTC).toInstant().toEpochMilli();
-
-                    if (nowMillis >= endingDateMillis) {
-                        guild = jda.getGuildById(guildId);
-                        if (guild == null) {
-                            removePoll(messageId, null, user);
-                        } else {
-                            var finalGuild = guild;
-                            var textChannel = guild.getTextChannelById(channelId);
-                            if (textChannel == null) {
-                                removePoll(messageId, finalGuild, user);
-                            } else {
-                                var lang = new Server(guild).getLanguage();
-                                switch (type) {
-                                    case "quick":
-                                        textChannel.retrieveMessageById(messageId).queue(message ->
-                                                        endQuickpoll(finalGuild, user, message, lang, jda),
-                                                failure -> removePoll(messageId, finalGuild, user));
-                                        break;
-
-                                    case "radio":
-                                    case "vote":
-                                        textChannel.retrieveMessageById(messageId).queue(message ->
-                                                        endPoll(finalGuild, user, message, lang, jda),
-                                                failure -> removePoll(messageId, finalGuild, user));
-                                        break;
-
-                                    default:
-                                        removePoll(messageId, guild, user);
-                                        break;
-                                }
-                            }
-                        }
-                    }
-                } while (resultSet.next());
-            }
+            var insert = connection.prepareStatement("INSERT INTO votes (guild_id,channel_id,message_id,author_id,type,ending_date) VALUES (?,?,?,?,?,?)");
+            insert.setLong(1, guildId);
+            insert.setLong(2, channelId);
+            insert.setLong(3, message.getIdLong());
+            insert.setLong(4, authorId);
+            insert.setString(5, type);
+            insert.setTimestamp(6, endingDate);
+            insert.executeUpdate();
         } catch (SQLException e) {
-            new Log(e, guild, user, "poll", null).sendLog(false);
+            new LoggingTask(e, jda, "Poll#set");
         } finally {
             closeQuietly(connection);
         }
     }
 
-    private static void removePoll(long messageId, Guild guild, User user) {
-        PollsDatabase.unsetPoll(messageId, guild, user);
-        PollsDatabase.unsetUserVotes(messageId, guild, user);
+    public void unset() {
+        Connection connection = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var delete = connection.prepareStatement("DELETE FROM votes WHERE message_id=?");
+            delete.setLong(1, message.getIdLong());
+            delete.executeUpdate();
+        } catch (SQLException e) {
+            new LoggingTask(e, jda, "Poll#unsetPoll");
+        } finally {
+            closeQuietly(connection);
+        }
+
+        unsetVotes();
     }
 
-    public static void endPoll(net.dv8tion.jda.api.entities.Guild guild, User user, Message message, String lang, JDA jda) {
+    public boolean isQuickPoll() {
+        Connection connection = null;
+        var isQuickvote = false;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement("SELECT type FROM votes WHERE message_id=?");
+            select.setLong(1, message.getIdLong());
+            var resultSet = select.executeQuery();
+            if (resultSet.first()) if (resultSet.getString("type").equals("quick")) isQuickvote = true;
+        } catch (SQLException e) {
+            new LoggingTask(e, jda, "Poll#isQuickPoll");
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return isQuickvote;
+    }
+
+    public boolean isPoll() {
+        Connection connection = null;
+        var isPoll = false;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement("SELECT type FROM votes WHERE message_id=?");
+            select.setLong(1, message.getIdLong());
+            var resultSet = select.executeQuery();
+            if (resultSet.first()) if (resultSet.getString("type").equals("vote")) isPoll = true;
+        } catch (SQLException e) {
+            new LoggingTask(e, jda, "Poll#isPoll");
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return isPoll;
+    }
+
+    public boolean isRadioPoll() {
+        Connection connection = null;
+        var isRadiovote = false;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement("SELECT type FROM votes WHERE message_id=?");
+            select.setLong(1, message.getIdLong());
+            var resultSet = select.executeQuery();
+            if (resultSet.first()) if (resultSet.getString("type").equals("radio")) isRadiovote = true;
+        } catch (SQLException e) {
+            new LoggingTask(e, jda, "Poll#isRadioPoll");
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return isRadiovote;
+    }
+
+    public long getAuthorId() {
+        Connection connection = null;
+        var authorId = 0L;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement("SELECT author_id FROM votes WHERE message_id=?");
+            select.setLong(1, message.getIdLong());
+            var resultSet = select.executeQuery();
+            if (resultSet.first()) authorId = resultSet.getLong("author_id");
+        } catch (SQLException e) {
+            new LoggingTask(e, jda, "Poll#getAuthorId");
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return authorId;
+    }
+
+    public void setVote(long userId, long emoteId, String emoji) {
+        Connection connection = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var insert = connection.prepareStatement("INSERT INTO user_votes (message_id,user_id,emote_id,emoji) VALUES (?,?,?,?)");
+            insert.setLong(1, message.getIdLong());
+            insert.setLong(2, userId);
+            insert.setLong(3, emoteId);
+            insert.setString(4, emoji);
+            insert.executeUpdate();
+        } catch (SQLException e) {
+            new LoggingTask(e, jda, "Poll#setVote");
+        } finally {
+            closeQuietly(connection);
+        }
+    }
+
+    public void unsetVote(long userId) {
+        Connection connection = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var delete = connection.prepareStatement("DELETE FROM user_votes WHERE message_id=? AND user_id=?");
+            delete.setLong(1, message.getIdLong());
+            delete.setLong(2, userId);
+            delete.executeUpdate();
+        } catch (SQLException e) {
+            new LoggingTask(e, jda, "Poll#unsetVote");
+        } finally {
+            closeQuietly(connection);
+        }
+    }
+
+    public void unsetVotes() {
+        Connection connection = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var delete = connection.prepareStatement("DELETE FROM user_votes WHERE message_id=?");
+            delete.setLong(1, message.getIdLong());
+            delete.executeUpdate();
+        } catch (SQLException e) {
+            new LoggingTask(e, jda, "Poll#unsetVotes");
+        } finally {
+            closeQuietly(connection);
+        }
+    }
+
+    public boolean hasVoted(long userId) {
+        Connection connection = null;
+        var hasVoted = false;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement("SELECT * FROM user_votes WHERE message_id=? AND user_id=?");
+            select.setLong(1, message.getIdLong());
+            select.setLong(2, userId);
+            var resultSet = select.executeQuery();
+            if (resultSet.first()) hasVoted = true;
+        } catch (SQLException e) {
+            new LoggingTask(e, jda, "Poll#hasVoted");
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return hasVoted;
+    }
+
+    public long getVoteEmoteId(long userId) {
+        Connection connection = null;
+        var id = 0L;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement("SELECT emote_id FROM user_votes WHERE message_id=? AND user_id=?");
+            select.setLong(1, message.getIdLong());
+            select.setLong(2, userId);
+            var resultSet = select.executeQuery();
+            if (resultSet.first()) id = resultSet.getLong("emote_id");
+        } catch (SQLException e) {
+            new LoggingTask(e, jda, "Poll#getEmoteId");
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return id;
+    }
+
+    public String getVoteEmoji(long userId) {
+        Connection connection = null;
+        var emote = "";
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement("SELECT emoji FROM user_votes WHERE message_id=? AND user_id=?");
+            select.setLong(1, message.getIdLong());
+            select.setLong(2, userId);
+            var resultSet = select.executeQuery();
+            if (resultSet.first()) emote = resultSet.getString("emoji");
+        } catch (SQLException e) {
+            new LoggingTask(e, jda, "Poll#getEmoji");
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return emote;
+    }
+
+    public void end() {
+        if (isQuickPoll()) endQuickPoll();
+        else endPoll();
+    }
+
+    private void endPoll() {
         Map<Integer, Integer> count = new HashMap<>();
         for (int i = 0; i < 10; i++) count.put(i + 1, 0);
 
@@ -129,17 +301,17 @@ public class Poll {
         if (author == null) return;
 
         eb.setColor(messageEmbed.getColor());
-        eb.setAuthor(String.format(LanguageHandler.get(lang, "vote_ended"), user.getName()), null, author.getIconUrl());
+        eb.setAuthor(String.format(LanguageHandler.get(lang, "vote_ended"), author.getName()), null, author.getIconUrl());
         eb.setTitle(field.getName());
         for (int i = 0; i < lines.size(); i++) eb.addField(lines.get(i), String.valueOf(count.get(i + 1)), true);
         eb.setFooter(LanguageHandler.get(lang, "votes_inactive"), jda.getSelfUser().getAvatarUrl());
 
         message.editMessage(eb.build()).queue();
         message.clearReactions().queue();
-        removePoll(message.getIdLong(), guild, user);
+        unset();
     }
 
-    public static void endQuickpoll(net.dv8tion.jda.api.entities.Guild guild, User user, Message message, String lang, JDA jda) {
+    public void endQuickPoll() {
         var upvoteCount = 0;
         var downvoteCount = 0;
 
@@ -159,7 +331,7 @@ public class Poll {
 
         var eb = new EmbedBuilder();
         eb.setColor(messageEmbed.getColor());
-        eb.setAuthor(String.format(LanguageHandler.get(lang, "quickvote_ended"), user.getName()), null, author.getIconUrl());
+        eb.setAuthor(String.format(LanguageHandler.get(lang, "quickvote_ended"), author.getName()), null, author.getIconUrl());
         eb.setDescription(messageEmbed.getDescription());
         eb.addField(upvoteEmoji, String.valueOf(upvoteCount), true);
         eb.addField(downvoteEmoji, String.valueOf(downvoteCount), true);
@@ -167,6 +339,68 @@ public class Poll {
 
         message.editMessage(eb.build()).queue();
         message.clearReactions().queue();
-        removePoll(message.getIdLong(), guild, user);
+        unset();
+    }
+
+    public static void check(JDA jda) {
+        Connection connection = null;
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement("SELECT * FROM votes");
+            var resultSet = select.executeQuery();
+            if (resultSet.first()) {
+                do {
+                    var guildId = resultSet.getLong("guild_id");
+                    var channelId = resultSet.getLong("channel_id");
+                    var messageId = resultSet.getLong("message_id");
+                    var type = resultSet.getString("type");
+                    var endingDate = resultSet.getTimestamp("ending_date");
+                    var endingDateMillis = endingDate.getTime();
+                    var nowMillis = OffsetDateTime.now(ZoneOffset.UTC).toInstant().toEpochMilli();
+
+                    var guild = jda.getGuildById(guildId);
+                    if (guild == null) return;
+
+                    var channel = guild.getTextChannelById(channelId);
+                    if (channel == null) return;
+
+                    channel.retrieveMessageById(messageId).queue(message -> {
+                        var guild1 = jda.getGuildById(guildId);
+                        if (guild1 == null) return;
+
+                        var lang = new Server(guild1).getLanguage();
+                        var poll = new Poll(jda, lang, message);
+
+                        if (nowMillis >= endingDateMillis) {
+                            guild1 = jda.getGuildById(guildId);
+                            if (guild1 == null) {
+                                poll.unset();
+                            } else {
+                                var textChannel = guild1.getTextChannelById(channelId);
+                                if (textChannel == null) {
+                                    poll.unset();
+                                } else {
+                                    switch (type) {
+                                        case "quick":
+                                        case "radio":
+                                        case "vote":
+                                           poll.end();
+                                            break;
+
+                                        default:
+                                            poll.unset();
+                                            break;
+                                    }
+                                }
+                            }
+                        }
+                    });
+                } while (resultSet.next());
+            }
+        } catch (SQLException e) {
+            new LoggingTask(e, jda, "PollUtil#check");
+        } finally {
+            closeQuietly(connection);
+        }
     }
 }

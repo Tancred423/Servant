@@ -4,7 +4,7 @@ package random;
 import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import servant.Log;
+import servant.LoggingTask;
 import utilities.Constants;
 import utilities.JsonReader;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
@@ -42,7 +42,7 @@ public class BirdCommand extends Command {
             eb.setImage(json.get("link").toString());
             event.reply(eb.build());
         } catch (IOException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
+            new LoggingTask(e, event.getJDA(), name, event);
         }
     }
 }

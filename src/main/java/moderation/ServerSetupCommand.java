@@ -48,7 +48,6 @@ public class ServerSetupCommand extends Command {
         var lang = LanguageHandler.getLanguage(event);
         var p = GuildHandler.getPrefix(event);
 
-        var guild = event.getGuild();
         var author = event.getAuthor();
         var channel = event.getChannel();
         channel.sendMessage(LanguageHandler.get(lang, "setupwizard_introduction")).queue(message -> {
@@ -62,7 +61,7 @@ public class ServerSetupCommand extends Command {
                     e -> {
                         if (e.getReactionEmote().getName().equals(accept)) {
                             message.clearReactions().queue();
-                            processLanguage(channel, author, message, event, lang, p, false, new Server(event.getGuild()), guild);
+                            processLanguage(channel, author, message, event, lang, p, false, new Server(event.getGuild()));
                         } else {
                             message.delete().queue();
                             event.reactWarning();
@@ -81,7 +80,7 @@ public class ServerSetupCommand extends Command {
     }
 
     // Language
-    private void processLanguage(MessageChannel channel, User author, Message previous, CommandEvent event, String lang, String p, boolean repeated, Server internalGuild, net.dv8tion.jda.api.entities.Guild guild) {
+    private void processLanguage(MessageChannel channel, User author, Message previous, CommandEvent event, String lang, String p, boolean repeated, Server server) {
         previous.editMessage(repeated ? LanguageHandler.get(lang, "setupwizard_language_repeated") :
                 LanguageHandler.get(lang, "setupwizard_language")).queue(
                 message -> waiter.waitForEvent(GuildMessageReceivedEvent.class,
@@ -91,15 +90,15 @@ public class ServerSetupCommand extends Command {
                             var language = e.getMessage().getContentRaw();
                             e.getMessage().delete().queue();
                             if (Parser.isValidLanguage(language)) {
-                                internalGuild.setLanguage(language);
-                                processPrefix(channel, author, message, event, lang, p, false, internalGuild, guild);
+                                server.setLanguage(language);
+                                processPrefix(channel, author, message, event, lang, p, false, server);
                             }
-                            else processLanguage(channel, author, previous, event, lang, p, true, internalGuild, guild);
+                            else processLanguage(channel, author, previous, event, lang, p, true, server);
                         }, 15, TimeUnit.MINUTES, () -> timeout(event, message, lang)));
     }
 
     // Prefix
-    private void processPrefix(MessageChannel channel, User author, Message previous, CommandEvent event, String lang, String p, boolean repeated, Server internalGuild, net.dv8tion.jda.api.entities.Guild guild) {
+    private void processPrefix(MessageChannel channel, User author, Message previous, CommandEvent event, String lang, String p, boolean repeated, Server server) {
         previous.editMessage(repeated ? String.format(LanguageHandler.get(lang, "setupwizard_prefix_repeated"), p) :
                 String.format(LanguageHandler.get(lang, "setupwizard_prefix"), accept, p)).queue(
                 message -> waiter.waitForEvent(GuildMessageReceivedEvent.class,
@@ -109,15 +108,15 @@ public class ServerSetupCommand extends Command {
                             var prefix = e.getMessage().getContentRaw();
                             e.getMessage().delete().queue();
                             if (Parser.isValidPrefix(prefix)) {
-                                internalGuild.setPrefix(prefix);
-                                processOffset(channel, author, message, event, lang, false, internalGuild, guild);
+                                server.setPrefix(prefix);
+                                processOffset(channel, author, message, event, lang, false, server);
                             }
-                            else processPrefix(channel, author, previous, event, lang, p, true, internalGuild, guild);
+                            else processPrefix(channel, author, previous, event, lang, p, true, server);
                         }, 15, TimeUnit.MINUTES, () -> timeout(event, message, lang)));
     }
 
     // Offset
-    private void processOffset(MessageChannel channel, User author, Message previous, CommandEvent event, String lang, boolean repeated, Server internalGuild, net.dv8tion.jda.api.entities.Guild guild) {
+    private void processOffset(MessageChannel channel, User author, Message previous, CommandEvent event, String lang, boolean repeated, Server server) {
         previous.editMessage(repeated ? LanguageHandler.get(lang, "setupwizard_offset_repeated") :
                 String.format(LanguageHandler.get(lang, "setupwizard_offset"), accept)).queue(
                 message -> waiter.waitForEvent(GuildMessageReceivedEvent.class,
@@ -128,11 +127,11 @@ public class ServerSetupCommand extends Command {
                             e.getMessage().delete().queue();
                             try {
                                 if (Parser.isValidOffset(offset)) {
-                                    internalGuild.setOffset(offset);
+                                    server.setOffset(offset);
                                     processFinish(message, event, lang);
-                                } else processOffset(channel, author, previous, event, lang, true, internalGuild, guild);
+                                } else processOffset(channel, author, previous, event, lang, true, server);
                             } catch (NumberFormatException ex) {
-                                processOffset(channel, author, previous, event, lang, true, internalGuild, guild);
+                                processOffset(channel, author, previous, event, lang, true, server);
                             }
                         }, 15, TimeUnit.MINUTES, () -> timeout(event, message, lang)), f -> {});
     }

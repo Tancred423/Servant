@@ -34,7 +34,6 @@ public class GuildLeaveListener extends ListenerAdapter {
          */
         if (guild.getIdLong() == 264445053596991498L) return; // Discord Bot List
         if (user.isBot()) return;
-        if (Blacklist.isBlacklisted(user, guild)) return;
 
         CompletableFuture.runAsync(() -> {
             var server = new Server(guild);
@@ -56,13 +55,14 @@ public class GuildLeaveListener extends ListenerAdapter {
 
             // Poll
             server.purgePolls();
-        }, Servant.threadPool);
+        }, Servant.fixedThreadPool);
     }
 
     private static void processKick(GuildLeaveEvent event, net.dv8tion.jda.api.entities.Guild guild, Member guildOwner, net.dv8tion.jda.api.entities.User guildOwnerUser) {
         System.out.println("[" + OffsetDateTime.now(ZoneId.of(Constants.LOG_OFFSET)).toString().replaceAll("T", " ").substring(0, 19) + "] " +
                 "Servant was kicked from " + guild.getName() + " (" + guild.getIdLong() + "). Owner: " + guildOwnerUser.getName() + "#" + guildOwnerUser.getDiscriminator() + " (" + guildOwner.getIdLong() + ").");
 
+        if (Blacklist.isBlacklisted(guild, guildOwnerUser)) return;
         guildOwnerUser.openPrivateChannel().queue(privateChannel -> {
             var guildOwnerMaster = new Master(guildOwnerUser);
             var language = new Server(guild).getLanguage();
@@ -75,7 +75,7 @@ public class GuildLeaveListener extends ListenerAdapter {
             eb.setAuthor(LanguageHandler.get(language, "kick_author"), null, bot.getEffectiveAvatarUrl());
             eb.setThumbnail(guild.getIconUrl());
             eb.setDescription(String.format(LanguageHandler.get(language, "kick_description"), Servant.config.getSupportGuildInv(), botOwner.getName(), botOwner.getDiscriminator()));
-            eb.setImage(ImageUtil.getImageUrl("kick", guild, guildOwnerUser));
+            eb.setImage(ImageUtil.getImageUrl(event.getJDA(), "kick"));
             eb.setFooter(String.format(LanguageHandler.get(language, "kick_footer"), guild.getName()), null);
 
             privateChannel.sendMessage(eb.build()).queue(success -> { /* ignore */ }, failure -> { /* ignore */ });

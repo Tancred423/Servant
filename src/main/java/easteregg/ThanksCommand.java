@@ -28,10 +28,9 @@ public class ThanksCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        var guild = event.getGuild();
         var user = event.getAuthor();
 
-        event.reply("You're welcome " + EmoteUtil.getEmoteMention(event.getJDA(), "love", guild, user));
+        event.reply("You're welcome " + EmoteUtil.getEmoteMention(event.getJDA(), "love"));
         checkAchievement(user, event.getMessage());
     }
 

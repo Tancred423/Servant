@@ -13,10 +13,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import servant.Servant;
-import useful.remindme.RemindMeSenderTask;
 import useful.giveaway.GiveawayHandler;
 import useful.polls.Poll;
 import useful.remindme.RemindMe;
+import useful.remindme.RemindMeSenderTask;
 import useful.signup.Signup;
 import utilities.Constants;
 import utilities.TimeUtil;
@@ -29,7 +29,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static servant.Database.closeQuietly;
@@ -50,53 +49,47 @@ public class ReadyListener extends ListenerAdapter {
         }
 
         var jda = event.getJDA();
+        var lang = Servant.config.getDefaultLanguage();
 
-        startExecutor(jda);
-        startRemindMe(jda);
+        startExecutor(jda, lang);
+        startRemindMe(jda, lang);
 
         System.out.println(jda.getSelfUser().getName() + " ready.");
     }
 
-    private void startRemindMe(JDA jda) {
-        var remindMeList = RemindMe.getRemindMeList();
+    private void startRemindMe(JDA jda, String lang) {
+        var remindMeList = RemindMe.getList(jda);
         for (var remindMe : remindMeList) {
             long delayInMillis = remindMe.getEventTime().toInstant().toEpochMilli() - System.currentTimeMillis();
-            Servant.remindMeService.schedule(new RemindMeSenderTask(jda, remindMe), delayInMillis, TimeUnit.MILLISECONDS);
+            Servant.remindMeService.schedule(new RemindMeSenderTask(jda, remindMe, lang), delayInMillis, TimeUnit.MILLISECONDS);
         }
     }
 
-    private void startExecutor(JDA jda) {
-        var threadFactory = Executors.defaultThreadFactory();
-
-        var executor1minute = Executors.newSingleThreadScheduledExecutor(threadFactory);
-        var executor5minutes = Executors.newSingleThreadScheduledExecutor(threadFactory);
-        var executor15minutes = Executors.newSingleThreadScheduledExecutor(threadFactory);
-        var executor24hours = Executors.newSingleThreadScheduledExecutor(threadFactory);
-
+    private void startExecutor(JDA jda, String lang) {
         var delayToNextMinute = TimeUtil.getDelayToNextMinuteInMillis();
         var delayToNext5Minutes = TimeUtil.getDelayToNext5MinutesInMillis();
         var delayToNextQuarter = TimeUtil.getDelayToNextQuarterInMillis();
         var delayToNextDay = TimeUtil.getDelayToNextDayInMillis();
 
         // 1 Minute Period
-        executor1minute.scheduleAtFixedRate(() -> {
+        Servant.periodService.scheduleAtFixedRate(() -> {
             GiveawayHandler.checkGiveaways(jda);
-            Signup.checkSignups(jda);
+            Signup.check(jda);
             Poll.check(jda);
         }, delayToNextMinute, 60 * 1000, TimeUnit.MILLISECONDS);
 
         // 5 Minute Period
-        executor5minutes.scheduleAtFixedRate(() -> settingPresence(jda), delayToNext5Minutes, 5 * 60 * 1000, TimeUnit.MILLISECONDS);
+        Servant.periodService.scheduleAtFixedRate(() -> settingPresence(jda, lang), delayToNext5Minutes, 5 * 60 * 1000, TimeUnit.MILLISECONDS);
 
         // 15 Minute Period
-        executor15minutes.scheduleAtFixedRate(() -> {
+        Servant.periodService.scheduleAtFixedRate(() -> {
             // Birthday
             BirthdayHandler.checkBirthdays(jda);
             BirthdayHandler.updateLists(jda);
         }, delayToNextQuarter, 15 * 60 * 1000, TimeUnit.MILLISECONDS);
 
         // 24 Hour Period
-        executor24hours.scheduleAtFixedRate(() -> {
+        Servant.periodService.scheduleAtFixedRate(() -> {
             try {
                 logServerAmount(jda);
             } catch (IOException | ParseException e) {
@@ -105,9 +98,7 @@ public class ReadyListener extends ListenerAdapter {
         }, delayToNextDay, 24 * 60 * 60 * 1000, TimeUnit.MILLISECONDS);
     }
 
-    private void settingPresence(JDA jda) {
-        var lang = Servant.config.getDefaultLanguage();
-
+    private void settingPresence(JDA jda, String lang) {
         if (counter == 0)
             jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing(String.format(LanguageHandler.get(lang, "presence_0"), Constants.VERSION, Servant.config.getDefaultPrefix())));
         else if (counter == 1)

@@ -1,7 +1,7 @@
 package listeners;
 
-import moderation.guild.Server;
 import moderation.toggle.Toggle;
+import moderation.voicelobby.VoiceLobby;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -17,7 +17,6 @@ public class GuildVoiceLeaveListener extends ListenerAdapter {
     // This event will be thrown if a user leaves a voice channel.
     public void onGuildVoiceLeave(@NotNull GuildVoiceLeaveEvent event) {
         var guild = event.getGuild();
-        var owner = guild.getOwner();
         var member = event.getMember();
         var user = member.getUser();
 
@@ -29,25 +28,24 @@ public class GuildVoiceLeaveListener extends ListenerAdapter {
          */
         if (guild.getIdLong() == 264445053596991498L) return; // Discord Bot List
         if (user.isBot()) return;
-        if (Blacklist.isBlacklisted(user, guild)) return;
+        if (Blacklist.isBlacklisted(guild, user)) return;
 
         CompletableFuture.runAsync(() -> {
             var channel = event.getChannelJoined();
-            var server = new Server(guild);
-            var activeIds = server.getActiveLobbies();
 
             // Voice Lobby
+            var activeIds = VoiceLobby.getActive(event.getJDA());
             if (Toggle.isEnabled(event, "voicelobby")) {
-                processVoiceLobby(event, guild, server, activeIds, channel);
+                processVoiceLobby(event, guild.getIdLong(), activeIds, channel);
             }
-        }, Servant.threadPool);
+        }, Servant.fixedThreadPool);
     }
 
-    private static void processVoiceLobby(GuildVoiceLeaveEvent event, net.dv8tion.jda.api.entities.Guild guild, Server internalGuild, List<Long> activeIds, VoiceChannel channel) {
+    private static void processVoiceLobby(GuildVoiceLeaveEvent event, long guildId, List<Long> activeIds, VoiceChannel channel) {
         var active = new LinkedList<VoiceChannel>();
         for (var activeId : activeIds) {
             if (event.getJDA().getVoiceChannelById(activeId) != null) active.add(event.getJDA().getVoiceChannelById(activeId));
-            else internalGuild.unsetActiveLobby(activeId);
+            else new VoiceLobby(event.getJDA(), guildId, activeId).unsetActive();
         }
 
         if (active.contains(channel) && channel.getMembers().size() == 0) {

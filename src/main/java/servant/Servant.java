@@ -20,6 +20,7 @@ import information.ServerInfoCommand;
 import interaction.*;
 import listeners.*;
 import moderation.*;
+import moderation.bestOfQuote.BestOfQuoteCommand;
 import moderation.birthday.BirthdayCommand;
 import moderation.guild.GuildCommand;
 import moderation.guild.GuildManager;
@@ -28,6 +29,7 @@ import moderation.joinleave.JoinMessageCommand;
 import moderation.joinleave.LeaveCommand;
 import moderation.joinleave.LeaveMessageCommand;
 import moderation.livestream.LivestreamCommand;
+import moderation.reactionRole.ReactionRoleCommand;
 import moderation.toggle.ToggleCommand;
 import moderation.toggle.ToggleFile;
 import moderation.user.UserCommand;
@@ -38,6 +40,7 @@ import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import owner.*;
 import owner.blacklist.BlacklistCommand;
+import owner.statsForNerds.ThreadCommand;
 import random.*;
 import random.randomImgur.RandomCommand;
 import useful.giveaway.GiveawayCommand;
@@ -45,7 +48,7 @@ import useful.polls.PollCommand;
 import useful.polls.QuickpollCommand;
 import useful.remindme.RemindMeCommand;
 import useful.signup.SignupCommand;
-import useful.timezone.TimezoneCommand;
+import useful.TimezoneCommand;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandClientBuilder;
 import zJdaUtilsLib.com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
@@ -60,9 +63,10 @@ public class Servant {
     public static ToggleFile toggle;
     public static Database db;
 
-    public static ExecutorService threadPool;
-    public static ExecutorService profilePool;
+    public static ExecutorService fixedThreadPool;
+    public static ExecutorService cachedThreadPool;
     public static ScheduledExecutorService remindMeService;
+    public static ScheduledExecutorService periodService;
 
     public static void main(String[] args) throws IOException, LoginException {
         // Config File
@@ -82,14 +86,13 @@ public class Servant {
         db = new Database();
         if (!db.connectToDatabase()) return;
 
-        // RemindMe Service
-        remindMeService = Executors.newScheduledThreadPool(1);
-
-
         var availProcessors = Runtime.getRuntime().availableProcessors();
         System.out.println("Available Processors: " + availProcessors);
-        threadPool = Executors.newFixedThreadPool(availProcessors + 1);
-        profilePool = Executors.newCachedThreadPool();
+
+        fixedThreadPool = Executors.newFixedThreadPool(availProcessors + 1);
+        cachedThreadPool = Executors.newCachedThreadPool();
+        remindMeService = Executors.newScheduledThreadPool(1);
+        periodService = Executors.newScheduledThreadPool(1);
 
         var waiter = new EventWaiter();
         var client = new CommandClientBuilder();

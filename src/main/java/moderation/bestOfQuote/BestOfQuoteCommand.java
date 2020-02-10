@@ -1,9 +1,8 @@
 // Author: Tancred423 (https://github.com/Tancred423)
-package moderation;
+package moderation.bestOfQuote;
 
 import files.language.LanguageHandler;
 import moderation.guild.GuildHandler;
-import moderation.guild.Server;
 import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -53,19 +52,20 @@ public class BestOfQuoteCommand extends Command {
 
         var args = event.getArgs().split(" ");
         var guild = event.getGuild();
-        var server = new Server(guild);
         var user = event.getAuthor();
         var master = new Master(user);
 
         var eb = new EmbedBuilder();
         eb.setColor(master.getColor());
 
+        var bestOfQuote = new BestOfQuote(event.getJDA(), guild.getIdLong());
+
         if (args[0].equalsIgnoreCase("show") || args[0].equalsIgnoreCase("sh")) {
-            var emote = server.getBestOfQuoteEmote(event.getJDA());
-            var emoji = server.getBestOfQuoteEmoji();
-            var number = server.getBestOfQuoteNumber();
-            var percentage = server.getBestOfQuotePercentage();
-            var channel = server.getBestOfQuoteChannel();
+            var emote = bestOfQuote.getEmote();
+            var emoji = bestOfQuote.getEmoji();
+            var number = bestOfQuote.getNumber();
+            var percentage = bestOfQuote.getPercentage();
+            var channel = bestOfQuote.getChannel();
 
             eb.setAuthor(LanguageHandler.get(lang, "bestofquote_setup"), null, null);
             eb.addField(LanguageHandler.get(lang, "bestof_emote"), emote == null ? (emoji == null ? LanguageHandler.get(lang, "bestof_noemote") : emoji) : emote.getAsMention(), true);
@@ -81,7 +81,7 @@ public class BestOfQuoteCommand extends Command {
         var message = event.getMessage();
         if (!message.getMentionedChannels().isEmpty()) {
             var mentionedChannel = message.getMentionedChannels().get(0);
-            server.setBestOfQuoteChannel(mentionedChannel.getIdLong());
+            bestOfQuote.setChannel(mentionedChannel.getIdLong());
             event.reactSuccess();
             return;
         }
@@ -90,7 +90,7 @@ public class BestOfQuoteCommand extends Command {
         if (args[0].matches("[0-9]+")) {
             try {
                 var mentionedNumber = Integer.parseInt(args[0]);
-                server.setBestOfQuoteNumber(mentionedNumber);
+                bestOfQuote.setNumber(mentionedNumber);
             } catch (NumberFormatException ex) {
                 event.reactError();
                 event.reply(LanguageHandler.get(lang, "bestof_numbertoobig"));
@@ -110,7 +110,7 @@ public class BestOfQuoteCommand extends Command {
                     event.reactError();
                     return;
                 }
-                server.setBestOfQuotePercentage(mentionedPercentage);
+                bestOfQuote.setPercentage(mentionedPercentage);
                 event.reactSuccess();
             } else {
                 event.reply(LanguageHandler.get(lang, "bestof_invalidpercentage"));
@@ -124,7 +124,7 @@ public class BestOfQuoteCommand extends Command {
             var mentionedEmote = message.getEmotes().get(0);
             try {
                 if (mentionedEmote.getGuild() != null)
-                    server.setBestOfQuoteEmote(mentionedEmote.getGuild().getIdLong(), mentionedEmote.getIdLong());
+                    bestOfQuote.setEmote(mentionedEmote.getGuild().getIdLong(), mentionedEmote.getIdLong());
             } catch (NullPointerException ex) {
                 event.reply(LanguageHandler.get(lang, "bestof_invalidemote"));
                 event.reactError();
@@ -137,7 +137,7 @@ public class BestOfQuoteCommand extends Command {
         // Emoji
         message.addReaction(args[0]).queue(success -> {
             var mentionedEmoji = args[0];
-            server.setBestOfQuoteEmoji(mentionedEmoji);
+            bestOfQuote.setEmoji(mentionedEmoji);
             event.reactSuccess();
         }, failure -> {
             event.reply(LanguageHandler.get(lang, "bestof_invalidemoji"));

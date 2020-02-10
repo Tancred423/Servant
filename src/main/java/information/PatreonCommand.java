@@ -34,7 +34,7 @@ public class PatreonCommand extends Command {
     @Override
     protected void execute(CommandEvent event) {
         var lang = LanguageHandler.getLanguage(event);
-        var guild = event.getGuild();
+        var jda = event.getJDA();
         var user = event.getAuthor();
         var master = new Master(user);
 
@@ -42,7 +42,7 @@ public class PatreonCommand extends Command {
                 .setColor(master.getColor())
                 .setAuthor(LanguageHandler.get(lang, "patreon_supportserver"), null, "https://i.imgur.com/rCnhGKA.jpg") // Patreon Icon
                 .setDescription(LanguageHandler.get(lang, "patreon_description"))
-                .setThumbnail(ImageUtil.getImageUrl("love", guild, user))
+                .setThumbnail(ImageUtil.getImageUrl(jda, "love"))
                 .addField("1. " + LanguageHandler.get(lang, "patreon_patreontitle"), LanguageHandler.get(lang, "patreon_subscription"), false)
                 .addField("$1+/month", LanguageHandler.get(lang, "patreon_$1"), true)
                 .addField("$3+/month", LanguageHandler.get(lang, "patreon_$3"), true)

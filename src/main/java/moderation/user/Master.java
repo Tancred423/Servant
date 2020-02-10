@@ -3,17 +3,15 @@ package moderation.user;
 
 import files.language.LanguageHandler;
 import interaction.Interaction;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.User;
-import servant.Log;
+import servant.LoggingTask;
 import servant.Servant;
-import useful.remindme.RemindMe;
 import utilities.MyEntry;
 
 import java.awt.*;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,162 +21,69 @@ import static servant.Database.closeQuietly;
 public class Master {
     private User user;
     private long userId;
+    private JDA jda;
 
     public Master(User user) {
         this.user = user;
         this.userId = user.getIdLong();
+        this.jda = user.getJDA();
     }
 
-    public User getUser() {
-        return user;
-    }
-
-    public long getUserId() {
-        return userId;
-    }
+    public User getUser() { return user; }
 
     // Methods
-    // RemindMe
-    public RemindMe getRemindMe(int aiNumber) {
+    // Blacklist
+    public boolean isBlacklisted() {
         Connection connection = null;
-        RemindMe remindMe = null;
+        var isBlacklisted = false;
 
         try {
             connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT * FROM remindme WHERE ai_number=? AND user_id=?");
-            select.setInt(1, aiNumber);
-            select.setLong(2, userId);
+            var select = connection.prepareStatement("SELECT * FROM blacklist WHERE id=?");
+            select.setLong(1, userId);
             var resultSet = select.executeQuery();
-            if (resultSet.first())
-                remindMe = new RemindMe(aiNumber, userId, resultSet.getTimestamp("event_time"), resultSet.getString("topic"));
+            if (resultSet.first()) isBlacklisted = true;
         } catch (SQLException e) {
-            new Log(e, null, null, "RemindMes.java", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#isBlacklisted");
         } finally {
             closeQuietly(connection);
         }
 
-        return remindMe;
+        return isBlacklisted;
     }
 
-    public int setRemindMe(Timestamp eventTime, String topic) {
-        Connection connection = null;
-        var aiNumber = 0;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var insert = connection.prepareStatement("INSERT INTO remindme (user_id,event_time,topic) VALUES (?,?,?)", Statement.RETURN_GENERATED_KEYS);
-            insert.setLong(1, userId);
-            insert.setTimestamp(2, eventTime);
-            insert.setString(3, topic);
-            insert.executeUpdate();
-
-            var resultSet = insert.getGeneratedKeys();
-            if (resultSet.first()) aiNumber = resultSet.getInt(1);
-        } catch (SQLException e) {
-            new Log(e, null, user, "Master.java - setRemindMe(Timestamp, String)", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-
-        return aiNumber;
-    }
-
-    public void unsetRemindMe(int aiNumber) {
+    public void setBlacklist() {
         Connection connection = null;
 
         try {
-            connection = Servant.db.getHikari().getConnection();
-            var insert = connection.prepareStatement("DELETE FROM remindme WHERE ai_number=? AND user_id=?");
-            insert.setInt(1, aiNumber);
-            insert.setLong(2, userId);
-            insert.executeUpdate();
-        } catch (SQLException e) {
-            new Log(e, null, user, "Master.java - unsetRemindMe(int, long)", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-
-    }
-
-    // Reminder
-    public boolean setReminder(Timestamp reminderTime, String topic) {
-        Connection connection = null;
-        var wasSet = false;
-
-        try {
-            if (!reminderHasEntry(reminderTime)) {
+            if (!isBlacklisted()) {
                 connection = Servant.db.getHikari().getConnection();
-                var insert = connection.prepareStatement("INSERT INTO reminder (user_id,reminder_time,topic) VALUES (?,?,?)");
+                var insert = connection.prepareStatement("INSERT INTO blacklist (id) VALUES (?)");
                 insert.setLong(1, userId);
-                insert.setTimestamp(2, reminderTime);
-                insert.setString(3, topic);
                 insert.executeUpdate();
-                wasSet = true;
             }
         } catch (SQLException e) {
-            new Log(e, null, user, "levelrole", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-
-        return wasSet;
-    }
-
-    public void unsetReminder(Timestamp reminderTime) {
-        Connection connection = null;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var insert = connection.prepareStatement("DELETE FROM reminder WHERE user_id=? AND reminder_time=?");
-            insert.setLong(1, userId);
-            insert.setTimestamp(2, reminderTime);
-            insert.executeUpdate();
-        } catch (SQLException e) {
-            new Log(e, null, user, "levelrole", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#setBlacklist");
         } finally {
             closeQuietly(connection);
         }
     }
 
-    private boolean reminderHasEntry(Timestamp reminderTime) {
+    public void unsetBlacklist() {
         Connection connection = null;
-        var hasEntry = false;
 
         try {
-            connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT * FROM reminder WHERE user_id=? AND reminder_time=?");
-            select.setLong(1, userId);
-            select.setTimestamp(2, reminderTime);
-            var resultSet = select.executeQuery();
-            hasEntry = resultSet.first();
+            if (isBlacklisted()) {
+                connection = Servant.db.getHikari().getConnection();
+                var delete = connection.prepareStatement("DELETE FROM blacklist WHERE id=?");
+                delete.setLong(1, userId);
+                delete.executeUpdate();
+            }
         } catch (SQLException e) {
-            new Log(e, null, user, "levelrole", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#unsetBlacklist");
         } finally {
             closeQuietly(connection);
         }
-
-        return hasEntry;
-    }
-
-    public Map<Timestamp, String> getReminders() {
-        Connection connection = null;
-        var reminders = new HashMap<Timestamp, String>();
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT * FROM reminder WHERE user_id=?");
-            select.setLong(1, userId);
-            var resultSet = select.executeQuery();
-            if (resultSet.first())
-                do reminders.put(resultSet.getTimestamp("reminder_time"), resultSet.getString("topic"));
-                while (resultSet.next());
-        } catch (SQLException e) {
-            new Log(e, null, user, "levelrole", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-
-        return reminders;
     }
 
     // Bio
@@ -193,7 +98,7 @@ public class Master {
             var resultSet = select.executeQuery();
             if (resultSet.first()) text = resultSet.getString("text");
         } catch (SQLException e) {
-            new Log(e, null, user, "bio", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#getBio");
         } finally {
             closeQuietly(connection);
         }
@@ -212,7 +117,7 @@ public class Master {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new Log(e, null, user, "bio", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#bioHasEntry");
         } finally {
             closeQuietly(connection);
         }
@@ -237,7 +142,7 @@ public class Master {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, null, user, "bio", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#setBio");
         } finally {
             closeQuietly(connection);
         }
@@ -256,7 +161,7 @@ public class Master {
             if (resultSet.first())
                 baguette = new MyEntry<>(resultSet.getInt("baguette_size"), resultSet.getInt("size_counter"));
         } catch (SQLException e) {
-            new Log(e, null, user, "baguette", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#getBaguette");
         } finally {
             closeQuietly(connection);
         }
@@ -275,7 +180,7 @@ public class Master {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new Log(e, null, user, "baguette", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#baguetteHasEntry");
         } finally {
             closeQuietly(connection);
         }
@@ -302,7 +207,7 @@ public class Master {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, null, user, "baguette", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#setBaguette");
         } finally {
             closeQuietly(connection);
         }
@@ -321,7 +226,7 @@ public class Master {
             var resultSet = select.executeQuery();
             hasAchievement = resultSet.first();
         } catch (SQLException e) {
-            new Log(e, null, user, "achievement", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#hasAchievement");
         } finally {
             closeQuietly(connection);
         }
@@ -343,7 +248,7 @@ public class Master {
                 while (resultSet.next());
             }
         } catch (SQLException e) {
-            new Log(e, null, user, "achievement", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#getAchievements");
         } finally {
             closeQuietly(connection);
         }
@@ -370,7 +275,7 @@ public class Master {
                     if (achievement.startsWith("level")) achievements.add(achievement);
                 } while (resultSet.next());
         } catch (SQLException e) {
-            new Log(e, null, user, "achievement", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#getLevelAchievements");
         } finally {
             closeQuietly(connection);
         }
@@ -389,7 +294,7 @@ public class Master {
             var resultSet = select.executeQuery();
             if (resultSet.first()) do ap += resultSet.getInt("ap"); while (resultSet.next());
         } catch (SQLException e) {
-            new Log(e, null, user, "achievement", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#getTotalAP");
         } finally {
             closeQuietly(connection);
         }
@@ -410,7 +315,7 @@ public class Master {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, null, user, "achievement", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#setAchievement");
         } finally {
             closeQuietly(connection);
         }
@@ -428,7 +333,7 @@ public class Master {
                 delete.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, null, user, "achievement", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#unsetAchievement");
         } finally {
             closeQuietly(connection);
         }
@@ -447,7 +352,7 @@ public class Master {
             if (resultSet.first()) offset = resultSet.getString("offset");
             offset = offset.equals("00:00") ? "Z" : offset;
         } catch (SQLException e) {
-            new Log(e, null, user, "offset", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#getOffset");
         } finally {
             closeQuietly(connection);
         }
@@ -466,7 +371,7 @@ public class Master {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new Log(e, null, user, "offset", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#offsetHasEntry");
         } finally {
             closeQuietly(connection);
         }
@@ -493,7 +398,7 @@ public class Master {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, null, user, "offset", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#setOffset");
         } finally {
             closeQuietly(connection);
         }
@@ -515,7 +420,7 @@ public class Master {
             var resultSet = select.executeQuery();
             if (resultSet.first()) prefix = resultSet.getString("prefix");
         } catch (SQLException e) {
-            new Log(e, null, user, "prefix", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#getPrefix");
         } finally {
             closeQuietly(connection);
         }
@@ -534,7 +439,7 @@ public class Master {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new Log(e, null, user, "prefix", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#prefixHasEntry");
         } finally {
             closeQuietly(connection);
         }
@@ -561,7 +466,7 @@ public class Master {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, null, user, "prefix", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#setPrefix");
         } finally {
             closeQuietly(connection);
         }
@@ -585,7 +490,7 @@ public class Master {
             if (language == null) language = Servant.config.getDefaultLanguage();
             else if (language.isEmpty()) language = Servant.config.getDefaultLanguage();
         } catch (SQLException e) {
-            new Log(e, null, user, "language", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#getLanguage");
         } finally {
             closeQuietly(connection);
         }
@@ -604,7 +509,7 @@ public class Master {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new Log(e, null, user, "language", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#languageHasEntry");
         } finally {
             closeQuietly(connection);
         }
@@ -631,7 +536,7 @@ public class Master {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, null, user, "language", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#setLanguage");
         } finally {
             closeQuietly(connection);
         }
@@ -654,7 +559,7 @@ public class Master {
             var resultSet = select.executeQuery();
             if (resultSet.first()) isStreamHidden = true;
         } catch (SQLException e) {
-            new Log(e, null, user, "livestream", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#isStreamHidden");
         } finally {
             closeQuietly(connection);
         }
@@ -673,7 +578,7 @@ public class Master {
             var resultSet = select.executeQuery();
             if (resultSet.first()) do streamHiddenGuilds.add(resultSet.getLong("guild_id")); while (resultSet.next());
         } catch (SQLException e) {
-            new Log(e, null, user, "livestream", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#getStreamHiddenGuilds");
         } finally {
             closeQuietly(connection);
         }
@@ -698,7 +603,7 @@ public class Master {
                 isStreamHidden = false;
             }
         } catch (SQLException e) {
-            new Log(e, null, user, "livestream", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#toggleStreamHidden");
         } finally {
             closeQuietly(connection);
         }
@@ -716,7 +621,7 @@ public class Master {
             delete.setLong(2, userId);
             delete.executeUpdate();
         } catch (SQLException e) {
-            new Log(e, null, user, "livestream", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#unsetStreamHidden");
         } finally {
             closeQuietly(connection);
         }
@@ -766,7 +671,7 @@ public class Master {
                 if (color != null) colorCode = String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
             }
         } catch (SQLException e) {
-            new Log(e, null, user, "color", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#getColorCode");
         } finally {
             closeQuietly(connection);
         }
@@ -814,7 +719,7 @@ public class Master {
                 }
             }
         } catch (SQLException e) {
-            new Log(e, null, user, "color", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#getColor");
         } finally {
             closeQuietly(connection);
         }
@@ -841,7 +746,7 @@ public class Master {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, null, user, "color", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#setColor");
         } finally {
             closeQuietly(connection);
         }
@@ -861,7 +766,7 @@ public class Master {
                 wasUnset = true;
             }
         } catch (SQLException e) {
-            new Log(e, null, user, "color", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#unsetColor");
         } finally {
             closeQuietly(connection);
         }
@@ -882,7 +787,7 @@ public class Master {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new Log(e, null, user, "db", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#hasEntry");
         } finally {
             closeQuietly(connection);
         }
@@ -908,7 +813,7 @@ public class Master {
                 ));
                 while (resultSet.next());
         } catch (SQLException e) {
-            new Log(e, null, user, "interaction", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#getInteractions");
         } finally {
             closeQuietly(connection);
         }
@@ -928,7 +833,7 @@ public class Master {
             var resultSet = select.executeQuery();
             if (resultSet.first()) commandCount = resultSet.getInt(isShared ? "shared" : "received");
         } catch (SQLException e) {
-            new Log(e, null, user, "interaction", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#getInteractionCount");
         } finally {
             closeQuietly(connection);
         }
@@ -962,7 +867,7 @@ public class Master {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, null, user, "interaction", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#incrementInteractionCount");
         } finally {
             closeQuietly(connection);
         }
@@ -989,7 +894,7 @@ public class Master {
                 } while (resultSet.next());
             }
         } catch (SQLException e) {
-            new Log(e, null, user, "featurecount", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#getFeatureCounts");
         } finally {
             closeQuietly(connection);
         }
@@ -1013,7 +918,7 @@ public class Master {
             var resultSet = select.executeQuery();
             if (resultSet.first()) featureCount = resultSet.getInt("count");
         } catch (SQLException e) {
-            new Log(e, null, user, "featurecount", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#getFeatureCount");
         } finally {
             closeQuietly(connection);
         }
@@ -1041,34 +946,13 @@ public class Master {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, null, user, "featurecount", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#incrementFeatureCount");
         } finally {
             closeQuietly(connection);
         }
     }
 
     // Level
-    public Map<Long, Integer> getExpOnGuilds() {
-        Connection connection = null;
-        var expOnGuilds = new HashMap<Long, Integer>();
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT * FROM user_exp WHERE user_id=?");
-            select.setLong(1, userId);
-            var resultSet = select.executeQuery();
-            if (resultSet.first())
-                do expOnGuilds.put(resultSet.getLong("guild_id"), resultSet.getInt("exp"));
-                while (resultSet.next());
-        } catch (SQLException e) {
-            new Log(e, null, user, "level", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-
-        return expOnGuilds;
-    }
-
     public int getExp(long guildId) {
         Connection connection = null;
         var exp = 0;
@@ -1081,7 +965,7 @@ public class Master {
             var resultSet = select.executeQuery();
             if (resultSet.first()) exp = resultSet.getInt("exp");
         } catch (SQLException e) {
-            new Log(e, null, user, "level", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#getExp");
         } finally {
             closeQuietly(connection);
         }
@@ -1110,7 +994,7 @@ public class Master {
                 update.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, null, user, "level", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#setExp");
         } finally {
             closeQuietly(connection);
         }
@@ -1129,7 +1013,7 @@ public class Master {
             if (resultSet.first())
             do feature += resultSet.getInt("count"); while (resultSet.next());
         } catch (SQLException e) {
-            new Log(e, null, user, "featurecount", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#getTotalFeatureCount");
         } finally {
             closeQuietly(connection);
         }
@@ -1164,7 +1048,7 @@ public class Master {
                 } while (resultSet.next());
             }
         } catch (SQLException e) {
-            new Log(e, null, user, "featurecount", null).sendLog(false);
+            new LoggingTask(e, jda, "Master#getFavoriteAnimal");
         } finally {
             closeQuietly(connection);
         }

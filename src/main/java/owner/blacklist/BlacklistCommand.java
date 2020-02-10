@@ -2,6 +2,8 @@
 package owner.blacklist;
 
 import files.language.LanguageHandler;
+import moderation.guild.Server;
+import moderation.user.Master;
 import net.dv8tion.jda.api.Permission;
 import servant.Servant;
 import utilities.Constants;
@@ -40,29 +42,38 @@ public class BlacklistCommand extends Command {
                     return;
                 }
 
-                var guild = event.getGuild();
-                var author = event.getAuthor();
+                var jda = event.getJDA();
 
                 if (event.getArgs().equals("show") || event.getArgs().equals("sh")) {
-                    var ids = Blacklist.getBlacklistedIds(guild, author);
+                    var blacklist = new Blacklist(jda);
+                    var ids = blacklist.getIds();
                     var sb = new StringBuilder();
                     for (var id : ids) sb.append(id).append("\n");
                     event.reply(ids.isEmpty() ? LanguageHandler.get(lang, "blacklist_empty") : sb.toString());
                 } else {
                     if (Parser.isValidId(event.getArgs())) {
                         var id = Long.parseLong(event.getArgs());
-                        if (Blacklist.isBlacklisted(id, guild, author)) Blacklist.unsetBlacklist(id, guild, author);
-                        else {
-                            Blacklist.setBlacklist(id, guild, author);
-                            var blacklistedGuild = event.getJDA().getGuildById(id);
-                            if (blacklistedGuild != null) blacklistedGuild.leave().queue();
+                        var guildToChange = jda.getGuildById(id);
+                        var userToChange = jda.getUserById(id);
+
+                        if (guildToChange != null) {
+                            var serverToChange = new Server(guildToChange);
+                            if (serverToChange.isBlacklisted()) serverToChange.unsetBlacklist();
+                            else serverToChange.setBlacklist();
+                            event.reactSuccess();
+                        } else if (userToChange != null) {
+                            var masterToChange = new Master(userToChange);
+                            if (masterToChange.isBlacklisted()) masterToChange.unsetBlacklist();
+                            else masterToChange.setBlacklist();
+                            event.reactSuccess();
+                        } else {
+                            event.reactWarning();
                         }
-                        event.reactSuccess();
                     } else event.reactError();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, Servant.threadPool);
+        }, Servant.fixedThreadPool);
     }
 }

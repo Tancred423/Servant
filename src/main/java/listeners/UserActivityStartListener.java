@@ -27,7 +27,7 @@ public class UserActivityStartListener extends ListenerAdapter {
          */
         if (guild.getIdLong() == 264445053596991498L) return; // Discord Bot List
         if (user.isBot()) return;
-        if (Blacklist.isBlacklisted(user, guild)) return;
+        if (Blacklist.isBlacklisted(guild, user)) return;
 
         CompletableFuture.runAsync(() -> {
             var newActivity = event.getNewActivity();
@@ -35,7 +35,7 @@ public class UserActivityStartListener extends ListenerAdapter {
 
             // Livestream
             processLivestream(event, guild, user, newActivity, lang);
-        }, Servant.threadPool);
+        }, Servant.fixedThreadPool);
     }
 
     private static void processLivestream(UserActivityStartEvent event, net.dv8tion.jda.api.entities.Guild guild, User user, Activity newActivity, String lang) {

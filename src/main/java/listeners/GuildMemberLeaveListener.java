@@ -31,7 +31,7 @@ public class GuildMemberLeaveListener extends ListenerAdapter {
          */
         if (guild.getIdLong() == 264445053596991498L) return; // Discord Bot List
         if (user.isBot()) return;
-        if (Blacklist.isBlacklisted(user, guild)) return;
+        if (Blacklist.isBlacklisted(guild, user)) return;
 
         CompletableFuture.runAsync(() -> {
             var server = new Server(guild);
@@ -52,12 +52,12 @@ public class GuildMemberLeaveListener extends ListenerAdapter {
                                     .setAuthor(String.format(LanguageHandler.get(lang, "leave_author"), user.getName(), user.getDiscriminator()), null, guild.getIconUrl())
                                     .setDescription(description == null ? LanguageHandler.get(lang, "leave_embeddescription") : description)
                                     .setThumbnail(user.getEffectiveAvatarUrl())
-                                    .setFooter(LanguageHandler.get(lang, "leave_footer"), ImageUtil.getImageUrl("clock", guild, user))
+                                    .setFooter(LanguageHandler.get(lang, "leave_footer"), ImageUtil.getImageUrl(event.getJDA(), "clock"))
                                     .setTimestamp(OffsetDateTime.now(ZoneOffset.of(server.getOffset())))
                                     .build()
                     ).queue();
                 }
             }
-        }, Servant.threadPool);
+        }, Servant.fixedThreadPool);
     }
 }

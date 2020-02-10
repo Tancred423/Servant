@@ -3,6 +3,7 @@ package listeners;
 
 import files.language.LanguageHandler;
 import moderation.guild.Server;
+import moderation.reactionRole.ReactionRole;
 import moderation.toggle.Toggle;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -13,7 +14,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import owner.blacklist.Blacklist;
 import servant.Servant;
-import useful.polls.PollsDatabase;
+import useful.polls.Poll;
 import utilities.EmoteUtil;
 
 import java.util.ArrayList;
@@ -33,30 +34,33 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
          */
         if (guild.getIdLong() == 264445053596991498L) return; // Discord Bot List
         if (user.isBot()) return;
-        if (Blacklist.isBlacklisted(user, guild)) return;
+        if (Blacklist.isBlacklisted(guild, user)) return;
 
         CompletableFuture.runAsync(() -> {
+            var jda = event.getJDA();
             var server = new Server(guild);
+            var channel = event.getChannel();
             var messageId = event.getMessageIdLong();
+            var lang = server.getLanguage();
 
-            // Quickpoll
-            if (PollsDatabase.isQuickpoll(messageId, guild, user)) {
-                processQuickpollMultipleVote(event, guild, user, messageId);
-            }
+            channel.retrieveMessageById(messageId).queue(message -> {
+                var poll = new Poll(jda, lang, message);
 
-            // Radiopoll
-            if (PollsDatabase.isRadioVote(messageId, guild, user)) {
-                processRadiovoteMultipleVote(event, guild, user, messageId);
-            }
+                // Quickpoll
+                if (poll.isQuickPoll()) processQuickpollMultipleVote(event, poll, user, messageId);
+
+                // Radiopoll
+                if (poll.isRadioPoll()) processRadiovoteMultipleVote(event, poll, user, messageId);
+            });
 
             // Reaction Role
             if (Toggle.isEnabled(event, "reactionrole")) {
-                processReactionRole(event, guild, user, server);
+                processReactionRole(event, guild, server);
             }
-        }, Servant.threadPool);
+        }, Servant.fixedThreadPool);
     }
 
-    private static void processQuickpollMultipleVote(GuildMessageReactionRemoveEvent event, net.dv8tion.jda.api.entities.Guild guild, User user, long messageId) {
+    private static void processQuickpollMultipleVote(GuildMessageReactionRemoveEvent event, Poll poll, User user, long messageId) {
         // Just react to Upvote, Shrug and Downvote.
         var reactionEmote = event.getReactionEmote();
         if (!reactionEmote.getName().equals(EmoteUtil.getEmoji("upvote"))
@@ -65,12 +69,12 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
             return;
 
         event.getChannel().retrieveMessageById(messageId).queue(message -> {
-            if (reactionEmote.getName().equals(PollsDatabase.getVoteEmoji(messageId, user.getIdLong(), guild, user)))
-                PollsDatabase.unsetUserVote(messageId, user.getIdLong(), guild, user);
+            if (reactionEmote.getName().equals(poll.getVoteEmoji(user.getIdLong())))
+                poll.unsetVote(user.getIdLong());
         });
     }
 
-    private static void processRadiovoteMultipleVote(GuildMessageReactionRemoveEvent event, net.dv8tion.jda.api.entities.Guild guild, User user, long messageId) {
+    private static void processRadiovoteMultipleVote(GuildMessageReactionRemoveEvent event, Poll poll, User user, long messageId) {
         // Just react to Upvote, Shrug and Downvote.
         var reactionEmote = event.getReactionEmote();
         if (!reactionEmote.isEmote()) {
@@ -89,16 +93,16 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 
         event.getChannel().retrieveMessageById(messageId).queue(message -> {
             if (reactionEmote.isEmote()) {
-                if (reactionEmote.getEmote().getIdLong() == PollsDatabase.getVoteEmoteId(messageId, user.getIdLong(), guild, user))
-                    PollsDatabase.unsetUserVote(messageId, user.getIdLong(), guild, user);
+                if (reactionEmote.getEmote().getIdLong() == poll.getVoteEmoteId(user.getIdLong()))
+                    poll.unsetVote(user.getIdLong());
             } else {
-                if (reactionEmote.getName().equals(PollsDatabase.getVoteEmoji(messageId, user.getIdLong(), guild, user)))
-                    PollsDatabase.unsetUserVote(messageId, user.getIdLong(), guild, user);
+                if (reactionEmote.getName().equals(poll.getVoteEmoji(user.getIdLong())))
+                    poll.unsetVote(user.getIdLong());
             }
         });
     }
 
-    private static void processReactionRole(GuildMessageReactionRemoveEvent event, net.dv8tion.jda.api.entities.Guild guild, User user, Server internalGuild) {
+    private static void processReactionRole(GuildMessageReactionRemoveEvent event, net.dv8tion.jda.api.entities.Guild guild, Server server) {
         var guildId = guild.getIdLong();
         var channelId = event.getChannel().getIdLong();
         var messageId = event.getMessageIdLong();
@@ -115,8 +119,10 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
             emoji = reactionEmote.getName();
         }
 
-        if (internalGuild.reactionRoleHasEntry(guildId, channelId, messageId, emoji, emoteGuildId, emoteId)) {
-            long roleId = internalGuild.getRoleId(guildId, channelId, messageId, emoji, emoteGuildId, emoteId);
+        var reactionRole = new ReactionRole(event.getJDA(), guildId, channelId, messageId, emoji, emoteGuildId, emoteId);
+
+        if (reactionRole.hasEntry()) {
+            long roleId = reactionRole.getRoleId();
             try {
                 var rolesToRemove = new ArrayList<Role>();
                 rolesToRemove.add(event.getGuild().getRoleById(roleId));

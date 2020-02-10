@@ -73,9 +73,6 @@ public class ServerlistCommand extends Command {
                         .map(g -> "**" + g.getName() + "** (ID:" + g.getId() + ") ~ " + g.getMembers().size() + " " + LanguageHandler.get(lang, "guildlist_members"))
                         .forEach(pbuilder::addItems);
 
-                var guild = event.getGuild();
-                var author = event.getAuthor();
-
                 Paginator p;
                 event.getJDA().getShardInfo();
                 p = pbuilder.setColor(new Master(event.getAuthor()).getColor())
@@ -87,6 +84,6 @@ public class ServerlistCommand extends Command {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, Servant.threadPool);
+        }, Servant.fixedThreadPool);
     }
 }

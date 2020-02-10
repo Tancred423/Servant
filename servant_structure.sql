@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Feb 06, 2020 at 09:58 PM
+-- Generation Time: Feb 11, 2020 at 12:18 AM
 -- Server version: 10.1.41-MariaDB-0+deb9u1
 -- PHP Version: 5.5.9-1ubuntu4
 
@@ -366,11 +366,14 @@ CREATE TABLE `reaction_role` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `remindme`
+-- Table structure for table `remindme_new`
 --
 
-CREATE TABLE `remindme` (
+CREATE TABLE `remindme_new` (
   `ai_number` int(11) NOT NULL,
+  `guild_id` bigint(18) NOT NULL,
+  `channel_id` bigint(18) NOT NULL,
+  `message_id` bigint(18) NOT NULL,
   `user_id` bigint(18) NOT NULL,
   `event_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `topic` varchar(1000) COLLATE utf8mb4_unicode_ci NOT NULL
@@ -692,10 +695,10 @@ ALTER TABLE `reaction_role`
   ADD PRIMARY KEY (`guild_id`,`channel_id`,`message_id`,`emoji`,`emote_guild_id`,`emote_id`);
 
 --
--- Indexes for table `remindme`
+-- Indexes for table `remindme_new`
 --
-ALTER TABLE `remindme`
-  ADD PRIMARY KEY (`ai_number`,`user_id`);
+ALTER TABLE `remindme_new`
+  ADD PRIMARY KEY (`ai_number`);
 
 --
 -- Indexes for table `signup`
@@ -774,9 +777,9 @@ ALTER TABLE `votes`
 --
 
 --
--- AUTO_INCREMENT for table `remindme`
+-- AUTO_INCREMENT for table `remindme_new`
 --
-ALTER TABLE `remindme`
+ALTER TABLE `remindme_new`
   MODIFY `ai_number` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;
 

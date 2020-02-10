@@ -6,7 +6,7 @@ import moderation.guild.GuildHandler;
 import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import servant.Log;
+import servant.LoggingTask;
 import utilities.Constants;
 import utilities.TimeUtil;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
@@ -56,14 +56,14 @@ public class ProfileCommand extends Command {
         var image = new File(path + OffsetDateTime.now(ZoneOffset.UTC).toEpochSecond() + "_" + ThreadLocalRandom.current().nextInt(100) + ".png");
 
         try {
-            var profileImage = new ProfileImage(profileUser, event.getGuild(), lang).generateImage();
+            var profileImage = new ProfileImage(event.getJDA(), profileUser, event.getGuild(), lang).generateImage();
             if (profileImage == null) {
                 System.out.println("error null");
                 return;
             }
             ImageIO.write(profileImage, "png", image);
         } catch (IOException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
+            new LoggingTask(e, event.getJDA(), name, event);
             return;
         }
 

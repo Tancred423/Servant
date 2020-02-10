@@ -23,12 +23,12 @@ public class GuildMemberRoleAddListener extends ListenerAdapter {
          */
         if (guild.getIdLong() == 264445053596991498L) return; // Discord Bot List
         if (user.isBot()) return;
-        if (Blacklist.isBlacklisted(user, guild)) return;
+        if (Blacklist.isBlacklisted(guild, user)) return;
 
         CompletableFuture.runAsync(() -> {
             // Patreon
             processPatreon(event);
-        }, Servant.threadPool);
+        }, Servant.fixedThreadPool);
     }
 
     private static void processPatreon(GuildMemberRoleAddEvent event) {

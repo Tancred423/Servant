@@ -2,8 +2,10 @@
 package fun.level;
 
 import files.language.LanguageHandler;
+import interaction.Interaction;
 import moderation.guild.Server;
 import moderation.user.Master;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import utilities.ImageUtil;
@@ -26,11 +28,13 @@ import java.util.List;
 import java.util.Map;
 
 public class ProfileImage {
+    private JDA jda;
     private User user;
     private Guild guild;
     private String lang;
 
-    ProfileImage(User user, Guild guild, String lang) {
+    ProfileImage(JDA jda, User user, Guild guild, String lang) {
+        this.jda = jda;
         this.user = user;
         this.guild = guild;
         this.lang = lang;
@@ -48,6 +52,9 @@ public class ProfileImage {
         var myriadPlain50pt = new Font("Myriad Pro", Font.PLAIN, 50); // MOC
         var myriadPlain40pt = new Font("Myriad Pro", Font.PLAIN, 40); // Command Info, Coloured Titles, Counter
 
+        // Colours
+        var masterColor = master.getColor();
+
         // Canvas
         var width = 2000;
         var height = 1500;
@@ -56,8 +63,8 @@ public class ProfileImage {
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         // Background
-        g2d.drawImage(getBg(master), 0, 0, null);
-        g2d.drawImage(getOverlay(), 0, 0, null);
+        g2d.drawImage(getBg(jda, master), 0, 0, null);
+        g2d.drawImage(getOverlay(jda), 0, 0, null);
 
         // Avatar
         var avaX = 750; // X and Y is not centered
@@ -80,7 +87,7 @@ public class ProfileImage {
 
         // EXP Ring
         var expRing = createRingShape(percent); // X and Y is centered
-        g2d.setColor(master.getColor());
+        g2d.setColor(masterColor);
         g2d.fill(expRing);
         g2d.setColor(Color.BLACK);
         g2d.draw(expRing);
@@ -88,48 +95,45 @@ public class ProfileImage {
         // User Name
         var name = user.getName() + "#" + user.getDiscriminator();
         var rect = new Rectangle(0, 500, 800, 450);
-        g2d.setColor(Color.WHITE);
-        drawCenteredString(g2d, name, rect, myriadPlain100pt);
+        drawCenteredString(g2d, name, rect, myriadPlain100pt, Color.WHITE);
 
         // Patreon Title
         var title = getTitle(master);
         rect = new Rectangle(0, 750, 800, 100);
-        g2d.setColor(master.getColor());
-        drawCenteredString(g2d, title, rect, myriadPlain75pt);
+        drawCenteredString(g2d, title, rect, myriadPlain75pt, masterColor);
 
         // Bio
-        g2d.setColor(Color.WHITE);
         var bio = master.getBio();
         var bioWithLineBreaks = getLineBreaks(bio);
         if (bioWithLineBreaks.size() == 1) {
             // One Line
             rect = new Rectangle(1300, 500, 630, 500);
-            drawCenteredString(g2d, bioWithLineBreaks.get(0).toString().trim(), rect, myriadPlain100pt);
+            drawCenteredString(g2d, bioWithLineBreaks.get(0).toString().trim(), rect, myriadPlain100pt, Color.WHITE);
         } else if (bioWithLineBreaks.size() == 2) {
             // Two Lines
             var line = bioWithLineBreaks.get(0).toString().trim();
             rect = new Rectangle(1300, 500, 630, 400);
-            drawCenteredString(g2d, line, rect, myriadPlain100pt);
+            drawCenteredString(g2d, line, rect, myriadPlain100pt, Color.WHITE);
 
             line = bioWithLineBreaks.get(1).toString().trim();
             rect = new Rectangle(1300, 550, 630, 500);
-            drawCenteredString(g2d, line, rect, myriadPlain100pt);
+            drawCenteredString(g2d, line, rect, myriadPlain100pt, Color.WHITE);
         } else if (bioWithLineBreaks.size() >= 3) {
             // Three Lines
             var line = bioWithLineBreaks.get(0).toString().trim();
             rect = new Rectangle(1300, 500, 630, 300);
-            drawCenteredString(g2d, line, rect, myriadPlain100pt);
+            drawCenteredString(g2d, line, rect, myriadPlain100pt, Color.WHITE);
 
             line = bioWithLineBreaks.get(1).toString().trim();
             rect = new Rectangle(1300, 550, 630, 400);
-            drawCenteredString(g2d, line, rect, myriadPlain100pt);
+            drawCenteredString(g2d, line, rect, myriadPlain100pt, Color.WHITE);
 
             var thirdLine = new StringBuilder();
             for (int i = 2; i < bioWithLineBreaks.size(); i++)
                 thirdLine.append(bioWithLineBreaks.get(i).toString()).append(" ");
             line = thirdLine.toString().trim();
             rect = new Rectangle(1300, 600, 630, 500);
-            drawCenteredString(g2d, line, rect, myriadPlain100pt);
+            drawCenteredString(g2d, line, rect, myriadPlain100pt, Color.WHITE);
         }
 
         // Titles: General Info, Command Stats, Most Used Commands, Achievements
@@ -137,19 +141,18 @@ public class ProfileImage {
         var commandStats = LanguageHandler.get(lang, "profile_commandstats").toUpperCase();
         var mostUsedCommands = LanguageHandler.get(lang, "profile_mostused").toUpperCase();
         var achievements = LanguageHandler.get(lang, "profile_achievements").toUpperCase();
-        g2d.setColor(master.getColor());
 
         rect = new Rectangle(0, 0, 1000, 100);
-        drawCenteredString(g2d, generalInfo, rect, myriadPlain40pt);
+        drawCenteredString(g2d, generalInfo, rect, myriadPlain40pt, masterColor);
 
         rect = new Rectangle(1000, 0, 1000, 100);
-        drawCenteredString(g2d, commandStats, rect, myriadPlain40pt);
+        drawCenteredString(g2d, commandStats, rect, myriadPlain40pt, masterColor);
 
         rect = new Rectangle(0, 1000, 1000, 100);
-        drawCenteredString(g2d, mostUsedCommands, rect, myriadPlain40pt);
+        drawCenteredString(g2d, mostUsedCommands, rect, myriadPlain40pt, masterColor);
 
         rect = new Rectangle(1000, 1000, 1000, 100);
-        drawCenteredString(g2d, achievements, rect, myriadPlain40pt);
+        drawCenteredString(g2d, achievements, rect, myriadPlain40pt, masterColor);
 
         // General Info - Level
         var levelText = LanguageHandler.get(lang, "profile_level");
@@ -338,8 +341,69 @@ public class ProfileImage {
         g2d.fill(shape);
         g2d.translate(animalX * -1, animalY * -1); // Reset
 
+        // Commands Stats - Most Shared Interaction
+        var msiText = LanguageHandler.get(lang, "profile_msi");
+        var msiX = 1100;
+        var msiY = 300;
+        layout = new TextLayout(msiText, myriadPlain40pt, frc);
+        shape = layout.getOutline(null);
+
+        g2d.setColor(Color.BLACK);
+        g2d.translate(msiX, msiY);
+        g2d.setStroke(new BasicStroke(outline));
+        g2d.draw(shape);
+        g2d.setColor(Color.WHITE);
+        g2d.fill(shape);
+        g2d.translate(msiX * -1, msiY * -1); // Reset
+
+        var interactions = master.getInteractions();
+        var msiValue = getMsi(interactions).getName();
+        var msiActualWidth = g2d.getFontMetrics().stringWidth(msiValue);
+        msiX = commandsStatsWidth - msiActualWidth;
+
+        layout = new TextLayout(msiValue, myriadPlain40pt, frc);
+        shape = layout.getOutline(null);
+
+        g2d.setColor(Color.BLACK);
+        g2d.translate(msiX, msiY);
+        g2d.setStroke(new BasicStroke(outline));
+        g2d.draw(shape);
+        g2d.setColor(Color.WHITE);
+        g2d.fill(shape);
+        g2d.translate(msiX * -1, msiY * -1); // Reset
+
+        // Commands Stats - Most Shared Interaction
+        var mriText = LanguageHandler.get(lang, "profile_mri");
+        var mriX = 1100;
+        var mriY = 380;
+        layout = new TextLayout(mriText, myriadPlain40pt, frc);
+        shape = layout.getOutline(null);
+
+        g2d.setColor(Color.BLACK);
+        g2d.translate(mriX, mriY);
+        g2d.setStroke(new BasicStroke(outline));
+        g2d.draw(shape);
+        g2d.setColor(Color.WHITE);
+        g2d.fill(shape);
+        g2d.translate(mriX * -1, mriY * -1); // Reset
+
+        var mriValue = getMri(interactions).getName();
+        var mriActualWidth = g2d.getFontMetrics().stringWidth(mriValue);
+        mriX = commandsStatsWidth - mriActualWidth;
+
+        layout = new TextLayout(mriValue, myriadPlain40pt, frc);
+        shape = layout.getOutline(null);
+
+        g2d.setColor(Color.BLACK);
+        g2d.translate(mriX, mriY);
+        g2d.setStroke(new BasicStroke(outline));
+        g2d.draw(shape);
+        g2d.setColor(Color.WHITE);
+        g2d.fill(shape);
+        g2d.translate(mriX * -1, mriY * -1); // Reset
+
         // Most Used Commands
-        var featureIcons = getFeatureIcons(guild, user);
+        var featureIcons = getFeatureIcons(jda);
         var featureCounts = master.getFeatureCounts();
 
         var i = 0;
@@ -357,14 +421,14 @@ public class ProfileImage {
 
                 // Set Text
                 rect = new Rectangle(x, y + 73, 64, 45);
-                drawCenteredString(g2d, String.valueOf(entry.getValue()), rect, myriadPlain50pt);
+                drawCenteredString(g2d, String.valueOf(entry.getValue()), rect, myriadPlain50pt, Color.WHITE);
 
                 i++;
             }
         }
 
         // Achievements
-        var achievementIcons = getAchievementIcons(guild, user);
+        var achievementIcons = getAchievementIcons(jda);
         var achievementsMap = master.getAchievements();
 
         i = 0;
@@ -384,7 +448,7 @@ public class ProfileImage {
 
                 // Set Text
                 rect = new Rectangle(x, y + 73, 64, 45);
-                drawCenteredString(g2d, String.valueOf(entry.getValue()), rect, myriadPlain50pt);
+                drawCenteredString(g2d, String.valueOf(entry.getValue()), rect, myriadPlain50pt, Color.WHITE);
             }
 
             i++;
@@ -413,34 +477,34 @@ public class ProfileImage {
         return lineBreaks;
     }
 
-    private Image getBg(Master master) {
+    private Image getBg(JDA jda, Master master) {
         try {
             if (master.isCreator())
-                return ImageIO.read(new URL(ImageUtil.getImageUrl("profile_bg_creator", guild, user)));
+                return ImageIO.read(new URL(ImageUtil.getImageUrl(jda, "profile_bg_creator")));
             else if (master.isVIP())
-                return ImageIO.read(new URL(ImageUtil.getImageUrl("profile_bg_vip", guild, user)));
+                return ImageIO.read(new URL(ImageUtil.getImageUrl(jda, "profile_bg_vip")));
             else if (master.is$10Patron())
-                return ImageIO.read(new URL(ImageUtil.getImageUrl("profile_bg_$10", guild, user)));
+                return ImageIO.read(new URL(ImageUtil.getImageUrl(jda, "profile_bg_$10")));
             else if (master.is$5Patron())
-                return ImageIO.read(new URL(ImageUtil.getImageUrl("profile_bg_$5", guild, user)));
+                return ImageIO.read(new URL(ImageUtil.getImageUrl(jda, "profile_bg_$5")));
             else if (master.is$3Patron())
-                return ImageIO.read(new URL(ImageUtil.getImageUrl("profile_bg_$3", guild, user)));
+                return ImageIO.read(new URL(ImageUtil.getImageUrl(jda, "profile_bg_$3")));
             else if (master.is$1Patron())
-                return ImageIO.read(new URL(ImageUtil.getImageUrl("profile_bg_$1", guild, user)));
+                return ImageIO.read(new URL(ImageUtil.getImageUrl(jda, "profile_bg_$1")));
             else if (master.isDonator())
-                return ImageIO.read(new URL(ImageUtil.getImageUrl("profile_bg_donator", guild, user)));
+                return ImageIO.read(new URL(ImageUtil.getImageUrl(jda, "profile_bg_donator")));
             else if (master.isServerBooster())
-                return ImageIO.read(new URL(ImageUtil.getImageUrl("profile_bg_booster", guild, user)));
+                return ImageIO.read(new URL(ImageUtil.getImageUrl(jda, "profile_bg_booster")));
             else
-                return ImageIO.read(new URL(ImageUtil.getImageUrl("profile_bg_normal", guild, user)));
+                return ImageIO.read(new URL(ImageUtil.getImageUrl(jda, "profile_bg_normal")));
         } catch (IOException e) {
             return null;
         }
     }
 
-    private Image getOverlay() {
+    private Image getOverlay(JDA jda) {
         try {
-            return ImageIO.read(new URL(ImageUtil.getImageUrl("profile_overlay", guild, user)));
+            return ImageIO.read(new URL(ImageUtil.getImageUrl(jda, "profile_overlay")));
         } catch (IOException e) {
             return null;
         }
@@ -505,12 +569,23 @@ public class ProfileImage {
         return area;
     }
 
-    public void drawCenteredString(Graphics g2d, String text, Rectangle rect, Font font) {
+    public void drawCenteredString(Graphics2D g2d, String text, Rectangle rect, Font font, Color fontColor) {
         var metrics = g2d.getFontMetrics(font);
         var x = rect.x + (rect.width - metrics.stringWidth(text)) / 2;
         var y = rect.y + ((rect.height - metrics.getHeight()) / 2) + metrics.getAscent();
+        float outline = 10;
         g2d.setFont(font);
-        g2d.drawString(text, x, y);
+        var frc = g2d.getFontRenderContext();
+        var layout = new TextLayout(text, font, frc);
+        var shape = layout.getOutline(null);
+
+        g2d.setColor(Color.BLACK);
+        g2d.translate(x, y);
+        g2d.setStroke(new BasicStroke(outline));
+        g2d.draw(shape);
+        g2d.setColor(fontColor);
+        g2d.fill(shape);
+        g2d.translate(x * -1, y * -1); // Reset
     }
 
     private String getTitle(Master master) {
@@ -534,19 +609,19 @@ public class ProfileImage {
             return LanguageHandler.get(lang, "profile_title_normal");
     }
 
-    private Map<String, String> getFeatureIcons(Guild guild, User user) {
+    private Map<String, String> getFeatureIcons(JDA jda) {
         var featureIcons = new HashMap<String, String>();
         var featureNames = NameAliasUtil.getValidFeatures();
         for (var featureName : featureNames)
-            featureIcons.put(featureName, ImageUtil.getImageUrl("f_" + featureName, guild, user));
+            featureIcons.put(featureName, ImageUtil.getImageUrl(jda, "f_" + featureName));
         return featureIcons;
     }
 
-    private Map<String, String> getAchievementIcons(Guild guild, User user) {
+    private Map<String, String> getAchievementIcons(JDA jda) {
         var achievementIcons = new HashMap<String, String>();
         var achievementNames = getValidAchievements();
         for (var achievementName : achievementNames)
-            achievementIcons.put(achievementName, ImageUtil.getImageUrl("a_" + achievementName, guild, user));
+            achievementIcons.put(achievementName, ImageUtil.getImageUrl(jda, "a_" + achievementName));
         return achievementIcons;
     }
 
@@ -587,5 +662,27 @@ public class ProfileImage {
         } catch (IOException e) {
             return null;
         }
+    }
+
+    private Interaction getMsi(List<Interaction> interactions) {
+        Interaction msi = null;
+
+        for (var interaction : interactions) {
+            if (msi == null || interaction.getShared() > msi.getShared())
+                msi = interaction;
+        }
+
+        return msi;
+    }
+
+    private Interaction getMri(List<Interaction> interactions) {
+        Interaction mri = null;
+
+        for (var interaction : interactions) {
+            if (mri == null || interaction.getReceived() > mri.getReceived())
+                mri = interaction;
+        }
+
+        return mri;
     }
 }

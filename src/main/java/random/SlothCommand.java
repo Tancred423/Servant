@@ -5,7 +5,7 @@ import files.language.LanguageHandler;
 import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import servant.Log;
+import servant.LoggingTask;
 import servant.Servant;
 import utilities.Constants;
 import utilities.JsonReader;
@@ -81,7 +81,7 @@ public class SlothCommand extends Command {
             eb.setImage(directImageLink);
             event.reply(eb.build());
         } catch (IOException e) {
-            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(true);
+            new LoggingTask(e, event.getJDA(), name, event);
         }
     }
 }

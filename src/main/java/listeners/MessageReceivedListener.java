@@ -38,7 +38,7 @@ public class MessageReceivedListener extends ListenerAdapter {
          */
         if (event.isFromGuild() && event.getGuild().getIdLong() == 264445053596991498L) return; // Discord Bot List
         if (user.isBot()) return;
-        if (Blacklist.isBlacklisted(user, event.isFromGuild() ? event.getGuild() : null)) return;
+        if (Blacklist.isBlacklisted(event.isFromGuild() ? event.getGuild() : null, user)) return;
 
         CompletableFuture.runAsync(() -> {
             if (event.getMessage().getContentRaw().equals("<@!" + event.getJDA().getSelfUser().getIdLong() + ">")
@@ -53,7 +53,7 @@ public class MessageReceivedListener extends ListenerAdapter {
                 }
             }
 
-        }, Servant.threadPool);
+        }, Servant.fixedThreadPool);
     }
 
     private static void processPrefix(MessageReceivedEvent event, net.dv8tion.jda.api.entities.User user) {
@@ -62,7 +62,6 @@ public class MessageReceivedListener extends ListenerAdapter {
 
         if (event.isFromGuild()) {
             var server = new Server(event.getGuild());
-            var guild = event.getGuild();
             prefix = server.getPrefix();
             lang = server.getLanguage();
         } else {
@@ -161,7 +160,7 @@ public class MessageReceivedListener extends ListenerAdapter {
             case "merry christmas":
             case "merry xmas":
                 logEasterEggFound(event, contentRaw);
-                event.getChannel().sendMessage(EmoteUtil.getEmoteMention(event.getJDA(), "servant_padoru", guild, user)).queue(sentMessage -> {
+                event.getChannel().sendMessage(EmoteUtil.getEmoteMention(event.getJDA(), "servant_padoru")).queue(sentMessage -> {
                     if (!master.hasAchievement("xmas")) {
                         master.setAchievement("xmas", 10);
                         new MessageUtil().reactAchievement(message);
@@ -171,7 +170,7 @@ public class MessageReceivedListener extends ListenerAdapter {
 
             case "padoru":
                 logEasterEggFound(event, contentRaw);
-                event.getChannel().sendMessage(new EmbedBuilder().setColor(master.getColor()).setImage(ImageUtil.getImageUrl("padoru", guild, user)).build()).queue(success -> {
+                event.getChannel().sendMessage(new EmbedBuilder().setColor(master.getColor()).setImage(ImageUtil.getImageUrl(event.getJDA(), "padoru")).build()).queue(success -> {
                     if (!master.hasAchievement("padoru")) {
                         master.setAchievement("padoru", 10);
                         new MessageUtil().reactAchievement(message);
@@ -253,7 +252,6 @@ public class MessageReceivedListener extends ListenerAdapter {
             userCd.put(user, ZonedDateTime.now(ZoneOffset.UTC));
             Level.guildCds.put(guild, userCd);
 
-            var authorId = user.getIdLong();
             var guildId = guild.getIdLong();
 
             var currentLevel = Level.getLevel(user, guildId);

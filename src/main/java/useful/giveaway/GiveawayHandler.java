@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
-import servant.Log;
+import servant.LoggingTask;
 import servant.Servant;
 import utilities.EmoteUtil;
 import utilities.ImageUtil;
@@ -106,7 +106,7 @@ public class GiveawayHandler {
                                     eb.setAuthor(String.format(LanguageHandler.get(lang, "giveaway_from"), author.getName()), null, author.getEffectiveAvatarUrl());
                                     eb.setDescription(String.format(LanguageHandler.get(lang, "giveaway_description_running"), prize, amountWinners, remainingTimeString, EmoteUtil.getEmoji("tada")));
                                     eb.appendDescription("\n\n" + String.format(LanguageHandler.get(lang, "giveaway_end_manually"), author.getAsMention()));
-                                    eb.setFooter(LanguageHandler.get(lang, "giveaway_endsat"), ImageUtil.getImageUrl("clock", guild, author));
+                                    eb.setFooter(LanguageHandler.get(lang, "giveaway_endsat"), ImageUtil.getImageUrl(jda, "clock"));
                                     eb.setTimestamp(giveaway);
 
                                     message.editMessage(eb.build()).queue();
@@ -118,7 +118,7 @@ public class GiveawayHandler {
                 } while (resultSet.next());
             }
         } catch (SQLException e) {
-            new Log(e, null, jda.getSelfUser(), "giveaway", null).sendLog(false);
+            new LoggingTask(e, jda, "GiveawayHandler#checkGiveaways");
         } finally {
             closeQuietly(connection);
         }
@@ -133,8 +133,6 @@ public class GiveawayHandler {
             return;
         }
 
-        var guild = message.getGuild();
-
         for (int i = 0; i < message.getReactions().size(); i++) {
             if (message.getReactions().get(i).getReactionEmote().getName().equals(EmoteUtil.getEmoji("tada"))) {
                 message.getReactions().get(i).retrieveUsers().queue(participantsList -> {
@@ -148,7 +146,7 @@ public class GiveawayHandler {
                         eb.setColor(new Master(author).getColor());
                         eb.setAuthor(String.format(LanguageHandler.get(lang, "giveaway_from"), author.getName()), null, author.getEffectiveAvatarUrl());
                         eb.setDescription(String.format(LanguageHandler.get(lang, "giveaway_description_nowinner"), prize, amountWinners));
-                        eb.setFooter(LanguageHandler.get(lang, "giveaway_endedat"), ImageUtil.getImageUrl("clock", guild, author));
+                        eb.setFooter(LanguageHandler.get(lang, "giveaway_endedat"), ImageUtil.getImageUrl(message.getJDA(), "clock"));
                         eb.setTimestamp(now);
                         message.editMessage(eb.build()).queue();
                     } else {
@@ -196,7 +194,6 @@ public class GiveawayHandler {
         var amountWinners = 0;
         var sb = new StringBuilder();
 
-        var guild = event.getGuild();
         var author = event.getAuthor();
 
         for (int i = 0; i < args.length; i++) {
@@ -284,7 +281,7 @@ public class GiveawayHandler {
         eb.setAuthor(String.format(LanguageHandler.get(lang, "giveaway_from"), message.getAuthor().getName()), null, message.getAuthor().getEffectiveAvatarUrl());
         eb.setDescription(String.format(LanguageHandler.get(lang, "giveaway_description_running"), prize, amountWinners, remainingTimeString, EmoteUtil.getEmoji("tada")));
         eb.appendDescription("\n\n" + String.format(LanguageHandler.get(lang, "giveaway_end_manually"), author.getAsMention()));
-        eb.setFooter(LanguageHandler.get(lang, "giveaway_endsat"), ImageUtil.getImageUrl("clock", guild, author));
+        eb.setFooter(LanguageHandler.get(lang, "giveaway_endsat"), ImageUtil.getImageUrl(event.getJDA(), "clock"));
         eb.setTimestamp(dateGiveaway);
 
         var finalPrize1 = prize;

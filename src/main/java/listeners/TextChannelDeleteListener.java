@@ -3,9 +3,7 @@ package listeners;
 import moderation.guild.Server;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import owner.blacklist.Blacklist;
 import servant.Servant;
-import useful.giveaway.GiveawayHandler;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -25,7 +23,6 @@ public class TextChannelDeleteListener extends ListenerAdapter {
          */
         if (guild.getIdLong() == 264445053596991498L) return; // Discord Bot List
         if (user.isBot()) return;
-        if (Blacklist.isBlacklisted(user, guild)) return;
 
         CompletableFuture.runAsync(() -> {
             var server = new Server(guild);
@@ -47,6 +44,6 @@ public class TextChannelDeleteListener extends ListenerAdapter {
 
             // Poll
             server.purgePollsFromChannel(channel.getIdLong());
-        }, Servant.threadPool);
+        }, Servant.fixedThreadPool);
     }
 }

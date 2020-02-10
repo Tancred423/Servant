@@ -1,14 +1,15 @@
 // Author: Tancred423 (https://github.com/Tancred423)
-package useful.timezone;
+package useful;
 
 import files.language.LanguageHandler;
 import moderation.guild.GuildHandler;
 import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import servant.Log;
+import servant.LoggingTask;
 import utilities.Constants;
 import utilities.MessageUtil;
+import utilities.TimezoneUtil;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
@@ -38,6 +39,8 @@ public class TimezoneCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
+        var jda = event.getJDA();
+
         var lang = LanguageHandler.getLanguage(event);
         var p = GuildHandler.getPrefix(event);
 
@@ -59,8 +62,8 @@ public class TimezoneCommand extends Command {
 
         var date = args[0];
         var time = args[1];
-        var zone = Timezone.getOffset(args[2]);
-        var targetZone = Timezone.getOffset(args[3]);
+        var zone = TimezoneUtil.getOffset(args[2]);
+        var targetZone = TimezoneUtil.getOffset(args[3]);
 
         if (zone == null) {
             event.reply(LanguageHandler.get(lang, "timezone_invalidzone_start"));
@@ -92,7 +95,7 @@ public class TimezoneCommand extends Command {
             eb.addField(LanguageHandler.get(lang, "timezone_output"), formatTarget, false);
             event.reply(eb.build());
         } catch (Exception e) {
-            new Log(e, event.getGuild(), event.getAuthor(), name, event).sendLog(false);
+            new LoggingTask(e, jda, "TimezoneCommand#execute");
             event.reply(LanguageHandler.get(lang, "timezone_invalid"));
             event.reactError();
         }

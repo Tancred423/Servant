@@ -34,12 +34,12 @@ public class GuildJoinListener extends ListenerAdapter {
          */
         if (guild.getIdLong() == 264445053596991498L) return; // Discord Bot List
         if (user.isBot()) return;
-        if (Blacklist.isBlacklisted(user, guild)) return;
+        if (Blacklist.isBlacklisted(guild, user)) return;
 
         CompletableFuture.runAsync(() -> {
             // Invite
             processInvite(event, guild, guildOwner);
-        }, Servant.threadPool);
+        }, Servant.fixedThreadPool);
     }
 
     private static void processInvite(GuildJoinEvent event, net.dv8tion.jda.api.entities.Guild guild, Member guildOwner) {
@@ -49,7 +49,7 @@ public class GuildJoinListener extends ListenerAdapter {
         System.out.println("[" + OffsetDateTime.now(ZoneId.of(Constants.LOG_OFFSET)).toString().replaceAll("T", " ").substring(0, 19) + "] " +
                 "Servant was invited to " + guild.getName() + " (" + guild.getIdLong() + "). Owner: " + guildOwnerUser + "#" + guildOwnerUser.getDiscriminator() + " (" + guildOwner.getIdLong() + ").");
 
-        if (Blacklist.isBlacklisted(guildOwnerUser, guild)) {
+        if (Blacklist.isBlacklisted(guild, guildOwnerUser)) {
             event.getGuild().leave().queue();
             System.out.println("Servant left " + guild.getName() + " because this guild was blacklisted.");
             return;
@@ -68,7 +68,7 @@ public class GuildJoinListener extends ListenerAdapter {
             eb.setAuthor(String.format(LanguageHandler.get(language, "invite_author"), bot.getName()), null, bot.getEffectiveAvatarUrl());
             eb.setThumbnail(guild.getIconUrl());
             eb.setDescription(String.format(LanguageHandler.get(language, "invite_description"), p, p, p, Servant.config.getSupportGuildInv(), botOwner.getName(), botOwner.getDiscriminator()));
-            eb.setImage(ImageUtil.getImageUrl("invite", guild, guildOwnerUser));
+            eb.setImage(ImageUtil.getImageUrl(event.getJDA(), "invite"));
             eb.setFooter(String.format(LanguageHandler.get(language, "invite_footer"), guild.getName()), null);
 
             privateChannel.sendMessage(eb.build()).queue();

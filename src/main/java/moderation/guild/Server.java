@@ -4,12 +4,11 @@ package moderation.guild;
 import files.language.LanguageHandler;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
-import servant.Log;
+import servant.LoggingTask;
 import servant.Servant;
+import useful.remindme.RemindMe;
 
 import java.sql.*;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.*;
 
 import static servant.Database.closeQuietly;
@@ -17,36 +16,73 @@ import static servant.Database.closeQuietly;
 public class Server {
     private Guild guild;
     private long guildId;
+    private JDA jda;
 
     public Server(Guild guild) {
         this.guild = guild;
         this.guildId = guild.getIdLong();
+        this.jda = guild.getJDA();
     }
 
     public Guild getGuild() { return guild; }
     public long getGuildId() { return guildId; }
 
-    // Poll
-    public void setVote(long channelId, long messageId, long authorId, String type, Timestamp endingDate) {
+    // Methods
+    // Blacklist
+    public boolean isBlacklisted() {
         Connection connection = null;
+        var isBlacklisted = false;
 
         try {
             connection = Servant.db.getHikari().getConnection();
-            var insert = connection.prepareStatement("INSERT INTO votes (guild_id,channel_id,message_id,author_id,type,ending_date) VALUES (?,?,?,?,?,?)");
-            insert.setLong(1, guildId);
-            insert.setLong(2, channelId);
-            insert.setLong(3, messageId);
-            insert.setLong(4, authorId);
-            insert.setString(5, type);
-            insert.setTimestamp(6, endingDate);
-            insert.executeUpdate();
+            var select = connection.prepareStatement("SELECT * FROM blacklist WHERE id=?");
+            select.setLong(1, guildId);
+            var resultSet = select.executeQuery();
+            if (resultSet.first()) isBlacklisted = true;
         } catch (SQLException e) {
-            new Log(e, guild, null, "poll", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#isBlacklisted");
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return isBlacklisted;
+    }
+
+    public void setBlacklist() {
+        Connection connection = null;
+
+        try {
+            if (!isBlacklisted()) {
+                connection = Servant.db.getHikari().getConnection();
+                var insert = connection.prepareStatement("INSERT INTO blacklist (id) VALUES (?)");
+                insert.setLong(1, guildId);
+                insert.executeUpdate();
+            }
+        } catch (SQLException e) {
+            new LoggingTask(e, jda, "Server#setBlacklist");
         } finally {
             closeQuietly(connection);
         }
     }
 
+    public void unsetBlacklist() {
+        Connection connection = null;
+
+        try {
+            if (isBlacklisted()) {
+                connection = Servant.db.getHikari().getConnection();
+                var delete = connection.prepareStatement("DELETE FROM blacklist WHERE id=?");
+                delete.setLong(1, guildId);
+                delete.executeUpdate();
+            }
+        } catch (SQLException e) {
+            new LoggingTask(e, jda, "Server#unsetBlacklist");
+        } finally {
+            closeQuietly(connection);
+        }
+    }
+
+    // Poll
     public void purgePollsFromChannel(long channelId) {
         Connection connection = null;
 
@@ -57,7 +93,7 @@ public class Server {
             delete.setLong(2, channelId);
             delete.executeUpdate();
         } catch (SQLException e) {
-            new Log(e, guild, null, "poll", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#purgePollsFromChannel");
         } finally {
             closeQuietly(connection);
         }
@@ -72,41 +108,7 @@ public class Server {
             delete.setLong(1, guildId);
             delete.executeUpdate();
         } catch (SQLException e) {
-            new Log(e, guild, null, "poll", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-    }
-
-    public boolean isPoll(long messageId) {
-        Connection connection = null;
-        var isSignupMessage = false;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT message_id FROM votes WHERE message_id=?");
-            select.setLong(1, messageId);
-            var resultSet = select.executeQuery();
-            isSignupMessage = resultSet.first();
-        } catch (SQLException e) {
-            new Log(e, guild, null, "poll", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-
-        return isSignupMessage;
-    }
-
-    public void unsetPoll(long messageId) {
-        Connection connection = null;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var delete = connection.prepareStatement("DELETE FROM votes WHERE message_id=?");
-            delete.setLong(1, messageId);
-            delete.executeUpdate();
-        } catch (SQLException e) {
-            new Log(e, guild, null, "poll", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#purgePolls");
         } finally {
             closeQuietly(connection);
         }
@@ -123,7 +125,7 @@ public class Server {
             delete.setLong(2, channelId);
             delete.executeUpdate();
         } catch (SQLException e) {
-            new Log(e, guild, null, "signup", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#purgeSignupsFromChannel");
         } finally {
             closeQuietly(connection);
         }
@@ -138,470 +140,10 @@ public class Server {
             delete.setLong(1, guildId);
             delete.executeUpdate();
         } catch (SQLException e) {
-            new Log(e, guild, null, "signup", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#purgeSignups");
         } finally {
             closeQuietly(connection);
         }
-    }
-
-    public boolean isSignupMessage(long messageId) {
-        Connection connection = null;
-        var isSignupMessage = false;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT message_id FROM signup WHERE message_id=?");
-            select.setLong(1, messageId);
-            var resultSet = select.executeQuery();
-            isSignupMessage = resultSet.first();
-        } catch (SQLException e) {
-            new Log(e, guild, null, "signup", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-
-        return isSignupMessage;
-    }
-
-    public long getSignupAuthorId(long messageId) {
-        Connection connection = null;
-        var authorId = 0L;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT author_id FROM signup WHERE message_id=?");
-            select.setLong(1, messageId);
-            var resultSet = select.executeQuery();
-            if (resultSet.first()) authorId = resultSet.getLong("author_id");
-        } catch (SQLException e) {
-            new Log(e, guild, null, "signup", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-
-        return authorId;
-    }
-
-    public int getSignupAmount(long messageId) {
-        Connection connection = null;
-        var amount = 0;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT amount FROM signup WHERE message_id=?");
-            select.setLong(1, messageId);
-            var resultSet = select.executeQuery();
-            if (resultSet.first()) amount = resultSet.getInt("amount");
-        } catch (SQLException e) {
-            new Log(e, guild, null, "signup", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-
-        return amount;
-    }
-
-    public String getSignupTitle(long messageId) {
-        Connection connection = null;
-        String authorId = null;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT title FROM signup WHERE message_id=?");
-            select.setLong(1, messageId);
-            var resultSet = select.executeQuery();
-            if (resultSet.first()) authorId = resultSet.getString("title");
-        } catch (SQLException e) {
-            new Log(e, guild, null, "signup", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-
-        return authorId;
-    }
-
-    public ZonedDateTime getSignupTime(long messageId) {
-        Connection connection = null;
-        ZonedDateTime expiration = null;
-
-        if (guild.getOwner() == null) return null;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT time FROM signup WHERE message_id=?");
-            select.setLong(1, messageId);
-            var resultSet = select.executeQuery();
-            if (resultSet.first()) expiration = resultSet.getTimestamp("time").toLocalDateTime()
-                    .atZone(ZoneId.of(getOffset()));
-        } catch (SQLException e) {
-            new Log(e, guild, null, "signup", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-
-        return expiration;
-    }
-
-    public boolean signupIsCustomDate(long messageId) {
-        Connection connection = null;
-        var isCustomDate = false;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT is_custom_date FROM signup WHERE message_id=?");
-            select.setLong(1, messageId);
-            var resultSet = select.executeQuery();
-            if (resultSet.first()) isCustomDate = resultSet.getBoolean("is_custom_date");
-        } catch (SQLException e) {
-            new Log(e, guild, null, "signup", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-
-        return isCustomDate;
-    }
-
-    public void setSignup(long messageId, long authorId, int amount, String title, Timestamp time, long channelId, boolean isCustomDate) {
-        Connection connection = null;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var insert = connection.prepareStatement("INSERT INTO signup (message_id,author_id,amount,title,time,guild_id,channel_id,is_custom_date) VALUES (?,?,?,?,?,?,?,?)");
-            insert.setLong(1, messageId);
-            insert.setLong(2, authorId);
-            insert.setInt(3, amount);
-            insert.setString(4, title);
-            insert.setTimestamp(5, time);
-            insert.setLong(6, guildId);
-            insert.setLong(7, channelId);
-            insert.setBoolean(8, isCustomDate);
-            insert.executeUpdate();
-        } catch (SQLException e) {
-            new Log(e, guild, null, "signup", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-    }
-
-    public void unsetSignup(long messageId) {
-        Connection connection = null;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var delete = connection.prepareStatement("DELETE FROM signup WHERE message_id=?");
-            delete.setLong(1, messageId);
-            delete.executeUpdate();
-        } catch (SQLException e) {
-            new Log(e, guild, null, "signup", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-    }
-
-    // BestOfQuote
-    private boolean bestOfQuoteHasEntry() {
-        Connection connection = null;
-        var hasEntry = false;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT * FROM best_of_quote WHERE guild_id=?");
-            select.setLong(1, guildId);
-            var resultSet = select.executeQuery();
-            hasEntry = resultSet.first();
-        } catch (SQLException e) {
-            new Log(e, guild, null, "bestofquote", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-
-        return hasEntry;
-    }
-
-    public Emote getBestOfQuoteEmote(JDA jda) {
-        Connection connection = null;
-        Emote emote = null;
-
-        var thisGuild = jda.getGuildById(guildId);
-        if (thisGuild == null) return null;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT * FROM best_of_quote WHERE guild_id=?");
-            select.setLong(1, guildId);
-            var resultSet = select.executeQuery();
-            if (resultSet.first()) {
-                var guildId = resultSet.getLong("emote_guild_id");
-                var emoteId = resultSet.getLong("emote_id");
-                if (guildId != 0 && emoteId != 0) emote = thisGuild.getEmoteById(emoteId);
-            }
-        } catch (SQLException e) {
-            new Log(e, guild, null, "bestofquote", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-
-        return emote;
-    }
-
-    public String getBestOfQuoteEmoji() {
-        Connection connection = null;
-        var emoji = "";
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT emoji FROM best_of_quote WHERE guild_id=?");
-            select.setLong(1, guildId);
-            var resultSet = select.executeQuery();
-            if (resultSet.first()) emoji = resultSet.getString("emoji");
-            if (emoji.isEmpty()) emoji = null;
-        } catch (SQLException e) {
-            new Log(e, guild, null, "bestofquote", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-
-        return emoji;
-    }
-
-    public TextChannel getBestOfQuoteChannel() {
-        Connection connection = null;
-        TextChannel channel = null;
-
-        var thisGuild = guild.getJDA().getGuildById(guildId);
-        if (thisGuild == null) return null;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT channel_id FROM best_of_quote WHERE guild_id=?");
-            select.setLong(1, guildId);
-            var resultSet = select.executeQuery();
-            if (resultSet.first()) channel = thisGuild.getTextChannelById(resultSet.getLong("channel_id"));
-        } catch (SQLException e) {
-            new Log(e, guild, null, "bestofquote", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-
-        return channel;
-    }
-
-    public int getBestOfQuoteNumber() {
-        Connection connection = null;
-        int number = 0;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT number FROM best_of_quote WHERE guild_id=?");
-            select.setLong(1, guildId);
-            var resultSet = select.executeQuery();
-            if (resultSet.first()) number = resultSet.getInt("number");
-        } catch (SQLException e) {
-            new Log(e, guild, null, "bestofquote", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-
-        return number;
-    }
-
-    public int getBestOfQuotePercentage() {
-        Connection connection = null;
-        int percentage = 0;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT percentage FROM best_of_quote WHERE guild_id=?");
-            select.setLong(1, guildId);
-            var resultSet = select.executeQuery();
-            if (resultSet.first()) percentage = resultSet.getInt("percentage");
-        } catch (SQLException e) {
-            new Log(e, guild, null, "bestofquote", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-
-        return percentage;
-    }
-
-    public void setBestOfQuoteChannel(long channelId) {
-        Connection connection = null;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            if (bestOfQuoteHasEntry()) {
-                var update = connection.prepareStatement("UPDATE best_of_quote SET channel_id=? WHERE guild_id=?");
-                update.setLong(1, channelId);
-                update.setLong(2, guildId);
-                update.executeUpdate();
-            } else {
-                var insert = connection.prepareStatement("INSERT INTO best_of_quote (guild_id,channel_id,number,percentage,emoji,emote_guild_id,emote_id) VALUES (?,?,?,?,?,?,?)");
-                insert.setLong(1, guildId);
-                insert.setLong(2, channelId);
-                insert.setInt(3, 0);
-                insert.setInt(4, 0);
-                insert.setString(5, "");
-                insert.setLong(6, 0);
-                insert.setLong(7, 0);
-                insert.executeUpdate();
-            }
-        } catch (SQLException e) {
-            new Log(e, guild, null, "bestofquote", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-    }
-
-    public void setBestOfQuoteEmote(long emoteGuildId, long emoteId) {
-        Connection connection = null;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            if (bestOfQuoteHasEntry()) {
-                var update = connection.prepareStatement("UPDATE best_of_quote SET emoji=?, emote_guild_id=?, emote_id=? WHERE guild_id=?");
-                update.setString(1, "");
-                update.setLong(2, emoteGuildId);
-                update.setLong(3, emoteId);
-                update.setLong(4, guildId);
-                update.executeUpdate();
-            } else {
-                var insert = connection.prepareStatement("INSERT INTO best_of_quote (guild_id,channel_id,number,percentage,emoji,emote_guild_id,emote_id) VALUES (?,?,?,?,?,?,?)");
-                insert.setLong(1, guildId);
-                insert.setLong(2, 0);
-                insert.setInt(3, 0);
-                insert.setInt(4, 0);
-                insert.setString(5, "");
-                insert.setLong(6, emoteGuildId);
-                insert.setLong(7, emoteId);
-                insert.executeUpdate();
-            }
-        } catch (SQLException e) {
-            new Log(e, guild, null, "bestofquote", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-    }
-
-    public void setBestOfQuoteEmoji(String emoji) {
-        Connection connection = null;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            if (bestOfQuoteHasEntry()) {
-                var update = connection.prepareStatement("UPDATE best_of_quote SET emoji=?, emote_guild_id=?, emote_id=? WHERE guild_id=?");
-                update.setString(1, emoji);
-                update.setLong(2, 0);
-                update.setLong(3, 0);
-                update.setLong(4, guildId);
-                update.executeUpdate();
-            } else {
-                var insert = connection.prepareStatement("INSERT INTO best_of_quote (guild_id,channel_id,number,percentage,emoji,emote_guild_id,emote_id) VALUES (?,?,?,?,?,?,?)");
-                insert.setLong(1, guildId);
-                insert.setLong(2, 0);
-                insert.setInt(3, 0);
-                insert.setInt(4, 0);
-                insert.setString(5, emoji);
-                insert.setLong(6, 0);
-                insert.setLong(7, 0);
-                insert.executeUpdate();
-            }
-        } catch (SQLException e) {
-            new Log(e, guild, null, "bestofquote", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-    }
-
-    public void setBestOfQuoteNumber(int number) {
-        Connection connection = null;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            if (bestOfQuoteHasEntry()) {
-                var update = connection.prepareStatement("UPDATE best_of_quote SET number=? WHERE guild_id=?");
-                update.setInt(1, number);
-                update.setLong(2, guildId);
-                update.executeUpdate();
-            } else {
-                var insert = connection.prepareStatement("INSERT INTO best_of_quote (guild_id,channel_id,number,percentage,emoji,emote_guild_id,emote_id) VALUES (?,?,?,?,?,?,?)");
-                insert.setLong(1, guildId);
-                insert.setLong(2, 0);
-                insert.setInt(3, number);
-                insert.setInt(4, 0);
-                insert.setString(5, "");
-                insert.setLong(6, 0);
-                insert.setLong(7, 0);
-                insert.executeUpdate();
-            }
-        } catch (SQLException e) {
-            new Log(e, guild, null, "bestofquote", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-    }
-
-    public void setBestOfQuotePercentage(int percentage) {
-        Connection connection = null;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            if (bestOfQuoteHasEntry()) {
-                var update = connection.prepareStatement("UPDATE best_of_quote SET percentage=? WHERE guild_id=?");
-                update.setInt(1, percentage);
-                update.setLong(2, guildId);
-                update.executeUpdate();
-            } else {
-                var insert = connection.prepareStatement("INSERT INTO best_of_quote (guild_id,channel_id,number,percentage,emoji,emote_guild_id,emote_id) VALUES (?,?,?,?,?,?,?)");
-                insert.setLong(1, guildId);
-                insert.setLong(2, 0);
-                insert.setInt(3, 0);
-                insert.setInt(4, percentage);
-                insert.setString(5, "");
-                insert.setLong(6, 0);
-                insert.setLong(7, 0);
-                insert.executeUpdate();
-            }
-        } catch (SQLException e) {
-            new Log(e, guild, null, "bestofquote", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-    }
-
-    public void addBestOfQuoteBlacklist(long messageId) {
-        Connection connection = null;
-
-        try {
-            if (!bestOfQuoteIsBlacklisted(messageId)) {
-                connection = Servant.db.getHikari().getConnection();
-                var insert = connection.prepareStatement("INSERT INTO best_of_quote_bl (message_id) VALUES (?)");
-                insert.setLong(1, messageId);
-                insert.executeUpdate();
-            }
-        } catch (SQLException e) {
-            new Log(e, guild, null, "bestofquote", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-    }
-
-    public boolean bestOfQuoteIsBlacklisted(long messageId) {
-        Connection connection = null;
-        var isBlacklisted = false;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT * FROM best_of_quote_bl WHERE message_id=?");
-            select.setLong(1, messageId);
-            var resultSet = select.executeQuery();
-            if (resultSet.first()) isBlacklisted = true;
-        } catch (SQLException e) {
-            new Log(e, guild, null, "bestofquote", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-
-        return isBlacklisted;
     }
 
     // BestOfImage
@@ -616,7 +158,7 @@ public class Server {
             ResultSet resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new Log(e, guild, null, "bestofimage", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#bestOfImageHasEntry");
         } finally {
             closeQuietly(connection);
         }
@@ -642,7 +184,7 @@ public class Server {
                 if (guildId != 0 && emoteId != 0) emote = thisGuild.getEmoteById(emoteId);
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "bestofimage", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#getBestOfImageEmote");
         } finally {
             closeQuietly(connection);
         }
@@ -662,7 +204,7 @@ public class Server {
             if (resultSet.first()) emoji = resultSet.getString("emoji");
             if (emoji.isEmpty()) emoji = null;
         } catch (SQLException e) {
-            new Log(e, guild, null, "bestofimage", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#getBestOfImageEmoji");
         } finally {
             closeQuietly(connection);
         }
@@ -684,7 +226,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) channel = thisGuild.getTextChannelById(resultSet.getLong("channel_id"));
         } catch (SQLException e) {
-            new Log(e, guild, null, "bestofimage", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#getBestOfImageChannel");
         } finally {
             closeQuietly(connection);
         }
@@ -703,7 +245,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) number = resultSet.getInt("number");
         } catch (SQLException e) {
-            new Log(e, guild, null, "bestofimage", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#getBestOfImageNumber");
         } finally {
             closeQuietly(connection);
         }
@@ -722,7 +264,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) percentage = resultSet.getInt("percentage");
         } catch (SQLException e) {
-            new Log(e, guild, null, "bestofimage", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#getBestOfImagePercentage");
         } finally {
             closeQuietly(connection);
         }
@@ -752,7 +294,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "bestofimage", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#setBestOfImageChannel");
         } finally {
             closeQuietly(connection);
         }
@@ -782,7 +324,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "bestofimage", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#setBestOfImageEmote");
         } finally {
             closeQuietly(connection);
         }
@@ -812,7 +354,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "bestofimage", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#setBestOfImageEmoji");
         } finally {
             closeQuietly(connection);
         }
@@ -840,7 +382,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "bestofimage", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#setBestOfImageNumber");
         } finally {
             closeQuietly(connection);
         }
@@ -868,7 +410,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "bestofimage", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#setBestOfImagePercentage");
         } finally {
             closeQuietly(connection);
         }
@@ -885,7 +427,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "bestofimage", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#addBestOfImageBlacklist");
         } finally {
             closeQuietly(connection);
         }
@@ -902,7 +444,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) isBlacklisted = true;
         } catch (SQLException e) {
-            new Log(e, guild, null, "bestofimage", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#bestOfImageIsBlacklisted");
         } finally {
             closeQuietly(connection);
         }
@@ -923,7 +465,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) wasGratulated = resultSet.getBoolean("was_gratulated");
         } catch (SQLException e) {
-            new Log(e, guild, null, "birthday", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#wasGratulated");
         } finally {
             closeQuietly(connection);
         }
@@ -943,7 +485,7 @@ public class Server {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new Log(e, guild, null, "birthday", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#birthdayGratulationHasEntry");
         } finally {
             closeQuietly(connection);
         }
@@ -964,7 +506,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "birthday", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#setGratulated");
         } finally {
             closeQuietly(connection);
         }
@@ -982,7 +524,7 @@ public class Server {
                 delete.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "birthday", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#unsetGratulated");
         } finally {
             closeQuietly(connection);
         }
@@ -997,7 +539,7 @@ public class Server {
             delete.setLong(1, guildId);
             delete.executeUpdate();
         } catch (SQLException e) {
-            new Log(e, guild, null, "birthday", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#unsetGratulateds");
         } finally {
             closeQuietly(connection);
         }
@@ -1014,7 +556,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) channelId = resultSet.getLong("channel_id");
         } catch (SQLException e) {
-            new Log(e, guild, null, "birthday", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#getBirthdayMessageChannelId");
         } finally {
             closeQuietly(connection);
         }
@@ -1033,7 +575,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) messageId = resultSet.getLong("message_id");
         } catch (SQLException e) {
-            new Log(e, guild, null, "birthday", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#getBirthdayMessageMessageId");
         } finally {
             closeQuietly(connection);
         }
@@ -1052,7 +594,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) messageId = resultSet.getLong("user_id");
         } catch (SQLException e) {
-            new Log(e, guild, null, "birthday", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#getBirthdayMessageAuthorId");
         } finally {
             closeQuietly(connection);
         }
@@ -1071,7 +613,7 @@ public class Server {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new Log(e, guild, null, "birthday", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#birthdayMessagesHasEntry");
         } finally {
             closeQuietly(connection);
         }
@@ -1100,7 +642,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "birthday", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#setBirthdayMessage");
         } finally {
             closeQuietly(connection);
         }
@@ -1117,7 +659,7 @@ public class Server {
                 delete.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "birthday", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#unsetBirthdayMessage");
         } finally {
             closeQuietly(connection);
         }
@@ -1143,7 +685,7 @@ public class Server {
                 do birthdays.put(resultSet.getLong("user_id"), resultSet.getString("birthday"));
                 while (resultSet.next());
         } catch (SQLException e) {
-            new Log(e, guild, null, "birthday", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#getBirthdays");
         } finally {
             closeQuietly(connection);
         }
@@ -1163,7 +705,7 @@ public class Server {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new Log(e, guild, null, "birthday", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#birthdaysHasEntry");
         } finally {
             closeQuietly(connection);
         }
@@ -1190,7 +732,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "birthday", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#setBirthday");
         } finally {
             closeQuietly(connection);
         }
@@ -1210,7 +752,7 @@ public class Server {
                 wasUnset = true;
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "birthday", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#unsetBirthday");
         } finally {
             closeQuietly(connection);
         }
@@ -1227,7 +769,7 @@ public class Server {
             delete.setLong(1, guildId);
             delete.executeUpdate();
         } catch (SQLException e) {
-            new Log(e, guild, null, "birthday", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#unsetBirthdays");
         } finally {
             closeQuietly(connection);
         }
@@ -1244,7 +786,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) birthdayChannelId = resultSet.getLong("birthday_channel_id");
         } catch (SQLException e) {
-            new Log(e, guild, null, "birthday", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#getBirthdayChannelId");
         } finally {
             closeQuietly(connection);
         }
@@ -1272,7 +814,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "birthday", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#setBirthdayChannelId");
         } finally {
             closeQuietly(connection);
         }
@@ -1294,7 +836,7 @@ public class Server {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new Log(e, guild, null, "guild", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#guildHasEntry");
         } finally {
             closeQuietly(connection);
         }
@@ -1316,7 +858,7 @@ public class Server {
                 do if (level >= resultSet.getInt("level")) roleId.add(resultSet.getLong("role_id"));
                 while (resultSet.next());
         } catch (SQLException e) {
-            new Log(e, guild, null, "levelrole", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#getLevelRolesForLevel");
         } finally {
             closeQuietly(connection);
         }
@@ -1336,7 +878,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) do roleId.add(resultSet.getLong("role_id")); while (resultSet.next());
         } catch (SQLException e) {
-            new Log(e, guild, null, "levelrole", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#getLevelRole");
         } finally {
             closeQuietly(connection);
         }
@@ -1357,7 +899,7 @@ public class Server {
                 do levelRoles.put(resultSet.getInt("level"), resultSet.getLong("role_id"));
                 while(resultSet.next());
         } catch (SQLException e) {
-            new Log(e, guild, null, "levelrole", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#getLevelRoles");
         } finally {
             closeQuietly(connection);
         }
@@ -1380,7 +922,7 @@ public class Server {
                 wasSet = true;
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "levelrole", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#setLevelRole");
         } finally {
             closeQuietly(connection);
         }
@@ -1399,7 +941,7 @@ public class Server {
             delete.setLong(3, roleId);
             delete.executeUpdate();
         } catch (SQLException e) {
-            new Log(e, guild, null, "levelrole", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#unsetLevelRole");
         } finally {
             closeQuietly(connection);
         }
@@ -1419,7 +961,7 @@ public class Server {
             if (language == null) language = Servant.config.getDefaultLanguage();
             else if (language.isEmpty()) language = Servant.config.getDefaultLanguage();
         } catch (SQLException e) {
-            new Log(e, guild, null, "language", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#getLanguage");
         } finally {
             closeQuietly(connection);
         }
@@ -1447,7 +989,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "language", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#setLanguage");
         } finally {
             closeQuietly(connection);
         }
@@ -1457,77 +999,8 @@ public class Server {
         setLanguage(Servant.config.getDefaultLanguage());
     }
 
-    // Lobby
-    public void setActiveLobby(long channelId) {
-        Connection connection = null;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var insert = connection.prepareStatement("INSERT INTO active_lobbies (channel_id) VALUES (?)");
-            insert.setLong(1, channelId);
-            insert.executeUpdate();
-        } catch (SQLException e) {
-            new Log(e, guild, null, "lobby", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-    }
-
-    public List<Long> getActiveLobbies() {
-        Connection connection = null;
-        var activeLobbies = new LinkedList<Long>();
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT * FROM active_lobbies");
-            var resultSet = select.executeQuery();
-            if (resultSet.first())
-                do activeLobbies.add(resultSet.getLong("channel_id"));
-                while (resultSet.next());
-        } catch (SQLException e) {
-            new Log(e, guild, null, "lobby", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-
-        return activeLobbies;
-    }
-
-    public void unsetActiveLobby(long channelId) {
-        Connection connection = null;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var delete = connection.prepareStatement("DELETE FROM active_lobbies WHERE channel_id=?");
-            delete.setLong(1, channelId);
-            delete.executeUpdate();
-        } catch (SQLException e) {
-            new Log(e, guild, null, "lobby", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-    }
-
-    private boolean lobbyHasEntry() {
-        Connection connection = null;
-        var hasEntry = false;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT * FROM lobby WHERE guild_id=?");
-            select.setLong(1, guildId);
-            var resultSet = select.executeQuery();
-            hasEntry = resultSet.first();
-        } catch (SQLException e) {
-            new Log(e, guild, null, "lobby", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-
-        return hasEntry;
-    }
-
-    public List<Long> getLobbies() {
+    // Voice Lobby
+    public List<Long> getVoiceLobbies() {
         Connection connection = null;
         var lobbies = new ArrayList<Long>();
 
@@ -1538,70 +1011,12 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) do lobbies.add(resultSet.getLong("channel_id")); while (resultSet.next());
         } catch (SQLException e) {
-            new Log(e, guild, null, "lobby", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#getVoiceLobbies");
         } finally {
             closeQuietly(connection);
         }
 
         return lobbies;
-    }
-
-    public boolean isLobby(long channelId) {
-        Connection connection = null;
-        var isLobby = false;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT * FROM lobby WHERE guild_id=? AND channel_id=?");
-            select.setLong(1, guildId);
-            select.setLong(2, channelId);
-            var resultSet = select.executeQuery();
-            if (resultSet.first()) isLobby = true;
-        } catch (SQLException e) {
-            new Log(e, guild, null, "lobby", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-
-        return isLobby;
-    }
-
-    public void setLobby(long channelId) {
-        Connection connection = null;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var insert = connection.prepareStatement("INSERT INTO lobby (guild_id,channel_id) VALUES (?,?)");
-            insert.setLong(1, guildId);
-            insert.setLong(2, channelId);
-            insert.executeUpdate();
-        } catch (SQLException e) {
-            new Log(e, guild, null, "lobby", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-    }
-
-    public boolean unsetLobby(long channelId) {
-        Connection connection = null;
-        var wasUnset = false;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            if (lobbyHasEntry()) {
-                var delete = connection.prepareStatement("DELETE FROM lobby WHERE guild_id=? and channel_id=?");
-                delete.setLong(1, guildId);
-                delete.setLong(2, channelId);
-                delete.executeUpdate();
-                wasUnset = true;
-            }
-        } catch (SQLException e) {
-            new Log(e, guild, null, "lobby", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-
-        return wasUnset;
     }
 
     // Prefix.
@@ -1616,7 +1031,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) prefix = resultSet.getString("prefix");
         } catch (SQLException e) {
-            new Log(e, guild, null, "prefix", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#getPrefix");
         } finally {
             closeQuietly(connection);
         }
@@ -1645,7 +1060,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "prefix", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#setPrefix");
         } finally {
             closeQuietly(connection);
         }
@@ -1668,7 +1083,7 @@ public class Server {
             if (resultSet.first()) offset = resultSet.getString("offset");
             offset = offset.equals("00:00") ? "Z" : offset;
         } catch (SQLException e) {
-            new Log(e, guild, null, "offset", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#getOffset");
         } finally {
             closeQuietly(connection);
         }
@@ -1696,7 +1111,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "offset", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#setOffset");
         } finally {
             closeQuietly(connection);
         }
@@ -1719,7 +1134,7 @@ public class Server {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new Log(e, guild, null, "featurecount", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#featureCountHasEntry");
         } finally {
             closeQuietly(connection);
         }
@@ -1739,7 +1154,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) featureCount = resultSet.getInt("count");
         } catch (SQLException e) {
-            new Log(e, guild, null, "featurecount", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#getFeatureCount");
         } finally {
             closeQuietly(connection);
         }
@@ -1767,7 +1182,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "featurecount", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#incrementFeatureCount");
         } finally {
             closeQuietly(connection);
         }
@@ -1787,7 +1202,7 @@ public class Server {
                 do userExp.put(resultSet.getLong("user_id"), resultSet.getInt("exp"));
                 while (resultSet.next());
         } catch (SQLException e) {
-            new Log(e, guild, null, "level", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#getLeaderboard");
         } finally {
             closeQuietly(connection);
         }
@@ -1807,7 +1222,7 @@ public class Server {
             var resultSet = select.executeQuery();
             hasAutorole = resultSet.first();
         } catch (SQLException e) {
-            new Log(e, guild, null, "autorole", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#hasAutorole");
         } finally {
             closeQuietly(connection);
         }
@@ -1833,7 +1248,7 @@ public class Server {
                 role.put(thisGuild.getRoleById(roleId), delay);
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "autorole", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#getAutorole");
         } finally {
             closeQuietly(connection);
         }
@@ -1853,7 +1268,7 @@ public class Server {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new Log(e, guild, null, "autorole", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#autoroleHasEntry");
         } finally {
             closeQuietly(connection);
         }
@@ -1880,7 +1295,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "autorole", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#setAutorole");
         } finally {
             closeQuietly(connection);
         }
@@ -1899,7 +1314,7 @@ public class Server {
                 wasUnset = true;
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "autorole", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#unsetAutorole");
         } finally {
             closeQuietly(connection);
         }
@@ -1920,7 +1335,7 @@ public class Server {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new Log(e, guild, null, "mediaonlychannel", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#mediaOnlyChannelHasEntry");
         } finally {
             closeQuietly(connection);
         }
@@ -1942,7 +1357,7 @@ public class Server {
                 wasSet = true;
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "mediaonlychannel", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#setMediaOnlyChannel");
         } finally {
             closeQuietly(connection);
         }
@@ -1964,7 +1379,7 @@ public class Server {
                 wasUnset = true;
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "mediaonlychannel", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#unsetMediaOnlyChannel");
         } finally {
             closeQuietly(connection);
         }
@@ -1981,7 +1396,7 @@ public class Server {
             delete.setLong(1, guildId);
             delete.executeUpdate();
         } catch (SQLException e) {
-            new Log(e, guild, null, "mediaonlychannel", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#purgeMediaOnlyChannels");
         } finally {
             closeQuietly(connection);
         }
@@ -2005,7 +1420,7 @@ public class Server {
             }
             if (channels.isEmpty()) channels = null;
         } catch (SQLException e) {
-            new Log(e, guild, null, "mediaonlychannel", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#getMediaOnlyChannels");
         } finally {
             closeQuietly(connection);
         }
@@ -2026,7 +1441,7 @@ public class Server {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new Log(e, guild, null, "toggle", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#toggleHasEntry");
         } finally {
             closeQuietly(connection);
         }
@@ -2047,7 +1462,7 @@ public class Server {
             if (resultSet.first()) isEnabled = resultSet.getBoolean("is_enabled");
             else isEnabled = Servant.toggle.get(feature);
         } catch (SQLException e) {
-            new Log(e, guild, null, "toggle", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#getToggleStatus");
         } finally {
             closeQuietly(connection);
         }
@@ -2074,7 +1489,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "toggle", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#setToggleStatus");
         } finally {
             closeQuietly(connection);
         }
@@ -2092,7 +1507,7 @@ public class Server {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new Log(e, guild, null, "join", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#joinNotifierHasEntry");
         } finally {
             closeQuietly(connection);
         }
@@ -2114,7 +1529,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) channel = thisGuild.getTextChannelById(resultSet.getLong("channel_id"));
         } catch (SQLException e) {
-            new Log(e, guild, null, "join", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#getJoinNotifierChannel");
         } finally {
             closeQuietly(connection);
         }
@@ -2139,7 +1554,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "join", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#setJoinNotifierChannel");
         } finally {
             closeQuietly(connection);
         }
@@ -2158,7 +1573,7 @@ public class Server {
                 wasUnset = true;
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "join", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#unsetJoinNotifierChannel");
         } finally {
             closeQuietly(connection);
         }
@@ -2178,7 +1593,7 @@ public class Server {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new Log(e, guild, null, "leave", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#leaveNotifierHasEntry");
         } finally {
             closeQuietly(connection);
         }
@@ -2200,7 +1615,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) channel = thisGuild.getTextChannelById(resultSet.getLong("channel_id"));
         } catch (SQLException e) {
-            new Log(e, guild, null, "leave", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#getLeaveNotifierChannel");
         } finally {
             closeQuietly(connection);
         }
@@ -2225,7 +1640,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "leave", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#setLeaveNotifierChannel");
         } finally {
             closeQuietly(connection);
         }
@@ -2244,7 +1659,7 @@ public class Server {
                 wasUnset = true;
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "leave", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#unsetLeaveNotifierChannel");
         } finally {
             closeQuietly(connection);
         }
@@ -2264,7 +1679,7 @@ public class Server {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new Log(e, guild, null, "join", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#joinLeaveMessageHasEntry");
         } finally {
             closeQuietly(connection);
         }
@@ -2285,7 +1700,7 @@ public class Server {
                     delete.setLong(1, guildId);
                     delete.executeUpdate();
                 } catch (SQLException e) {
-                    new Log(e, guild, null, "livestream", null).sendLog(false);
+                    new LoggingTask(e, jda, "Server#checkAndPurgeJoinLeaveMessage");
                 } finally {
                     closeQuietly(connection);
                 }
@@ -2307,7 +1722,7 @@ public class Server {
                 if (msg.equalsIgnoreCase("empty")) msg = null;
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "join", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#getJoinMessage");
         } finally {
             closeQuietly(connection);
         }
@@ -2333,7 +1748,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "join", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#setJoinMessage");
         } finally {
             closeQuietly(connection);
         }
@@ -2355,7 +1770,7 @@ public class Server {
                 if (msg.equalsIgnoreCase("empty")) msg = null;
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "leave", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#getLeaveMessage");
         } finally {
             closeQuietly(connection);
         }
@@ -2381,7 +1796,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "leave", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#setLeaveMessage");
         } finally {
             closeQuietly(connection);
         }
@@ -2407,7 +1822,7 @@ public class Server {
                 } while (resultSet.next());
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "level", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#getUserRank");
         } finally {
             closeQuietly(connection);
         }
@@ -2427,7 +1842,7 @@ public class Server {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new Log(e, guild, null, "livestream", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#streamerModeHasEntry");
         } finally {
             closeQuietly(connection);
         }
@@ -2446,7 +1861,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) isStreamerMode = resultSet.getBoolean("is_streamer_mode");
         } catch (SQLException e) {
-            new Log(e, guild, null, "livestream", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#isStreamerMode");
         } finally {
             closeQuietly(connection);
         }
@@ -2471,7 +1886,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "livestream", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#toggleStreamerMode");
         } finally {
             closeQuietly(connection);
         }
@@ -2488,7 +1903,7 @@ public class Server {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new Log(e, guild, null, "livestream", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#streamChannelHasEntry");
         } finally {
             closeQuietly(connection);
         }
@@ -2507,7 +1922,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) channelId = resultSet.getLong("channel_id");
         } catch (SQLException e) {
-            new Log(e, guild, null, "livestream", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#getStreamChannelId");
         } finally {
             closeQuietly(connection);
         }
@@ -2532,7 +1947,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "livestream", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#setStreamChannel");
         } finally {
             closeQuietly(connection);
         }
@@ -2551,7 +1966,7 @@ public class Server {
                 wasUnset = true;
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "livestream", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#unsetStreamChannel");
         } finally {
             closeQuietly(connection);
         }
@@ -2570,7 +1985,7 @@ public class Server {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new Log(e, guild, null, "livestream", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#streamingRoleHasEntry");
         } finally {
             closeQuietly(connection);
         }
@@ -2589,7 +2004,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) role = resultSet.getLong("role_id");
         } catch (SQLException e) {
-            new Log(e, guild, null, "livestream", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#getStreamingRoleId");
         } finally {
             closeQuietly(connection);
         }
@@ -2614,7 +2029,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "livestream", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#setStreamingRole");
         } finally {
             closeQuietly(connection);
         }
@@ -2633,7 +2048,7 @@ public class Server {
                 wasUnset = true;
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "livestream", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#unsetStreamingRole");
         } finally {
             closeQuietly(connection);
         }
@@ -2653,7 +2068,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) isStreamer = true;
         } catch (SQLException e) {
-            new Log(e, guild, null, "livestream", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#isStreamer");
         } finally {
             closeQuietly(connection);
         }
@@ -2672,7 +2087,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) do streamers.add(resultSet.getLong("user_id")); while (resultSet.next());
         } catch (SQLException e) {
-            new Log(e, guild, null, "livestream", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#getStreamers");
         } finally {
             closeQuietly(connection);
         }
@@ -2690,7 +2105,7 @@ public class Server {
             insert.setLong(2, userId);
             insert.executeUpdate();
         } catch (SQLException e) {
-            new Log(e, guild, null, "livestream", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#setStreamer");
         } finally {
             closeQuietly(connection);
         }
@@ -2710,118 +2125,12 @@ public class Server {
                 wasUnset = true;
             }
         } catch (SQLException e) {
-            new Log(e, guild, null, "livestream", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#unsetStreamer");
         } finally {
             closeQuietly(connection);
         }
 
         return wasUnset;
-    }
-
-    // Reaction Role
-    public boolean setReactionRole(long guildId, long channelId, long messageId, String emoji, long emoteGuildId,
-                               long emoteId, long roleId) {
-        Connection connection = null;
-        var wasSet = true;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            if (!reactionRoleHasEntry(guildId, channelId, messageId, emoji, emoteGuildId, emoteId)) {
-                var insert = connection.prepareStatement("INSERT INTO reaction_role (guild_id, channel_id, message_id, emoji, emote_guild_id, emote_id, role_id) VALUES (?,?,?,?,?,?,?)");
-                insert.setLong(1, guildId);
-                insert.setLong(2, channelId);
-                insert.setLong(3, messageId);
-                insert.setString(4, (emoji == null ? "" : emoji));
-                insert.setLong(5, emoteGuildId);
-                insert.setLong(6, emoteId);
-                insert.setLong(7, roleId);
-                insert.executeUpdate();
-                wasSet = false;
-            }
-        } catch (SQLException e) {
-            new Log(e, guild, null, "reactionrole", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-
-        return wasSet;
-    }
-
-    public boolean unsetReactionRole(long guildId, long channelId, long messageId, String emoji, long emoteGuildId,
-                                 long emoteId) {
-        Connection connection = null;
-        var wasSet = true;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            if (reactionRoleHasEntry(guildId, channelId, messageId, emoji, emoteGuildId, emoteId)) {
-                var delete = connection.prepareStatement("DELETE FROM reaction_role WHERE guild_id=? AND channel_id=? AND message_id=? AND emoji=? AND emote_guild_id=? AND emote_id=?");
-                delete.setLong(1, guildId);
-                delete.setLong(2, channelId);
-                delete.setLong(3, messageId);
-                delete.setString(4, (emoji == null ? "" : emoji));
-                delete.setLong(5, emoteGuildId);
-                delete.setLong(6, emoteId);
-                delete.executeUpdate();
-                wasSet = false;
-            }
-        } catch (SQLException e) {
-            new Log(e, guild, null, "reactionrole", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-
-        return wasSet;
-    }
-
-    public long getRoleId(long guildId, long channelId, long messageId, String emoji, long emoteGuildId,
-                          long emoteId) {
-        Connection connection = null;
-        var roleId = 0L;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT role_id FROM reaction_role WHERE guild_id=? AND channel_id=? AND message_id=? AND emoji=? AND emote_guild_id=? AND emote_id=?");
-            select.setLong(1, guildId);
-            select.setLong(2, channelId);
-            select.setLong(3, messageId);
-            select.setString(4, (emoji == null ? "" : emoji));
-            select.setLong(5, emoteGuildId);
-            select.setLong(6, emoteId);
-            var resultSet = select.executeQuery();
-            if (resultSet.first()) roleId = resultSet.getLong("role_id");
-        } catch (SQLException e) {
-            new Log(e, guild, null, "reactionrole", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-
-        return roleId;
-    }
-
-    public boolean reactionRoleHasEntry(long guildId, long channelId, long messageId, String emoji, long emoteGuildId,
-                                        long emoteId) {
-        Connection connection = null;
-        var hasEntry = false;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT role_id FROM reaction_role WHERE guild_id=? AND channel_id=? AND message_id=? AND emoji=? AND emote_guild_id=? AND emote_id=?");
-            select.setLong(1, guildId);
-            select.setLong(2, channelId);
-            select.setLong(3, messageId);
-            select.setString(4, (emoji == null ? "" : emoji));
-            select.setLong(5, emoteGuildId);
-            select.setLong(6, emoteId);
-            var resultSet = select.executeQuery();
-            hasEntry = resultSet.first();
-        } catch (SQLException e) {
-            new Log(e, guild, null, "reactionrole", null).sendLog(false);
-        } finally {
-            closeQuietly(connection);
-        }
-
-        return hasEntry;
     }
 
     // Giveaway
@@ -2838,7 +2147,7 @@ public class Server {
             var resultSet = preparedStatement.executeQuery();
             isGiveaway = resultSet.first();
         } catch (SQLException e) {
-            new Log(e, guild, null, "giveaway", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#isGiveaway");
         } finally {
             closeQuietly(connection);
         }
@@ -2861,7 +2170,7 @@ public class Server {
             preparedStatement.setInt(7, amountWinners);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            new Log(e, guild, null, "giveaway", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#insertGiveawayToDb");
         } finally {
             closeQuietly(connection);
         }
@@ -2878,7 +2187,7 @@ public class Server {
             delete.setLong(3, messageId);
             delete.executeUpdate();
         } catch (SQLException e) {
-            new Log(e, guild, null, "giveaway", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#deleteGiveawayFromDb");
         } finally {
             closeQuietly(connection);
         }
@@ -2894,7 +2203,7 @@ public class Server {
             delete.setLong(2, channelId);
             delete.executeUpdate();
         } catch (SQLException e) {
-            new Log(e, guild, null, "giveaway", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#purgeGiveawaysFromChannel");
         } finally {
             closeQuietly(connection);
         }
@@ -2909,7 +2218,7 @@ public class Server {
             delete.setLong(1, guildId);
             delete.executeUpdate();
         } catch (SQLException e) {
-            new Log(e, guild, null, "giveaway", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#purgeGiveaways");
         } finally {
             closeQuietly(connection);
         }
@@ -2926,7 +2235,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) currentGiveaways = getRunningGiveaways(jda, resultSet, lang);
         } catch (SQLException e) {
-            new Log(e, guild, null, "giveaway", null).sendLog(false);
+            new LoggingTask(e, jda, "Server#getCurrentGiveaways");
         } finally {
             closeQuietly(connection);
         }
@@ -2948,5 +2257,76 @@ public class Server {
         while (resultSet.next());
 
         return giveawayList.toString();
+    }
+
+    // RemindMe
+    public RemindMe getRemindMe(int aiNumber) {
+        Connection connection = null;
+        RemindMe remindMe = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement("SELECT * FROM remindme_new WHERE ai_number=?");
+            select.setInt(1, aiNumber);
+            var resultSet = select.executeQuery();
+            if (resultSet.first()) {
+                remindMe = new RemindMe(
+                        resultSet.getInt("ai_number"),
+                        resultSet.getLong("guild_id"),
+                        resultSet.getLong("channel_id"),
+                        resultSet.getLong("message_id"),
+                        resultSet.getLong("user_id"),
+                        resultSet.getTimestamp("event_time"),
+                        resultSet.getString("topic")
+                );
+            }
+        } catch (SQLException e) {
+            new LoggingTask(e, jda, "Server#getRemindMe");
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return remindMe;
+    }
+
+    public int setRemindMe(long channelId, long messageId, long userId, Timestamp eventTime, String topic) {
+        Connection connection = null;
+        var aiNumber = 0;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var insert = connection.prepareStatement("INSERT INTO remindme_new (guild_id,channel_id,message_id,user_id,event_time,topic) VALUES (?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+            insert.setLong(1, guildId);
+            insert.setLong(2, channelId);
+            insert.setLong(3, messageId);
+            insert.setLong(4, userId);
+            insert.setTimestamp(5, eventTime);
+            insert.setString(6, topic);
+            insert.executeUpdate();
+
+            var resultSet = insert.getGeneratedKeys();
+            if (resultSet.first()) aiNumber = resultSet.getInt(1);
+        } catch (SQLException e) {
+            new LoggingTask(e, jda, "Server#setRemindMe");
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return aiNumber;
+    }
+
+    public void unsetRemindMe(int aiNumber) {
+        Connection connection = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var insert = connection.prepareStatement("DELETE FROM remindme_new WHERE ai_number=?");
+            insert.setInt(1, aiNumber);
+            insert.executeUpdate();
+        } catch (SQLException e) {
+            new LoggingTask(e, jda, "Server#unsetRemindMe");
+        } finally {
+            closeQuietly(connection);
+        }
     }
 }

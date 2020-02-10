@@ -4,9 +4,9 @@ import moderation.guild.Server;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageDeleteEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
-import owner.blacklist.Blacklist;
 import servant.Servant;
-import useful.giveaway.GiveawayHandler;
+import useful.polls.Poll;
+import useful.signup.Signup;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -26,11 +26,13 @@ public class GuildMessageDeleteListener extends ListenerAdapter {
          */
         if (guild.getIdLong() == 264445053596991498L) return; // Discord Bot List
         if (user.isBot()) return;
-        if (Blacklist.isBlacklisted(user, guild)) return;
 
         CompletableFuture.runAsync(() -> {
+            var jda = event.getJDA();
             var server = new Server(guild);
             var messageId = event.getMessageIdLong();
+            var channel = guild.getTextChannelById(event.getChannel().getIdLong());
+            var lang = server.getLanguage();
 
             // Birthday
             if (server.getBirthdayMessageMessageId() == messageId)
@@ -41,12 +43,15 @@ public class GuildMessageDeleteListener extends ListenerAdapter {
                 server.deleteGiveawayFromDb(event.getChannel().getIdLong(), messageId);
 
             // Signup
-            if (server.isSignupMessage(messageId))
-                server.unsetSignup(messageId);
+            var signup = new Signup(jda, messageId);
+            if (signup.isSignup()) signup.unset();
 
             // Poll
-            if (server.isPoll(messageId))
-                server.unsetPoll(messageId);
-        }, Servant.threadPool);
+            if (channel != null)
+                channel.retrieveMessageById(messageId).queue(message -> {
+                    var poll = new Poll(jda, lang, message);
+                    if (poll.isPoll()) poll.unset();
+                }, failure -> {});
+        }, Servant.fixedThreadPool);
     }
 }

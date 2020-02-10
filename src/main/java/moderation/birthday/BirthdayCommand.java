@@ -5,7 +5,7 @@ import files.language.LanguageHandler;
 import moderation.guild.GuildHandler;
 import moderation.guild.Server;
 import net.dv8tion.jda.api.Permission;
-import servant.Log;
+import servant.LoggingTask;
 import utilities.Constants;
 import utilities.MessageUtil;
 import utilities.Parser;
@@ -47,10 +47,11 @@ public class BirthdayCommand extends Command {
             return;
         }
 
-        var message = event.getMessage();
-        var args = event.getArgs();
         var guild = event.getGuild();
         var server = new Server(guild);
+
+        var message = event.getMessage();
+        var args = event.getArgs();
         var bot = event.getSelfUser();
 
         try {
@@ -104,7 +105,7 @@ public class BirthdayCommand extends Command {
                 event.reply(LanguageHandler.get(lang, "birthday_invalid"));
             }
         } catch (ParseException e) {
-            new Log(e, guild, event.getAuthor(), name, event).sendLog(true);
+            new LoggingTask(e, event.getJDA(), name, event);
         }
     }
 }
