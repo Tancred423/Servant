@@ -104,36 +104,38 @@ public class ProfileImage {
 
         // Bio
         var bio = master.getBio();
-        var bioWithLineBreaks = getLineBreaks(bio);
-        if (bioWithLineBreaks.size() == 1) {
-            // One Line
-            rect = new Rectangle(1300, 500, 630, 500);
-            drawCenteredString(g2d, bioWithLineBreaks.get(0).toString().trim(), rect, myriadPlain100pt, Color.WHITE);
-        } else if (bioWithLineBreaks.size() == 2) {
-            // Two Lines
-            var line = bioWithLineBreaks.get(0).toString().trim();
-            rect = new Rectangle(1300, 500, 630, 400);
-            drawCenteredString(g2d, line, rect, myriadPlain100pt, Color.WHITE);
+        if (!bio.isEmpty()) {
+            var bioWithLineBreaks = getLineBreaks(bio);
+            if (bioWithLineBreaks.size() == 1) {
+                // One Line
+                rect = new Rectangle(1300, 500, 630, 500);
+                drawCenteredString(g2d, bioWithLineBreaks.get(0).toString().trim(), rect, myriadPlain100pt, Color.WHITE);
+            } else if (bioWithLineBreaks.size() == 2) {
+                // Two Lines
+                var line = bioWithLineBreaks.get(0).toString().trim();
+                rect = new Rectangle(1300, 500, 630, 400);
+                drawCenteredString(g2d, line, rect, myriadPlain100pt, Color.WHITE);
 
-            line = bioWithLineBreaks.get(1).toString().trim();
-            rect = new Rectangle(1300, 550, 630, 500);
-            drawCenteredString(g2d, line, rect, myriadPlain100pt, Color.WHITE);
-        } else if (bioWithLineBreaks.size() >= 3) {
-            // Three Lines
-            var line = bioWithLineBreaks.get(0).toString().trim();
-            rect = new Rectangle(1300, 500, 630, 300);
-            drawCenteredString(g2d, line, rect, myriadPlain100pt, Color.WHITE);
+                line = bioWithLineBreaks.get(1).toString().trim();
+                rect = new Rectangle(1300, 550, 630, 500);
+                drawCenteredString(g2d, line, rect, myriadPlain100pt, Color.WHITE);
+            } else if (bioWithLineBreaks.size() >= 3) {
+                // Three Lines
+                var line = bioWithLineBreaks.get(0).toString().trim();
+                rect = new Rectangle(1300, 500, 630, 300);
+                drawCenteredString(g2d, line, rect, myriadPlain100pt, Color.WHITE);
 
-            line = bioWithLineBreaks.get(1).toString().trim();
-            rect = new Rectangle(1300, 550, 630, 400);
-            drawCenteredString(g2d, line, rect, myriadPlain100pt, Color.WHITE);
+                line = bioWithLineBreaks.get(1).toString().trim();
+                rect = new Rectangle(1300, 550, 630, 400);
+                drawCenteredString(g2d, line, rect, myriadPlain100pt, Color.WHITE);
 
-            var thirdLine = new StringBuilder();
-            for (int i = 2; i < bioWithLineBreaks.size(); i++)
-                thirdLine.append(bioWithLineBreaks.get(i).toString()).append(" ");
-            line = thirdLine.toString().trim();
-            rect = new Rectangle(1300, 600, 630, 500);
-            drawCenteredString(g2d, line, rect, myriadPlain100pt, Color.WHITE);
+                var thirdLine = new StringBuilder();
+                for (int i = 2; i < bioWithLineBreaks.size(); i++)
+                    thirdLine.append(bioWithLineBreaks.get(i).toString()).append(" ");
+                line = thirdLine.toString().trim();
+                rect = new Rectangle(1300, 600, 630, 500);
+                drawCenteredString(g2d, line, rect, myriadPlain100pt, Color.WHITE);
+            }
         }
 
         // Titles: General Info, Command Stats, Most Used Commands, Achievements

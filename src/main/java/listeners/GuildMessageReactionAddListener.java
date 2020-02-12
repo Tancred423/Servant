@@ -106,7 +106,7 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
                 if (Toggle.isEnabled(event, "radiovote") && poll.isRadioPoll()) {
                     processRadiopollMultipleVote(event, poll, user, messageId);
                 }
-            });
+            }, f -> {});
 
             // Reaction Role
             if (Toggle.isEnabled(event, "reactionrole")) processReactionRole(event, guild);

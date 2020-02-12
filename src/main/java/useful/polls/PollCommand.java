@@ -89,7 +89,7 @@ public class PollCommand extends Command {
                         else processVote(event, question, answers, lang, false);
 
                         message.delete().queue(s -> {}, f -> {});
-                        event.getMessage().delete().queue();
+                        event.getMessage().delete().queue(s -> {}, f -> {});
                     }, 15, TimeUnit.MINUTES, () -> timeout(message, event, lang));
         });
     }
