@@ -47,7 +47,7 @@ public class GuildVoiceJoinListener extends ListenerAdapter {
     }
 
     private static void processVoiceLobby(GuildVoiceJoinEvent event, net.dv8tion.jda.api.entities.Guild guild, User user, Member member, VoiceChannel channel, String lang) {
-        var active = new LinkedList<VoiceChannel>();
+        var actives = new LinkedList<VoiceChannel>();
         channel.createCopy().queue(newChannel ->
                 newChannel.getManager().setParent(channel.getParent()).queue(parent ->
                         newChannel.getManager().setName(VoiceLobby.getVoiceLobbyName(member, lang)).queue(name ->
@@ -61,21 +61,20 @@ public class GuildVoiceJoinListener extends ListenerAdapter {
                                                         public void run() {
                                                             var activeIds = VoiceLobby.getActive(event.getJDA());
 
-                                                            for (var activeId : activeIds) {
+                                                            for (var activeId : activeIds)
                                                                 if (event.getJDA().getVoiceChannelById(activeId) != null)
-                                                                    active.add(event.getJDA().getVoiceChannelById(activeId));
+                                                                    actives.add(event.getJDA().getVoiceChannelById(activeId));
                                                                 else
                                                                     new VoiceLobby(event.getJDA(), guild.getIdLong(), activeId).unsetActive();
-                                                            }
 
-                                                            for (int i = 0; i < active.size(); i++) {
-                                                                if (active.get(i).getMembers().size() == 0) {
-                                                                    var vc = event.getJDA().getVoiceChannelById(active.get(i).getIdLong());
+                                                            for (int i = 0; i < actives.size(); i++) {
+                                                                if (actives.get(i).getMembers().size() == 0) {
+                                                                    var vc = event.getJDA().getVoiceChannelById(actives.get(i).getIdLong());
                                                                     if (vc != null) {
                                                                         vc.delete().queue(success -> {
                                                                         }, failure -> {
                                                                         });
-                                                                        active.remove(active.get(i));
+                                                                        actives.remove(actives.get(i));
                                                                     }
                                                                 }
                                                             }
@@ -83,7 +82,18 @@ public class GuildVoiceJoinListener extends ListenerAdapter {
                                                     }, 2000
                                             );
                                         });
-                                    } catch (IllegalStateException ignored) { }
+                                    } catch (IllegalStateException e) {
+                                        var activeIds = VoiceLobby.getActive(event.getJDA());
+
+                                        for (var activeId : activeIds)
+                                            if (event.getJDA().getVoiceChannelById(activeId) != null)
+                                                actives.add(event.getJDA().getVoiceChannelById(activeId));
+                                            else
+                                                new VoiceLobby(event.getJDA(), guild.getIdLong(), activeId).unsetActive();
+
+                                        for (var active : actives)
+                                            if (active.getMembers().size() == 0) active.delete().queue();
+                                    }
                                 })
                         ), failure -> System.out.println("Couldn't create new voice channel. User: " + user.getName() + "#" + user.getDiscriminator() + " (" + user.getIdLong() + ") Guild: " + guild.getName() + " (" + guild.getIdLong() + ")")
                 )
