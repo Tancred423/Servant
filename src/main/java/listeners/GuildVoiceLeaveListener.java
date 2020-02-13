@@ -31,11 +31,11 @@ public class GuildVoiceLeaveListener extends ListenerAdapter {
         if (Blacklist.isBlacklisted(guild, user)) return;
 
         CompletableFuture.runAsync(() -> {
-            var channel = event.getChannelJoined();
+            var channel = event.getChannelLeft();
 
             // Voice Lobby
             var activeIds = VoiceLobby.getActive(event.getJDA());
-            if (Toggle.isEnabled(event, "voicelobby")) {
+            if (Toggle.isEnabled(event, "voicelobby") && activeIds.contains(channel.getIdLong())) {
                 processVoiceLobby(event, guild.getIdLong(), activeIds, channel);
             }
         }, Servant.fixedThreadPool);

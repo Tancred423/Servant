@@ -40,7 +40,8 @@ public class GuildVoiceJoinListener extends ListenerAdapter {
 
             // Voice Lobby
             if (Toggle.isEnabled(event, "voicelobby")) {
-                if (channels.contains(channel.getIdLong())) processVoiceLobby(event, guild, user, member, channel, lang);
+                if (channels.contains(channel.getIdLong()))
+                    processVoiceLobby(event, guild, user, member, channel, lang);
             }
         }, Servant.fixedThreadPool);
     }
@@ -50,7 +51,8 @@ public class GuildVoiceJoinListener extends ListenerAdapter {
         channel.createCopy().queue(newChannel ->
                 newChannel.getManager().setParent(channel.getParent()).queue(parent ->
                         newChannel.getManager().setName(VoiceLobby.getVoiceLobbyName(member, lang)).queue(name ->
-                                guild.modifyVoiceChannelPositions().selectPosition(newChannel).moveTo(channel.getPosition() + 1).queue(position ->
+                                guild.modifyVoiceChannelPositions().selectPosition(newChannel).moveTo(channel.getPosition() + 1).queue(position -> {
+                                    try {
                                         guild.moveVoiceMember(member, newChannel).queue(move -> {
                                             new VoiceLobby(event.getJDA(), guild.getIdLong(), newChannel.getIdLong()).setActive();
                                             new java.util.Timer().schedule(
@@ -62,7 +64,8 @@ public class GuildVoiceJoinListener extends ListenerAdapter {
                                                             for (var activeId : activeIds) {
                                                                 if (event.getJDA().getVoiceChannelById(activeId) != null)
                                                                     active.add(event.getJDA().getVoiceChannelById(activeId));
-                                                                else new VoiceLobby(event.getJDA(), guild.getIdLong(), activeId).unsetActive();
+                                                                else
+                                                                    new VoiceLobby(event.getJDA(), guild.getIdLong(), activeId).unsetActive();
                                                             }
 
                                                             for (int i = 0; i < active.size(); i++) {
@@ -79,11 +82,11 @@ public class GuildVoiceJoinListener extends ListenerAdapter {
                                                         }
                                                     }, 2000
                                             );
-                                        })
-                                )
+                                        });
+                                    } catch (IllegalStateException ignored) { }
+                                })
                         ), failure -> System.out.println("Couldn't create new voice channel. User: " + user.getName() + "#" + user.getDiscriminator() + " (" + user.getIdLong() + ") Guild: " + guild.getName() + " (" + guild.getIdLong() + ")")
                 )
-
         );
     }
 }

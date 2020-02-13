@@ -157,5 +157,5 @@ public class VoiceLobby {
         return "⤷ " + member.getEffectiveName() +
                 (member.getEffectiveName().toLowerCase().endsWith("s") ?
                         LanguageHandler.get(lang, "apostrophe") :
-                        LanguageHandler.get(lang, "apostropge_s")) + " Lobby"; }
+                        LanguageHandler.get(lang, "apostrophe_s")) + " Lobby"; }
 }
