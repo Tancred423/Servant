@@ -550,7 +550,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
                                 command.run(cevent);
 
                                 if (Toggle.isEnabled(cevent, "deletecommands") && !command.getName().equals("toggle") && event.isFromGuild())
-                                    event.getMessage().delete().queue();
+                                    event.getMessage().delete().queue(s -> {}, f -> {});
 
                                 // Statistics
                                 new Master(event.getAuthor()).incrementFeatureCount(command.getName());

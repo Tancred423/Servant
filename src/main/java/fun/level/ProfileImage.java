@@ -359,20 +359,23 @@ public class ProfileImage {
         g2d.translate(msiX * -1, msiY * -1); // Reset
 
         var interactions = master.getInteractions();
-        var msiValue = getMsi(interactions).getName();
-        var msiActualWidth = g2d.getFontMetrics().stringWidth(msiValue);
-        msiX = commandsStatsWidth - msiActualWidth;
+        var msi = getMsi(interactions);
+        if (msi != null) {
+            var msiValue = msi.getName();
+            var msiActualWidth = g2d.getFontMetrics().stringWidth(msiValue);
+            msiX = commandsStatsWidth - msiActualWidth;
 
-        layout = new TextLayout(msiValue, myriadPlain40pt, frc);
-        shape = layout.getOutline(null);
+            layout = new TextLayout(msiValue, myriadPlain40pt, frc);
+            shape = layout.getOutline(null);
 
-        g2d.setColor(Color.BLACK);
-        g2d.translate(msiX, msiY);
-        g2d.setStroke(new BasicStroke(outline));
-        g2d.draw(shape);
-        g2d.setColor(Color.WHITE);
-        g2d.fill(shape);
-        g2d.translate(msiX * -1, msiY * -1); // Reset
+            g2d.setColor(Color.BLACK);
+            g2d.translate(msiX, msiY);
+            g2d.setStroke(new BasicStroke(outline));
+            g2d.draw(shape);
+            g2d.setColor(Color.WHITE);
+            g2d.fill(shape);
+            g2d.translate(msiX * -1, msiY * -1); // Reset
+        }
 
         // Commands Stats - Most Shared Interaction
         var mriText = LanguageHandler.get(lang, "profile_mri");
@@ -389,20 +392,23 @@ public class ProfileImage {
         g2d.fill(shape);
         g2d.translate(mriX * -1, mriY * -1); // Reset
 
-        var mriValue = getMri(interactions).getName();
-        var mriActualWidth = g2d.getFontMetrics().stringWidth(mriValue);
-        mriX = commandsStatsWidth - mriActualWidth;
+        var mri = getMri(interactions);
+        if (mri != null) {
+            var mriValue = mri.getName();
+            var mriActualWidth = g2d.getFontMetrics().stringWidth(mriValue);
+            mriX = commandsStatsWidth - mriActualWidth;
 
-        layout = new TextLayout(mriValue, myriadPlain40pt, frc);
-        shape = layout.getOutline(null);
+            layout = new TextLayout(mriValue, myriadPlain40pt, frc);
+            shape = layout.getOutline(null);
 
-        g2d.setColor(Color.BLACK);
-        g2d.translate(mriX, mriY);
-        g2d.setStroke(new BasicStroke(outline));
-        g2d.draw(shape);
-        g2d.setColor(Color.WHITE);
-        g2d.fill(shape);
-        g2d.translate(mriX * -1, mriY * -1); // Reset
+            g2d.setColor(Color.BLACK);
+            g2d.translate(mriX, mriY);
+            g2d.setStroke(new BasicStroke(outline));
+            g2d.draw(shape);
+            g2d.setColor(Color.WHITE);
+            g2d.fill(shape);
+            g2d.translate(mriX * -1, mriY * -1); // Reset
+        }
 
         // Most Used Commands
         var featureIcons = getFeatureIcons(jda);

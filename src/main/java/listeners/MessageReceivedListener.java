@@ -6,6 +6,7 @@ import moderation.guild.Server;
 import moderation.toggle.Toggle;
 import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -13,7 +14,6 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import owner.blacklist.Blacklist;
 import servant.Servant;
-import utilities.ImageUtil;
 import utilities.*;
 
 import java.awt.*;
@@ -48,7 +48,7 @@ public class MessageReceivedListener extends ListenerAdapter {
             } else {
                 var gotPurged = processMediaOnlyChannel(event, user); // MediaOnlyChannel
                 if (!gotPurged) {
-                    processEasterEggs(event, user); // Easter Eggs
+                    processEasterEggs(event.getJDA(), event, user); // Easter Eggs
                     processLevel(event, user); // Level
                 }
             }
@@ -73,8 +73,7 @@ public class MessageReceivedListener extends ListenerAdapter {
         event.getChannel().sendMessage(String.format(LanguageHandler.get(lang, "current_prefix"), prefix)).queue();
     }
 
-    private static void processEasterEggs(MessageReceivedEvent event, net.dv8tion.jda.api.entities.User user) {
-        var guild = event.isFromGuild() ? event.getGuild() : null;
+    private static void processEasterEggs(JDA jda, MessageReceivedEvent event, net.dv8tion.jda.api.entities.User user) {
         var master = new Master(user);
         var message = event.getMessage();
         var contentRaw = message.getContentRaw().toLowerCase();
@@ -89,7 +88,7 @@ public class MessageReceivedListener extends ListenerAdapter {
             case "its name is":
             case "its name's":
                 logEasterEggFound(event, contentRaw);
-                event.getChannel().sendMessage(new EmbedBuilder().setColor(color).setImage("https://i.imgur.com/ohcdKgU.gif").build()).queue(sentMessage -> {
+                event.getChannel().sendMessage(new EmbedBuilder().setColor(color).setImage(ImageUtil.getImageUrl(jda, "excalibur")).build()).queue(sentMessage -> {
                     if (!master.hasAchievement("excalibur")) {
                         master.setAchievement("excalibur", 50);
                         new MessageUtil().reactAchievement(message);
@@ -99,8 +98,9 @@ public class MessageReceivedListener extends ListenerAdapter {
 
             case "i am the bone of my sword":
             case "i'm the bone of my sword":
+            case "im the bone of my sword":
                 logEasterEggFound(event, contentRaw);
-                event.getChannel().sendMessage(new EmbedBuilder().setColor(color).setImage("https://i.imgur.com/XZ7q5Xg.gif").build()).queue(sentMessage -> {
+                event.getChannel().sendMessage(new EmbedBuilder().setColor(color).setImage(ImageUtil.getImageUrl(jda, "unlimitedbladeworks")).build()).queue(sentMessage -> {
                     if (!master.hasAchievement("unlimited_blade_works")) {
                         master.setAchievement("unlimited_blade_works", 50);
                         new MessageUtil().reactAchievement(message);
@@ -110,7 +110,7 @@ public class MessageReceivedListener extends ListenerAdapter {
 
             case "gae bolg":
                 logEasterEggFound(event, contentRaw);
-                event.getChannel().sendMessage(new EmbedBuilder().setColor(color).setImage("https://i.imgur.com/Mu1vw26.gif").build()).queue(sentMessage -> {
+                event.getChannel().sendMessage(new EmbedBuilder().setColor(color).setImage(ImageUtil.getImageUrl(jda, "gaebolg")).build()).queue(sentMessage -> {
                     if (!master.hasAchievement("gae_bolg")) {
                         master.setAchievement("gae_bolg", 50);
                         new MessageUtil().reactAchievement(message);
@@ -120,7 +120,7 @@ public class MessageReceivedListener extends ListenerAdapter {
 
             case "hey listen":
                 logEasterEggFound(event, contentRaw);
-                event.getChannel().sendMessage(new EmbedBuilder().setColor(color).setImage("https://i.imgur.com/w4S5NIt.gif").build()).queue(sentMessage -> {
+                event.getChannel().sendMessage(new EmbedBuilder().setColor(color).setImage(ImageUtil.getImageUrl(jda, "heylisten")).build()).queue(sentMessage -> {
                     if (!master.hasAchievement("navi")) {
                         master.setAchievement("navi", 50);
                         new MessageUtil().reactAchievement(message);
@@ -130,7 +130,7 @@ public class MessageReceivedListener extends ListenerAdapter {
 
             case "deus vult":
                 logEasterEggFound(event, contentRaw);
-                event.getChannel().sendMessage(new EmbedBuilder().setColor(color).setImage("https://i.kym-cdn.com/photos/images/newsfeed/001/176/858/c69.gif").build()).queue(sentMessage -> {
+                event.getChannel().sendMessage(new EmbedBuilder().setColor(color).setImage(ImageUtil.getImageUrl(jda, "deusvult")).build()).queue(sentMessage -> {
                     if (!master.hasAchievement("deusvult")) {
                         master.setAchievement("deusvult", 10);
                         new MessageUtil().reactAchievement(message);
@@ -147,7 +147,7 @@ public class MessageReceivedListener extends ListenerAdapter {
             case "<@550309058251456512> fite me":
             case "<@550309058251456512> fight me":
                 logEasterEggFound(event, contentRaw);
-                event.getChannel().sendMessage(new EmbedBuilder().setColor(color).setImage("https://i.imgur.com/wINPdOJ.gif").build()).queue(sentMessage -> {
+                event.getChannel().sendMessage(new EmbedBuilder().setColor(color).setImage(ImageUtil.getImageUrl(jda, "fiteme")).build()).queue(sentMessage -> {
                     if (!master.hasAchievement("fiteme")) {
                         master.setAchievement("fiteme", 10);
                         new MessageUtil().reactAchievement(message);
@@ -176,6 +176,20 @@ public class MessageReceivedListener extends ListenerAdapter {
                         new MessageUtil().reactAchievement(message);
                     }
                 }, failure -> logEasterEggError(event));
+                break;
+
+            case "<@!436916794796670977> thanks":
+            case "<@!436916794796670977> thank you":
+            case "<@436916794796670977> thank":
+            case "<@!550309058251456512> thanks":
+            case "<@!550309058251456512> thank you":
+            case "<@550309058251456512> thank":
+                event.getChannel().sendMessage("You're welcome " + EmoteUtil.getEmoteMention(event.getJDA(), "love")).queue(success -> {
+                    if (!master.hasAchievement("kind")) {
+                        master.setAchievement("kind", 10);
+                        new MessageUtil().reactAchievement(message);
+                    }
+                });
                 break;
         }
     }

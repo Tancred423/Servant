@@ -1,7 +1,6 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package servant;
 
-import easteregg.ThanksCommand;
 import files.ConfigFile;
 import files.language.LanguageHandler;
 import fun.AvatarCommand;
@@ -190,10 +189,7 @@ public class Servant {
                 new PandaCommand(),
                 new PikachuCommand(),
                 new RedPandaCommand(),
-                new SlothCommand(),
-
-                // Easter Eggs
-                new ThanksCommand()
+                new SlothCommand()
         );
 
         new JDABuilder(AccountType.BOT)

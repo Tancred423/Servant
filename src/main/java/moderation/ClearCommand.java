@@ -84,11 +84,12 @@ public class ClearCommand extends Command {
                 for (Message message : messages) if (message.getAuthor().equals(user)) deleteList.add(message);
                 var deletedMessages = channel.purgeMessages(deleteList);
 
-                deletedMessages.get(0).thenRunAsync(() -> new MessageUtil().sendAndExpire(
-                        channel,
-                        new MessageBuilder().setContent(String.format(LanguageHandler.get(lang, "clear_cleared"), deleteList.size())).build(),
-                        5 * 1000 // 5 seconds.
-                ));
+                if (deletedMessages.size() > 0)
+                    deletedMessages.get(0).thenRunAsync(() -> new MessageUtil().sendAndExpire(
+                            channel,
+                            new MessageBuilder().setContent(String.format(LanguageHandler.get(lang, "clear_cleared"), deleteList.size())).build(),
+                            5 * 1000 // 5 seconds.
+                    ));
             }), failure -> { /* ignore */ });
         }
     }
