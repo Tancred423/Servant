@@ -139,12 +139,13 @@ public class MessageReceivedListener extends ListenerAdapter {
                 break;
 
             case "<@!436916794796670977> fite me":
-            case "<@!436916794796670977> fight me":
             case "<@436916794796670977> fite me":
+            case "<@!436916794796670977> fight me":
             case "<@436916794796670977> fight me":
+
             case "<@!550309058251456512> fite me":
-            case "<@!550309058251456512> fight me":
             case "<@550309058251456512> fite me":
+            case "<@!550309058251456512> fight me":
             case "<@550309058251456512> fight me":
                 logEasterEggFound(event, contentRaw);
                 event.getChannel().sendMessage(new EmbedBuilder().setColor(color).setImage(ImageUtil.getImageUrl(jda, "fiteme")).build()).queue(sentMessage -> {
@@ -179,11 +180,14 @@ public class MessageReceivedListener extends ListenerAdapter {
                 break;
 
             case "<@!436916794796670977> thanks":
+            case "<@436916794796670977> thanks":
             case "<@!436916794796670977> thank you":
-            case "<@436916794796670977> thank":
+            case "<@436916794796670977> thank you":
+
             case "<@!550309058251456512> thanks":
+            case "<@550309058251456512> thanks":
             case "<@!550309058251456512> thank you":
-            case "<@550309058251456512> thank":
+            case "<@550309058251456512> thank you":
                 event.getChannel().sendMessage("You're welcome " + EmoteUtil.getEmoteMention(event.getJDA(), "love")).queue(success -> {
                     if (!master.hasAchievement("kind")) {
                         master.setAchievement("kind", 10);
