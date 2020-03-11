@@ -118,7 +118,7 @@ public class GiveawayHandler {
                 } while (resultSet.next());
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "GiveawayHandler#checkGiveaways");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "GiveawayHandler#checkGiveaways"));
         } finally {
             closeQuietly(connection);
         }

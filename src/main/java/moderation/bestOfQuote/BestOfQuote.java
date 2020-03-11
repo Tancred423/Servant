@@ -32,7 +32,7 @@ public class BestOfQuote {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "BestOfQuote#hasEntry");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "BestOfQuote#hasEntry"));
         } finally {
             closeQuietly(connection);
         }
@@ -58,7 +58,7 @@ public class BestOfQuote {
                 if (guildId != 0 && emoteId != 0) emote = thisGuild.getEmoteById(emoteId);
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "BestOfQuote#getEmote");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "BestOfQuote#getEmote"));
         } finally {
             closeQuietly(connection);
         }
@@ -78,7 +78,7 @@ public class BestOfQuote {
             if (resultSet.first()) emoji = resultSet.getString("emoji");
             if (emoji.isEmpty()) emoji = null;
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "BestOfQuote#getEmoji");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "BestOfQuote#getEmoji"));
         } finally {
             closeQuietly(connection);
         }
@@ -100,7 +100,7 @@ public class BestOfQuote {
             var resultSet = select.executeQuery();
             if (resultSet.first()) channel = guild.getTextChannelById(resultSet.getLong("channel_id"));
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "BestOfQuote#getChannel");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "BestOfQuote#getChannel"));
         } finally {
             closeQuietly(connection);
         }
@@ -119,7 +119,7 @@ public class BestOfQuote {
             var resultSet = select.executeQuery();
             if (resultSet.first()) number = resultSet.getInt("number");
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "BestOfQuote#getNumber");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "BestOfQuote#getNumber"));
         } finally {
             closeQuietly(connection);
         }
@@ -138,7 +138,7 @@ public class BestOfQuote {
             var resultSet = select.executeQuery();
             if (resultSet.first()) percentage = resultSet.getInt("percentage");
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "BestOfQuote#getPercentage");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "BestOfQuote#getPercentage"));
         } finally {
             closeQuietly(connection);
         }
@@ -168,7 +168,7 @@ public class BestOfQuote {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "BestOfQuote#setChannel");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "BestOfQuote#setChannel"));
         } finally {
             closeQuietly(connection);
         }
@@ -198,7 +198,7 @@ public class BestOfQuote {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "BestOfQuote#setEmote");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "BestOfQuote#setEmote"));
         } finally {
             closeQuietly(connection);
         }
@@ -228,7 +228,7 @@ public class BestOfQuote {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "BestOfQuote#setEmoji");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "BestOfQuote#setEmoji"));
         } finally {
             closeQuietly(connection);
         }
@@ -256,7 +256,7 @@ public class BestOfQuote {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "BestOfQuote#setNumber");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "BestOfQuote#setNumber"));
         } finally {
             closeQuietly(connection);
         }
@@ -284,7 +284,7 @@ public class BestOfQuote {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "BestOfQuote#setPercentage");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "BestOfQuote#setPercentage"));
         } finally {
             closeQuietly(connection);
         }
@@ -301,7 +301,7 @@ public class BestOfQuote {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "BestOfQuote#addBlacklist");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "BestOfQuote#addBlacklist"));
         } finally {
             closeQuietly(connection);
         }
@@ -318,7 +318,7 @@ public class BestOfQuote {
             var resultSet = select.executeQuery();
             if (resultSet.first()) isBlacklisted = true;
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "BestOfQuote#isBlacklisted");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "BestOfQuote#isBlacklisted"));
         } finally {
             closeQuietly(connection);
         }

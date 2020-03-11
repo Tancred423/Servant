@@ -40,7 +40,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) isBlacklisted = true;
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#isBlacklisted");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#isBlacklisted"));
         } finally {
             closeQuietly(connection);
         }
@@ -59,7 +59,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#setBlacklist");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#setBlacklist"));
         } finally {
             closeQuietly(connection);
         }
@@ -76,7 +76,7 @@ public class Server {
                 delete.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#unsetBlacklist");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#unsetBlacklist"));
         } finally {
             closeQuietly(connection);
         }
@@ -93,7 +93,7 @@ public class Server {
             delete.setLong(2, channelId);
             delete.executeUpdate();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#purgePollsFromChannel");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#purgePollsFromChannel"));
         } finally {
             closeQuietly(connection);
         }
@@ -108,7 +108,7 @@ public class Server {
             delete.setLong(1, guildId);
             delete.executeUpdate();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#purgePolls");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#purgePolls"));
         } finally {
             closeQuietly(connection);
         }
@@ -125,7 +125,7 @@ public class Server {
             delete.setLong(2, channelId);
             delete.executeUpdate();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#purgeSignupsFromChannel");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#purgeSignupsFromChannel"));
         } finally {
             closeQuietly(connection);
         }
@@ -140,7 +140,7 @@ public class Server {
             delete.setLong(1, guildId);
             delete.executeUpdate();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#purgeSignups");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#purgeSignups"));
         } finally {
             closeQuietly(connection);
         }
@@ -158,7 +158,7 @@ public class Server {
             ResultSet resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#bestOfImageHasEntry");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#bestOfImageHasEntry"));
         } finally {
             closeQuietly(connection);
         }
@@ -184,7 +184,7 @@ public class Server {
                 if (guildId != 0 && emoteId != 0) emote = thisGuild.getEmoteById(emoteId);
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#getBestOfImageEmote");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#getBestOfImageEmote"));
         } finally {
             closeQuietly(connection);
         }
@@ -204,7 +204,7 @@ public class Server {
             if (resultSet.first()) emoji = resultSet.getString("emoji");
             if (emoji.isEmpty()) emoji = null;
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#getBestOfImageEmoji");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#getBestOfImageEmoji"));
         } finally {
             closeQuietly(connection);
         }
@@ -226,7 +226,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) channel = thisGuild.getTextChannelById(resultSet.getLong("channel_id"));
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#getBestOfImageChannel");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#getBestOfImageChannel"));
         } finally {
             closeQuietly(connection);
         }
@@ -245,7 +245,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) number = resultSet.getInt("number");
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#getBestOfImageNumber");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#getBestOfImageNumber"));
         } finally {
             closeQuietly(connection);
         }
@@ -264,7 +264,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) percentage = resultSet.getInt("percentage");
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#getBestOfImagePercentage");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#getBestOfImagePercentage"));
         } finally {
             closeQuietly(connection);
         }
@@ -294,7 +294,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#setBestOfImageChannel");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#setBestOfImageChannel"));
         } finally {
             closeQuietly(connection);
         }
@@ -324,7 +324,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#setBestOfImageEmote");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#setBestOfImageEmote"));
         } finally {
             closeQuietly(connection);
         }
@@ -354,7 +354,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#setBestOfImageEmoji");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#setBestOfImageEmoji"));
         } finally {
             closeQuietly(connection);
         }
@@ -382,7 +382,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#setBestOfImageNumber");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#setBestOfImageNumber"));
         } finally {
             closeQuietly(connection);
         }
@@ -410,7 +410,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#setBestOfImagePercentage");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#setBestOfImagePercentage"));
         } finally {
             closeQuietly(connection);
         }
@@ -427,7 +427,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#addBestOfImageBlacklist");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#addBestOfImageBlacklist"));
         } finally {
             closeQuietly(connection);
         }
@@ -444,7 +444,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) isBlacklisted = true;
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#bestOfImageIsBlacklisted");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#bestOfImageIsBlacklisted"));
         } finally {
             closeQuietly(connection);
         }
@@ -465,7 +465,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) wasGratulated = resultSet.getBoolean("was_gratulated");
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#wasGratulated");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#wasGratulated"));
         } finally {
             closeQuietly(connection);
         }
@@ -485,7 +485,7 @@ public class Server {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#birthdayGratulationHasEntry");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#birthdayGratulationHasEntry"));
         } finally {
             closeQuietly(connection);
         }
@@ -506,7 +506,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#setGratulated");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#setGratulated"));
         } finally {
             closeQuietly(connection);
         }
@@ -524,7 +524,7 @@ public class Server {
                 delete.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#unsetGratulated");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#unsetGratulated"));
         } finally {
             closeQuietly(connection);
         }
@@ -539,7 +539,7 @@ public class Server {
             delete.setLong(1, guildId);
             delete.executeUpdate();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#unsetGratulateds");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#unsetGratulateds"));
         } finally {
             closeQuietly(connection);
         }
@@ -556,7 +556,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) channelId = resultSet.getLong("channel_id");
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#getBirthdayMessageChannelId");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#getBirthdayMessageChannelId"));
         } finally {
             closeQuietly(connection);
         }
@@ -575,7 +575,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) messageId = resultSet.getLong("message_id");
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#getBirthdayMessageMessageId");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#getBirthdayMessageMessageId"));
         } finally {
             closeQuietly(connection);
         }
@@ -594,7 +594,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) messageId = resultSet.getLong("user_id");
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#getBirthdayMessageAuthorId");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#getBirthdayMessageAuthorId"));
         } finally {
             closeQuietly(connection);
         }
@@ -613,7 +613,7 @@ public class Server {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#birthdayMessagesHasEntry");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#birthdayMessagesHasEntry"));
         } finally {
             closeQuietly(connection);
         }
@@ -642,7 +642,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#setBirthdayMessage");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#setBirthdayMessage"));
         } finally {
             closeQuietly(connection);
         }
@@ -659,7 +659,7 @@ public class Server {
                 delete.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#unsetBirthdayMessage");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#unsetBirthdayMessage"));
         } finally {
             closeQuietly(connection);
         }
@@ -685,7 +685,7 @@ public class Server {
                 do birthdays.put(resultSet.getLong("user_id"), resultSet.getString("birthday"));
                 while (resultSet.next());
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#getBirthdays");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#getBirthdays"));
         } finally {
             closeQuietly(connection);
         }
@@ -705,7 +705,7 @@ public class Server {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#birthdaysHasEntry");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#birthdaysHasEntry"));
         } finally {
             closeQuietly(connection);
         }
@@ -732,7 +732,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#setBirthday");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#setBirthday"));
         } finally {
             closeQuietly(connection);
         }
@@ -752,7 +752,7 @@ public class Server {
                 wasUnset = true;
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#unsetBirthday");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#unsetBirthday"));
         } finally {
             closeQuietly(connection);
         }
@@ -769,7 +769,7 @@ public class Server {
             delete.setLong(1, guildId);
             delete.executeUpdate();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#unsetBirthdays");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#unsetBirthdays"));
         } finally {
             closeQuietly(connection);
         }
@@ -786,7 +786,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) birthdayChannelId = resultSet.getLong("birthday_channel_id");
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#getBirthdayChannelId");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#getBirthdayChannelId"));
         } finally {
             closeQuietly(connection);
         }
@@ -814,7 +814,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#setBirthdayChannelId");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#setBirthdayChannelId"));
         } finally {
             closeQuietly(connection);
         }
@@ -836,7 +836,7 @@ public class Server {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#guildHasEntry");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#guildHasEntry"));
         } finally {
             closeQuietly(connection);
         }
@@ -858,7 +858,7 @@ public class Server {
                 do if (level >= resultSet.getInt("level")) roleId.add(resultSet.getLong("role_id"));
                 while (resultSet.next());
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#getLevelRolesForLevel");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#getLevelRolesForLevel"));
         } finally {
             closeQuietly(connection);
         }
@@ -878,7 +878,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) do roleId.add(resultSet.getLong("role_id")); while (resultSet.next());
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#getLevelRole");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#getLevelRole"));
         } finally {
             closeQuietly(connection);
         }
@@ -899,7 +899,7 @@ public class Server {
                 do levelRoles.put(resultSet.getInt("level"), resultSet.getLong("role_id"));
                 while(resultSet.next());
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#getLevelRoles");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#getLevelRoles"));
         } finally {
             closeQuietly(connection);
         }
@@ -922,7 +922,7 @@ public class Server {
                 wasSet = true;
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#setLevelRole");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#setLevelRole"));
         } finally {
             closeQuietly(connection);
         }
@@ -941,7 +941,7 @@ public class Server {
             delete.setLong(3, roleId);
             delete.executeUpdate();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#unsetLevelRole");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#unsetLevelRole"));
         } finally {
             closeQuietly(connection);
         }
@@ -961,7 +961,7 @@ public class Server {
             if (language == null) language = Servant.config.getDefaultLanguage();
             else if (language.isEmpty()) language = Servant.config.getDefaultLanguage();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#getLanguage");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#getLanguage"));
         } finally {
             closeQuietly(connection);
         }
@@ -989,7 +989,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#setLanguage");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#setLanguage"));
         } finally {
             closeQuietly(connection);
         }
@@ -1011,7 +1011,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) do lobbies.add(resultSet.getLong("channel_id")); while (resultSet.next());
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#getVoiceLobbies");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#getVoiceLobbies"));
         } finally {
             closeQuietly(connection);
         }
@@ -1031,7 +1031,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) prefix = resultSet.getString("prefix");
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#getPrefix");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#getPrefix"));
         } finally {
             closeQuietly(connection);
         }
@@ -1060,7 +1060,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#setPrefix");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#setPrefix"));
         } finally {
             closeQuietly(connection);
         }
@@ -1083,7 +1083,7 @@ public class Server {
             if (resultSet.first()) offset = resultSet.getString("offset");
             offset = offset.equals("00:00") ? "Z" : offset;
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#getOffset");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#getOffset"));
         } finally {
             closeQuietly(connection);
         }
@@ -1111,7 +1111,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#setOffset");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#setOffset"));
         } finally {
             closeQuietly(connection);
         }
@@ -1134,7 +1134,7 @@ public class Server {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#featureCountHasEntry");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#featureCountHasEntry"));
         } finally {
             closeQuietly(connection);
         }
@@ -1154,7 +1154,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) featureCount = resultSet.getInt("count");
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#getFeatureCount");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#getFeatureCount"));
         } finally {
             closeQuietly(connection);
         }
@@ -1182,7 +1182,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#incrementFeatureCount");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#incrementFeatureCount"));
         } finally {
             closeQuietly(connection);
         }
@@ -1202,7 +1202,7 @@ public class Server {
                 do userExp.put(resultSet.getLong("user_id"), resultSet.getInt("exp"));
                 while (resultSet.next());
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#getLeaderboard");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#getLeaderboard"));
         } finally {
             closeQuietly(connection);
         }
@@ -1222,7 +1222,7 @@ public class Server {
             var resultSet = select.executeQuery();
             hasAutorole = resultSet.first();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#hasAutorole");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#hasAutorole"));
         } finally {
             closeQuietly(connection);
         }
@@ -1248,7 +1248,7 @@ public class Server {
                 role.put(thisGuild.getRoleById(roleId), delay);
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#getAutorole");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#getAutorole"));
         } finally {
             closeQuietly(connection);
         }
@@ -1268,7 +1268,7 @@ public class Server {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#autoroleHasEntry");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#autoroleHasEntry"));
         } finally {
             closeQuietly(connection);
         }
@@ -1295,7 +1295,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#setAutorole");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#setAutorole"));
         } finally {
             closeQuietly(connection);
         }
@@ -1314,7 +1314,7 @@ public class Server {
                 wasUnset = true;
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#unsetAutorole");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#unsetAutorole"));
         } finally {
             closeQuietly(connection);
         }
@@ -1335,7 +1335,7 @@ public class Server {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#mediaOnlyChannelHasEntry");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#mediaOnlyChannelHasEntry"));
         } finally {
             closeQuietly(connection);
         }
@@ -1357,7 +1357,7 @@ public class Server {
                 wasSet = true;
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#setMediaOnlyChannel");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#setMediaOnlyChannel"));
         } finally {
             closeQuietly(connection);
         }
@@ -1379,7 +1379,7 @@ public class Server {
                 wasUnset = true;
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#unsetMediaOnlyChannel");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#unsetMediaOnlyChannel"));
         } finally {
             closeQuietly(connection);
         }
@@ -1396,7 +1396,7 @@ public class Server {
             delete.setLong(1, guildId);
             delete.executeUpdate();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#purgeMediaOnlyChannels");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#purgeMediaOnlyChannels"));
         } finally {
             closeQuietly(connection);
         }
@@ -1420,7 +1420,7 @@ public class Server {
             }
             if (channels.isEmpty()) channels = null;
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#getMediaOnlyChannels");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#getMediaOnlyChannels"));
         } finally {
             closeQuietly(connection);
         }
@@ -1441,7 +1441,7 @@ public class Server {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#toggleHasEntry");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#toggleHasEntry"));
         } finally {
             closeQuietly(connection);
         }
@@ -1462,7 +1462,7 @@ public class Server {
             if (resultSet.first()) isEnabled = resultSet.getBoolean("is_enabled");
             else isEnabled = Servant.toggle.get(feature);
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#getToggleStatus");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#getToggleStatus"));
         } finally {
             closeQuietly(connection);
         }
@@ -1489,7 +1489,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#setToggleStatus");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#setToggleStatus"));
         } finally {
             closeQuietly(connection);
         }
@@ -1507,7 +1507,7 @@ public class Server {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#joinNotifierHasEntry");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#joinNotifierHasEntry"));
         } finally {
             closeQuietly(connection);
         }
@@ -1529,7 +1529,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) channel = thisGuild.getTextChannelById(resultSet.getLong("channel_id"));
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#getJoinNotifierChannel");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#getJoinNotifierChannel"));
         } finally {
             closeQuietly(connection);
         }
@@ -1554,7 +1554,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#setJoinNotifierChannel");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#setJoinNotifierChannel"));
         } finally {
             closeQuietly(connection);
         }
@@ -1573,7 +1573,7 @@ public class Server {
                 wasUnset = true;
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#unsetJoinNotifierChannel");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#unsetJoinNotifierChannel"));
         } finally {
             closeQuietly(connection);
         }
@@ -1593,7 +1593,7 @@ public class Server {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#leaveNotifierHasEntry");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#leaveNotifierHasEntry"));
         } finally {
             closeQuietly(connection);
         }
@@ -1615,7 +1615,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) channel = thisGuild.getTextChannelById(resultSet.getLong("channel_id"));
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#getLeaveNotifierChannel");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#getLeaveNotifierChannel"));
         } finally {
             closeQuietly(connection);
         }
@@ -1640,7 +1640,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#setLeaveNotifierChannel");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#setLeaveNotifierChannel"));
         } finally {
             closeQuietly(connection);
         }
@@ -1659,7 +1659,7 @@ public class Server {
                 wasUnset = true;
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#unsetLeaveNotifierChannel");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#unsetLeaveNotifierChannel"));
         } finally {
             closeQuietly(connection);
         }
@@ -1679,7 +1679,7 @@ public class Server {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#joinLeaveMessageHasEntry");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#joinLeaveMessageHasEntry"));
         } finally {
             closeQuietly(connection);
         }
@@ -1700,7 +1700,7 @@ public class Server {
                     delete.setLong(1, guildId);
                     delete.executeUpdate();
                 } catch (SQLException e) {
-                    new LoggingTask(e, jda, "Server#checkAndPurgeJoinLeaveMessage");
+                    Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#checkAndPurgeJoinLeaveMessage"));
                 } finally {
                     closeQuietly(connection);
                 }
@@ -1722,7 +1722,7 @@ public class Server {
                 if (msg.equalsIgnoreCase("empty")) msg = null;
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#getJoinMessage");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#getJoinMessage"));
         } finally {
             closeQuietly(connection);
         }
@@ -1748,7 +1748,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#setJoinMessage");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#setJoinMessage"));
         } finally {
             closeQuietly(connection);
         }
@@ -1770,7 +1770,7 @@ public class Server {
                 if (msg.equalsIgnoreCase("empty")) msg = null;
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#getLeaveMessage");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#getLeaveMessage"));
         } finally {
             closeQuietly(connection);
         }
@@ -1796,7 +1796,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#setLeaveMessage");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#setLeaveMessage"));
         } finally {
             closeQuietly(connection);
         }
@@ -1822,7 +1822,7 @@ public class Server {
                 } while (resultSet.next());
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#getUserRank");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#getUserRank"));
         } finally {
             closeQuietly(connection);
         }
@@ -1842,7 +1842,7 @@ public class Server {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#streamerModeHasEntry");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#streamerModeHasEntry"));
         } finally {
             closeQuietly(connection);
         }
@@ -1861,7 +1861,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) isStreamerMode = resultSet.getBoolean("is_streamer_mode");
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#isStreamerMode");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#isStreamerMode"));
         } finally {
             closeQuietly(connection);
         }
@@ -1886,7 +1886,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#toggleStreamerMode");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#toggleStreamerMode"));
         } finally {
             closeQuietly(connection);
         }
@@ -1903,7 +1903,7 @@ public class Server {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#streamChannelHasEntry");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#streamChannelHasEntry"));
         } finally {
             closeQuietly(connection);
         }
@@ -1922,7 +1922,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) channelId = resultSet.getLong("channel_id");
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#getStreamChannelId");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#getStreamChannelId"));
         } finally {
             closeQuietly(connection);
         }
@@ -1947,7 +1947,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#setStreamChannel");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#setStreamChannel"));
         } finally {
             closeQuietly(connection);
         }
@@ -1966,7 +1966,7 @@ public class Server {
                 wasUnset = true;
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#unsetStreamChannel");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#unsetStreamChannel"));
         } finally {
             closeQuietly(connection);
         }
@@ -1985,7 +1985,7 @@ public class Server {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#streamingRoleHasEntry");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#streamingRoleHasEntry"));
         } finally {
             closeQuietly(connection);
         }
@@ -2004,7 +2004,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) role = resultSet.getLong("role_id");
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#getStreamingRoleId");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#getStreamingRoleId"));
         } finally {
             closeQuietly(connection);
         }
@@ -2029,7 +2029,7 @@ public class Server {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#setStreamingRole");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#setStreamingRole"));
         } finally {
             closeQuietly(connection);
         }
@@ -2048,7 +2048,7 @@ public class Server {
                 wasUnset = true;
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#unsetStreamingRole");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#unsetStreamingRole"));
         } finally {
             closeQuietly(connection);
         }
@@ -2068,7 +2068,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) isStreamer = true;
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#isStreamer");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#isStreamer"));
         } finally {
             closeQuietly(connection);
         }
@@ -2087,7 +2087,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) do streamers.add(resultSet.getLong("user_id")); while (resultSet.next());
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#getStreamers");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#getStreamers"));
         } finally {
             closeQuietly(connection);
         }
@@ -2105,7 +2105,7 @@ public class Server {
             insert.setLong(2, userId);
             insert.executeUpdate();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#setStreamer");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#setStreamer"));
         } finally {
             closeQuietly(connection);
         }
@@ -2125,7 +2125,7 @@ public class Server {
                 wasUnset = true;
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#unsetStreamer");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#unsetStreamer"));
         } finally {
             closeQuietly(connection);
         }
@@ -2147,7 +2147,7 @@ public class Server {
             var resultSet = preparedStatement.executeQuery();
             isGiveaway = resultSet.first();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#isGiveaway");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#isGiveaway"));
         } finally {
             closeQuietly(connection);
         }
@@ -2170,7 +2170,7 @@ public class Server {
             preparedStatement.setInt(7, amountWinners);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#insertGiveawayToDb");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#insertGiveawayToDb"));
         } finally {
             closeQuietly(connection);
         }
@@ -2187,7 +2187,7 @@ public class Server {
             delete.setLong(3, messageId);
             delete.executeUpdate();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#deleteGiveawayFromDb");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#deleteGiveawayFromDb"));
         } finally {
             closeQuietly(connection);
         }
@@ -2203,7 +2203,7 @@ public class Server {
             delete.setLong(2, channelId);
             delete.executeUpdate();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#purgeGiveawaysFromChannel");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#purgeGiveawaysFromChannel"));
         } finally {
             closeQuietly(connection);
         }
@@ -2218,7 +2218,7 @@ public class Server {
             delete.setLong(1, guildId);
             delete.executeUpdate();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#purgeGiveaways");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#purgeGiveaways"));
         } finally {
             closeQuietly(connection);
         }
@@ -2235,7 +2235,7 @@ public class Server {
             var resultSet = select.executeQuery();
             if (resultSet.first()) currentGiveaways = getRunningGiveaways(jda, resultSet, lang);
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#getCurrentGiveaways");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#getCurrentGiveaways"));
         } finally {
             closeQuietly(connection);
         }
@@ -2281,7 +2281,7 @@ public class Server {
                 );
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#getRemindMe");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#getRemindMe"));
         } finally {
             closeQuietly(connection);
         }
@@ -2307,7 +2307,7 @@ public class Server {
             var resultSet = insert.getGeneratedKeys();
             if (resultSet.first()) aiNumber = resultSet.getInt(1);
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#setRemindMe");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#setRemindMe"));
         } finally {
             closeQuietly(connection);
         }
@@ -2324,9 +2324,172 @@ public class Server {
             insert.setInt(1, aiNumber);
             insert.executeUpdate();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Server#unsetRemindMe");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#unsetRemindMe"));
         } finally {
             closeQuietly(connection);
         }
+    }
+
+    // Log
+    private boolean logHasEntry() {
+        Connection connection = null;
+        var hasEntry = false;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement("SELECT * FROM log WHERE guild_id=?");
+            select.setLong(1, guildId);
+            var resultSet = select.executeQuery();
+            hasEntry = resultSet.first();
+        } catch (SQLException e) {
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#logHasEntry"));
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return hasEntry;
+    }
+
+    public HashMap<String, Boolean> getLogEvents() {
+        Connection connection = null;
+        var logSettings = new HashMap<String, Boolean>();
+
+        if (logHasEntry()) {
+            try {
+                connection = Servant.db.getHikari().getConnection();
+                var select = connection.prepareStatement("SELECT * FROM log WHERE guild_id=?");
+                select.setLong(1, guildId);
+                var resultSet = select.executeQuery();
+                if (resultSet.first()) {
+                    logSettings.put("boost_count", resultSet.getBoolean("boost_count"));
+                    logSettings.put("member_join", resultSet.getBoolean("member_join"));
+                    logSettings.put("member_leave", resultSet.getBoolean("member_leave"));
+                    logSettings.put("role_add", resultSet.getBoolean("role_add"));
+                    logSettings.put("role_remove", resultSet.getBoolean("role_remove"));
+                }
+            } catch (SQLException e) {
+                Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#getLogSettings"));
+            } finally {
+                closeQuietly(connection);
+            }
+        }
+
+        return logSettings;
+    }
+
+    public boolean logIsEnabled(String eventName) {
+        Connection connection = null;
+        var isEnabled = true;
+
+        if (logHasEntry()) {
+            try {
+                connection = Servant.db.getHikari().getConnection();
+                var select = connection.prepareStatement("SELECT * FROM log WHERE guild_id=?");
+                select.setLong(1, guildId);
+                var resultSet = select.executeQuery();
+                if (resultSet.first()) isEnabled = resultSet.getBoolean(eventName);
+            } catch (SQLException e) {
+                Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#logIsEnabled"));
+            } finally {
+                closeQuietly(connection);
+            }
+        }
+
+        return isEnabled;
+    }
+
+    public long getLogChannelId() {
+        Connection connection = null;
+        var logChannelId = 0L;
+
+        if (logHasEntry()) {
+            try {
+                connection = Servant.db.getHikari().getConnection();
+                var select = connection.prepareStatement("SELECT * FROM log WHERE guild_id=?");
+                select.setLong(1, guildId);
+                var resultSet = select.executeQuery();
+                if (resultSet.first()) logChannelId = resultSet.getLong("channel_id");
+            } catch (SQLException e) {
+                Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#getLogSettings"));
+            } finally {
+                closeQuietly(connection);
+            }
+        }
+
+        return logChannelId;
+    }
+
+    public void setLogChannel(MessageChannel channel) {
+        Connection connection = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            if (logHasEntry()) {
+                var update = connection.prepareStatement("UPDATE log SET channel_id=? WHERE guild_id=?");
+                update.setLong(1, channel.getIdLong());
+                update.setLong(2, guildId);
+                update.executeUpdate();
+            } else {
+                var insert = connection.prepareStatement("INSERT INTO log " +
+                        "(guild_id,channel_id,boost_count,member_join,member_leave,role_add,role_remove) " +
+                        "VALUES (?,?,?,?,?,?,?)");
+                insert.setLong(1, guildId);
+                insert.setLong(2, channel.getIdLong());
+                insert.setBoolean(3, true);
+                insert.setBoolean(4, true);
+                insert.setBoolean(5, true);
+                insert.setBoolean(6, true);
+                insert.setBoolean(7, true);
+                insert.executeUpdate();
+            }
+        } catch (SQLException e) {
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#setLogChannel"));
+        } finally {
+            closeQuietly(connection);
+        }
+    }
+
+    public boolean logToggle(String eventName) {
+        Connection connection = null;
+        var wasToggled = false;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            if (logHasEntry()) {
+                var status = logIsEnabled(eventName);
+                var update = connection.prepareStatement("UPDATE log SET " + eventName + "=? WHERE guild_id=?");
+                update.setBoolean(1, !status);
+                update.setLong(2, guildId);
+                update.executeUpdate();
+                wasToggled = true;
+            }
+        } catch (SQLException e) {
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#logToggle"));
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return wasToggled;
+    }
+
+    public boolean unsetLog() {
+        Connection connection = null;
+        var wasUnset = false;
+
+        try {
+            if (logHasEntry()) {
+                connection = Servant.db.getHikari().getConnection();
+                var delete = connection.prepareStatement("DELETE FROM log WHERE guild_id=?");
+                delete.setLong(1, guildId);
+                delete.executeUpdate();
+                wasUnset = true;
+            }
+        } catch (SQLException e) {
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Server#unsetLog"));
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return wasUnset;
     }
 }

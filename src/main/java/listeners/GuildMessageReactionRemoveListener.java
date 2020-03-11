@@ -33,6 +33,7 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
          * 3.   Ignore any request from blacklisted users and guilds.
          */
         if (guild.getIdLong() == 264445053596991498L) return; // Discord Bot List
+        if (user == null) return;
         if (user.isBot()) return;
         if (Blacklist.isBlacklisted(guild, user)) return;
 
@@ -51,7 +52,7 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
 
                 // Radiopoll
                 if (poll.isRadioPoll()) processRadiovoteMultipleVote(event, poll, user, messageId);
-            });
+            }, f -> {});
 
             // Reaction Role
             if (Toggle.isEnabled(event, "reactionrole")) {

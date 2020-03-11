@@ -61,7 +61,7 @@ public class RemindMe {
                 } while (resultSet.next());
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "RemindMe#getList");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "RemindMe#getList"));
         } finally {
             closeQuietly(connection);
         }

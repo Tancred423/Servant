@@ -1,15 +1,19 @@
 package listeners;
 
+import files.language.LanguageHandler;
 import moderation.guild.Server;
-import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
+import moderation.log.Log;
+import net.dv8tion.jda.api.events.guild.update.GuildUpdateBoostCountEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import servant.Servant;
 
+import javax.annotation.Nonnull;
+import java.awt.*;
 import java.util.concurrent.CompletableFuture;
 
-public class TextChannelDeleteListener extends ListenerAdapter {
+public class GuildUpdateBoostCountListener extends ListenerAdapter {
     // This event will be thrown if a text channel gets deleted.
-    public void onTextChannelDelete(TextChannelDeleteEvent event) {
+    public void onGuildUpdateBoostCount(@Nonnull GuildUpdateBoostCountEvent event) {
         var guild = event.getGuild();
         var guildOwner = guild.getOwner();
         if (guildOwner == null) return; // To eliminate errors. Will never occur.
@@ -26,26 +30,19 @@ public class TextChannelDeleteListener extends ListenerAdapter {
 
         CompletableFuture.runAsync(() -> {
             var server = new Server(guild);
-            var channel = event.getChannel();
             var jda = event.getJDA();
             var lang = server.getLanguage();
 
-            // Birthday (Auto Updating Lists)
-            if (server.getBirthdayMessageChannelId() == channel.getIdLong())
-                server.unsetBirthdayMessage();
-
-            // Giveaway
-            server.purgeGiveawaysFromChannel(channel.getIdLong());
-
-            // MediaOnlyChannel
-            if (server.mediaOnlyChannelHasEntry(channel))
-                server.unsetMediaOnlyChannel(channel);
-
-            // Signup
-            server.purgeSignupsFromChannel(channel.getIdLong());
-
-            // Poll
-            server.purgePollsFromChannel(channel.getIdLong());
+            // Log
+            if (server.getLogChannelId() != 0 && server.logIsEnabled("boost_count")) {
+                var logChannel = guild.getTextChannelById(server.getLogChannelId());
+                if (logChannel != null) {
+                    logChannel.sendMessage(Log.getLogEmbed(jda, Color.decode(Servant.config.getDefaultColorCode()),
+                            LanguageHandler.get(lang, "log_boost_count_title"),
+                            String.format(LanguageHandler.get(lang, "log_boost_count_description"), event.getNewBoostCount())
+                    )).queue();
+                }
+            }
         }, Servant.fixedThreadPool);
     }
 }

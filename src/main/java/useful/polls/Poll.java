@@ -44,7 +44,7 @@ public class Poll {
             insert.setTimestamp(6, endingDate);
             insert.executeUpdate();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Poll#set");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Poll#set"));
         } finally {
             closeQuietly(connection);
         }
@@ -59,7 +59,7 @@ public class Poll {
             delete.setLong(1, message.getIdLong());
             delete.executeUpdate();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Poll#unsetPoll");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Poll#unsetPoll"));
         } finally {
             closeQuietly(connection);
         }
@@ -78,7 +78,7 @@ public class Poll {
             var resultSet = select.executeQuery();
             if (resultSet.first()) if (resultSet.getString("type").equals("quick")) isQuickvote = true;
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Poll#isQuickPoll");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Poll#isQuickPoll"));
         } finally {
             closeQuietly(connection);
         }
@@ -97,7 +97,7 @@ public class Poll {
             var resultSet = select.executeQuery();
             if (resultSet.first()) if (resultSet.getString("type").equals("vote")) isPoll = true;
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Poll#isPoll");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Poll#isPoll"));
         } finally {
             closeQuietly(connection);
         }
@@ -116,7 +116,7 @@ public class Poll {
             var resultSet = select.executeQuery();
             if (resultSet.first()) if (resultSet.getString("type").equals("radio")) isRadiovote = true;
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Poll#isRadioPoll");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Poll#isRadioPoll"));
         } finally {
             closeQuietly(connection);
         }
@@ -135,7 +135,7 @@ public class Poll {
             var resultSet = select.executeQuery();
             if (resultSet.first()) authorId = resultSet.getLong("author_id");
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Poll#getAuthorId");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Poll#getAuthorId"));
         } finally {
             closeQuietly(connection);
         }
@@ -155,7 +155,7 @@ public class Poll {
             insert.setString(4, emoji);
             insert.executeUpdate();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Poll#setVote");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Poll#setVote"));
         } finally {
             closeQuietly(connection);
         }
@@ -171,7 +171,7 @@ public class Poll {
             delete.setLong(2, userId);
             delete.executeUpdate();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Poll#unsetVote");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Poll#unsetVote"));
         } finally {
             closeQuietly(connection);
         }
@@ -186,7 +186,7 @@ public class Poll {
             delete.setLong(1, message.getIdLong());
             delete.executeUpdate();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Poll#unsetVotes");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Poll#unsetVotes"));
         } finally {
             closeQuietly(connection);
         }
@@ -204,7 +204,7 @@ public class Poll {
             var resultSet = select.executeQuery();
             if (resultSet.first()) hasVoted = true;
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Poll#hasVoted");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Poll#hasVoted"));
         } finally {
             closeQuietly(connection);
         }
@@ -224,7 +224,7 @@ public class Poll {
             var resultSet = select.executeQuery();
             if (resultSet.first()) id = resultSet.getLong("emote_id");
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Poll#getEmoteId");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Poll#getEmoteId"));
         } finally {
             closeQuietly(connection);
         }
@@ -244,7 +244,7 @@ public class Poll {
             var resultSet = select.executeQuery();
             if (resultSet.first()) emote = resultSet.getString("emoji");
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Poll#getEmoji");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Poll#getEmoji"));
         } finally {
             closeQuietly(connection);
         }
@@ -394,11 +394,11 @@ public class Poll {
                                 }
                             }
                         }
-                    });
+                    }, f -> {});
                 } while (resultSet.next());
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "PollUtil#check");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "PollUtil#check"));
         } finally {
             closeQuietly(connection);
         }

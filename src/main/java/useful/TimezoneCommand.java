@@ -7,6 +7,7 @@ import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import servant.LoggingTask;
+import servant.Servant;
 import utilities.Constants;
 import utilities.MessageUtil;
 import utilities.TimezoneUtil;
@@ -95,7 +96,7 @@ public class TimezoneCommand extends Command {
             eb.addField(LanguageHandler.get(lang, "timezone_output"), formatTarget, false);
             event.reply(eb.build());
         } catch (Exception e) {
-            new LoggingTask(e, jda, "TimezoneCommand#execute");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "TimezoneCommand#execute"));
             event.reply(LanguageHandler.get(lang, "timezone_invalid"));
             event.reactError();
         }

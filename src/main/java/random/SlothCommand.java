@@ -81,7 +81,7 @@ public class SlothCommand extends Command {
             eb.setImage(directImageLink);
             event.reply(eb.build());
         } catch (IOException e) {
-            new LoggingTask(e, event.getJDA(), name, event);
+            Servant.fixedThreadPool.submit(new LoggingTask(e, event.getJDA(), name, event));
         }
     }
 }

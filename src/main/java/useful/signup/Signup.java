@@ -43,7 +43,7 @@ public class Signup {
             var resultSet = select.executeQuery();
             if (resultSet.first()) amount = resultSet.getInt("amount");
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Signup#getAmount");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Signup#getAmount"));
         } finally {
             closeQuietly(connection);
         }
@@ -62,7 +62,7 @@ public class Signup {
             var resultSet = select.executeQuery();
             if (resultSet.first()) authorId = resultSet.getString("title");
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Signup#getTitle");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Signup#getTitle"));
         } finally {
             closeQuietly(connection);
         }
@@ -81,7 +81,7 @@ public class Signup {
             var resultSet = select.executeQuery();
             isSignupMessage = resultSet.first();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Signup#isSignup");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Signup#isSignup"));
         } finally {
             closeQuietly(connection);
         }
@@ -100,7 +100,7 @@ public class Signup {
             var resultSet = select.executeQuery();
             if (resultSet.first()) authorId = resultSet.getLong("author_id");
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Signup#getAuthorId");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Signup#getAuthorId"));
         } finally {
             closeQuietly(connection);
         }
@@ -119,7 +119,7 @@ public class Signup {
             var resultSet = select.executeQuery();
             if (resultSet.first()) expiration = resultSet.getTimestamp("time");
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Signup#getTime");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Signup#getTime"));
         } finally {
             closeQuietly(connection);
         }
@@ -138,7 +138,7 @@ public class Signup {
             var resultSet = select.executeQuery();
             if (resultSet.first()) isCustomDate = resultSet.getBoolean("is_custom_date");
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Signup#isCustomDate");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Signup#isCustomDate"));
         } finally {
             closeQuietly(connection);
         }
@@ -162,7 +162,7 @@ public class Signup {
             insert.setBoolean(8, isCustomDate);
             insert.executeUpdate();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Signup#set");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Signup#set"));
         } finally {
             closeQuietly(connection);
         }
@@ -177,7 +177,7 @@ public class Signup {
             delete.setLong(1, messageId);
             delete.executeUpdate();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Signup#unset");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Signup#unset"));
         } finally {
             closeQuietly(connection);
         }
@@ -222,7 +222,7 @@ public class Signup {
                 } while (resultSet.next());
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Signup#check");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Signup#check"));
         } finally {
             closeQuietly(connection);
         }

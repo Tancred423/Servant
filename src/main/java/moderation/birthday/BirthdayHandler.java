@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import servant.LoggingTask;
+import servant.Servant;
 import utilities.ImageUtil;
 import utilities.StringUtil;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
@@ -42,7 +43,7 @@ public class BirthdayHandler {
                         if (list == null) server.unsetBirthdayMessage();
                         else message.editMessage(list).queue();
                     } catch (ParseException e) {
-                        new LoggingTask(e, jda, "BirthdayHandler#updateLists");
+                        Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "BirthdayHandler#updateLists"));
                     }
                 });
             }

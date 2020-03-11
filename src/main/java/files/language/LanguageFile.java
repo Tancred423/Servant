@@ -345,6 +345,42 @@ public class LanguageFile {
         en_gb.setProperty("livestream_announcement", "%s just went live on [Twitch (click me)](%s)!");
         en_gb.setProperty("livestream_announcement_game", "Streaming %s");
 
+        /// Log
+        en_gb.setProperty("log_description", "Log stuff that happen in your server.");
+        en_gb.setProperty("log_usage", "**Set/update the log channel**\n" +
+                "Command: `%s%s set [#channel]`\n" +
+                "Example: `%s%s set #log`\n" +
+                "\n" +
+                "**Unset the log** (This will delete all log settings)\n" +
+                "Command: `%s%s unset`\n" +
+                "\n" +
+                "**Show current log settings**\n" +
+                "Command: `%s%s show`\n" +
+                "\n" +
+                "**Toggle event status**\n" +
+                "Command: `%s%s toggle [event name]`\n" +
+                "Example: `%s%s toggle role_add`");
+        en_gb.setProperty("log_hint", "You can find a full list of event names by executing `%s%s show`");
+        en_gb.setProperty("log_invalidmention", "You have to mention a channel.");
+        en_gb.setProperty("log_unset", "There is nothing to unset.");
+        en_gb.setProperty("log_settings", "Log Settings");
+        en_gb.setProperty("log_channel", "Log Channel");
+        en_gb.setProperty("log_events", "Events");
+        en_gb.setProperty("log_on", "On");
+        en_gb.setProperty("log_off", "Off");
+        en_gb.setProperty("log_boost_count_title", "Boost Count Update");
+        en_gb.setProperty("log_boost_count_description", "New boost count: %s");
+        en_gb.setProperty("log_member_join_title", "Member Joined");
+        en_gb.setProperty("log_member_join_description", "%s just joined.");
+        en_gb.setProperty("log_member_leave_title", "Member Left");
+        en_gb.setProperty("log_member_leave_description", "%s just left.");
+        en_gb.setProperty("log_role_add_title", "Role(s) Add");
+        en_gb.setProperty("log_role_add_description", "%s just received following role(s): %s");
+        en_gb.setProperty("log_role_remove_title", "Role(s) Remove");
+        en_gb.setProperty("log_role_remove_description", "%s just got following role(s) removed: %s");
+        en_gb.setProperty("log_toggle_args", "You have to state which event to toggle. Use `%s%s show` for a complete list.");
+        en_gb.setProperty("log_toggle_invalid_args", "You have to state a valid event. Use `%s%s show` for a complete list.");
+
         /// Media Only Channel
         en_gb.setProperty("mediaonlychannel_description", "If a member writes a normal message into a text channel that is marked as mediaonlychannel, the message will be removed and a warning will be posted.\n" +
                 "Members only can post links or upload files.\n" +
@@ -1409,6 +1445,42 @@ public class LanguageFile {
         de_de.setProperty("livestream_announcement_title", "Livestream!");
         de_de.setProperty("livestream_announcement", "%s ging gerade auf [Twitch (click me)](%s) live!");
         de_de.setProperty("livestream_announcement_game", "Streamt %s");
+
+        /// Log
+        de_de.setProperty("log_description", "Dokumentiere Sachen, die in deinem Server passieren.");
+        de_de.setProperty("log_usage", "**Setze/aktualisiere den Log-Kanal**\n" +
+                "Befehl: `%s%s set [#kanal]`\n" +
+                "Beispiel: `%s%s set #log`\n" +
+                "\n" +
+                "**Setze den Log zurück** (Dies löscht alle Log-Einstellungen)\n" +
+                "Befehl: `%s%s unset`\n" +
+                "\n" +
+                "**Zeige die aktuellen Log-Einstellungen an**\n" +
+                "Befehl: `%s%s show`\n" +
+                "\n" +
+                "**(De)aktiviere zu dokumentierende Events**\n" +
+                "Befehl: `%s%s toggle [Eventname]`\n" +
+                "Beispiel: `%s%s toggle role_add`");
+        de_de.setProperty("log_hint", "Indem du `%s%s show` eingibst, kannst du eine volle Liste der Eventnamen erhalten.");
+        de_de.setProperty("log_invalidmention", "Du musst einen Kanal erwähnen.");
+        de_de.setProperty("log_unset", "Es gibt nichts zum zurücksetzen.");
+        de_de.setProperty("log_settings", "Log-Einstellungen");
+        de_de.setProperty("log_channel", "Log-Kanal");
+        de_de.setProperty("log_events", "Events");
+        de_de.setProperty("log_on", "An");
+        de_de.setProperty("log_off", "Aus");
+        de_de.setProperty("log_boost_count_title", "Boost Zähler Aktualisierung");
+        de_de.setProperty("log_boost_count_description", "Neue Boost-Anzahl: %s");
+        de_de.setProperty("log_member_join_title", "Mitglied ist dem Server beigetreten");
+        de_de.setProperty("log_member_join_description", "%s ist soeben diesem Server beigetreten.");
+        de_de.setProperty("log_member_leave_title", "Mitglied hat den Server verlassen");
+        de_de.setProperty("log_member_leave_description", "%s hat soeben den Server verlassen.");
+        de_de.setProperty("log_role_add_title", "Rolle(n) hinzugefügt");
+        de_de.setProperty("log_role_add_description", "%s erhielt soeben folgende Rolle(n): %s");
+        de_de.setProperty("log_role_remove_title", "Rolle(n) entfernt");
+        de_de.setProperty("log_role_remove_description", "%s verlor soeben folgende Rolle(n): %s");
+        de_de.setProperty("log_toggle_args", "Du musst angeben, welches Event Du togglen willst. Benutze `%s%s show`, um eine komplette Liste zu erhalten.");
+        de_de.setProperty("log_toggle_invalid_args", "Du musst einen gültigen Eventnamen angeben. Benutze `%s%s show`, um eine komplette Liste zu erhalten.");
 
         /// Media Only Channel
         de_de.setProperty("mediaonlychannel_description", "Falls ein Mitglied eine normale Nachricht in einen Textkanal, der als MediaOnlyChannel markiert ist, schreibt, wird die Nachricht gelöscht und eine Warnung wird gesendet.\n" +

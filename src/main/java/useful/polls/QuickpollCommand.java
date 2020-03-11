@@ -63,6 +63,6 @@ public class QuickpollCommand extends Command {
             new Poll(event.getJDA(), lang, sentMessage).set(guild.getIdLong(), sentMessage.getChannel().getIdLong(), user.getIdLong(), "quick", Timestamp.valueOf(dateIn7Days));
         });
 
-        message.delete().queue();
+        message.delete().queue(s -> {}, f -> {});
     }
 }

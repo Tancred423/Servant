@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Feb 11, 2020 at 12:18 AM
+-- Generation Time: Mar 11, 2020 at 07:41 PM
 -- Server version: 10.1.41-MariaDB-0+deb9u1
 -- PHP Version: 5.5.9-1ubuntu4
 
@@ -334,6 +334,22 @@ CREATE TABLE `level_role` (
 CREATE TABLE `lobby` (
   `guild_id` bigint(18) NOT NULL,
   `channel_id` bigint(18) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `log`
+--
+
+CREATE TABLE `log` (
+  `guild_id` bigint(18) NOT NULL,
+  `channel_id` bigint(18) NOT NULL,
+  `boost_count` tinyint(1) NOT NULL,
+  `member_join` tinyint(1) NOT NULL,
+  `member_leave` tinyint(1) NOT NULL,
+  `role_add` tinyint(1) NOT NULL,
+  `role_remove` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -681,6 +697,12 @@ ALTER TABLE `level_role`
 --
 ALTER TABLE `lobby`
   ADD PRIMARY KEY (`guild_id`,`channel_id`);
+
+--
+-- Indexes for table `log`
+--
+ALTER TABLE `log`
+  ADD PRIMARY KEY (`guild_id`);
 
 --
 -- Indexes for table `mediaonlychannel`

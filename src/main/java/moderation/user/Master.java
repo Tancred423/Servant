@@ -44,7 +44,7 @@ public class Master {
             var resultSet = select.executeQuery();
             if (resultSet.first()) isBlacklisted = true;
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#isBlacklisted");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#isBlacklisted"));
         } finally {
             closeQuietly(connection);
         }
@@ -63,7 +63,7 @@ public class Master {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#setBlacklist");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#setBlacklist"));
         } finally {
             closeQuietly(connection);
         }
@@ -80,7 +80,7 @@ public class Master {
                 delete.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#unsetBlacklist");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#unsetBlacklist"));
         } finally {
             closeQuietly(connection);
         }
@@ -98,7 +98,7 @@ public class Master {
             var resultSet = select.executeQuery();
             if (resultSet.first()) text = resultSet.getString("text");
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#getBio");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#getBio"));
         } finally {
             closeQuietly(connection);
         }
@@ -117,7 +117,7 @@ public class Master {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#bioHasEntry");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#bioHasEntry"));
         } finally {
             closeQuietly(connection);
         }
@@ -142,7 +142,7 @@ public class Master {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#setBio");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#setBio"));
         } finally {
             closeQuietly(connection);
         }
@@ -161,7 +161,7 @@ public class Master {
             if (resultSet.first())
                 baguette = new MyEntry<>(resultSet.getInt("baguette_size"), resultSet.getInt("size_counter"));
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#getBaguette");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#getBaguette"));
         } finally {
             closeQuietly(connection);
         }
@@ -180,7 +180,7 @@ public class Master {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#baguetteHasEntry");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#baguetteHasEntry"));
         } finally {
             closeQuietly(connection);
         }
@@ -207,7 +207,7 @@ public class Master {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#setBaguette");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#setBaguette"));
         } finally {
             closeQuietly(connection);
         }
@@ -226,7 +226,7 @@ public class Master {
             var resultSet = select.executeQuery();
             hasAchievement = resultSet.first();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#hasAchievement");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#hasAchievement"));
         } finally {
             closeQuietly(connection);
         }
@@ -248,7 +248,7 @@ public class Master {
                 while (resultSet.next());
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#getAchievements");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#getAchievements"));
         } finally {
             closeQuietly(connection);
         }
@@ -275,7 +275,7 @@ public class Master {
                     if (achievement.startsWith("level")) achievements.add(achievement);
                 } while (resultSet.next());
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#getLevelAchievements");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#getLevelAchievements"));
         } finally {
             closeQuietly(connection);
         }
@@ -294,7 +294,7 @@ public class Master {
             var resultSet = select.executeQuery();
             if (resultSet.first()) do ap += resultSet.getInt("ap"); while (resultSet.next());
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#getTotalAP");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#getTotalAP"));
         } finally {
             closeQuietly(connection);
         }
@@ -315,7 +315,7 @@ public class Master {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#setAchievement");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#setAchievement"));
         } finally {
             closeQuietly(connection);
         }
@@ -333,7 +333,7 @@ public class Master {
                 delete.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#unsetAchievement");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#unsetAchievement"));
         } finally {
             closeQuietly(connection);
         }
@@ -352,7 +352,7 @@ public class Master {
             if (resultSet.first()) offset = resultSet.getString("offset");
             offset = offset.equals("00:00") ? "Z" : offset;
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#getOffset");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#getOffset"));
         } finally {
             closeQuietly(connection);
         }
@@ -371,7 +371,7 @@ public class Master {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#offsetHasEntry");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#offsetHasEntry"));
         } finally {
             closeQuietly(connection);
         }
@@ -398,7 +398,7 @@ public class Master {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#setOffset");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#setOffset"));
         } finally {
             closeQuietly(connection);
         }
@@ -420,7 +420,7 @@ public class Master {
             var resultSet = select.executeQuery();
             if (resultSet.first()) prefix = resultSet.getString("prefix");
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#getPrefix");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#getPrefix"));
         } finally {
             closeQuietly(connection);
         }
@@ -439,7 +439,7 @@ public class Master {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#prefixHasEntry");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#prefixHasEntry"));
         } finally {
             closeQuietly(connection);
         }
@@ -466,7 +466,7 @@ public class Master {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#setPrefix");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#setPrefix"));
         } finally {
             closeQuietly(connection);
         }
@@ -490,7 +490,7 @@ public class Master {
             if (language == null) language = Servant.config.getDefaultLanguage();
             else if (language.isEmpty()) language = Servant.config.getDefaultLanguage();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#getLanguage");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#getLanguage"));
         } finally {
             closeQuietly(connection);
         }
@@ -509,7 +509,7 @@ public class Master {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#languageHasEntry");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#languageHasEntry"));
         } finally {
             closeQuietly(connection);
         }
@@ -536,7 +536,7 @@ public class Master {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#setLanguage");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#setLanguage"));
         } finally {
             closeQuietly(connection);
         }
@@ -559,7 +559,7 @@ public class Master {
             var resultSet = select.executeQuery();
             if (resultSet.first()) isStreamHidden = true;
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#isStreamHidden");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#isStreamHidden"));
         } finally {
             closeQuietly(connection);
         }
@@ -578,7 +578,7 @@ public class Master {
             var resultSet = select.executeQuery();
             if (resultSet.first()) do streamHiddenGuilds.add(resultSet.getLong("guild_id")); while (resultSet.next());
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#getStreamHiddenGuilds");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#getStreamHiddenGuilds"));
         } finally {
             closeQuietly(connection);
         }
@@ -603,7 +603,7 @@ public class Master {
                 isStreamHidden = false;
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#toggleStreamHidden");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#toggleStreamHidden"));
         } finally {
             closeQuietly(connection);
         }
@@ -621,7 +621,7 @@ public class Master {
             delete.setLong(2, userId);
             delete.executeUpdate();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#unsetStreamHidden");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#unsetStreamHidden"));
         } finally {
             closeQuietly(connection);
         }
@@ -671,7 +671,7 @@ public class Master {
                 if (color != null) colorCode = String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#getColorCode");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#getColorCode"));
         } finally {
             closeQuietly(connection);
         }
@@ -719,7 +719,7 @@ public class Master {
                 }
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#getColor");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#getColor"));
         } finally {
             closeQuietly(connection);
         }
@@ -746,7 +746,7 @@ public class Master {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#setColor");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#setColor"));
         } finally {
             closeQuietly(connection);
         }
@@ -766,7 +766,7 @@ public class Master {
                 wasUnset = true;
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#unsetColor");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#unsetColor"));
         } finally {
             closeQuietly(connection);
         }
@@ -787,7 +787,7 @@ public class Master {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#hasEntry");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#hasEntry"));
         } finally {
             closeQuietly(connection);
         }
@@ -813,7 +813,7 @@ public class Master {
                 ));
                 while (resultSet.next());
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#getInteractions");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#getInteractions"));
         } finally {
             closeQuietly(connection);
         }
@@ -833,7 +833,7 @@ public class Master {
             var resultSet = select.executeQuery();
             if (resultSet.first()) commandCount = resultSet.getInt(isShared ? "shared" : "received");
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#getInteractionCount");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#getInteractionCount"));
         } finally {
             closeQuietly(connection);
         }
@@ -867,7 +867,7 @@ public class Master {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#incrementInteractionCount");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#incrementInteractionCount"));
         } finally {
             closeQuietly(connection);
         }
@@ -894,7 +894,7 @@ public class Master {
                 } while (resultSet.next());
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#getFeatureCounts");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#getFeatureCounts"));
         } finally {
             closeQuietly(connection);
         }
@@ -918,7 +918,7 @@ public class Master {
             var resultSet = select.executeQuery();
             if (resultSet.first()) featureCount = resultSet.getInt("count");
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#getFeatureCount");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#getFeatureCount"));
         } finally {
             closeQuietly(connection);
         }
@@ -946,7 +946,7 @@ public class Master {
                 insert.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#incrementFeatureCount");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#incrementFeatureCount"));
         } finally {
             closeQuietly(connection);
         }
@@ -965,7 +965,7 @@ public class Master {
             var resultSet = select.executeQuery();
             if (resultSet.first()) exp = resultSet.getInt("exp");
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#getExp");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#getExp"));
         } finally {
             closeQuietly(connection);
         }
@@ -994,7 +994,7 @@ public class Master {
                 update.executeUpdate();
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#setExp");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#setExp"));
         } finally {
             closeQuietly(connection);
         }
@@ -1013,7 +1013,7 @@ public class Master {
             if (resultSet.first())
             do feature += resultSet.getInt("count"); while (resultSet.next());
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#getTotalFeatureCount");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#getTotalFeatureCount"));
         } finally {
             closeQuietly(connection);
         }
@@ -1048,7 +1048,7 @@ public class Master {
                 } while (resultSet.next());
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Master#getFavoriteAnimal");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Master#getFavoriteAnimal"));
         } finally {
             closeQuietly(connection);
         }

@@ -47,7 +47,7 @@ public class ReactionRole {
                 wasSet = false;
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "ReactionRole#set");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "ReactionRole#set"));
         } finally {
             closeQuietly(connection);
         }
@@ -73,7 +73,7 @@ public class ReactionRole {
                 wasSet = false;
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "ReactionRole#unset");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "ReactionRole#unset"));
         } finally {
             closeQuietly(connection);
         }
@@ -97,7 +97,7 @@ public class ReactionRole {
             var resultSet = select.executeQuery();
             if (resultSet.first()) roleId = resultSet.getLong("role_id");
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "ReactionRole#getRoleId");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "ReactionRole#getRoleId"));
         } finally {
             closeQuietly(connection);
         }
@@ -121,7 +121,7 @@ public class ReactionRole {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "ReactionRole#hasEntry");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "ReactionRole#hasEntry"));
         } finally {
             closeQuietly(connection);
         }

@@ -42,16 +42,16 @@ public class GuildMessageDeleteListener extends ListenerAdapter {
             if (server.isGiveaway(event.getChannel().getIdLong(), event.getMessageIdLong()))
                 server.deleteGiveawayFromDb(event.getChannel().getIdLong(), messageId);
 
-            // Signup
-            var signup = new Signup(jda, messageId);
-            if (signup.isSignup()) signup.unset();
-
             // Poll
             if (channel != null)
                 channel.retrieveMessageById(messageId).queue(message -> {
                     var poll = new Poll(jda, lang, message);
                     if (poll.isPoll()) poll.unset();
                 }, failure -> {});
+
+            // Signup
+            var signup = new Signup(jda, messageId);
+            if (signup.isSignup()) signup.unset();
         }, Servant.fixedThreadPool);
     }
 }

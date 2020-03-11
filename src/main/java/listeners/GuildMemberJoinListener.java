@@ -3,6 +3,7 @@ package listeners;
 
 import files.language.LanguageHandler;
 import moderation.guild.Server;
+import moderation.log.Log;
 import moderation.toggle.Toggle;
 import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -42,6 +43,8 @@ public class GuildMemberJoinListener extends ListenerAdapter {
             var member = event.getMember();
             var selfMember = guild.getMemberById(event.getJDA().getSelfUser().getIdLong());
             if (selfMember == null) return; // To eliminate errors. Will never occur.
+            var jda = event.getJDA();
+            var lang = server.getLanguage();
 
             // AutoRole
             if (Toggle.isEnabled(event, "autorole") && server.hasAutorole()) {
@@ -56,7 +59,6 @@ public class GuildMemberJoinListener extends ListenerAdapter {
 
             // Join
             if (Toggle.isEnabled(event, "join")) {
-                var lang = new Server(event.getGuild()).getLanguage();
                 var joinNotifierChannel = server.getJoinNotifierChannel();
 
                 if (joinNotifierChannel != null && joinNotifierChannel.canTalk(selfMember)) {
@@ -71,6 +73,17 @@ public class GuildMemberJoinListener extends ListenerAdapter {
                                     .setTimestamp(OffsetDateTime.now(ZoneOffset.of(server.getOffset())))
                                     .build()
                     ).queue();
+                }
+            }
+
+            // Log
+            if (server.getLogChannelId() != 0 && server.logIsEnabled("member_join")) {
+                var logChannel = guild.getTextChannelById(server.getLogChannelId());
+                if (logChannel != null) {
+                    logChannel.sendMessage(Log.getLogEmbed(jda, master.getColor(),
+                            LanguageHandler.get(lang, "log_member_join_title"),
+                            String.format(LanguageHandler.get(lang, "log_member_join_description"), event.getMember().getEffectiveName())
+                    )).queue();
                 }
             }
         }, Servant.fixedThreadPool);

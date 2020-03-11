@@ -4,18 +4,17 @@ import files.language.LanguageHandler;
 import moderation.guild.Server;
 import moderation.log.Log;
 import moderation.user.Master;
-import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.jetbrains.annotations.NotNull;
 import owner.blacklist.Blacklist;
-import patreon.PatreonHandler;
 import servant.Servant;
 
+import javax.annotation.Nonnull;
 import java.util.concurrent.CompletableFuture;
 
-public class GuildMemberRoleAddListener extends ListenerAdapter {
-    // This event will be thrown if a user received a new role in a guild.
-    public void onGuildMemberRoleAdd(@NotNull GuildMemberRoleAddEvent event) {
+public class GuildMemberRoleRemoveListener extends ListenerAdapter {
+    // This event will be thrown if a user loses a role in a guild.
+    public void onGuildMemberRoleRemove(@Nonnull GuildMemberRoleRemoveEvent event) {
         var guild = event.getGuild();
         var user = event.getUser();
 
@@ -38,7 +37,7 @@ public class GuildMemberRoleAddListener extends ListenerAdapter {
             var lang = server.getLanguage();
 
             // Log
-            if (server.getLogChannelId() != 0 && server.logIsEnabled("role_add")) {
+            if (server.getLogChannelId() != 0 && server.logIsEnabled("role_remove")) {
                 var logChannel = guild.getTextChannelById(server.getLogChannelId());
                 if (logChannel != null) {
                     var sb = new StringBuilder().append("\n");
@@ -47,36 +46,11 @@ public class GuildMemberRoleAddListener extends ListenerAdapter {
                         sb.append(role.getName()).append(" (").append(role.getIdLong()).append(")\n");
 
                     logChannel.sendMessage(Log.getLogEmbed(jda, master.getColor(),
-                            LanguageHandler.get(lang, "log_role_add_title"),
-                            String.format(LanguageHandler.get(lang, "log_role_add_description"), event.getMember().getEffectiveName(), sb.toString())
+                            LanguageHandler.get(lang, "log_role_remove_title"),
+                            String.format(LanguageHandler.get(lang, "log_role_remove_description"), event.getMember().getEffectiveName(), sb.toString())
                     )).queue();
                 }
             }
-
-            // Patreon
-            processPatreon(event);
         }, Servant.fixedThreadPool);
-    }
-
-    private static void processPatreon(GuildMemberRoleAddEvent event) {
-        if (!event.getGuild().getId().equals(Servant.config.getSupportGuildId())) return;
-
-        switch (event.getRoles().get(0).getId()) {
-            case "489738762838867969": // Donation
-                PatreonHandler.sendPatreonNotification(event, "donation");
-                break;
-            case "502472440455233547": // $1
-                PatreonHandler.sendPatreonNotification(event, "$1");
-                break;
-            case "502472546600353796": // $3
-                PatreonHandler.sendPatreonNotification(event, "$3");
-                break;
-            case "502472823638458380": // $5
-                PatreonHandler.sendPatreonNotification(event, "$5");
-                break;
-            case "502472869234868224": // $10
-                PatreonHandler.sendPatreonNotification(event, "$10");
-                break;
-        }
     }
 }

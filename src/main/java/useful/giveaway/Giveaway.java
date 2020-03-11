@@ -49,7 +49,7 @@ public class Giveaway {
                 amountWinners = resultSet.getInt("amount_winners");
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Giveaway#setAttributes");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Giveaway#setAttributes"));
         } finally {
             closeQuietly(connection);
         }

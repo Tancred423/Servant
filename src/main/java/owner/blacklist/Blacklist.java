@@ -34,7 +34,7 @@ public class Blacklist {
             if (resultSet.first())
                 do blacklistedIds.add(resultSet.getLong("id")); while (resultSet.next());
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Blacklist#getIds");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Blacklist#getIds"));
         } finally {
             closeQuietly(connection);
         }

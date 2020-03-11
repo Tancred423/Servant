@@ -32,7 +32,7 @@ public class EmoteUtil {
             }
             else emoteMention = getEmoji(emoteName);
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "EmoteUtil#getEmoteMention");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "EmoteUtil#getEmoteMention"));
         } finally {
             closeQuietly(connection);
         }
@@ -55,7 +55,7 @@ public class EmoteUtil {
                 if (thisGuild != null) emote = thisGuild.getEmoteById(resultSet.getLong("emote_id"));
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "EmoteUtil#getEmote");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "EmoteUtil#getEmote"));
         } finally {
             closeQuietly(connection);
         }
@@ -156,7 +156,7 @@ public class EmoteUtil {
                 emotes.add("\uD83D\uDD1F");
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "EmoteUtil#getVoteEmotes");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "EmoteUtil#getVoteEmotes"));
         } finally {
             closeQuietly(connection);
         }

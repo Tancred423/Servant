@@ -25,7 +25,7 @@ public class ImageUtil {
             var resultSet = select.executeQuery();
             if (resultSet.first()) imageUrl = resultSet.getString("image_url");
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "ImageUtil#getImageUrl");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "ImageUtil#getImageUrl"));
         } finally {
             closeQuietly(connection);
         }
@@ -108,6 +108,7 @@ public class ImageUtil {
                 put("wink", servantEmotes2.getEmoteById(673449569324892169L));
                 put("mostusedcommands", servantEmotes2.getEmoteById(673461657246367744L));
                 put("sloth", servantEmotes2.getEmoteById(673472485093801994L));
+                put("log", servantEmotes2.getEmoteById(687334387095830563L));
             }
         }};
     }

@@ -7,6 +7,7 @@ import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import servant.LoggingTask;
+import servant.Servant;
 import utilities.Constants;
 import utilities.TimeUtil;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
@@ -63,7 +64,7 @@ public class ProfileCommand extends Command {
             }
             ImageIO.write(profileImage, "png", image);
         } catch (IOException e) {
-            new LoggingTask(e, event.getJDA(), name, event);
+            Servant.fixedThreadPool.submit(new LoggingTask(e, event.getJDA(), name, event));
             return;
         }
 

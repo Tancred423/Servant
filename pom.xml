@@ -19,7 +19,7 @@
         <repository>
             <id>central</id>
             <name>bintray</name>
-            <url>http://jcenter.bintray.com</url>
+            <url>https://jcenter.bintray.com</url>
         </repository>
     </repositories>
 
@@ -27,14 +27,19 @@
         <!-- SLF4J -->
         <dependency>
             <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
-            <version>1.7.29</version>
+            <version>1.6.4</version>
         </dependency>
         <!-- JDA -->
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>4.0.0_61</version>
+            <version>4.1.1_110</version>
         </dependency>
         <!-- JSON-->
         <dependency>
@@ -76,7 +81,7 @@
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
-            <version>3.4.1</version>
+            <version>3.4.2</version>
         </dependency>
         <!-- JSoup -->
         <dependency>

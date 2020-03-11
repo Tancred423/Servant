@@ -48,7 +48,7 @@ public class Interaction {
                 gif = gifs.get(random);
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "Interaction#getGifUrl");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Interaction#getGifUrl"));
         } finally {
             closeQuietly(connection);
         }

@@ -60,10 +60,10 @@ public class ServerSetupCommand extends Command {
                             || e.getReactionEmote().getName().equals(decline)),
                     e -> {
                         if (e.getReactionEmote().getName().equals(accept)) {
-                            message.clearReactions().queue();
+                            message.clearReactions().queue(s -> {}, f -> {});
                             processLanguage(channel, author, message, event, lang, p, false, new Server(event.getGuild()));
                         } else {
-                            message.delete().queue();
+                            message.delete().queue(s -> {}, f -> {});
                             event.reactWarning();
                         }
                     }, 15, TimeUnit.MINUTES, () -> timeout(event, message, lang));
@@ -88,7 +88,7 @@ public class ServerSetupCommand extends Command {
                                 && e.getChannel().equals(channel),
                         e -> {
                             var language = e.getMessage().getContentRaw();
-                            e.getMessage().delete().queue();
+                            e.getMessage().delete().queue(s -> {}, f -> {});
                             if (Parser.isValidLanguage(language)) {
                                 server.setLanguage(language);
                                 processPrefix(channel, author, message, event, lang, p, false, server);
@@ -106,7 +106,7 @@ public class ServerSetupCommand extends Command {
                                 && e.getChannel().equals(channel),
                         e -> {
                             var prefix = e.getMessage().getContentRaw();
-                            e.getMessage().delete().queue();
+                            e.getMessage().delete().queue(s -> {}, f -> {});
                             if (Parser.isValidPrefix(prefix)) {
                                 server.setPrefix(prefix);
                                 processOffset(channel, author, message, event, lang, false, server);
@@ -124,7 +124,7 @@ public class ServerSetupCommand extends Command {
                                 && e.getChannel().equals(channel),
                         e -> {
                             var offset = e.getMessage().getContentRaw();
-                            e.getMessage().delete().queue();
+                            e.getMessage().delete().queue(s -> {}, f -> {});
                             try {
                                 if (Parser.isValidOffset(offset)) {
                                     server.setOffset(offset);

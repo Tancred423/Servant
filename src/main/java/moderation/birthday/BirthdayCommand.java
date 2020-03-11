@@ -6,6 +6,7 @@ import moderation.guild.GuildHandler;
 import moderation.guild.Server;
 import net.dv8tion.jda.api.Permission;
 import servant.LoggingTask;
+import servant.Servant;
 import utilities.Constants;
 import utilities.MessageUtil;
 import utilities.Parser;
@@ -105,7 +106,7 @@ public class BirthdayCommand extends Command {
                 event.reply(LanguageHandler.get(lang, "birthday_invalid"));
             }
         } catch (ParseException e) {
-            new LoggingTask(e, event.getJDA(), name, event);
+            Servant.fixedThreadPool.submit(new LoggingTask(e, event.getJDA(), name, event));
         }
     }
 }

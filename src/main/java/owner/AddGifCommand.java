@@ -76,7 +76,7 @@ public class AddGifCommand extends Command {
                     url = new URL(gifUrl);
                     c = url.openConnection();
                 } catch (IOException e) {
-                    new LoggingTask(e, event.getJDA(), name, event);
+                    Servant.fixedThreadPool.submit(new LoggingTask(e, event.getJDA(), name, event));
                     return;
                 }
                 var contentType = c.getContentType();
@@ -96,7 +96,7 @@ public class AddGifCommand extends Command {
 
                     event.reactSuccess();
                 } catch (SQLException e) {
-                    new LoggingTask(e, event.getJDA(), name, event);
+                    Servant.fixedThreadPool.submit(new LoggingTask(e, event.getJDA(), name, event));
                 } finally {
                     closeQuietly(connection);
                 }

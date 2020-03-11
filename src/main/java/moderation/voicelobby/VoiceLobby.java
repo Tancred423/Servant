@@ -34,7 +34,7 @@ public class VoiceLobby {
             insert.setLong(1, channelId);
             insert.executeUpdate();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "VoiceLobby#setActive");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "VoiceLobby#setActive"));
         } finally {
             closeQuietly(connection);
         }
@@ -49,7 +49,7 @@ public class VoiceLobby {
             delete.setLong(1, channelId);
             delete.executeUpdate();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "VoiceLobby#unsetActive");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "VoiceLobby#unsetActive"));
         } finally {
             closeQuietly(connection);
         }
@@ -67,7 +67,7 @@ public class VoiceLobby {
                 do activeLobbies.add(resultSet.getLong("channel_id"));
                 while (resultSet.next());
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "VoiceLobby#getActive");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "VoiceLobby#getActive"));
         } finally {
             closeQuietly(connection);
         }
@@ -87,7 +87,7 @@ public class VoiceLobby {
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "VoiceLobby#lobbyHasEntry");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "VoiceLobby#lobbyHasEntry"));
         } finally {
             closeQuietly(connection);
         }
@@ -107,7 +107,7 @@ public class VoiceLobby {
             var resultSet = select.executeQuery();
             if (resultSet.first()) isLobby = true;
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "VoiceLobby#isVoiceLobby");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "VoiceLobby#isVoiceLobby"));
         } finally {
             closeQuietly(connection);
         }
@@ -125,7 +125,7 @@ public class VoiceLobby {
             insert.setLong(2, channelId);
             insert.executeUpdate();
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "VoiceLobby#set");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "VoiceLobby#set"));
         } finally {
             closeQuietly(connection);
         }
@@ -145,7 +145,7 @@ public class VoiceLobby {
                 wasUnset = true;
             }
         } catch (SQLException e) {
-            new LoggingTask(e, jda, "VoiceLobby#unset");
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "VoiceLobby#unset"));
         } finally {
             closeQuietly(connection);
         }

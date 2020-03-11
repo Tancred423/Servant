@@ -42,6 +42,8 @@ public class NameAliasUtil {
             case "livestream":
             case "stream":
                 return "livestream";
+            case "log":
+                return "log";
             case "mediaonlychannel":
             case "mediaonly":
                 return "mediaonlychannel";

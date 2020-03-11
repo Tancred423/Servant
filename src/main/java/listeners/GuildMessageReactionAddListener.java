@@ -137,7 +137,7 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
             var reactionCount = 0;
 
             var reactionEmote = event.getReactionEmote();
-            if (voteEmote != null) {
+            if (voteEmote != null && reactionEmote.isEmote()) {
                 // Emote
                 if (!reactionEmote.getEmote().equals(voteEmote)) {
                     temporaryBlacklist.remove(messageId);
@@ -155,7 +155,7 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
                     temporaryBlacklist.remove(messageId);
                     return;
                 }
-            } else if (voteEmoji != null) {
+            } else if (voteEmoji != null && reactionEmote.isEmoji()) {
                 // Emoji
                 if (!reactionEmote.getName().equals(voteEmoji)) {
                     temporaryBlacklist.remove(messageId);

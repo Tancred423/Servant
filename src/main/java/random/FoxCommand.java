@@ -5,6 +5,7 @@ import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import servant.LoggingTask;
+import servant.Servant;
 import utilities.Constants;
 import utilities.JsonReader;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
@@ -42,7 +43,7 @@ public class FoxCommand extends Command {
             eb.setImage(json.get("link").toString());
             event.reply(eb.build());
         } catch (IOException e) {
-            new LoggingTask(e, event.getJDA(), name, event);
+            Servant.fixedThreadPool.submit(new LoggingTask(e, event.getJDA(), name, event));
         }
     }
 }

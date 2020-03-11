@@ -28,6 +28,7 @@ import moderation.joinleave.JoinMessageCommand;
 import moderation.joinleave.LeaveCommand;
 import moderation.joinleave.LeaveMessageCommand;
 import moderation.livestream.LivestreamCommand;
+import moderation.log.LogCommand;
 import moderation.reactionRole.ReactionRoleCommand;
 import moderation.toggle.ToggleCommand;
 import moderation.toggle.ToggleFile;
@@ -123,6 +124,7 @@ public class Servant {
                 new LeaveMessageCommand(),
                 new LevelRoleCommand(),
                 new LivestreamCommand(),
+                new LogCommand(),
                 new MediaOnlyChannelCommand(),
                 new ReactionRoleCommand(),
                 new RoleCommand(),
@@ -211,10 +213,12 @@ public class Servant {
                 .addEventListeners(new GuildLeaveListener()) // Birthday, Kick
                 .addEventListeners(new GuildMemberJoinListener()) // AutoRole, Join
                 .addEventListeners(new GuildMemberLeaveListener()) // Leave
-                .addEventListeners(new GuildMemberRoleAddListener()) // Patreon
+                .addEventListeners(new GuildMemberRoleAddListener()) // Log, Patreon
+                .addEventListeners(new GuildMemberRoleRemoveListener()) // Log
                 .addEventListeners(new GuildMessageDeleteListener())  // Birthday
                 .addEventListeners(new GuildMessageReactionAddListener()) // BestOfImage, BestOfQuote, Quickpoll, Poll, Radiopoll, Reaction Role, Signup
                 .addEventListeners(new GuildMessageReactionRemoveListener()) // Quickpoll, Radiopoll, Reaction Role
+                .addEventListeners(new GuildUpdateBoostCountListener()) // Log
                 .addEventListeners(new GuildVoiceJoinListener()) // VoiceLobby
                 .addEventListeners(new GuildVoiceLeaveListener()) // VoiceLobby
                 .addEventListeners(new GuildVoiceMoveListener()) // Voicelobby
