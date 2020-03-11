@@ -346,7 +346,7 @@ public class LanguageFile {
         en_gb.setProperty("livestream_announcement_game", "Streaming %s");
 
         /// Log
-        en_gb.setProperty("log_description", "Log stuff that happen in your server.");
+        en_gb.setProperty("log_description", "Log stuff that happens in your server.");
         en_gb.setProperty("log_usage", "**Set/update the log channel**\n" +
                 "Command: `%s%s set [#channel]`\n" +
                 "Example: `%s%s set #log`\n" +
@@ -360,7 +360,12 @@ public class LanguageFile {
                 "**Toggle event status**\n" +
                 "Command: `%s%s toggle [event name]`\n" +
                 "Example: `%s%s toggle role_add`");
-        en_gb.setProperty("log_hint", "You can find a full list of event names by executing `%s%s show`");
+        en_gb.setProperty("log_hint", "Full list of event names:\n" +
+                "* boost_count\n" +
+                "* member_join\n" +
+                "* member_leave\n" +
+                "* role_add\n" +
+                "* role_remove");
         en_gb.setProperty("log_invalidmention", "You have to mention a channel.");
         en_gb.setProperty("log_unset", "There is nothing to unset.");
         en_gb.setProperty("log_settings", "Log Settings");
