@@ -94,7 +94,8 @@ public class ServerSetupCommand extends Command {
                                 processPrefix(channel, author, message, event, lang, p, false, server);
                             }
                             else processLanguage(channel, author, previous, event, lang, p, true, server);
-                        }, 15, TimeUnit.MINUTES, () -> timeout(event, message, lang)));
+                        }, 15, TimeUnit.MINUTES, () -> timeout(event, message, lang)),
+                f -> {});
     }
 
     // Prefix
@@ -112,7 +113,8 @@ public class ServerSetupCommand extends Command {
                                 processOffset(channel, author, message, event, lang, false, server);
                             }
                             else processPrefix(channel, author, previous, event, lang, p, true, server);
-                        }, 15, TimeUnit.MINUTES, () -> timeout(event, message, lang)));
+                        }, 15, TimeUnit.MINUTES, () -> timeout(event, message, lang)),
+                f -> {});
     }
 
     // Offset
@@ -133,7 +135,8 @@ public class ServerSetupCommand extends Command {
                             } catch (NumberFormatException ex) {
                                 processOffset(channel, author, previous, event, lang, true, server);
                             }
-                        }, 15, TimeUnit.MINUTES, () -> timeout(event, message, lang)), f -> {});
+                        }, 15, TimeUnit.MINUTES, () -> timeout(event, message, lang))
+                , f -> {});
     }
 
     // Finish

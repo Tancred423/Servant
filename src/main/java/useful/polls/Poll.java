@@ -303,12 +303,21 @@ public class Poll {
         eb.setColor(messageEmbed.getColor());
         eb.setAuthor(String.format(LanguageHandler.get(lang, "vote_ended"), author.getName()), null, author.getIconUrl());
         eb.setTitle(field.getName());
-        for (int i = 0; i < lines.size(); i++) eb.addField(lines.get(i), String.valueOf(count.get(i + 1)), true);
+        for (int i = 0; i < lines.size(); i++) eb.addField(shortenTitle(lines.get(i)), String.valueOf(count.get(i + 1)), true);
         eb.setFooter(LanguageHandler.get(lang, "votes_inactive"), jda.getSelfUser().getAvatarUrl());
 
         message.editMessage(eb.build()).queue();
         message.clearReactions().queue();
         unset();
+    }
+
+    private String shortenTitle(String title) {
+        if (title.length() > 256) {
+            title = title.substring(0, 256 - 3);
+            title += "...";
+        }
+
+        return title;
     }
 
     public void endQuickPoll() {

@@ -36,7 +36,7 @@ public class ProfileCommand extends Command {
         this.userPermissions = new Permission[0];
         this.botPermissions = new Permission[] {
                 Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY,
-                Permission.MESSAGE_EMBED_LINKS
+                Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_ATTACH_FILES
         };
     }
 

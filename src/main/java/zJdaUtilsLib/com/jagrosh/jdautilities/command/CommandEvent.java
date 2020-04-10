@@ -266,6 +266,14 @@ public class CommandEvent {
     private void sendMessage(MessageChannel chan, String message) {
         var messages = splitMessage(message);
         for(int i=0; i<MAX_MESSAGES && i<messages.size(); i++) {
+            if (event.isFromGuild()) {
+                var selfMember = event.getGuild().getMemberById(chan.getJDA().getSelfUser().getIdLong());
+                if (selfMember != null) {
+                    var textChan = event.getGuild().getTextChannelById(chan.getId());
+                    if (textChan != null && !textChan.canTalk(selfMember)) return;
+                }
+            }
+
             chan.sendMessage(messages.get(i)).queue(m -> {
                 if(event.isFromType(ChannelType.TEXT)) linkId(m);
             }, f -> {});

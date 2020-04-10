@@ -45,7 +45,7 @@ public class MessageUtil {
 
     public void reactAchievement(Message message) {
         var emote = EmoteUtil.getEmoji("achievement");
-        if (emote != null) message.addReaction(emote).queue();
+        if (emote != null) message.addReaction(emote).queue(s -> {}, f -> {});
         else {
             var emoji = EmoteUtil.getEmoji("achievement");
             if (emoji != null) message.addReaction(emoji).queue();
