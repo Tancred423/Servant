@@ -165,6 +165,8 @@ public class Servant {
 
                 // Interaction
                 new BegCommand(),
+                new BiteCommand(),
+                new BullyCommand(),
                 new CookieCommand(),
                 new CopCommand(),
                 new DabCommand(),

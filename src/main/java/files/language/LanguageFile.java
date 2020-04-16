@@ -84,6 +84,7 @@ public class LanguageFile {
         en_gb.setProperty("presence_2", "%s servers | %shelp");
         en_gb.setProperty("presence_3", "%spatreon | %shelp");
         en_gb.setProperty("presence_4", "https://servant.tanc.red");
+        en_gb.setProperty("presence_5", "#StayAtHome | %shelp");
 
         // Owner
         /// Add Gif
@@ -905,9 +906,8 @@ public class LanguageFile {
         en_gb.setProperty("achievements_title", "%s%s Achievements");
 
         /// Avatar
-        en_gb.setProperty("avatar_description", "Steal someone's avatar.");
-        en_gb.setProperty("avatar_usage", "Command: `%s%s @user`\n");
         en_gb.setProperty("avatar_stolen", "%s just stole %s's avatar!");
+        en_gb.setProperty("avatar_self", "%s just stole their own avatar!");
 
         /// Baguette
         en_gb.setProperty("baguette_49", "Unlucky");
@@ -2007,9 +2007,8 @@ public class LanguageFile {
         de_de.setProperty("achievements_title", "%s%s Erfolge");
 
         /// Avatar
-        de_de.setProperty("avatar_description", "Stehle jemandes Avatar.");
-        de_de.setProperty("avatar_usage", "Befehl: `%s%s @nutzer`\n");
         de_de.setProperty("avatar_stolen", "%s hat gerade %ss Avatar geklaut!");
+        de_de.setProperty("avatar_self", "%s sich selbst das Avatar geklaut!");
 
         /// Baguette
         de_de.setProperty("baguette_49", "Mies Brudi");

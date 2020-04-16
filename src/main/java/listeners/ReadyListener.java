@@ -109,9 +109,11 @@ public class ReadyListener extends ListenerAdapter {
             jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing(String.format(LanguageHandler.get(lang, "presence_3"), Servant.config.getDefaultPrefix(), Servant.config.getDefaultPrefix())));
         else if (counter == 4)
             jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing(LanguageHandler.get(lang, "presence_4")));
+        else if (counter == 5)
+            jda.getPresence().setPresence(OnlineStatus.ONLINE, Activity.playing(String.format(LanguageHandler.get(lang, "presence_5"), Servant.config.getDefaultPrefix())));
 
         counter++;
-        if (counter == 5) counter = 0;
+        if (counter == 6) counter = 0;
     }
 
     @SuppressWarnings({"ResultOfMethodCallIgnored", "unchecked"})
