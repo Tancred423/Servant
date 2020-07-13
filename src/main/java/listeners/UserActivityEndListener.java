@@ -1,13 +1,12 @@
 package listeners;
 
-import moderation.guild.Server;
-import moderation.livestream.Livestream;
-import moderation.user.Master;
+import commands.owner.blacklist.Blacklist;
+import plugins.moderation.livestream.LivestreamHandler;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.user.UserActivityEndEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import owner.blacklist.Blacklist;
+import servant.MyGuild;
 import servant.Servant;
 
 import javax.annotation.Nonnull;
@@ -31,23 +30,22 @@ public class UserActivityEndListener extends ListenerAdapter {
 
         CompletableFuture.runAsync(() -> {
             var oldActivity = event.getOldActivity();
+            var myGuild = new MyGuild(guild);
 
             // Livestream
-            processLivestream(event, guild, user, oldActivity);
+            if (myGuild.pluginIsEnabled("livestream") && myGuild.categoryIsEnabled("moderation"))
+                processLivestream(event, guild, user, oldActivity);
         }, Servant.fixedThreadPool);
     }
 
     private static void processLivestream(UserActivityEndEvent event, net.dv8tion.jda.api.entities.Guild guild, User user, Activity oldActivity) {
-        // Users can hide themselves from this feature.
-        if (new Master(user).isStreamHidden(guild.getIdLong())) return;
-
         // Check if user is streamer if guild is in streamer mode.
-        var isStreamerMode = new Server(guild).isStreamerMode();
-        if (isStreamerMode)
-            if (!new Server(guild).getStreamers().contains(user.getIdLong())) return;
+        var isPublic = new MyGuild(guild).streamIsPublic();
+        if (!isPublic)
+            if (!new MyGuild(guild).getStreamerRoles().contains(user.getIdLong())) return;
 
         if (oldActivity.getType().name().equalsIgnoreCase("streaming")) {
-            Livestream.removeRole(guild, event.getMember(), guild.getRoleById(new Server(guild).getStreamingRoleId()));
+            LivestreamHandler.removeRole(guild, event.getMember(), guild.getRoleById(new MyGuild(guild).getStreamRoleId()));
         }
     }
 }

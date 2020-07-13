@@ -2,57 +2,35 @@
 package utilities;
 
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Emote;
 import servant.LoggingTask;
 import servant.Servant;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 import static servant.Database.closeQuietly;
 
 public class EmoteUtil {
-    public static String getEmoteMention(JDA jda, String emoteName) {
+    public static Emote getEmote(JDA jda, String name) {
         Connection connection = null;
-        var emoteMention = "";
+        Emote emote = null;
 
         try {
             connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT guild_id, emote_id FROM emote WHERE emote_name=?");
-            select.setString(1, emoteName);
+            var select = connection.prepareStatement(
+                    "SELECT emote_guild_id, emote_id " +
+                            "FROM const_emotes " +
+                            "WHERE name=?");
+            select.setString(1, name);
             var resultSet = select.executeQuery();
 
             if (resultSet.first()) {
-                var thisGuild = jda.getGuildById(resultSet.getLong("guild_id"));
-                if (thisGuild == null) return emoteMention;
-                var emote = thisGuild.getEmoteById(resultSet.getLong("emote_id"));
-                if (emote == null) return emoteMention;
-
-                emoteMention = emote.getAsMention();
-            }
-            else emoteMention = getEmoji(emoteName);
-        } catch (SQLException e) {
-            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "EmoteUtil#getEmoteMention"));
-        } finally {
-            closeQuietly(connection);
-        }
-
-        return emoteMention;
-    }
-
-    public static net.dv8tion.jda.api.entities.Emote getEmote(JDA jda, String emoteName) {
-        Connection connection = null;
-        net.dv8tion.jda.api.entities.Emote emote = null;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT guild_id, emote_id FROM emote WHERE emote_name=?");
-            select.setString(1, emoteName);
-            var resultSet = select.executeQuery();
-
-            if (resultSet.first()) {
-                var thisGuild = jda.getGuildById(resultSet.getLong("guild_id"));
-                if (thisGuild != null) emote = thisGuild.getEmoteById(resultSet.getLong("emote_id"));
+                var sm = jda.getShardManager();
+                if (sm != null) {
+                    var thisGuild = sm.getGuildById(resultSet.getLong("emote_guild_id"));
+                    if (thisGuild != null) emote = thisGuild.getEmoteById(resultSet.getLong("emote_id"));
+                }
             }
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "EmoteUtil#getEmote"));
@@ -63,104 +41,25 @@ public class EmoteUtil {
         return emote;
     }
 
-    public static String getEmoji(String emojiName) {
-        switch (emojiName) {
-            case "baguette1":
-            case "baguette2":
-            case "baguette3":
-                return "\uD83E\uDD56"; // 🥖
-
-            case "upvote":
-                return "\uD83D\uDC4D"; // 👍
-
-            case "shrug":
-                return "\uD83E\uDD37"; // 🤷
-
-            case "downvote":
-                return "\uD83D\uDC4E"; // 👎
-
-            case "end":
-                return "❌"; // ❌
-
-            case "one":
-                return "1⃣";
-            case "two":
-                return "2⃣";
-            case "three":
-                return "3⃣";
-            case "four":
-                return "4⃣";
-            case "five":
-                return "5⃣";
-            case "six":
-                return "6⃣";
-            case "seven":
-                return "7⃣";
-            case "eight":
-                return "8⃣";
-            case "nine":
-                return "9⃣";
-            case "ten":
-                return "\uD83D\uDD1F";
-
-            case "achievement":
-                return "✨";
-
-            case "tada":
-                return "\uD83C\uDF89";
-
-            case "love":
-                return "♥";
-
-            case "servant_padoru":
-                return "\uD83C\uDF84"; // 🎄
-
-            case "pinged":
-                return "\uD83D\uDCA2"; // 💢
-
-            default:
-                return null;
-        }
-    }
-
-    public static String[] getVoteEmotes(JDA jda) {
+    public static String getEmoji(JDA jda, String name) {
         Connection connection = null;
-        var emotes = new ArrayList<String>();
+        String emoji = null;
 
         try {
             connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT * FROM emote");
+            var select = connection.prepareStatement(
+                    "SELECT emoji " +
+                            "FROM const_emojis " +
+                            "WHERE name=?");
+            select.setString(1, name);
             var resultSet = select.executeQuery();
-            if (resultSet.first())
-                do {
-                    if (resultSet.getString("emote_name").startsWith("vote")) {
-                        var thisGuild = jda.getGuildById(resultSet.getLong("guild_id"));
-                        if (thisGuild != null) {
-                            var emote = thisGuild.getEmoteById(resultSet.getLong("emote_id"));
-                            if (emote != null) emotes.add(emote.getAsMention());
-                        }
-                    }
-                } while (resultSet.next());
-
-            if (emotes.size() != 10) {
-                emotes.clear();
-                emotes.add("1⃣");
-                emotes.add("2⃣");
-                emotes.add("3⃣");
-                emotes.add("4⃣");
-                emotes.add("5⃣");
-                emotes.add("6⃣");
-                emotes.add("7⃣");
-                emotes.add("8⃣");
-                emotes.add("9⃣");
-                emotes.add("\uD83D\uDD1F");
-            }
+            if (resultSet.first()) emoji = resultSet.getString("emoji");
         } catch (SQLException e) {
-            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "EmoteUtil#getVoteEmotes"));
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "EmoteUtil#getEmoji"));
         } finally {
             closeQuietly(connection);
         }
 
-        return emotes.toArray(new String[0]);
+        return emoji;
     }
 }

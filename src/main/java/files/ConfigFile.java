@@ -16,7 +16,6 @@ public class ConfigFile {
     private String botOwnerColorCode;
     private String supportGuildId;
     private String supportGuildInv;
-    private String unsplashClientId;
 
     // Constructor.
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -44,7 +43,7 @@ public class ConfigFile {
         config.setProperty("botToken", "");
         config.setProperty("defaultLanguage", "en_gb"); // British English
         config.setProperty("defaultOffset", "00:00"); // UTC
-        config.setProperty("defaultColorCode", "0x6c86d5"); // Discord-themed blue
+        config.setProperty("defaultColorCode", "0x7289DA"); // Discord-themed blue
         config.setProperty("defaultPrefix", "!");
         config.setProperty("expCdMillis", "60000"); // 1 minute
         config.setProperty("botOwnerId", "");
@@ -76,7 +75,6 @@ public class ConfigFile {
         this.botOwnerColorCode = config.getProperty("botOwnerColorCode");
         this.supportGuildId = config.getProperty("supportGuildId");
         this.supportGuildInv = config.getProperty("supportGuildInv");
-        this.unsplashClientId = config.getProperty("unsplashClientId");
     }
 
     // Getter.
@@ -90,7 +88,6 @@ public class ConfigFile {
     public String getBotOwnerColorCode() { return botOwnerColorCode; }
     public String getSupportGuildId() { return supportGuildId; }
     public String getSupportGuildInv() { return supportGuildInv; }
-    public String getUnsplashClientId() { return unsplashClientId; }
 
     // Checks.
     public boolean isMissing() {
@@ -116,7 +113,6 @@ public class ConfigFile {
         if (getBotOwnerColorCode() == null) corrupted = true;
         if (getSupportGuildId() == null) corrupted = true;
         if (getSupportGuildInv() == null) corrupted = true;
-        if (getUnsplashClientId() == null) corrupted = true;
 
         if (corrupted) System.out.println(corruptedMessage);
         else {
@@ -151,12 +147,12 @@ public class ConfigFile {
             }
 
             if (getBotOwnerId().isEmpty()) {
-                System.out.println(String.format(errorMessage, "bot owner (user) ID"));
+                System.out.println(String.format(errorMessage, "bot commands.owner (user) ID"));
                 missing = true;
             }
 
             if (getBotOwnerColorCode().isEmpty()) {
-                System.out.println(String.format(errorMessage, "bot owner color code"));
+                System.out.println(String.format(errorMessage, "bot commands.owner color code"));
                 missing = true;
             }
 
@@ -167,11 +163,6 @@ public class ConfigFile {
 
             if (getSupportGuildInv().isEmpty()) {
                 System.out.println(String.format(errorMessage, "support guild invite link"));
-                missing = true;
-            }
-
-            if (getUnsplashClientId().isEmpty()) {
-                System.out.println(String.format(errorMessage, "unsplash client id"));
                 missing = true;
             }
         }

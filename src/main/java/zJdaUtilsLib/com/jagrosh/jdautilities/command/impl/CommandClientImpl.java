@@ -18,45 +18,36 @@
 // Also better help message via embeds.
 package zJdaUtilsLib.com.jagrosh.jdautilities.command.impl;
 
+import commands.owner.blacklist.Blacklist;
 import files.language.LanguageHandler;
-import moderation.guild.Server;
-import moderation.toggle.Toggle;
-import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.ShutdownEvent;
-import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
-import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageDeleteEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
-import net.dv8tion.jda.internal.requests.Requester;
 import net.dv8tion.jda.internal.utils.Checks;
-import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import owner.blacklist.Blacklist;
+import servant.MyGuild;
+import servant.MyUser;
 import servant.Servant;
+import utilities.ConsoleLog;
 import utilities.Constants;
-import utilities.NameAliasUtil;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.*;
 import zJdaUtilsLib.com.jagrosh.jdautilities.commons.utils.FixedSizeCache;
 import zJdaUtilsLib.com.jagrosh.jdautilities.commons.utils.SafeIdUtil;
 
-import java.io.IOException;
-import java.io.Reader;
+import java.awt.*;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
@@ -148,7 +139,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
                     "User: " + event.getAuthor().getName() + "#" + event.getAuthor().getDiscriminator() + " (" + event.getAuthor().getIdLong() + ").");
 
             var eb = new EmbedBuilder();
-            eb.setColor(new Master(event.getAuthor()).getColor());
+            eb.setColor(Color.decode(new MyUser(event.getAuthor()).getColorCode()));
             var g = event.getJDA().getGuildById(436925371577925642L);
             eb.setThumbnail(g == null ? null : g.getIconUrl());
             eb.setAuthor(event.getSelfUser().getName() + " Commands\n", null, event.getSelfUser().getAvatarUrl());
@@ -171,8 +162,8 @@ public class CommandClientImpl implements CommandClient, EventListener {
                     }
 
                     var userPrefix = event.getGuild() == null ?
-                            new Master(event.getAuthor()).getPrefix() :
-                            new Server(event.getGuild()).getPrefix();
+                            new MyUser(event.getAuthor()).getPrefix() :
+                            new MyGuild(event.getGuild()).getPrefix();
 
                     builder.append("\n`").append(userPrefix).append(prefix == null ? " " : "").append(command.getName())
                             .append(command.getArguments() == null ? "`" : " " + command.getArguments() + "`")
@@ -196,7 +187,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
             }
 
             event.replyInDm(eb.build(), unused -> {
-            }, t -> event.replyWarning(LanguageHandler.get(new Master(event.getAuthor()).getLanguage(), "blocking_dm")));
+            }, t -> event.replyWarning(LanguageHandler.get(new MyUser(event.getAuthor()).getLanguageCode(), "blocking_dm")));
         } : helpConsumer;
 
         // Load commands
@@ -435,15 +426,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
     @Override
     public void onEvent(@NotNull GenericEvent event) {
         if (event instanceof MessageReceivedEvent) onMessageReceived((MessageReceivedEvent)event);
-
         else if (event instanceof GuildMessageDeleteEvent && usesLinkedDeletion()) onMessageDelete((GuildMessageDeleteEvent) event);
-
-        else if (event instanceof GuildJoinEvent) {
-            if (((GuildJoinEvent)event).getGuild().getSelfMember().getTimeJoined()
-                    .plusMinutes(10).isAfter(OffsetDateTime.now()))
-                sendStats(event.getJDA());
-        }
-        else if (event instanceof GuildLeaveEvent) sendStats(event.getJDA());
         else if (event instanceof ReadyEvent) onReady((ReadyEvent)event);
         else if (event instanceof ShutdownEvent) {
             GuildSettingsManager<?> manager = getSettingsManager();
@@ -469,7 +452,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
         GuildSettingsManager<?> manager = getSettingsManager();
         if(manager != null) manager.init();
 
-        sendStats(event.getJDA());
+//        sendStats(event.getJDA());
     }
 
     private void onMessageReceived(MessageReceivedEvent event) {
@@ -485,7 +468,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
         if (settings != null) if (settings.getPrefixes() != null && settings.getPrefixes().isEmpty()) settings = null;
 
         if (settings == null) {
-            var userPrefix = new Master(event.getAuthor()).getPrefix();
+            var userPrefix = new MyUser(event.getAuthor()).getPrefix();
             // Check for default prefix.
             if(rawContent.toLowerCase().startsWith(userPrefix.toLowerCase()))
                 parts = splitOnPrefixLength(rawContent, userPrefix.length());
@@ -511,13 +494,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
         }
 
         if (parts != null) { // Starts with valid prefix.
-            if (useHelp && (parts[0].equalsIgnoreCase(helpWord) || parts[0].equalsIgnoreCase(helpWorldAlias))) {
-                var cevent = new CommandEvent(event, parts[1]==null ? "" : parts[1], this);
-                if (listener != null) listener.onCommand(cevent, null);
-                helpConsumer.accept(cevent); // Fire help consumer
-                if (listener != null) listener.onCompletedCommand(cevent, null);
-                return; // Help Consumer is done
-            } else if (event.isFromType(ChannelType.PRIVATE) || event.getTextChannel().canTalk()) {
+                if (event.isFromType(ChannelType.PRIVATE) || event.getTextChannel().canTalk()) {
                 var name = parts[0].toLowerCase();
                 var args = parts[1] == null ? "" : parts[1];
                 final Command command; // this will be null if it's not a command
@@ -532,34 +509,23 @@ public class CommandClientImpl implements CommandClient, EventListener {
 
                 if (command != null) {
                     // Execute Command
-                    var toggleName = NameAliasUtil.getToggleName(command.getName());
-
                     CompletableFuture.runAsync(() -> {
                         try {
-                            // Logging Command
-                            System.out.println("[" + OffsetDateTime.now(ZoneId.of(Constants.LOG_OFFSET)).toString().replaceAll("T", " ").substring(0, 19) + "] " +
-                                    "Command executed: " + event.getMessage().getContentDisplay() + ". " +
-                                    "Guild: " + (event.isFromGuild() ? event.getGuild().getName() + " (" + event.getGuild().getIdLong() + ")" : "DM") + ". " +
-                                    "User: " + event.getAuthor().getName() + "#" + event.getAuthor().getDiscriminator() + " (" + event.getAuthor().getIdLong() + ").");
-
                             var cevent = new CommandEvent(event, args, this);
 
-                            if (Toggle.isEnabled(cevent, toggleName)) {
-                                if (listener != null) listener.onCommand(cevent, command);
-                                uses.put(command.getName(), uses.getOrDefault(command.getName(), 0) + 1);
-                                command.run(cevent);
+                            if (event.isFromGuild()) {
+                                var myGuild = new MyGuild(event.getGuild());
+                                if (myGuild.commandIsEnabled(command.getName()) && myGuild.categoryIsEnabled(command.getCategory().getName()))
+                                    startCommand(event, cevent, command, myGuild, name);
+                            } else startCommand(event, cevent, command, null, name);
 
-                                if (Toggle.isEnabled(cevent, "deletecommands") && !command.getName().equals("toggle") && event.isFromGuild())
-                                    event.getMessage().delete().queue(s -> {}, f -> {});
-
-                                // Statistics
-                                new Master(event.getAuthor()).incrementFeatureCount(command.getName());
-                                if (event.isFromGuild()) new Server(event.getGuild()).incrementFeatureCount(command.getName());
-                            }
+                            // Statistics
+                            new MyUser(event.getAuthor()).incrementCommandCount(command.getName());
+                            if (event.isFromGuild()) new MyGuild(event.getGuild()).incrementCommandCount(command.getName());
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                    }, toggleName.equals("profile") ? Servant.cachedThreadPool : Servant.fixedThreadPool);
+                    }, command.getName().equals("profile") ? Servant.cachedThreadPool : Servant.fixedThreadPool);
                     return;
                 }
             }
@@ -568,109 +534,19 @@ public class CommandClientImpl implements CommandClient, EventListener {
         if (listener != null) listener.onNonCommandMessage(event);
     }
 
-    private void sendStats(JDA jda) {
-        OkHttpClient client = jda.getHttpClient();
+    private void startCommand(MessageReceivedEvent event, CommandEvent cevent, Command command, MyGuild myGuild, String name) {
+        event.getChannel().sendTyping().queue();
+        ConsoleLog.send(event, false);
 
-        if(carbonKey != null) {
-            FormBody.Builder bodyBuilder = new FormBody.Builder()
-                    .add("key", carbonKey)
-                    .add("servercount", Integer.toString(jda.getGuilds().size()));
+        if (listener != null) listener.onCommand(cevent, command);
+        uses.put(command.getName(), uses.getOrDefault(command.getName(), 0) + 1);
+        command.run(cevent);
 
-            jda.getShardInfo();
-            bodyBuilder.add("shard_id", Integer.toString(jda.getShardInfo().getShardId()))
-                       .add("shard_count", Integer.toString(jda.getShardInfo().getShardTotal()));
-
-            Request.Builder builder = new Request.Builder()
-                    .post(bodyBuilder.build())
-                    .url("https://www.carbonitex.net/discord/data/botdata.php");
-
-            client.newCall(builder.build()).enqueue(new Callback() {
-                @Override
-                public void onResponse(@NotNull Call call, @NotNull Response response) {
-                    LOG.info("Successfully send information to carbonitex.net");
-                    response.close();
-                }
-
-                @Override
-                public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                    LOG.error("Failed to send information to carbonitex.net ", e);
-                }
-            });
-        }
-
-        // Both bots.discord.pw and discordbots.org use the same JSON body
-        // structure for POST requests to their stats APIs, so we reuse the same
-        // JSON for both
-        JSONObject body = new JSONObject().put("server_count", jda.getGuilds().size());
-        jda.getShardInfo();
-        body.put("shard_id", jda.getShardInfo().getShardId())
-            .put("shard_count", jda.getShardInfo().getShardTotal());
-
-        if(botsOrgKey != null) {
-            Request.Builder builder = new Request.Builder()
-                    .post(RequestBody.create(Requester.MEDIA_TYPE_JSON, body.toString()))
-                    .url("https://discordbots.org/api/bots/" + jda.getSelfUser().getId() + "/stats")
-                    .header("Authorization", botsOrgKey)
-                    .header("Content-Type", "application/json");
-            
-            client.newCall(builder.build()).enqueue(new Callback() {
-                @Override
-                public void onResponse(@NotNull Call call, @NotNull Response response) {
-                    LOG.info("Successfully send information to discordbots.org");
-                    response.close();
-                }
-
-                @Override
-                public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                    LOG.error("Failed to send information to discordbots.org ", e);
-                }
-            });
-        }
-        
-        if(botsKey != null) {
-            Request.Builder builder = new Request.Builder()
-                    .post(RequestBody.create(Requester.MEDIA_TYPE_JSON, body.toString()))
-                    .url("https://bots.discord.pw/api/bots/" + jda.getSelfUser().getId() + "/stats")
-                    .header("Authorization", botsKey)
-                    .header("Content-Type", "application/json");
-
-            client.newCall(builder.build()).enqueue(new Callback() {
-                @Override
-                public void onResponse(@NotNull Call call, @NotNull Response response) {
-                    LOG.info("Successfully send information to bots.discord.pw");
-                    response.close();
-                }
-
-                @Override
-                public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                    LOG.error("Failed to send information to bots.discord.pw ", e);
-                }
-            });
-
-            Request.Builder b = new Request.Builder()
-                    .get().url("https://bots.discord.pw/api/bots/" + jda.getSelfUser().getId() + "/stats")
-                    .header("Authorization", botsKey)
-                    .header("Content-Type", "application/json");
-
-            client.newCall(b.build()).enqueue(new Callback() {
-                @Override
-                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                    assert response.body() != null;
-                    try (response; Reader reader = response.body().charStream()) {
-                        JSONArray array = new JSONObject(new JSONTokener(reader)).getJSONArray("stats");
-                        int total = 0;
-                        for (int i = 0; i < array.length(); i++)
-                            total += array.getJSONObject(i).getInt("server_count");
-                        totalGuilds = total;
-                    }
-                    // Close the response
-                }
-
-                @Override
-                public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                    LOG.error("Failed to retrieve bot shard information from bots.discord.pw ", e);
-                }
-            });
+        if (event.isFromGuild()) {
+            if (myGuild.featureIsEnabled("cmddeletion")) {
+                Servant.myDeletedMessageCache.put(event.getMessageIdLong(), "");
+                if (!name.equals("clear")) event.getMessage().delete().queue();
+            }
         }
     }
 

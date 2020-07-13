@@ -1,8 +1,8 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package files.language;
 
-import moderation.guild.Server;
-import moderation.user.Master;
+import servant.MyGuild;
+import servant.MyUser;
 import servant.Servant;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
@@ -42,19 +42,22 @@ public class LanguageHandler {
     }
 
     public static String get(String lang, String key) {
+        var text = "Text not found.";
+
         try {
-            String text = LanguageFile.get(lang, key);
-            if (text == null) text = "Text not found.";
-            return text;
+            var tmpText = LanguageFile.get(lang, key);
+            if (tmpText != null) text = tmpText;
         } catch (IOException e) {
-            return "Text not found.";
+            System.out.println("LanguageHandler#get: Failed to access language file: " + e.getMessage());
         }
+
+        return text;
     }
 
     public static String getLanguage(CommandEvent event) {
         if (event == null) return Servant.config.getDefaultLanguage();
         else return event.getGuild() == null ?
-                new Master(event.getAuthor()).getLanguage() :
-                new Server(event.getGuild()).getLanguage();
+                new MyUser(event.getAuthor()).getLanguageCode() :
+                new MyGuild(event.getGuild()).getLanguageCode();
     }
 }

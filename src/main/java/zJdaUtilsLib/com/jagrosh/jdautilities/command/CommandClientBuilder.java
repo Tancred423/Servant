@@ -17,6 +17,7 @@ package zJdaUtilsLib.com.jagrosh.jdautilities.command;
 
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import servant.Servant;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.impl.AnnotatedModuleCompilerImpl;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.impl.CommandClientImpl;
 
@@ -53,6 +54,8 @@ public class CommandClientBuilder {
         CommandClient client = new CommandClientImpl(ownerId, coOwnerIds, prefix, altprefix, game, status, serverInvite,
                                                      success, warning, error, carbonKey, botsKey, botsOrgKey, new ArrayList<>(commands), useHelp,
                                                      helpConsumer, helpWord, executor, linkedCacheSize, compiler, manager);
+        Servant.commands = new ArrayList<>(commands);
+
         if(listener!=null) client.setListener(listener);
         return client;
     }

@@ -1,20 +1,21 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package listeners;
 
+import commands.owner.blacklist.Blacklist;
+import commands.utility.polls.Poll;
+import commands.utility.rate.Rating;
+import commands.utility.signup.Signup;
 import files.language.LanguageHandler;
-import moderation.guild.Server;
-import moderation.reactionRole.ReactionRole;
-import moderation.toggle.Toggle;
+import plugins.moderation.reactionRole.ReactionRole;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionRemoveEvent;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
-import owner.blacklist.Blacklist;
+import servant.MyGuild;
+import servant.MyMessage;
 import servant.Servant;
-import useful.polls.Poll;
 import utilities.EmoteUtil;
 
 import java.util.ArrayList;
@@ -23,7 +24,10 @@ import java.util.concurrent.CompletableFuture;
 public class GuildMessageReactionRemoveListener extends ListenerAdapter {
     // This event will be thrown if a user removes their reaction from a message in a guild.
     public void onGuildMessageReactionRemove(@NotNull GuildMessageReactionRemoveEvent event) {
+        var jda = event.getJDA();
         var guild = event.getGuild();
+        var tc = event.getChannel();
+        var msgId = event.getMessageIdLong();
         var user = event.getUser();
 
         /* Certain conditions must meet, so this event is allowed to be executed:
@@ -38,99 +42,118 @@ public class GuildMessageReactionRemoveListener extends ListenerAdapter {
         if (Blacklist.isBlacklisted(guild, user)) return;
 
         CompletableFuture.runAsync(() -> {
-            var jda = event.getJDA();
-            var server = new Server(guild);
-            var channel = event.getChannel();
-            var messageId = event.getMessageIdLong();
-            var lang = server.getLanguage();
+            var myGuild = new MyGuild(guild);
+            var myMessage = new MyMessage(jda, guild.getIdLong(), tc.getIdLong(), msgId);
+            var lang = myGuild.getLanguageCode();
+            var reactionEmote = event.getReactionEmote();
 
-            channel.retrieveMessageById(messageId).queue(message -> {
-                var poll = new Poll(jda, lang, message);
+            // Quickpoll
+            if (myGuild.commandIsEnabled("quickpoll") && myMessage.isQuickpoll() && reactionEmote.isEmoji()) {
+                if (reactionEmote.getName().equals(EmoteUtil.getEmoji(jda, "upvote"))
+                        || reactionEmote.getName().equals(EmoteUtil.getEmoji(jda, "downvote"))) {
+                    var quickpoll = new Poll(jda, lang, guild.getIdLong(), tc.getIdLong(), msgId);
 
-                // Quickpoll
-                if (poll.isQuickPoll()) processQuickpollMultipleVote(event, poll, user, messageId);
+                    event.getChannel().retrieveMessageById(msgId).queue(message -> {
+                        if (reactionEmote.getName().equals(quickpoll.getVoteEmoji(user.getIdLong())))
+                            quickpoll.unsetVote(user.getIdLong(), reactionEmote.getName());
+                    });
+                }
+            }
 
-                // Radiopoll
-                if (poll.isRadioPoll()) processRadiovoteMultipleVote(event, poll, user, messageId);
-            }, f -> {});
+            // Poll
+            if (myGuild.commandIsEnabled("poll") && (myMessage.isCheckpoll() || myMessage.isRadiopoll()) && reactionEmote.isEmoji()) {
+                var poll = new Poll(jda, lang, guild.getIdLong(), tc.getIdLong(), msgId);
+
+                var amountAnswers = poll.getAmountAnswers();
+                var reactions = new ArrayList<String>();
+                for (int i = 1; i <= amountAnswers; i++) {
+                    String name = null;
+                    switch (i) {
+                        case 1:
+                            name = "one";
+                            break;
+                        case 2:
+                            name = "two";
+                            break;
+                        case 3:
+                            name = "three";
+                            break;
+                        case 4:
+                            name = "four";
+                            break;
+                        case 5:
+                            name = "five";
+                            break;
+                        case 6:
+                            name = "six";
+                            break;
+                        case 7:
+                            name = "seven";
+                            break;
+                        case 8:
+                            name = "eight";
+                            break;
+                        case 9:
+                            name = "nine";
+                            break;
+                        case 10:
+                            name = "ten";
+                            break;
+                    }
+                    reactions.add(EmoteUtil.getEmoji(jda, name));
+                }
+
+                if (reactions.contains(reactionEmote.getName())) {
+                    event.getChannel().retrieveMessageById(msgId).queue(message -> {
+                        poll.unsetVote(user.getIdLong(), reactionEmote.getName());
+                    });
+                }
+            }
+
+            // Rating
+            if (myGuild.commandIsEnabled("rating") && myMessage.isRating() && reactionEmote.isEmoji()) {
+                var rating = new Rating(jda, lang, guild.getIdLong(), tc.getIdLong(), msgId);
+                var reactionEmoteName = event.getReactionEmote().getName();
+
+                if (rating.hasParticipated(user.getIdLong())
+                        && rating.getParticipantEmoji(user.getIdLong()).equals(reactionEmoteName))
+                    rating.unsetParticipant(user.getIdLong(), reactionEmote.getName());
+            }
 
             // Reaction Role
-            if (Toggle.isEnabled(event, "reactionrole")) {
-                processReactionRole(event, guild, server);
+            if (myGuild.pluginIsEnabled("reactionrole") & myGuild.categoryIsEnabled("moderation") && myMessage.isReactionRole() && reactionEmote.isEmoji()) {
+                processReactionRole(event, guild);
+            }
+
+            // Signup
+            if (myGuild.commandIsEnabled("signup") && myMessage.isSignup() && reactionEmote.isEmoji()) {
+                if (reactionEmote.getName().equals(EmoteUtil.getEmoji(jda, "upvote"))) {
+                    var signup = new Signup(jda, guild.getIdLong(), tc.getIdLong(), msgId);
+                    signup.unsetParticipant(user.getIdLong());
+                }
             }
         }, Servant.fixedThreadPool);
     }
 
-    private static void processQuickpollMultipleVote(GuildMessageReactionRemoveEvent event, Poll poll, User user, long messageId) {
-        // Just react to Upvote, Shrug and Downvote.
-        var reactionEmote = event.getReactionEmote();
-        if (!reactionEmote.getName().equals(EmoteUtil.getEmoji("upvote"))
-                && !reactionEmote.getName().equals(EmoteUtil.getEmoji("shrug"))
-                && !reactionEmote.getName().equals(EmoteUtil.getEmoji("downvote")))
-            return;
-
-        event.getChannel().retrieveMessageById(messageId).queue(message -> {
-            if (reactionEmote.getName().equals(poll.getVoteEmoji(user.getIdLong())))
-                poll.unsetVote(user.getIdLong());
-        });
-    }
-
-    private static void processRadiovoteMultipleVote(GuildMessageReactionRemoveEvent event, Poll poll, User user, long messageId) {
-        // Just react to Upvote, Shrug and Downvote.
-        var reactionEmote = event.getReactionEmote();
-        if (!reactionEmote.isEmote()) {
-            if (!reactionEmote.getName().equals(EmoteUtil.getEmoji("one"))
-                    && !reactionEmote.getName().equals(EmoteUtil.getEmoji("two"))
-                    && !reactionEmote.getName().equals(EmoteUtil.getEmoji("three"))
-                    && !reactionEmote.getName().equals(EmoteUtil.getEmoji("four"))
-                    && !reactionEmote.getName().equals(EmoteUtil.getEmoji("five"))
-                    && !reactionEmote.getName().equals(EmoteUtil.getEmoji("six"))
-                    && !reactionEmote.getName().equals(EmoteUtil.getEmoji("seven"))
-                    && !reactionEmote.getName().equals(EmoteUtil.getEmoji("eight"))
-                    && !reactionEmote.getName().equals(EmoteUtil.getEmoji("nine"))
-                    && !reactionEmote.getName().equals(EmoteUtil.getEmoji("ten"))
-            ) return;
-        } else return;
-
-        event.getChannel().retrieveMessageById(messageId).queue(message -> {
-            if (reactionEmote.isEmote()) {
-                if (reactionEmote.getEmote().getIdLong() == poll.getVoteEmoteId(user.getIdLong()))
-                    poll.unsetVote(user.getIdLong());
-            } else {
-                if (reactionEmote.getName().equals(poll.getVoteEmoji(user.getIdLong())))
-                    poll.unsetVote(user.getIdLong());
-            }
-        });
-    }
-
-    private static void processReactionRole(GuildMessageReactionRemoveEvent event, net.dv8tion.jda.api.entities.Guild guild, Server server) {
-        var guildId = guild.getIdLong();
-        var channelId = event.getChannel().getIdLong();
+    private static void processReactionRole(GuildMessageReactionRemoveEvent event, net.dv8tion.jda.api.entities.Guild guild) {
         var messageId = event.getMessageIdLong();
-        String emoji = null;
-        var emoteGuildId = 0L;
-        var emoteId = 0L;
-
         var reactionEmote = event.getReactionEmote();
-        if (reactionEmote.isEmote()) {
-            if (reactionEmote.getEmote().getGuild() == null) return;
-            emoteGuildId = reactionEmote.getEmote().getGuild().getIdLong();
-            emoteId = reactionEmote.getEmote().getIdLong();
-        } else {
-            emoji = reactionEmote.getName();
-        }
-
-        var reactionRole = new ReactionRole(event.getJDA(), guildId, channelId, messageId, emoji, emoteGuildId, emoteId);
-
-        if (reactionRole.hasEntry()) {
-            long roleId = reactionRole.getRoleId();
-            try {
-                var rolesToRemove = new ArrayList<Role>();
-                rolesToRemove.add(event.getGuild().getRoleById(roleId));
-                event.getGuild().modifyMemberRoles(event.getMember(), null, rolesToRemove).queue();
-            } catch (InsufficientPermissionException | HierarchyException e) {
-                event.getChannel().sendMessage(LanguageHandler.get(new Server(event.getGuild()).getLanguage(), "reactionrole_insufficient")).queue();
+        var emoji = reactionEmote.getName();
+        var reactionRole = new ReactionRole(event.getJDA(), messageId);
+        var roleIds = reactionRole.getRoleIds(emoji);
+        try {
+            var rolesToRemove = new ArrayList<Role>();
+            for (var roleId : roleIds) {
+                var role = guild.getRoleById(roleId);
+                if (role == null) {
+                    reactionRole.deleteRoleId(roleId);
+                } else rolesToRemove.add(role);
             }
+            var member = event.getMember();
+            if (member != null)
+                guild.modifyMemberRoles(member, null, rolesToRemove).queue();
+        } catch (InsufficientPermissionException | HierarchyException e) {
+            event.getChannel().sendMessage(LanguageHandler.get(new MyGuild(event.getGuild()).getLanguageCode(), "reactionrole_insufficient")).queue();
         }
     }
 }

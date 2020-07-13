@@ -1,52 +1,50 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package listeners;
 
+import commands.owner.blacklist.Blacklist;
+import commands.utility.giveaway.Giveaway;
+import commands.utility.polls.Poll;
+import commands.utility.rate.Rating;
+import commands.utility.remindme.RemindMe;
+import commands.utility.signup.Signup;
 import files.language.LanguageHandler;
-import moderation.bestOfQuote.BestOfQuote;
-import moderation.guild.Server;
-import moderation.reactionRole.ReactionRole;
-import moderation.toggle.Toggle;
-import moderation.user.Master;
+import plugins.moderation.bestOfQuote.BestOfQuoteHandler;
+import plugins.moderation.reactionRole.ReactionRole;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
-import owner.blacklist.Blacklist;
+import servant.MyGuild;
+import servant.MyMessage;
+import servant.MyUser;
 import servant.Servant;
-import useful.giveaway.Giveaway;
-import useful.giveaway.GiveawayHandler;
-import useful.polls.Poll;
-import useful.signup.Signup;
 import utilities.EmoteUtil;
 import utilities.TimeUtil;
 
-import java.sql.Timestamp;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 public class GuildMessageReactionAddListener extends ListenerAdapter {
     // A temporary blacklist to prevent multiple reactions processes.
-    private static List<Long> temporaryBlacklist = new ArrayList<>();
+    private static final List<Long> temporaryBlacklistImage = new ArrayList<>();
+    private static final List<Long> temporaryBlacklistQuote = new ArrayList<>();
 
     // This event will be thrown if a user reacts on a message in a guild.
     public void onGuildMessageReactionAdd(@NotNull GuildMessageReactionAddEvent event) {
-        var guild = event.getGuild();
-        var user = event.getUser();
-        var channel = event.getChannel();
         var jda = event.getJDA();
+        var guild = event.getGuild();
+        var tc = event.getChannel();
+        var msgId = event.getMessageIdLong();
+        var user = event.getUser();
 
         /* Certain conditions must meet, so this event is allowed to be executed:
          * 1.   Ignore any request from the Discord Bot List as this big guild
@@ -59,106 +57,207 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
         if (Blacklist.isBlacklisted(guild, user)) return;
 
         CompletableFuture.runAsync(() -> {
-            var server = new Server(guild);
-            var messageId = event.getMessageIdLong();
-            var lang = server.getLanguage();
+            var myGuild = new MyGuild(guild);
+            var myUser = new MyUser(user);
+            var myMessage = new MyMessage(jda, guild.getIdLong(), tc.getIdLong(), msgId);
+            var lang = myGuild.getLanguageCode();
+            var reactionEmote = event.getReactionEmote();
 
             // Best Of Image
-            if (Toggle.isEnabled(event, "bestofimage") && !temporaryBlacklist.contains(messageId)) {
-                temporaryBlacklist.add(messageId);
-                if (server.bestOfImageIsBlacklisted(messageId)) temporaryBlacklist.remove(messageId);
-                else processBestOfImage(event, server, messageId);
+            if (myGuild.pluginIsEnabled("bestofimage") && myGuild.categoryIsEnabled("moderation") && !temporaryBlacklistImage.contains(msgId)) {
+                temporaryBlacklistImage.add(msgId);
+                if (myGuild.bestOfImageIsBlacklisted(msgId)) temporaryBlacklistImage.remove(msgId);
+                else processBestOfImage(event, myGuild, msgId);
             }
 
             // Best Of Quote
-            if (Toggle.isEnabled(event, "bestofquote") && !temporaryBlacklist.contains(messageId)) {
-                temporaryBlacklist.add(messageId);
-                var bestOfQuote = new BestOfQuote(jda, guild.getIdLong());
-                if (bestOfQuote.isBlacklisted(messageId)) temporaryBlacklist.remove(messageId);
-                else processBestOfQuote(event, messageId);
+            if (myGuild.pluginIsEnabled("bestofquote") && myGuild.categoryIsEnabled("moderation") && !temporaryBlacklistQuote.contains(msgId)) {
+                temporaryBlacklistQuote.add(msgId);
+                if (myGuild.bestOfQuoteIsBlacklisted(msgId)) temporaryBlacklistQuote.remove(msgId);
+                else processBestOfQuote(event, myGuild, msgId);
             }
 
             // Giveaway
-            if (Toggle.isEnabled(event, "giveaway")
-                    && server.isGiveaway(channel.getIdLong(), messageId)
-                    && (event.getReactionEmote().isEmoji() && event.getReactionEmote().getName().equals(EmoteUtil.getEmoji("end")))) {
-                channel.retrieveMessageById(messageId).queue(message -> {
-                    var giveaway = new Giveaway(jda, guild.getIdLong(), channel.getIdLong(), messageId);
-                    if (giveaway.getHostId() == user.getIdLong())
-                        GiveawayHandler.announceWinners(message, giveaway.getAmountWinners(), giveaway.getPrize(), lang, jda.getUserById(giveaway.getHostId()));
-                });
+            if (myGuild.commandIsEnabled("giveaway") && myMessage.isGiveaway() && reactionEmote.isEmoji()) {
+                if (reactionEmote.getName().equals(EmoteUtil.getEmoji(jda, "tada"))) {
+                    // Enter participant
+                    var giveaway = new Giveaway(jda, lang, guild.getIdLong(), tc.getIdLong(), msgId);
+                    var wasSet = giveaway.setParticipant(user.getIdLong());
+                    if (wasSet) {
+                        tc.retrieveMessageById(msgId).queue(message -> event.getReaction().retrieveUsers().queue(users -> {
+                            if (users.size() > 4900) {
+                                user.openPrivateChannel().queue(pc ->
+                                        pc.sendMessage(new EmbedBuilder()
+                                                .setColor(Color.decode(myUser.getColorCode()))
+                                                .setTitle("Giveaway")
+                                                .setDescription(String.format(LanguageHandler.get(lang, "giveaway_dm"), message.getJumpUrl()))
+                                                .setFooter(LanguageHandler.get(lang, "giveaway_dm_footer"))
+                                                .build()
+                                        ).queue());
+                            }
+                        }));
+                    }
+                } else if (reactionEmote.getName().equals(EmoteUtil.getEmoji(jda, "end"))) {
+                    // Announce winners
+                    var giveaway = new Giveaway(jda, lang, guild.getIdLong(), tc.getIdLong(), msgId);
+                    if (giveaway.getAuthorId() == user.getIdLong()) {
+                        tc.retrieveMessageById(msgId).queue(message -> giveaway.end());
+                    }
+                }
             }
 
-            channel.retrieveMessageById(messageId).queue(message -> {
-                // Quickpoll
-                var poll = new Poll(jda, lang, message);
-                if (Toggle.isEnabled(event, "quickvote") && poll.isQuickPoll()) {
-                    processQuickpollEnd(event, poll, user, messageId);
-                    processQuickpollMultipleVote(event, poll, user, messageId);
+            // Quickpoll
+            if (myGuild.commandIsEnabled("quickpoll") && myMessage.isQuickpoll() && reactionEmote.isEmoji()) {
+                var quickpoll = new Poll(jda, lang, guild.getIdLong(), tc.getIdLong(), msgId);
+                if (reactionEmote.getName().equals(EmoteUtil.getEmoji(jda, "upvote"))
+                        || reactionEmote.getName().equals(EmoteUtil.getEmoji(jda, "downvote"))) {
+                    // Handle multi vote
+                    event.getChannel().retrieveMessageById(msgId).queue(message -> {
+                        var userId = user.getIdLong();
+                        if (quickpoll.hasVoted(userId)) event.getReaction().removeReaction(user).queue();
+                        else quickpoll.setVote(user.getIdLong(), reactionEmote.getName());
+                    });
+                } else if (reactionEmote.getName().equals(EmoteUtil.getEmoji(jda, "end"))) {
+                    // End quickpoll
+                    if (quickpoll.getAuthorId() == user.getIdLong())
+                        tc.retrieveMessageById(msgId).queue(message -> quickpoll.endQuickPoll());
+                }
+            }
+
+            // Poll
+            if (myGuild.commandIsEnabled("poll") && (myMessage.isCheckpoll() || myMessage.isRadiopoll())) {
+                var poll = new Poll(jda, lang, guild.getIdLong(), tc.getIdLong(), msgId);
+
+                var amountAnswers = poll.getAmountAnswers();
+                var reactions = new ArrayList<String>();
+                for (int i = 1; i <= amountAnswers; i++) {
+                    String name = null;
+                    switch (i) {
+                        case 1: name = "one";
+                            break;
+                        case 2: name = "two";
+                            break;
+                        case 3: name = "three";
+                            break;
+                        case 4: name = "four";
+                            break;
+                        case 5: name = "five";
+                            break;
+                        case 6: name = "six";
+                            break;
+                        case 7: name = "seven";
+                            break;
+                        case 8: name = "eight";
+                            break;
+                        case 9: name = "nine";
+                            break;
+                        case 10: name = "ten";
+                            break;
+                    }
+                    reactions.add(EmoteUtil.getEmoji(jda, name));
                 }
 
-                // Poll
-                if (Toggle.isEnabled(event, "vote") && (poll.isPoll() || poll.isRadioPoll())) {
-                    processPollEnd(event, poll, user, messageId);
+                if (reactions.contains(reactionEmote.getName())) {
+                    // Add user vote
+                    event.getChannel().retrieveMessageById(msgId).queue(message -> {
+                        var userId = user.getIdLong();
+                        if (poll.hasVoted(userId) && myMessage.isRadiopoll()) event.getReaction().removeReaction(user).queue();
+                        else poll.setVote(userId, reactionEmote.getName());
+                    });
+                } else if (reactionEmote.getName().equals(EmoteUtil.getEmoji(jda, "end"))) {
+                    // End poll
+                    if (poll.getAuthorId() == user.getIdLong())
+                        tc.retrieveMessageById(msgId).queue(message -> poll.endPoll());
                 }
+            }
 
-                // Radiopoll
-                if (Toggle.isEnabled(event, "radiovote") && poll.isRadioPoll()) {
-                    processRadiopollMultipleVote(event, poll, user, messageId);
+            // Rating
+            if (myGuild.commandIsEnabled("rating") && myMessage.isRating() && reactionEmote.isEmoji()) {
+                var rating = new Rating(jda, lang, guild.getIdLong(), tc.getIdLong(), msgId);
+                var reactionEmoteName = reactionEmote.getName();
+                if (reactionEmoteName.equals(EmoteUtil.getEmoji(jda, "end"))) {
+                    // End Rating
+                    if (rating.getAuthorId() == user.getIdLong())
+                        tc.retrieveMessageById(msgId).queue(message -> rating.end());
+                    else event.getReaction().removeReaction(user).queue();
+                } else if (reactionEmoteName.equals(EmoteUtil.getEmoji(jda, "one"))
+                        || reactionEmoteName.equals(EmoteUtil.getEmoji(jda, "two"))
+                        || reactionEmoteName.equals(EmoteUtil.getEmoji(jda, "three"))
+                        || reactionEmoteName.equals(EmoteUtil.getEmoji(jda, "four"))
+                        || reactionEmoteName.equals(EmoteUtil.getEmoji(jda, "five"))) {
+                    if (rating.hasParticipated(user.getIdLong())) event.getReaction().removeReaction(user).queue();
+                    else rating.setParticipant(user.getIdLong(), reactionEmoteName);
                 }
-            }, f -> {});
+            }
 
             // Reaction Role
-            if (Toggle.isEnabled(event, "reactionrole")) processReactionRole(event, guild);
+            if (myGuild.pluginIsEnabled("reactionrole") && myGuild.categoryIsEnabled("moderation") && myMessage.isReactionRole() && reactionEmote.isEmoji())
+                processReactionRole(event, guild);
+
+            // RemindMe
+            if (myGuild.commandIsEnabled("remindme") && myMessage.isRemindMe() && reactionEmote.isEmoji()) {
+                if (reactionEmote.getName().equals(EmoteUtil.getEmoji(jda, "upvote"))) {
+                    // Enter participant
+                    var remindMe = new RemindMe(jda, guild.getIdLong(), tc.getIdLong(), msgId);
+                    if (remindMe.getAuthorId() != event.getUserIdLong()) {
+                        var wasSet = remindMe.setParticipant(user.getIdLong());
+                        if (wasSet) {
+                            tc.retrieveMessageById(msgId).queue(message -> event.getReaction().retrieveUsers().queue(users -> {
+                                if (users.size() > 4900) {
+                                    user.openPrivateChannel().queue(pc ->
+                                            pc.sendMessage(new EmbedBuilder()
+                                                    .setColor(Color.decode(myUser.getColorCode()))
+                                                    .setTitle("RemindMe")
+                                                    .setDescription(String.format(LanguageHandler.get(lang, "remindme_dm"), message.getJumpUrl()))
+                                                    .setFooter(LanguageHandler.get(lang, "remindme_dm_footer"))
+                                                    .build()
+                                            ).queue());
+                                }
+                            }));
+                        }
+                    }
+                }
+            }
 
             // Signup
-            var signup = new Signup(jda, messageId);
-            if (Toggle.isEnabled(event, "signup") && signup.isSignup()) {
-                processSignup(event, user, server, signup, messageId);
+            if (myGuild.commandIsEnabled("signup") && myMessage.isSignup() && reactionEmote.isEmoji()) {
+                if (reactionEmote.getName().equals(EmoteUtil.getEmoji(jda, "upvote"))) {
+                    // Enter participant & check amount after
+                    var signup = new Signup(jda, guild.getIdLong(), tc.getIdLong(), msgId);
+                    var wasSet = signup.setParticipant(user.getIdLong());
+                    if (wasSet && signup.getParticipants().size() >= signup.getAmountParticipants()) signup.end();
+                } else if (reactionEmote.getName().equals(EmoteUtil.getEmoji(jda, "end"))) {
+                    // End signup
+                    var signup = new Signup(jda, guild.getIdLong(), tc.getIdLong(), msgId);
+                    if (signup.getAuthorId() == user.getIdLong())
+                        tc.retrieveMessageById(msgId).queue(message -> signup.end());
+                    else event.getReaction().removeReaction(user).queue();
+                }
             }
         }, Servant.fixedThreadPool);
     }
 
-    private void processBestOfImage(GuildMessageReactionAddEvent event, Server server, long messageId) {
+    private void processBestOfImage(GuildMessageReactionAddEvent event, MyGuild myGuild, long messageId) {
         event.getChannel().retrieveMessageById(messageId).queue(message -> {
             var attachments = message.getAttachments();
             if (attachments.isEmpty()) {
-                temporaryBlacklist.remove(messageId);
+                temporaryBlacklistImage.remove(messageId);
                 return;
             }
 
             for (var attachment : attachments) if (!attachment.isImage()) {
-                temporaryBlacklist.remove(messageId);
+                temporaryBlacklistImage.remove(messageId);
                 return;
             }
 
-            var voteEmote = server.getBestOfImageEmote();
-            var voteEmoji = server.getBestOfImageEmoji();
+            var voteEmoji = myGuild.getBestOfImageEmoji();
             var reactionCount = 0;
 
             var reactionEmote = event.getReactionEmote();
-            if (voteEmote != null && reactionEmote.isEmote()) {
-                // Emote
-                if (!reactionEmote.getEmote().equals(voteEmote)) {
-                    temporaryBlacklist.remove(messageId);
-                    return;
-                }
-
-                var messageReactions = message.getReactions();
-                for (var mr : messageReactions)
-                    if (mr.getReactionEmote().getEmote().equals(voteEmote)) {
-                        reactionCount = mr.getCount();
-                        break;
-                    }
-
-                if (reactionCount == 0) {
-                    temporaryBlacklist.remove(messageId);
-                    return;
-                }
-            } else if (voteEmoji != null && reactionEmote.isEmoji()) {
+            if (reactionEmote.isEmoji()) {
                 // Emoji
                 if (!reactionEmote.getName().equals(voteEmoji)) {
-                    temporaryBlacklist.remove(messageId);
+                    temporaryBlacklistImage.remove(messageId);
                     return;
                 }
 
@@ -170,49 +269,49 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
                     }
 
                 if (reactionCount == 0) {
-                    temporaryBlacklist.remove(messageId);
+                    temporaryBlacklistImage.remove(messageId);
                     return;
                 }
             } else {
-                temporaryBlacklist.remove(messageId);
+                temporaryBlacklistImage.remove(messageId);
                 return;
             }
 
-            var number = server.getBestOfImageNumber();
-            var percentage = server.getBestOfImagePercentage();
+            var number = myGuild.getBestOfImageMinVotesFlat();
+            var percentage = myGuild.getBestOfImageMinVotesPercent();
 
             var onlineMemberCount = 0;
             var members = event.getGuild().getMembers();
             for (var member : members) if (member.getOnlineStatus() == OnlineStatus.ONLINE) onlineMemberCount++;
             var onlineMemberPercentage = (int) Math.ceil(onlineMemberCount * percentage / 100.0);
-
-            var lang = new Server(event.getGuild()).getLanguage();
+            var lang = new MyGuild(event.getGuild()).getLanguageCode();
 
             if (number != 0 && percentage != 0) {
                 if (reactionCount >= number && reactionCount >= onlineMemberPercentage)
-                    sendBestOfImage(message, server, reactionCount, attachments, lang);
-                else temporaryBlacklist.remove(messageId);
+                    sendBestOfImage(message, myGuild, reactionCount, attachments, lang);
+                else temporaryBlacklistImage.remove(messageId);
             } else if (number != 0) {
                 if (reactionCount >= number)
-                    sendBestOfImage(message, server, reactionCount, attachments, lang);
-                else temporaryBlacklist.remove(messageId);
+                    sendBestOfImage(message, myGuild, reactionCount, attachments, lang);
+                else temporaryBlacklistImage.remove(messageId);
             } else if (percentage != 0) {
                 if (reactionCount >= onlineMemberPercentage)
-                    sendBestOfImage(message, server, reactionCount, attachments, lang);
-                else temporaryBlacklist.remove(messageId);
-            } else temporaryBlacklist.remove(messageId);
+                    sendBestOfImage(message, myGuild, reactionCount, attachments, lang);
+                else temporaryBlacklistImage.remove(messageId);
+            } else temporaryBlacklistImage.remove(messageId);
         }, failure -> { /* Ignored */ });
 
-        new Timer().schedule(TimeUtil.wrap(() -> temporaryBlacklist.remove(messageId)), 10 * 1000);
+        new Timer().schedule(TimeUtil.wrap(() -> temporaryBlacklistImage.remove(messageId)), 10 * 1000);
     }
 
-    private static void sendBestOfImage(Message message, Server server, int reactionCount, List<Message.Attachment> attachmentList, String lang) {
-        var channel = server.getBestOfImageChannel();
+    private static void sendBestOfImage(Message message, MyGuild myGuild, int reactionCount, List<Message.Attachment> attachmentList, String lang) {
+        var channel = myGuild.getBestOfImageChannel();
+        if (channel == null) return;
         var author = message.getAuthor();
 
         for (var attachment : attachmentList) {
             var eb = new EmbedBuilder();
-            eb.setColor(new Master(author).getColor());
+            eb.setColor(Color.decode(new MyUser(author).getColorCode()));
             eb.setAuthor(author.getName() + "#" + author.getDiscriminator(), null, author.getEffectiveAvatarUrl());
             eb.setTitle(!message.getContentDisplay().isEmpty() ? message.getContentDisplay() : null);
             eb.setDescription("[" + LanguageHandler.get(lang, "bestof_jump") + "](" + message.getJumpUrl() + ")");
@@ -223,46 +322,26 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
             channel.sendMessage(eb.build()).queue();
 
             // Spam prevention. Every message just once.
-            server.addBestOfImageBlacklist(message.getIdLong());
+            myGuild.addBestOfImageBlacklist(message.getIdLong(), message.getTextChannel().getIdLong());
         }
     }
 
-    private void processBestOfQuote(GuildMessageReactionAddEvent event, long messageId) {
-        event.getChannel().retrieveMessageById(messageId).queue(message -> {
+    private void processBestOfQuote(GuildMessageReactionAddEvent event, MyGuild myGuild, long msgId) {
+        event.getChannel().retrieveMessageById(msgId).queue(message -> {
             var attachments = message.getAttachments();
             if (!attachments.isEmpty()) {
-                temporaryBlacklist.remove(messageId);
+                temporaryBlacklistQuote.remove(msgId);
                 return;
             }
 
-            var bestOfQuote = new BestOfQuote(event.getJDA(), message.getGuild().getIdLong());
-            var voteEmote = bestOfQuote.getEmote();
-            var voteEmoji = bestOfQuote.getEmoji();
+            var voteEmoji = myGuild.getBestOfQuoteEmoji();
             var reactionCount = 0;
 
             var reactionEmote = event.getReactionEmote();
-            if (voteEmote != null) {
-                // Emote
-                if (!reactionEmote.getEmote().equals(voteEmote)) {
-                    temporaryBlacklist.remove(messageId);
-                    return;
-                }
-
-                var messageReactions = message.getReactions();
-                for (var mr : messageReactions)
-                    if (mr.getReactionEmote().getEmote().equals(voteEmote)) {
-                        reactionCount = mr.getCount();
-                        break;
-                    }
-
-                if (reactionCount == 0) {
-                    temporaryBlacklist.remove(messageId);
-                    return;
-                }
-            } else if (voteEmoji != null) {
+            if (reactionEmote.isEmoji()) {
                 // Emoji
                 if (!reactionEmote.getName().equals(voteEmoji)) {
-                    temporaryBlacklist.remove(messageId);
+                    temporaryBlacklistQuote.remove(msgId);
                     return;
                 }
 
@@ -274,171 +353,84 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
                     }
 
                 if (reactionCount == 0) {
-                    temporaryBlacklist.remove(messageId);
+                    temporaryBlacklistQuote.remove(msgId);
                     return;
                 }
             } else {
-                temporaryBlacklist.remove(messageId);
+                temporaryBlacklistQuote.remove(msgId);
                 return;
             }
 
-            var number = bestOfQuote.getNumber();
-            var percentage = bestOfQuote.getPercentage();
+            var number = myGuild.getBestOfQuoteMinVotesFlat();
+            var percentage = myGuild.getBestOfQuoteMinVotesPercent();
 
             var onlineMemberCount = 0;
             var members = event.getGuild().getMembers();
             for (var member : members) if (member.getOnlineStatus() == OnlineStatus.ONLINE) onlineMemberCount++;
             var onlineMemberPercentage = (int) Math.ceil(onlineMemberCount * percentage / 100.0);
-            var lang = new Server(event.getGuild()).getLanguage();
+            var lang = new MyGuild(event.getGuild()).getLanguageCode();
 
             if (number != 0 && percentage != 0) {
                 if (reactionCount >= number && reactionCount >= onlineMemberPercentage)
                     sendBestOfQuote(message, reactionCount, lang);
-                else temporaryBlacklist.remove(messageId);
+                else temporaryBlacklistQuote.remove(msgId);
             } else if (number != 0) {
                 if (reactionCount >= number)
                     sendBestOfQuote(message, reactionCount, lang);
-                else temporaryBlacklist.remove(messageId);
+                else temporaryBlacklistQuote.remove(msgId);
             } else if (percentage != 0) {
                 if (reactionCount >= onlineMemberPercentage)
                     sendBestOfQuote(message, reactionCount, lang);
-                else temporaryBlacklist.remove(messageId);
-            } else temporaryBlacklist.remove(messageId);
+                else temporaryBlacklistQuote.remove(msgId);
+            } else temporaryBlacklistQuote.remove(msgId);
         }, failure -> { /* Ignored */ });
 
-        final var executor = new ScheduledThreadPoolExecutor(1);
-        executor.schedule(() -> {
-            temporaryBlacklist.remove(messageId);
-        }, 10, TimeUnit.SECONDS);
+        new Timer().schedule(TimeUtil.wrap(() -> temporaryBlacklistQuote.remove(msgId)), 10 * 1000);
     }
 
     private static void sendBestOfQuote(Message message, int reactionCount, String lang) {
-        var bestOfQuote = new BestOfQuote(message.getJDA(), message.getGuild().getIdLong());
+        var bestOfQuote = new BestOfQuoteHandler(message.getJDA(), message.getGuild().getIdLong());
         var channel = bestOfQuote.getChannel();
+        if (channel == null) return;
         var author = message.getAuthor();
 
+        var content = message.getContentDisplay().replaceAll("\n", "\n> ");
+        content = "> " + content;
+
         var eb = new EmbedBuilder();
-        eb.setColor(new Master(author).getColor());
+        eb.setColor(Color.decode(new MyUser(author).getColorCode()));
         eb.setAuthor(author.getName() + "#" + author.getDiscriminator(), null, author.getEffectiveAvatarUrl());
-        eb.setTitle(!message.getContentDisplay().isEmpty() ? message.getContentDisplay() : null);
-        eb.setDescription("[" + LanguageHandler.get(lang, "bestof_jump") + "](" + message.getJumpUrl() + ")");
+        eb.setDescription("[" + LanguageHandler.get(lang, "bestof_jump") + "](" + message.getJumpUrl() + ")\n\n " +
+                content);
         eb.setFooter(String.format(LanguageHandler.get(lang, "bestof_footer"), reactionCount, message.getChannel().getName()), null);
         eb.setTimestamp(message.getTimeCreated());
 
         channel.sendMessage(eb.build()).queue();
 
         // Spam prevention. Every message just once.
-        bestOfQuote.addBlacklist(message.getIdLong());
-    }
-
-    private static void processQuickpollEnd(GuildMessageReactionAddEvent event, Poll poll, User user, long messageId) {
-        var reactionEmote = event.getReactionEmote();
-        if (!reactionEmote.isEmote()) {
-            if (!reactionEmote.getName().equals(EmoteUtil.getEmoji("end"))) return; // Has to be the end emoji.
-            if (user.getIdLong() != poll.getAuthorId()) return; // Has to be done by author.
-
-            // The author has reacted with an ending emote on their quickpoll.
-            event.getChannel().retrieveMessageById(messageId).queue(message -> poll.endQuickPoll());
-        }
-    }
-
-    private static void processQuickpollMultipleVote(GuildMessageReactionAddEvent event, Poll poll, User user, long messageId) {
-        // Just react to Upvote, Shrug and Downvote.
-        var reactionEmote = event.getReactionEmote();
-        if (!reactionEmote.getName().equals(EmoteUtil.getEmoji("upvote"))
-                && !reactionEmote.getName().equals(EmoteUtil.getEmoji("shrug"))
-                && !reactionEmote.getName().equals(EmoteUtil.getEmoji("downvote"))) return;
-
-        event.getChannel().retrieveMessageById(messageId).queue(message -> {
-            var userId = user.getIdLong();
-            if (poll.hasVoted(userId)) event.getReaction().removeReaction(user).queue();
-            else poll.setVote(userId, (reactionEmote.isEmote() ? reactionEmote.getEmote().getIdLong() : 0), (reactionEmote.isEmote() ? "" : reactionEmote.getName()));
-        });
-    }
-
-    private static void processPollEnd(GuildMessageReactionAddEvent event, Poll poll, User user, long messageId) {
-        var reactionEmote = event.getReactionEmote();
-        if (!reactionEmote.isEmote()) {
-            if (!reactionEmote.getName().equals(EmoteUtil.getEmoji("end"))) return;
-        } else return;
-
-        if (user.getIdLong() != poll.getAuthorId()) return; // Has to be done by author.
-
-        // The author has reacted with an ending emote on their poll.
-        event.getChannel().retrieveMessageById(messageId).queue(message -> poll.end());
-    }
-
-    private static void processRadiopollMultipleVote(GuildMessageReactionAddEvent event, Poll poll, User user, long messageId) {
-        // Just react to One - Ten.
-        var reactionEmote = event.getReactionEmote();
-        if (!reactionEmote.isEmote()) {
-            if (!reactionEmote.getName().equals(EmoteUtil.getEmoji("one"))
-                    && !reactionEmote.getName().equals(EmoteUtil.getEmoji("two"))
-                    && !reactionEmote.getName().equals(EmoteUtil.getEmoji("three"))
-                    && !reactionEmote.getName().equals(EmoteUtil.getEmoji("four"))
-                    && !reactionEmote.getName().equals(EmoteUtil.getEmoji("five"))
-                    && !reactionEmote.getName().equals(EmoteUtil.getEmoji("six"))
-                    && !reactionEmote.getName().equals(EmoteUtil.getEmoji("seven"))
-                    && !reactionEmote.getName().equals(EmoteUtil.getEmoji("eight"))
-                    && !reactionEmote.getName().equals(EmoteUtil.getEmoji("nine"))
-                    && !reactionEmote.getName().equals(EmoteUtil.getEmoji("ten"))
-            ) return;
-        } else return;
-
-        event.getChannel().retrieveMessageById(messageId).queue(message -> {
-            var userId = user.getIdLong();
-            if (poll.hasVoted(userId)) event.getReaction().removeReaction(user).queue();
-            else poll.setVote(userId, (reactionEmote.isEmote() ? reactionEmote.getEmote().getIdLong() : 0), (reactionEmote.isEmote() ? "" : reactionEmote.getName()));
-        });
+        bestOfQuote.addBlacklist(message.getIdLong(), message.getTextChannel().getIdLong());
     }
 
     private static void processReactionRole(GuildMessageReactionAddEvent event, Guild guild) {
-        var guildId = guild.getIdLong();
-        var channelId = event.getChannel().getIdLong();
         var messageId = event.getMessageIdLong();
 
-        String emoji = null;
-        var emoteGuildId = 0L;
-        var emoteId = 0L;
-
         var reactionEmote = event.getReactionEmote();
-        if (reactionEmote.isEmote()) {
-            if (reactionEmote.getEmote().getGuild() == null) return;
-            emoteGuildId = reactionEmote.getEmote().getGuild().getIdLong();
-            emoteId = reactionEmote.getEmote().getIdLong();
-        } else {
-            emoji = reactionEmote.getName();
-        }
+        var emoji = reactionEmote.getName();
 
-        var reactionRole = new ReactionRole(event.getJDA(), guildId, channelId, messageId, emoji, emoteGuildId, emoteId);
+        var reactionRole = new ReactionRole(event.getJDA(), messageId);
 
-        if (reactionRole.hasEntry()) {
-            var roleId = reactionRole.getRoleId();
-            try {
-                var rolesToAdd = new ArrayList<Role>();
-                rolesToAdd.add(event.getGuild().getRoleById(roleId));
-                event.getGuild().modifyMemberRoles(event.getMember(), rolesToAdd, null).queue();
-            } catch (InsufficientPermissionException | HierarchyException e) {
-                event.getChannel().sendMessage(LanguageHandler.get(new Server(event.getGuild()).getLanguage(), "reactionrole_insufficient")).queue();
+        var roleIds = reactionRole.getRoleIds(emoji);
+        try {
+            var rolesToAdd = new ArrayList<Role>();
+            for (var roleId : roleIds) {
+                var role = guild.getRoleById(roleId);
+                if (role == null) {
+                    reactionRole.deleteRoleId(roleId);
+                } else rolesToAdd.add(role);
             }
+            guild.modifyMemberRoles(event.getMember(), rolesToAdd, null).queue();
+        } catch (InsufficientPermissionException | HierarchyException e) {
+            event.getChannel().sendMessage(LanguageHandler.get(new MyGuild(event.getGuild()).getLanguageCode(), "reactionrole_insufficient")).queue();
         }
-    }
-
-    private static void processSignup(GuildMessageReactionAddEvent event, User user, Server server, Signup signup, long messageId) {
-        var forceEnd = false;
-        var endEmoji = EmoteUtil.getEmoji("end");
-        if (!event.getReactionEmote().isEmote() && event.getReactionEmote().getName().equals(endEmoji)) {
-            if (event.getUser().getIdLong() != signup.getAuthorId())
-                event.getReaction().removeReaction(user).queue();
-            else forceEnd = true;
-        }
-
-        var expiration = signup.getTime();
-        var isCustomDate = signup.isCustomDate();
-        if (!isCustomDate) expiration = Timestamp.from(OffsetDateTime.now(ZoneOffset.of(server.getOffset())).toInstant());
-
-        var finalForceEnd = forceEnd;
-        var finalExpiration = expiration;
-        event.getChannel().retrieveMessageById(messageId).queue(message -> signup.end(server, message, finalForceEnd, finalExpiration.toInstant()));
     }
 }

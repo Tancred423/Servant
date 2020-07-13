@@ -1,21 +1,20 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package listeners;
 
+import commands.owner.blacklist.Blacklist;
 import files.language.LanguageHandler;
-import moderation.guild.Server;
-import moderation.log.Log;
-import moderation.toggle.Toggle;
-import moderation.user.Master;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberLeaveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
-import owner.blacklist.Blacklist;
+import servant.MyGuild;
+import servant.MyUser;
 import servant.Servant;
 import utilities.ImageUtil;
 
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.awt.*;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.concurrent.CompletableFuture;
 
 public class GuildMemberLeaveListener extends ListenerAdapter {
@@ -35,40 +34,48 @@ public class GuildMemberLeaveListener extends ListenerAdapter {
         if (Blacklist.isBlacklisted(guild, user)) return;
 
         CompletableFuture.runAsync(() -> {
-            var server = new Server(guild);
-            var master = new Master(user);
+            var myGuild = new MyGuild(guild);
+            var myUser = new MyUser(user);
             var selfMember = guild.getMemberById(event.getJDA().getSelfUser().getIdLong());
             if (selfMember == null) return; // To eliminate errors. Will never occur.
+            var lang = myGuild.getLanguageCode();
             var jda = event.getJDA();
-            var lang = server.getLanguage();
+            var guildOwner = guild.getOwner();
+            if (guildOwner == null) return;
+            var myGuildOwnerUser = new MyUser(guildOwner.getUser());
 
             // Leave
-            if (Toggle.isEnabled(event, "leave")) {
-                var leaveNotifierChannel = server.getLeaveNotifierChannel();
+            if (myGuild.pluginIsEnabled("leave") && myGuild.categoryIsEnabled("moderation")) {
+                var leaveTc = myGuild.getLeaveTc();
 
-                if (leaveNotifierChannel != null && leaveNotifierChannel.canTalk(selfMember)) {
-                    var description = server.getLeaveMessage();
-                    leaveNotifierChannel.sendMessage(
+                if (leaveTc != null && leaveTc.canTalk(selfMember)) {
+                    var description = myGuild.getLeaveMessage();
+                    leaveTc.sendMessage(
                             new EmbedBuilder()
-                                    .setColor(master.getColor())
-                                    .setAuthor(String.format(LanguageHandler.get(lang, "leave_author"), user.getName(), user.getDiscriminator()), null, guild.getIconUrl())
+                                    .setColor(Color.decode(myUser.getColorCode()))
+                                    .setAuthor(String.format(LanguageHandler.get(lang, "leave_author"), user.getName()), null, guild.getIconUrl())
                                     .setDescription(description == null ? LanguageHandler.get(lang, "leave_embeddescription") : description)
                                     .setThumbnail(user.getEffectiveAvatarUrl())
-                                    .setFooter(LanguageHandler.get(lang, "leave_footer"), ImageUtil.getImageUrl(event.getJDA(), "clock"))
-                                    .setTimestamp(OffsetDateTime.now(ZoneOffset.of(server.getOffset())))
+                                    .setFooter(LanguageHandler.get(lang, "leave_footer"), ImageUtil.getUrl(event.getJDA(), "clock"))
+                                    .setTimestamp(LocalDateTime.now())
                                     .build()
                     ).queue();
                 }
             }
 
             // Log
-            if (server.getLogChannelId() != 0 && server.logIsEnabled("member_leave")) {
-                var logChannel = guild.getTextChannelById(server.getLogChannelId());
+            if (myGuild.pluginIsEnabled("log") && myGuild.categoryIsEnabled("moderation") && myGuild.logIsEnabled("user_leave")) {
+                var logChannel = guild.getTextChannelById(myGuild.getLogChannelId());
                 if (logChannel != null) {
-                    logChannel.sendMessage(Log.getLogEmbed(jda, master.getColor(),
-                            LanguageHandler.get(lang, "log_member_leave_title"),
-                            String.format(LanguageHandler.get(lang, "log_member_leave_description"), event.getMember().getEffectiveName())
-                    )).queue();
+                    logChannel.sendMessage(
+                            new EmbedBuilder()
+                                    .setColor(myGuildOwnerUser.getColor())
+                                    .setTitle(LanguageHandler.get(lang, "log_user_leave_title"))
+                                    .addField(LanguageHandler.get(lang, "user"), event.getMember().getUser().getName() + "#" + event.getMember().getUser().getDiscriminator(), true)
+                                    .setFooter(LanguageHandler.get(lang, "log_at"), ImageUtil.getUrl(jda, "clock"))
+                                    .setTimestamp(Instant.now())
+                                    .build()
+                    ).queue();
                 }
             }
         }, Servant.fixedThreadPool);

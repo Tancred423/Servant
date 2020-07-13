@@ -1,14 +1,15 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package servant;
 
+import files.language.LanguageHandler;
 import net.dv8tion.jda.api.JDA;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 public class LoggingTask implements Runnable {
-    private Exception e;
-    private JDA jda;
-    private String function;
-    private CommandEvent commandEvent;
+    private final Exception e;
+    private final JDA jda;
+    private final String function;
+    private final CommandEvent commandEvent;
 
     public LoggingTask(Exception e, JDA jda, String function) {
         this.e = e;
@@ -28,9 +29,8 @@ public class LoggingTask implements Runnable {
     public void run() {
         if (commandEvent != null) {
             // Notify User
-            commandEvent.reactWarning();
-            commandEvent.reply("Something went wrong, master!\n" +
-                    "A report was sent to the bot owner.");
+            var lang = LanguageHandler.getLanguage(commandEvent);
+            commandEvent.replyError(LanguageHandler.get(lang, "general_error"));
         }
 
         // Error Log
@@ -38,15 +38,18 @@ public class LoggingTask implements Runnable {
 
         // Error DM
         if (jda != null) {
-            var botOwner = jda.getUserById(Servant.config.getBotOwnerId());
-            if (botOwner != null) {
-                botOwner.openPrivateChannel().queue(privateChannel ->
-                        privateChannel.sendMessage("```c\n" +
-                                "Error\n" +
-                                "-----\n" +
-                                (function == null ? "" : "Function: " + function + "\n") +
-                                (e == null ? "" : "Error: " + e.getMessage() + "\n") +
-                                "```").queue());
+            var shardManager = jda.getShardManager();
+            if (shardManager != null) {
+                var botOwner = shardManager.getUserById(Servant.config.getBotOwnerId());
+                if (botOwner != null) {
+                    botOwner.openPrivateChannel().queue(privateChannel ->
+                            privateChannel.sendMessage("```c\n" +
+                                    "Error\n" +
+                                    "-----\n" +
+                                    (function == null ? "" : "Function: " + function + "\n") +
+                                    (e == null ? "" : "Error: " + e.getMessage() + "\n") +
+                                    "```").queue());
+                }
             }
         }
     }

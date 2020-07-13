@@ -1,72 +1,73 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package servant;
 
+import commands.dashboard.DashboardCommand;
+import commands.dashboard.DiscontinuedCommand;
+import commands.dashboard.LeaderboardCommand;
+import commands.fun.avatar.AvatarCommand;
+import commands.fun.baguette.BaguetteCommand;
+import commands.fun.bubbleWrap.BubbleWrapCommand;
+import commands.fun.coinFlip.CoinFlipCommand;
+import commands.fun.flip.FlipCommand;
+import commands.fun.love.LoveCommand;
+import commands.fun.profile.AchievementsCommand;
+import commands.fun.profile.CommandsCommand;
+import commands.fun.profile.ProfileCommand;
+import commands.interaction.*;
+import commands.moderation.clear.ClearCommand;
+import commands.moderation.editembed.EditEmbedCommand;
+import commands.owner.EvalCommand;
+import commands.owner.RefreshCommand;
+import commands.owner.ServerlistCommand;
+import commands.owner.ShutdownCommand;
+import commands.owner.blacklist.BlacklistCommand;
+import commands.owner.statsForNerds.ThreadCommand;
+import commands.random.*;
+import commands.random.randomImgur.RandomCommand;
+import commands.standard.bofInfo.BotInfoCommand;
+import commands.standard.help.HelpCommand;
+import commands.standard.ping.PingCommand;
+import commands.standard.supporter.SupporterCommand;
+import commands.utility.TimezoneCommand;
+import commands.utility.giveaway.GiveawayCommand;
+import commands.utility.polls.poll.PollCommand;
+import commands.utility.polls.quickpoll.QuickpollCommand;
+import commands.utility.rate.RateCommand;
+import commands.utility.remindme.RemindMeCommand;
+import commands.utility.signup.SignupCommand;
 import files.ConfigFile;
 import files.language.LanguageHandler;
-import fun.AvatarCommand;
-import fun.BaguetteCommand;
-import fun.CoinflipCommand;
-import fun.LoveCommand;
-import fun.embed.CreateEmbedCommand;
-import fun.embed.EditEmbedCommand;
-import fun.flip.FlipCommand;
-import fun.flip.UnflipCommand;
-import fun.level.*;
-import information.BotInfoCommand;
-import information.PatreonCommand;
-import information.PingCommand;
-import information.ServerInfoCommand;
-import interaction.*;
+import servant.guild.GuildManager;
 import listeners.*;
-import moderation.*;
-import moderation.bestOfQuote.BestOfQuoteCommand;
-import moderation.birthday.BirthdayCommand;
-import moderation.guild.GuildCommand;
-import moderation.guild.GuildManager;
-import moderation.joinleave.JoinCommand;
-import moderation.joinleave.JoinMessageCommand;
-import moderation.joinleave.LeaveCommand;
-import moderation.joinleave.LeaveMessageCommand;
-import moderation.livestream.LivestreamCommand;
-import moderation.log.LogCommand;
-import moderation.reactionRole.ReactionRoleCommand;
-import moderation.toggle.ToggleCommand;
-import moderation.toggle.ToggleFile;
-import moderation.user.UserCommand;
-import moderation.voicelobby.VoiceLobbyCommand;
-import net.dv8tion.jda.api.AccountType;
-import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
-import owner.*;
-import owner.blacklist.BlacklistCommand;
-import owner.statsForNerds.ThreadCommand;
-import random.*;
-import random.randomImgur.RandomCommand;
-import useful.giveaway.GiveawayCommand;
-import useful.polls.PollCommand;
-import useful.polls.QuickpollCommand;
-import useful.remindme.RemindMeCommand;
-import useful.signup.SignupCommand;
-import useful.TimezoneCommand;
+import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
+import net.jodah.expiringmap.ExpiringMap;
+import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandClientBuilder;
 import zJdaUtilsLib.com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class Servant {
     public static ConfigFile config;
-    public static ToggleFile toggle;
     public static Database db;
 
     public static ExecutorService fixedThreadPool;
     public static ExecutorService cachedThreadPool;
-    public static ScheduledExecutorService remindMeService;
+    public static ScheduledExecutorService scheduledService;
     public static ScheduledExecutorService periodService;
+
+    public static ArrayList<Command> commands;
+
+    public static ExpiringMap<Long, MyMessage> myMessageCache;
+    public static ExpiringMap<Long, String> myDeletedMessageCache;
 
     public static void main(String[] args) throws IOException, LoginException {
         // Config File
@@ -79,21 +80,31 @@ public class Servant {
         // Language File
         LanguageHandler.initialize();
 
-        // Toggle File
-        toggle = new ToggleFile();
-
         // Database
         db = new Database();
         if (!db.connectToDatabase()) return;
 
+        // Thread Pools
         var availProcessors = Runtime.getRuntime().availableProcessors();
         System.out.println("Available Processors: " + availProcessors);
 
         fixedThreadPool = Executors.newFixedThreadPool(availProcessors + 1);
         cachedThreadPool = Executors.newCachedThreadPool();
-        remindMeService = Executors.newScheduledThreadPool(1);
+        scheduledService = Executors.newScheduledThreadPool(1);
         periodService = Executors.newScheduledThreadPool(1);
 
+        // Message Cache
+        myMessageCache = ExpiringMap.builder()
+                .maxSize(10000)
+                .expiration(1, TimeUnit.HOURS)
+                .build();
+
+        myDeletedMessageCache = ExpiringMap.builder()
+                .maxSize(10000)
+                .expiration(30, TimeUnit.SECONDS)
+                .build();
+
+        // JDA Stuff
         var waiter = new EventWaiter();
         var client = new CommandClientBuilder();
 
@@ -103,8 +114,12 @@ public class Servant {
         client.setServerInvite("discord.gg/4GpaH5V");
         client.setGuildSettingsManager(new GuildManager());
         client.addCommands(
+                // Discontinued
+                new DashboardCommand(),
+                new DiscontinuedCommand(),
+                new LeaderboardCommand(),
+
                 // Owner
-                new AddGifCommand(),
                 new BlacklistCommand(),
                 new EvalCommand(),
                 new RefreshCommand(),
@@ -112,66 +127,45 @@ public class Servant {
                 new ShutdownCommand(),
                 new ThreadCommand(),
 
-                // Moderation
-                new AutoRoleCommand(),
-                new BestOfImageCommand(),
-                new BestOfQuoteCommand(),
-                new BirthdayCommand(),
-                new ClearCommand(),
-                new JoinCommand(),
-                new JoinMessageCommand(),
-                new LeaveCommand(),
-                new LeaveMessageCommand(),
-                new LevelRoleCommand(),
-                new LivestreamCommand(),
-                new LogCommand(),
-                new MediaOnlyChannelCommand(),
-                new ReactionRoleCommand(),
-                new RoleCommand(),
-                new GuildCommand(),
-                new ServerSetupCommand(waiter),
-                new ToggleCommand(),
-                new UserCommand(),
-                new VoiceLobbyCommand(),
-
-                // Information
+                // Standard
                 new BotInfoCommand(),
-                new PatreonCommand(),
+                new HelpCommand(),
                 new PingCommand(),
-                new ServerInfoCommand(),
+                new SupporterCommand(),
 
-                // Useful
+                // Moderation
+                new ClearCommand(),
+                new EditEmbedCommand(waiter),
+
+                // Utility
                 new GiveawayCommand(),
+                new PollCommand(waiter),
                 new QuickpollCommand(),
+                new RateCommand(),
                 new RemindMeCommand(),
                 new SignupCommand(),
                 new TimezoneCommand(),
-                new PollCommand(waiter),
 
                 // Fun
                 new AchievementsCommand(),
                 new AvatarCommand(),
                 new BaguetteCommand(),
-                new BioCommand(),
-                new CoinflipCommand(),
-                new CreateEmbedCommand(waiter),
-                new EditEmbedCommand(waiter),
+                new BubbleWrapCommand(),
+                new CoinFlipCommand(),
+                new CommandsCommand(),
                 new FlipCommand(),
-                new LeaderboardCommand(),
                 new LoveCommand(),
-                new MostUsedCommandsCommand(),
                 new ProfileCommand(),
-                new UnflipCommand(),
 
                 // Interaction
                 new BegCommand(),
+                new BirthdayCommand(),
                 new BiteCommand(),
                 new BullyCommand(),
                 new CookieCommand(),
                 new CopCommand(),
                 new DabCommand(),
                 new FlexCommand(),
-                new HappyBirthdayCommand(),
                 new HighfiveCommand(),
                 new HugCommand(),
                 new KissCommand(),
@@ -179,6 +173,7 @@ public class Servant {
                 new PatCommand(),
                 new PokeCommand(),
                 new SlapCommand(),
+                new ShameCommand(),
                 new WaveCommand(),
                 new WinkCommand(),
 
@@ -187,22 +182,19 @@ public class Servant {
                 new BirdCommand(),
                 new CatCommand(),
                 new DogCommand(),
+                new FennecCommand(),
                 new FoxCommand(),
                 new KoalaCommand(),
-                new MemeCommand(),
                 new PandaCommand(),
                 new PikachuCommand(),
                 new RedPandaCommand(),
                 new SlothCommand()
         );
 
-        new JDABuilder(AccountType.BOT)
+        new DefaultShardManagerBuilder()
                 .setToken(config.getBotToken())
-
-                // While loading.
                 .setStatus(OnlineStatus.DO_NOT_DISTURB)
                 .setActivity(Activity.playing("loading..."))
-
                 .addEventListeners(client.build())
                 .addEventListeners(waiter)
 
@@ -211,25 +203,39 @@ public class Servant {
                  * To reduce the amount of thrown events and created threads, we will
                  * handle all commands from the same event type in the same class and thread.
                  */
+                .addEventListeners(new CategoryCreateListener()) // Log
+                .addEventListeners(new CategoryDeleteListener()) // Log
+                .addEventListeners(new EmoteAddedListener()) // Log
+                .addEventListeners(new EmoteRemovedListener()) // Log
+                .addEventListeners(new GuildBanListener()) // Log
+                .addEventListeners(new GuildInviteCreateListener()) // Log
+                .addEventListeners(new GuildInviteDeleteListener()) // Log
                 .addEventListeners(new GuildJoinListener()) // Invite
-                .addEventListeners(new GuildLeaveListener()) // Birthday, Kick
-                .addEventListeners(new GuildMemberJoinListener()) // AutoRole, Join
-                .addEventListeners(new GuildMemberLeaveListener()) // Leave
+                .addEventListeners(new GuildLeaveListener()) // Purges
+                .addEventListeners(new GuildMemberJoinListener()) // AutoRole, Join, Log
+                .addEventListeners(new GuildMemberLeaveListener()) // Leave, Log
                 .addEventListeners(new GuildMemberRoleAddListener()) // Log, Patreon
-                .addEventListeners(new GuildMemberRoleRemoveListener()) // Log
-                .addEventListeners(new GuildMessageDeleteListener())  // Birthday
-                .addEventListeners(new GuildMessageReactionAddListener()) // BestOfImage, BestOfQuote, Quickpoll, Poll, Radiopoll, Reaction Role, Signup
-                .addEventListeners(new GuildMessageReactionRemoveListener()) // Quickpoll, Radiopoll, Reaction Role
+                .addEventListeners(new GuildMemberRoleRemoveListener()) // Log, Patreon
+                .addEventListeners(new GuildMessageDeleteListener())  // Log, Purges
+                .addEventListeners(new GuildMessageReactionAddListener()) // BestOfImage, BestOfQuote, Giveaway, Quickpoll, Poll, Rating, Reaction Role, RemindMe, Signup
+                .addEventListeners(new GuildMessageReactionRemoveListener()) // Quickpoll, Poll, Rating, ReactionRole, Signup
+                .addEventListeners(new GuildMessageUpdateListener()) // Log
+                .addEventListeners(new GuildUnbanListener()) // Log
                 .addEventListeners(new GuildUpdateBoostCountListener()) // Log
-                .addEventListeners(new GuildVoiceJoinListener()) // VoiceLobby
-                .addEventListeners(new GuildVoiceLeaveListener()) // VoiceLobby
-                .addEventListeners(new GuildVoiceMoveListener()) // Voicelobby
-                .addEventListeners(new MessageReceivedListener()) // EasterEggs, Level, MediaOnlyChannel, Prefix
-                .addEventListeners(new ReadyListener()) // Birthday
-                .addEventListeners(new TextChannelDeleteListener()) // Giveaway
+                .addEventListeners(new GuildUpdateBoostTierListener()) // Log
+                .addEventListeners(new GuildVoiceJoinListener()) // VoiceLobby, Log
+                .addEventListeners(new GuildVoiceLeaveListener()) // VoiceLobby, Log
+                .addEventListeners(new GuildVoiceMoveListener()) // Voicelobby, Log
+                .addEventListeners(new MessageReceivedListener()) // Prefix, MediaOnlyChannel, Cache, CustomCommands, Level, EasterEggs
+                .addEventListeners(new ReadyListener()) // Presence, Birthday, Giveaway, Poll, Quickpoll, Rating, RemindMe, Signup
+                .addEventListeners(new RoleCreateListener()) // Log
+                .addEventListeners(new RoleDeleteListener()) // Log
+                .addEventListeners(new TextChannelCreateListener()) // Log
+                .addEventListeners(new TextChannelDeleteListener()) // Log, Purges
                 .addEventListeners(new UserActivityEndListener()) // Livestream
                 .addEventListeners(new UserActivityStartListener()) // Livestream
-
-                .build();
+                .addEventListeners(new VoiceChannelCreateListener()) // Log
+                .addEventListeners(new VoiceChannelDeleteListener()) // Log, Purges
+        .build();
     }
 }

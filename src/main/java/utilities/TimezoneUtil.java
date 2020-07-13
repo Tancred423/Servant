@@ -143,6 +143,7 @@ public class TimezoneUtil {
             case "pmst": return "-03:00";
             case "pont": return "+11:00";
             case "pst": return "-08:00";
+            case "pt": return "-07:00";
             case "pyst": return "-03:00";
             case "pyt": return "-04:00";
             case "ret": return "+04:00";

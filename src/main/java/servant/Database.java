@@ -16,6 +16,7 @@ public class Database {
         new HikariFile();
         var resourcesDir = System.getProperty("user.dir") + "/resources";
         var hikariConfig = new HikariConfig(resourcesDir + "/hikari.properties");
+
         try {
             hikari = new HikariDataSource(hikariConfig);
             return true;

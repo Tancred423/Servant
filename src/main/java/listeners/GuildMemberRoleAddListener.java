@@ -1,16 +1,19 @@
 package listeners;
 
+import commands.owner.blacklist.Blacklist;
 import files.language.LanguageHandler;
-import moderation.guild.Server;
-import moderation.log.Log;
-import moderation.user.Master;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
-import owner.blacklist.Blacklist;
-import patreon.PatreonHandler;
+import servant.supporter.SupporterHandler;
+import servant.MyGuild;
+import servant.MyUser;
 import servant.Servant;
+import utilities.Constants;
+import utilities.ImageUtil;
 
+import java.time.Instant;
 import java.util.concurrent.CompletableFuture;
 
 public class GuildMemberRoleAddListener extends ListenerAdapter {
@@ -18,6 +21,7 @@ public class GuildMemberRoleAddListener extends ListenerAdapter {
     public void onGuildMemberRoleAdd(@NotNull GuildMemberRoleAddEvent event) {
         var guild = event.getGuild();
         var user = event.getUser();
+        var jda = event.getJDA();
 
         /* Certain conditions must meet, so this event is allowed to be executed:
          * 1.   Ignore any request from the Discord Bot List as this big guild
@@ -30,26 +34,31 @@ public class GuildMemberRoleAddListener extends ListenerAdapter {
         if (Blacklist.isBlacklisted(guild, user)) return;
 
         CompletableFuture.runAsync(() -> {
-            var server = new Server(guild);
-            var master = new Master(user);
+            var myGuild = new MyGuild(guild);
+            var myUser = new MyUser(user);
             var selfMember = guild.getMemberById(event.getJDA().getSelfUser().getIdLong());
             if (selfMember == null) return; // To eliminate errors. Will never occur.
-            var jda = event.getJDA();
-            var lang = server.getLanguage();
+            var lang = myGuild.getLanguageCode();
 
             // Log
-            if (server.getLogChannelId() != 0 && server.logIsEnabled("role_add")) {
-                var logChannel = guild.getTextChannelById(server.getLogChannelId());
+            if (myGuild.pluginIsEnabled("log") && myGuild.categoryIsEnabled("moderation") && myGuild.logIsEnabled("role_add")) {
+                var logChannel = guild.getTextChannelById(myGuild.getLogChannelId());
                 if (logChannel != null) {
                     var sb = new StringBuilder().append("\n");
                     var roles = event.getRoles();
                     for (var role : roles)
                         sb.append(role.getName()).append(" (").append(role.getIdLong()).append(")\n");
 
-                    logChannel.sendMessage(Log.getLogEmbed(jda, master.getColor(),
-                            LanguageHandler.get(lang, "log_role_add_title"),
-                            String.format(LanguageHandler.get(lang, "log_role_add_description"), event.getMember().getEffectiveName(), sb.toString())
-                    )).queue();
+                    logChannel.sendMessage(
+                            new EmbedBuilder()
+                                    .setColor(myUser.getColor())
+                                    .setTitle(LanguageHandler.get(lang, "log_role_add_title"))
+                                    .addField(LanguageHandler.get(lang, "member"), event.getMember().getUser().getName() + "#" + event.getMember().getUser().getDiscriminator(), false)
+                                    .addField(LanguageHandler.get(lang, "role_s"), sb.toString(), false)
+                                    .setFooter(LanguageHandler.get(lang, "log_at"), ImageUtil.getUrl(jda, "clock"))
+                                    .setTimestamp(Instant.now())
+                                    .build()
+                    ).queue();
                 }
             }
 
@@ -61,22 +70,18 @@ public class GuildMemberRoleAddListener extends ListenerAdapter {
     private static void processPatreon(GuildMemberRoleAddEvent event) {
         if (!event.getGuild().getId().equals(Servant.config.getSupportGuildId())) return;
 
-        switch (event.getRoles().get(0).getId()) {
-            case "489738762838867969": // Donation
-                PatreonHandler.sendPatreonNotification(event, "donation");
-                break;
-            case "502472440455233547": // $1
-                PatreonHandler.sendPatreonNotification(event, "$1");
-                break;
-            case "502472546600353796": // $3
-                PatreonHandler.sendPatreonNotification(event, "$3");
-                break;
-            case "502472823638458380": // $5
-                PatreonHandler.sendPatreonNotification(event, "$5");
-                break;
-            case "502472869234868224": // $10
-                PatreonHandler.sendPatreonNotification(event, "$10");
-                break;
+        var supporterRole = event.getGuild().getRoleById(Constants.SUPPORTER_ROLE_ID);
+        var receivedRoleId = event.getRoles().get(0).getIdLong();
+
+        if (receivedRoleId == Constants.DONATOR_ROLE_ID) {
+            SupporterHandler.sendSupporterAlert(event, "donation");
+            if (supporterRole != null) event.getGuild().addRoleToMember(event.getMember(), supporterRole).queue();
+        } else if (receivedRoleId == Constants.PATREON_ROLE_ID) {
+            SupporterHandler.sendSupporterAlert(event, "patron");
+            if (supporterRole != null) event.getGuild().addRoleToMember(event.getMember(), supporterRole).queue();
+        } else if (receivedRoleId == Constants.BOOSTER_ROLE_ID) {
+            SupporterHandler.sendSupporterAlert(event, "boost");
+            if (supporterRole != null) event.getGuild().addRoleToMember(event.getMember(), supporterRole).queue();
         }
     }
 }

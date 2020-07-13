@@ -7,6 +7,22 @@ import java.util.GregorianCalendar;
 import java.util.TimerTask;
 
 public class TimeUtil {
+    public static long daysToMillis(long days) {
+        return hoursToMillis(days * 24);
+    }
+
+    public static long hoursToMillis(long hours) {
+        return minutesToMillis(hours * 60);
+    }
+
+    public static long minutesToMillis(long minutes) {
+        return secondsToMillis(minutes * 60);
+    }
+
+    public static long secondsToMillis(long seconds) {
+        return seconds * 1000;
+    }
+
     public static long getDelayToNextMinuteInMillis() {
         var now = new Date();
         var calendar = Calendar.getInstance();

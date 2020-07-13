@@ -15,10 +15,10 @@
  */
 package zJdaUtilsLib.com.jagrosh.jdautilities.command;
 
+import files.language.LanguageHandler;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.VoiceChannel;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -31,6 +31,7 @@ public abstract class Command {
     protected Category category = null;
     protected String arguments = null;
     protected boolean guildOnly = true;
+    protected boolean modCommand = false;
     protected String requiredRole = null;
     protected boolean ownerCommand = false;
     protected int cooldown = 0;
@@ -42,13 +43,12 @@ public abstract class Command {
     protected boolean usesTopicTags = true;
     protected boolean hidden = false;
     protected CooldownScope cooldownScope = CooldownScope.USER;
-    
-    private final static String BOT_PERM = "%s I need the %s permission in this %s!";
-    private final static String USER_PERM = "%s You must have the %s permission in this %s to use that!";
 
     protected abstract void execute(CommandEvent event);
 
     public final void run(CommandEvent event) {
+        var lang = LanguageHandler.getLanguage(event);
+
         // child check
         if(!event.getArgs().isEmpty()) {
             String[] parts = Arrays.copyOf(event.getArgs().split("\\s+",2), 2);
@@ -79,14 +79,14 @@ public abstract class Command {
 
         // is allowed check
         if(event.isFromType(ChannelType.TEXT) && !isAllowed(event.getTextChannel())) {
-            terminate(event, "That command cannot be used in this channel!");
+            terminate(event, LanguageHandler.get(lang, "invalid_channel"));
             return;
         }
         
         // required role check
         if(requiredRole!=null)
             if(!event.isFromType(ChannelType.TEXT) || event.getMember().getRoles().stream().noneMatch(r -> r.getName().equalsIgnoreCase(requiredRole))) {
-                terminate(event, event.getClient().getError()+" You must have a role called `"+requiredRole+"` to use that!");
+                terminate(event, event.getClient().getError() + " " + String.format(LanguageHandler.get(lang, "needed_role"), requiredRole));
                 return;
             }
         
@@ -96,24 +96,26 @@ public abstract class Command {
             for(Permission p: botPermissions) {
                 if(p.isChannel()) {
                     if(p.name().startsWith("VOICE")) {
-                        VoiceChannel vc = event.getMember().getVoiceState().getChannel();
-                        if(vc==null) {
-                            terminate(event, event.getClient().getError()+" You must be in a voice channel to use that!");
-                            return;
-                        }
-                        else if(!event.getSelfMember().hasPermission(vc, p)) {
-                            terminate(event, String.format(BOT_PERM, event.getClient().getError(), p.name(), "Voice Channel"));
-                            return;
+                        var vs = event.getMember().getVoiceState();
+                        if (vs != null) {
+                            var vc = vs.getChannel();
+                            if (vc == null) {
+                                terminate(event, event.getClient().getError() + " " + LanguageHandler.get(lang, "hastobe_vc"));
+                                return;
+                            } else if (!event.getSelfMember().hasPermission(vc, p)) {
+                                terminate(event, String.format(LanguageHandler.get(lang, "permission_bot"), event.getClient().getError(), p.name(), LanguageHandler.get(lang, "vc").toLowerCase()));
+                                return;
+                            }
                         }
                     } else {
                         if(!event.getSelfMember().hasPermission(event.getTextChannel(), p)) {
-                            terminate(event, String.format(BOT_PERM, event.getClient().getError(), p.name(), "Channel"));
+                            terminate(event, String.format(LanguageHandler.get(lang, "permission_bot"), event.getClient().getError(), p.name(), LanguageHandler.get(lang, "channel").toLowerCase()));
                             return;
                         }
                     }
                 } else {
                     if(!event.getSelfMember().hasPermission(event.getTextChannel(), p)) {
-                        terminate(event, String.format(BOT_PERM, event.getClient().getError(), p.name(), "Guild"));
+                        terminate(event, String.format(LanguageHandler.get(lang, "permission_bot"), event.getClient().getError(), p.name(), LanguageHandler.get(lang, "guild").toLowerCase()));
                         return;
                     }
                 }
@@ -123,18 +125,18 @@ public abstract class Command {
             for(Permission p: userPermissions) {
                 if(p.isChannel()) {
                     if(!event.getMember().hasPermission(event.getTextChannel(), p)) {
-                        terminate(event, String.format(USER_PERM, event.getClient().getError(), p.name(), "Channel"));
+                        terminate(event, String.format(LanguageHandler.get(lang, "permission_user"), event.getClient().getError(), p.name(), LanguageHandler.get(lang, "channel")));
                         return;
                     }
                 } else {
                     if(!event.getMember().hasPermission(p)) {
-                        terminate(event, String.format(USER_PERM, event.getClient().getError(), p.name(), "Guild"));
+                        terminate(event, String.format(LanguageHandler.get(lang, "permission_user"), event.getClient().getError(), p.name(), LanguageHandler.get(lang, "guild")));
                         return;
                     }
                 }
             }
-        } else if(guildOnly) {
-            terminate(event, event.getClient().getError()+" This command cannot be used in Direct messages");
+        } else if (guildOnly) {
+            terminate(event, event.getClient().getError() + " " + LanguageHandler.get(lang, "forbidden_dm"));
             return;
         }
         
@@ -256,18 +258,21 @@ public abstract class Command {
             case GUILD:        return event.getGuild()!=null ? cooldownScope.genKey(name,event.getGuild().getIdLong()) :
                     CooldownScope.CHANNEL.genKey(name,event.getChannel().getIdLong());
             case CHANNEL:      return cooldownScope.genKey(name,event.getChannel().getIdLong());
-            case SHARD:        return event.getJDA().getShardInfo()!=null ? cooldownScope.genKey(name, event.getJDA().getShardInfo().getShardId()) :
-                    CooldownScope.GLOBAL.genKey(name, 0);
-            case USER_SHARD:   return event.getJDA().getShardInfo()!=null ? cooldownScope.genKey(name,event.getAuthor().getIdLong(),event.getJDA().getShardInfo().getShardId()) :
-                    CooldownScope.USER.genKey(name, event.getAuthor().getIdLong());
+            case SHARD:
+                event.getJDA().getShardInfo();
+                return cooldownScope.genKey(name, event.getJDA().getShardInfo().getShardId());
+            case USER_SHARD:
+                event.getJDA().getShardInfo();
+                return cooldownScope.genKey(name,event.getAuthor().getIdLong(),event.getJDA().getShardInfo().getShardId());
             case GLOBAL:       return cooldownScope.genKey(name, 0);
             default:           return "";
         }
     }
 
     public String getCooldownError(CommandEvent event, int remaining) {
+        var lang = LanguageHandler.getLanguage(event);
         if(remaining<=0) return null;
-        String front = event.getClient().getWarning()+" That command is on cooldown for "+remaining+" more seconds";
+        String front = event.getClient().getWarning() + " " + String.format(LanguageHandler.get(lang, "cooldown_warning"), remaining);
         if(cooldownScope.equals(CooldownScope.USER)) return front+"!";
         else if(cooldownScope.equals(CooldownScope.USER_GUILD) && event.getGuild()==null)
             return front+" "+CooldownScope.USER_CHANNEL.errorSpecification+"!";

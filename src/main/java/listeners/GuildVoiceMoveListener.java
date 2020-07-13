@@ -1,65 +1,87 @@
 package listeners;
 
-import moderation.guild.Server;
-import moderation.toggle.Toggle;
-import moderation.voicelobby.VoiceLobby;
+import files.language.LanguageHandler;
+import plugins.moderation.voicelobby.VoiceLobbyHandler;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
-import owner.blacklist.Blacklist;
+import servant.MyGuild;
+import servant.MyUser;
 import servant.Servant;
+import utilities.Constants;
+import utilities.ImageUtil;
 
+import java.time.Instant;
 import java.util.LinkedList;
 import java.util.concurrent.CompletableFuture;
 
 public class GuildVoiceMoveListener extends ListenerAdapter {
     // This event will be thrown if a user moves to a voice channel from a vc.
     public void onGuildVoiceMove(@NotNull GuildVoiceMoveEvent event) {
-        var guild = event.getGuild();
         var member = event.getMember();
         var user = member.getUser();
-        
-        /* Certain conditions must meet, so this event is allowed to be executed:
-         * 1.   Ignore any request from the Discord Bot List as this big guild
-         *      invoke a lot of events, but never use this bot actively.
-         * 2.   Ignore any request from bots to prevent infinite loops.
-         * 3.   Ignore any request from blacklisted users and guilds.
-         */
-        if (guild.getIdLong() == 264445053596991498L) return; // Discord Bot List
-        if (user.isBot()) return;
-        if (Blacklist.isBlacklisted(guild, user)) return;
+        var myUser = new MyUser(user);
+        var guild = event.getGuild();
+        var myGuild = new MyGuild(guild);
+        var guildOwner = guild.getOwner();
+        if (guildOwner == null) return; // To eliminate errors. Will never occur.
+        var myGuildOwnerUser = new MyUser(guildOwner.getUser());
+        var jda = event.getJDA();
+        var lang = myGuild.getLanguageCode();
+        var channel = event.getChannelJoined();
+
+        // Blacklist
+        if (guild.getIdLong() == Constants.DISCORD_BOT_LIST_ID) return;
+        if (guildOwner.getUser().isBot()) return;
+        if (myGuild.isBlacklisted() || myUser.isBlacklisted()) return;
 
         CompletableFuture.runAsync(() -> {
-            var server = new Server(guild);
-            var lang = server.getLanguage();
-
             // Voice Lobby
-            if (Toggle.isEnabled(event, "voicelobby")) {
-                processVoiceLobby(event, guild, server, user, member, lang);
+            if (myGuild.pluginIsEnabled("voicelobby") && myGuild.categoryIsEnabled("moderation")) {
+                processVoiceLobby(event, guild, myGuild, user, member, lang);
+            }
+
+            // Log
+            if (myGuild.pluginIsEnabled("log") && myGuild.categoryIsEnabled("moderation") && myGuild.logIsEnabled("vc_move")) {
+                var logChannel = guild.getTextChannelById(myGuild.getLogChannelId());
+                if (logChannel != null) {
+                    logChannel.sendMessage(new EmbedBuilder()
+                            .setColor(myGuildOwnerUser.getColor())
+                            .setTitle(LanguageHandler.get(lang, "log_vc_move_title"))
+                            .addField(LanguageHandler.get(lang, "user"), event.getMember().getUser().getName() + "#" + event.getMember().getUser().getDiscriminator(), true)
+                            .addField(LanguageHandler.get(lang, "user_id"), event.getMember().getUser().getId(), true)
+                            .addField(LanguageHandler.get(lang, "vc"), event.getChannelLeft().getName() + " → " + event.getChannelJoined().getName(), false)
+                            .addField(LanguageHandler.get(lang, "vc_id"), event.getChannelLeft().getId() + " → " + event.getChannelJoined().getId(), false)
+                            .setFooter(LanguageHandler.get(lang, "log_at"), ImageUtil.getUrl(jda, "clock"))
+                            .setTimestamp(Instant.now())
+                            .build()
+                    ).queue();
+                }
             }
         }, Servant.fixedThreadPool);
     }
 
-    private static void processVoiceLobby(GuildVoiceMoveEvent event, net.dv8tion.jda.api.entities.Guild guild, Server server, User user, Member member, String lang) {
+    private static void processVoiceLobby(GuildVoiceMoveEvent event, net.dv8tion.jda.api.entities.Guild guild, MyGuild myGuild, User user, Member member, String lang) {
         var actives = new LinkedList<VoiceChannel>();
-        var activeIds = VoiceLobby.getActive(event.getJDA());
+        var activeIds = VoiceLobbyHandler.getActive(event.getJDA());
         for (var activeId : activeIds)
             if (event.getJDA().getVoiceChannelById(activeId) != null)
                 actives.add(event.getJDA().getVoiceChannelById(activeId));
             else
-                new VoiceLobby(event.getJDA(), guild.getIdLong(), activeId).unsetActive();
+                new VoiceLobbyHandler(event.getJDA(), guild.getIdLong(), activeId).unsetActive();
 
-        var channels = server.getVoiceLobbies();
+        var channels = myGuild.getVoiceLobbies();
         var joinedChannel = event.getChannelJoined();
         if (channels.contains(joinedChannel.getIdLong())) {
             // Join
             joinedChannel.createCopy().queue(newChannel -> {
-                new VoiceLobby(event.getJDA(), guild.getIdLong(), newChannel.getIdLong()).setActive();
+                new VoiceLobbyHandler(event.getJDA(), guild.getIdLong(), newChannel.getIdLong()).setActive();
                 newChannel.getManager().setParent(joinedChannel.getParent()).queue(
-                        parent -> newChannel.getManager().setName(VoiceLobby.getVoiceLobbyName(member, lang)).queue(
+                        parent -> newChannel.getManager().setName(VoiceLobbyHandler.getVoiceLobbyName(member, lang)).queue(
                                 name -> guild.modifyVoiceChannelPositions().selectPosition(newChannel).moveTo(joinedChannel.getPosition() + 1).queue(
                                         position -> {
                                             try {
@@ -86,7 +108,7 @@ public class GuildVoiceMoveListener extends ListenerAdapter {
         // Leave
         var leftChannel = event.getChannelLeft();
         if (actives.contains(leftChannel) && leftChannel.getMembers().size() == 0) {
-            leftChannel.delete().queue();
+            leftChannel.delete().queue(s -> {}, f -> {});
             actives.remove(leftChannel);
         }
     }

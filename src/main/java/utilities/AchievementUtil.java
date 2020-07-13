@@ -7,6 +7,8 @@ import net.dv8tion.jda.api.JDA;
 public class AchievementUtil {
     public static String getFancyName(JDA jda, String name, String lang) {
         switch (name.toLowerCase()) {
+            case "console": return LanguageHandler.get(lang, "achievement_console");
+
             case "excalibur": return LanguageHandler.get(lang, "achievement_excalibur");
             case "unlimited_blade_works": return LanguageHandler.get(lang, "achievement_unlimited_blade_works");
             case "gae_bolg": return LanguageHandler.get(lang, "achievement_gae_bolg");

@@ -2,18 +2,19 @@
 package listeners;
 
 import files.language.LanguageHandler;
-import moderation.guild.Server;
-import moderation.user.Master;
+import servant.MyGuild;
+import servant.MyUser;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
-import owner.blacklist.Blacklist;
+import commands.owner.blacklist.Blacklist;
 import servant.Servant;
 import utilities.Constants;
 import utilities.ImageUtil;
 
+import java.awt.*;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.concurrent.CompletableFuture;
@@ -56,19 +57,19 @@ public class GuildJoinListener extends ListenerAdapter {
         }
 
         guildOwnerUser.openPrivateChannel().queue(privateChannel -> {
-            var guildOwnerMaster = new Master(guildOwnerUser);
-            var language = new Server(guild).getLanguage();
+            var myOwner = new MyUser(guildOwnerUser);
+            var language = new MyGuild(guild).getLanguageCode();
             var p = Servant.config.getDefaultPrefix();
             var botOwner = event.getJDA().getUserById(Servant.config.getBotOwnerId());
             if (botOwner == null) return;
             var bot = event.getJDA().getSelfUser();
             var eb = new EmbedBuilder();
 
-            eb.setColor(guildOwnerMaster.getColor());
+            eb.setColor(Color.decode(myOwner.getColorCode()));
             eb.setAuthor(String.format(LanguageHandler.get(language, "invite_author"), bot.getName()), null, bot.getEffectiveAvatarUrl());
             eb.setThumbnail(guild.getIconUrl());
-            eb.setDescription(String.format(LanguageHandler.get(language, "invite_description"), p, p, p, Servant.config.getSupportGuildInv(), botOwner.getName(), botOwner.getDiscriminator()));
-            eb.setImage(ImageUtil.getImageUrl(event.getJDA(), "invite"));
+            eb.setDescription(String.format(LanguageHandler.get(language, "invite_description"), Constants.WEBSITE, Constants.SUPPORT));
+            eb.setImage(ImageUtil.getUrl(event.getJDA(), "invite"));
             eb.setFooter(String.format(LanguageHandler.get(language, "invite_footer"), guild.getName()), null);
 
             privateChannel.sendMessage(eb.build()).queue();

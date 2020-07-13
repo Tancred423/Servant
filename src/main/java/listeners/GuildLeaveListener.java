@@ -1,21 +1,12 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package listeners;
 
-import files.language.LanguageHandler;
-import moderation.guild.Server;
-import moderation.user.Master;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
-import owner.blacklist.Blacklist;
+import servant.MyGuild;
 import servant.Servant;
-import utilities.Constants;
-import utilities.ImageUtil;
 
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.util.concurrent.CompletableFuture;
 
 public class GuildLeaveListener extends ListenerAdapter {
@@ -36,49 +27,10 @@ public class GuildLeaveListener extends ListenerAdapter {
         if (user.isBot()) return;
 
         CompletableFuture.runAsync(() -> {
-            var server = new Server(guild);
+            var myGuild = new MyGuild(guild);
 
-            // Birthday
-            server.purgeBirthday();
-
-            // Giveaway
-            server.purgeGiveaways();
-
-            // Kick
-            processKick(event, guild, guildOwner, user);
-
-            // MediaOnlyChannel
-            server.purgeMediaOnlyChannels();
-
-            // Signup
-            server.purgeSignups();
-
-            // Poll
-            server.purgePolls();
+            // PURGES
+            myGuild.purge();
         }, Servant.fixedThreadPool);
-    }
-
-    private static void processKick(GuildLeaveEvent event, net.dv8tion.jda.api.entities.Guild guild, Member guildOwner, net.dv8tion.jda.api.entities.User guildOwnerUser) {
-        System.out.println("[" + OffsetDateTime.now(ZoneId.of(Constants.LOG_OFFSET)).toString().replaceAll("T", " ").substring(0, 19) + "] " +
-                "Servant was kicked from " + guild.getName() + " (" + guild.getIdLong() + "). Owner: " + guildOwnerUser.getName() + "#" + guildOwnerUser.getDiscriminator() + " (" + guildOwner.getIdLong() + ").");
-
-        if (Blacklist.isBlacklisted(guild, guildOwnerUser)) return;
-        guildOwnerUser.openPrivateChannel().queue(privateChannel -> {
-            var guildOwnerMaster = new Master(guildOwnerUser);
-            var language = new Server(guild).getLanguage();
-            var botOwner = event.getJDA().getUserById(Servant.config.getBotOwnerId());
-            if (botOwner == null) return;
-            var bot = event.getJDA().getSelfUser();
-
-            var eb = new EmbedBuilder();
-            eb.setColor(guildOwnerMaster.getColor());
-            eb.setAuthor(LanguageHandler.get(language, "kick_author"), null, bot.getEffectiveAvatarUrl());
-            eb.setThumbnail(guild.getIconUrl());
-            eb.setDescription(String.format(LanguageHandler.get(language, "kick_description"), Servant.config.getSupportGuildInv(), botOwner.getName(), botOwner.getDiscriminator()));
-            eb.setImage(ImageUtil.getImageUrl(event.getJDA(), "kick"));
-            eb.setFooter(String.format(LanguageHandler.get(language, "kick_footer"), guild.getName()), null);
-
-            privateChannel.sendMessage(eb.build()).queue(success -> { /* ignore */ }, failure -> { /* ignore */ });
-        }, failure -> { /* ignore */ });
     }
 }

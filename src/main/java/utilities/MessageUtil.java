@@ -1,76 +1,95 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package utilities;
 
-import moderation.user.Master;
+import files.language.LanguageHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
+import servant.LoggingTask;
+import servant.MyUser;
+import servant.Servant;
 
 import java.awt.*;
-import java.util.Map;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.regex.Pattern;
+
+import static servant.Database.closeQuietly;
 
 public class MessageUtil {
     public void sendAndExpire(MessageChannel channel, Message message, long cooldown) {
-        channel.sendMessage(message).queue(sentMessage -> new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                if (sentMessage != null) sentMessage.delete().queue(s -> {}, f -> {});
-            }
-        }, cooldown));
-    }
+        channel.sendMessage(message).queue(sentMessage -> {
+            Servant.myDeletedMessageCache.put(sentMessage.getIdLong(), "");
 
-    public void sendEmbed(MessageChannel channel, Color color, String authorName, String authorUrl, String authorIconUrl, String title, String thumbUrl, String description, Map<String, Map.Entry<String, Boolean>> fields, String imageUrl, String footerText, String footerIconUrl) {
-        var eb  = new EmbedBuilder();
-        if (color       != null) eb.setColor(color);
-        if (authorName  != null) eb.setAuthor(authorName, authorUrl, authorIconUrl);
-        if (title       != null) eb.setTitle(title);
-        if (thumbUrl    != null) eb.setThumbnail(thumbUrl);
-        if (description != null) eb.setDescription(description);
-
-        if (fields      != null)
-            for (Map.Entry<String, Map.Entry<String, Boolean>> entry : fields.entrySet())
-                if (entry.getKey() != null)
-                    eb.addField(entry.getKey(), entry.getValue().getKey(), entry.getValue().getValue());
-
-        if (imageUrl    != null) eb.setImage(imageUrl);
-        if (footerText  != null) eb.setFooter(footerText, footerIconUrl);
-
-        channel.sendMessage(eb.build()).queue();
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    sentMessage.delete().queue(s -> {}, f -> {});
+                }
+            }, cooldown);
+        });
     }
 
     public void reactAchievement(Message message) {
-        var emote = EmoteUtil.getEmoji("achievement");
+        var jda = message.getJDA();
+        var emote = EmoteUtil.getEmote(jda, "achievement");
         if (emote != null) message.addReaction(emote).queue(s -> {}, f -> {});
         else {
-            var emoji = EmoteUtil.getEmoji("achievement");
+            var emoji = EmoteUtil.getEmoji(jda, "achievement");
             if (emoji != null) message.addReaction(emoji).queue();
         }
     }
 
-    public static MessageEmbed createUsageEmbed(String commandName, User author, String description, boolean ownerCommand, Permission[] permissions, String[] aliases, String usage, String hint) {
-        var master = new Master(author);
+    public static MessageEmbed createUsageEmbed(String commandName, User author, String lang, String description, String[] aliases, String usage, String hint) {
+        var myUser = new MyUser(author);
 
         var sb = new StringBuilder();
-        for (var perm : permissions) sb.append(perm.getName()).append("\n");
-        var permission = sb.toString();
-
-        sb = new StringBuilder();
         for (var alias : aliases) sb.append(alias).append("\n");
         var alias = sb.toString();
 
-        return new EmbedBuilder()
-                .setColor(master.getColor())
-                .setAuthor(commandName.substring(0, 1).toUpperCase() + commandName.substring(1) + " Usage", null, null)
-                .setDescription((description == null ? "No description available." : description))
-                .addField(permissions.length > 1 ? "Permissions" : "Permission", ownerCommand ? "Bot Owner" : permission.isEmpty() ? "None" : permission, true)
-                .addField(aliases.length > 1 ? "Aliases" : "Alias", alias.isEmpty() ? "No aliases available" : alias, true)
-                .addField("Usage", usage == null ? "No usage available" : usage, false)
-                .addField("Hint", hint == null ? "No hint available" : hint, false)
-                .build();
+        var eb = new EmbedBuilder()
+                .setColor(Color.decode(myUser.getColorCode()))
+                .setTitle(commandName.substring(0, 1).toUpperCase() + commandName.substring(1))
+                .addField(LanguageHandler.get(lang, "description"), description == null ? " " : description, true)
+                .addField(aliases.length > 1 ? LanguageHandler.get(lang, "aliases") : LanguageHandler.get(lang, "alias"), alias.isEmpty() ? " " : alias, true)
+                .addField(LanguageHandler.get(lang, "usage"), usage == null ? " " : usage, false);
+
+        if (hint != null) eb.addField(LanguageHandler.get(lang, "hint"), hint, false);
+
+        if (commandName.equalsIgnoreCase("birthday")) {
+            eb.setFooter(LanguageHandler.get(lang, "usageembed_birthday_settings"));
+        }
+
+        return eb.build();
+    }
+
+    public static String removePrefix(JDA jda, long id, boolean isFromGuild, String invoke) {
+        Connection connection = null;
+        var prefix = Servant.config.getDefaultPrefix();
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var preparedStatement = connection.prepareStatement(
+                    "SELECT prefix " +
+                            "FROM " + (isFromGuild ? "guilds" : "users") + " " +
+                            "WHERE " + (isFromGuild ? "guild_id" : "user_id") + "=?");
+            preparedStatement.setLong(1, id);
+            var resultSet = preparedStatement.executeQuery();
+            if (resultSet.first()) {
+                var tmpPrefix = resultSet.getString("prefix");
+                if (!tmpPrefix.trim().isEmpty()) prefix = tmpPrefix;
+            }
+        } catch (SQLException e) {
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MessageUtil#removePrefix"));
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return invoke.replaceFirst(Pattern.quote(prefix), "");
     }
 }

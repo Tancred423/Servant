@@ -3,25 +3,679 @@ package files.language;
 
 import nu.studer.java.util.OrderedProperties;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class LanguageFile {
     static void createDefaultEN_GB() throws IOException {
         var en_gb = new OrderedProperties();
         var os = new FileOutputStream(System.getProperty("user.dir") + "/resources/lang/en_gb.ini");
 
-        // General
+        ///////////////////////////////////// Global Arguments /////////////////////////////////////
+
+        var valid_args = "Valid arguments:\n" +
+                "- Days: days, day, d\n" +
+                "- Hours: hours, hour, h\n" +
+                "- Minutes: minutes, minute, min, m";
+
+        ///////////////////////////////////// General /////////////////////////////////////
+
+        en_gb.setProperty("no_ending_quotation_mark", "No ending quotation mark.");
+        en_gb.setProperty("topic_too_long", "Topic is too long.");
+        en_gb.setProperty("missing_time_unit", "Time or time unit not provided in time argument.");
+        en_gb.setProperty("invalid_char", "Invalid character: '%s'");
+        en_gb.setProperty("jump", "Jump");
+        en_gb.setProperty("tmp_disabled", "This command has been disabled temporarily due to a bug.");
+        en_gb.setProperty("cooldown_warning", "That command is on cooldown for %s more seconds");
+        en_gb.setProperty("needed_role", "You must have a role called `%s` to use that!");
+        en_gb.setProperty("invalid_channel", "That command cannot be used in this channel!");
+        en_gb.setProperty("hastobe_vc", "You must be in a voice channel to use that!");
+        en_gb.setProperty("permission_bot", "%s I need the %s permission in this %s!");
+        en_gb.setProperty("permission_user", "%s You must have the %s permission in this %s to use that!");
+        en_gb.setProperty("forbidden_dm", "This command cannot be used in direct messages.");
         en_gb.setProperty("permission", ":x: You must have the %s permission in this server to use that!");
-        en_gb.setProperty("blocking_dm", "Help cannot be sent because you are blocking Direct Messages.");
         en_gb.setProperty("invalid_mention", "Invalid mention.");
         en_gb.setProperty("current_prefix", "Current prefix: %s");
         en_gb.setProperty("unknown_message", "Unknown message.");
         en_gb.setProperty("apostrophe", "'");
         en_gb.setProperty("apostrophe_s", "'s");
         en_gb.setProperty("times", "times");
+        en_gb.setProperty("ap", "Achievement Points");
+        en_gb.setProperty("commands_used", "Commands Used");
+        en_gb.setProperty("commands", "Commands");
+        en_gb.setProperty("missing_args", "Missing arguments");
+        en_gb.setProperty("missing_time_args", "Missing time arguments");
+        en_gb.setProperty("member", "Member");
+        en_gb.setProperty("role_s", "Role(s)");
+        en_gb.setProperty("author", "Author");
+        en_gb.setProperty("msg_id", "Message ID");
+        en_gb.setProperty("category_id", "Category ID");
+        en_gb.setProperty("emote_id", "Emote ID");
+        en_gb.setProperty("emote", "Emote");
+        en_gb.setProperty("invite", "Invite");
+        en_gb.setProperty("user", "User");
+        en_gb.setProperty("user_id", "User ID");
+        en_gb.setProperty("vc", "Voice Channel");
+        en_gb.setProperty("vc_id", "Voice Channel ID");
+        en_gb.setProperty("role_id", "Role ID");
+        en_gb.setProperty("tc_id", "Text Channel ID");
+        en_gb.setProperty("general_error", "Something went wrong! The bot dev will take care of that ASAP.");
+        en_gb.setProperty("description", "Description");
+        en_gb.setProperty("usage", "Usage");
+        en_gb.setProperty("alias", "Alias");
+        en_gb.setProperty("aliases", "Aliases");
+        en_gb.setProperty("hint", "Hint");
+        en_gb.setProperty("channel", "Channel");
+        en_gb.setProperty("guild", "Server");
 
-        // Features
-        /// Achievement
+        ///////////////////////////////////// Commands /////////////////////////////////////
+
+        ////////////////// Dashboard //////////////////
+
+        // Dashboard
+        en_gb.setProperty("dashboard_link", "The dashboard can be found here: <%s>");
+        en_gb.setProperty("dashboard_discontinued", "This command is discontinued.\n" +
+                "This is because you can now do everything this command did in the dashboard: <%s>");
+        en_gb.setProperty("dashboard_birthday_settings", "The birthday settings are now on the dashboard!");
+
+        // Discontinued
+        en_gb.setProperty("discontinued", "This command is discontinued.");
+
+        // Leaderboard
+        en_gb.setProperty("leaderboard_website", "The leaderboard can now be found here: <https://servant.gg/leaderboard/%s>");
+
+        ////////////////// Fun //////////////////
+
+        // Achievements
+        en_gb.setProperty("achievements_title", "%s%s Achievements");
+
+        // Avatar
+        en_gb.setProperty("avatar_avatar", "Avatar");
+        en_gb.setProperty("avatar_self", "%s just stole their own avatar!");
+        en_gb.setProperty("avatar_stolen", "%s just stole %s's avatar!");
+
+        // Baguette
+        en_gb.setProperty("baguette_49", "Unlucky");
+        en_gb.setProperty("baguette_50", "JACKPOT! Now you're cool.");
+
+        // BubbleWrap
+        en_gb.setProperty("bubblewrap_title", "Bubble Wrap!");
+        en_gb.setProperty("bubblewrap_subtitle", "POP POP POP!");
+        en_gb.setProperty("bubblewrap_footer", "Knick knickediknack, uh yeah!");
+
+        // Coinflip
+        en_gb.setProperty("coinflip_head", "Head!");
+        en_gb.setProperty("coinflip_tail", "Tail!");
+
+        // Commands
+        en_gb.setProperty("commands_title", "%s%s commands");
+        en_gb.setProperty("commands_footer", "If you used this command in hope to see a command list, try using %shelp or visit the website: %s");
+
+        // Flip
+        en_gb.setProperty("flip_description", "Flip a user");
+        en_gb.setProperty("flip_usage", "**Flip a user**\n" +
+                "Command: `%s%s @user`\n" +
+                "\n" +
+                "**Unflip a user**\n" +
+                "Command: `%s%s @user`");
+
+        // Love
+        en_gb.setProperty("love_description", "Ship two people, or just one with themselves.");
+        en_gb.setProperty("love_usage", "**Ship yourself with someone**\n" +
+                "Command: `%s%s @user`\n" +
+                "\n" +
+                "**Ship two users**\n" +
+                "Command: `%s%s @user1 @user2`");
+
+        en_gb.setProperty("love_self_100", "Damn! Straight to the fap!");
+        en_gb.setProperty("love_self_90", "Pretty self confident, don't you think?");
+        en_gb.setProperty("love_self_80", "So narcissistic...");
+        en_gb.setProperty("love_self_70", "You love yourself more than others love you.");
+        en_gb.setProperty("love_self_69", "Nice.");
+        en_gb.setProperty("love_self_60", "Seems like you are accepting yourself.");
+        en_gb.setProperty("love_self_50", "You seem to be undecided if you like yourself or not.");
+        en_gb.setProperty("love_self_42", "You found the answer.");
+        en_gb.setProperty("love_self_40", "Now you can look into the mirror with pride.");
+        en_gb.setProperty("love_self_30", "A bit unsecure, but I'm sure you can handle it.");
+        en_gb.setProperty("love_self_20", "You are doing great. Build some self confidence!");
+        en_gb.setProperty("love_self_10", "Believe in yourself!");
+        en_gb.setProperty("love_self_0", "Thats tough. We still love you <3");
+
+        en_gb.setProperty("love_noself_100", "Damn! Thats a match!");
+        en_gb.setProperty("love_noself_90", "Get up and invite them for a dinner.");
+        en_gb.setProperty("love_noself_80", "You sure, you don't wanna date?");
+        en_gb.setProperty("love_noself_70", "I call a sis-/bromance.");
+        en_gb.setProperty("love_noself_69", "Nice.");
+        en_gb.setProperty("love_noself_60", "There is a chance.");
+        en_gb.setProperty("love_noself_50", "I bet you can be friends. :)");
+        en_gb.setProperty("love_noself_42", "You found the answer.");
+        en_gb.setProperty("love_noself_40", "At least you are trying.");
+        en_gb.setProperty("love_noself_30", "I don't think this will work out.");
+        en_gb.setProperty("love_noself_20", "At least a bit, amirite.");
+        en_gb.setProperty("love_noself_10", "Dats pretty low, tho.");
+        en_gb.setProperty("love_noself_0", "Well, that won't work out.");
+
+        en_gb.setProperty("love_fallback", "Urgh!");
+
+        // Profile
+        en_gb.setProperty("profile_footer1", "Also try \"%s%s @user\"");
+        en_gb.setProperty("profile_footer2", "Also try \"%s%s\"");
+
+        en_gb.setProperty("profile_generalinfo", "General info");
+        en_gb.setProperty("profile_commandstats", "Command stats");
+        en_gb.setProperty("profile_mostused", "Most used commands");
+        en_gb.setProperty("profile_nocommands", "No commands were used yet");
+        en_gb.setProperty("profile_achievements", "Achievements");
+        en_gb.setProperty("profile_noachievements", "No achievements");
+
+        en_gb.setProperty("profile_level", "Level");
+        en_gb.setProperty("profile_rank",  "Rank");
+
+        en_gb.setProperty("profile_baguette", "Biggest Baguette");
+        en_gb.setProperty("profile_nobaguette", "No baguette yet");
+        en_gb.setProperty("profile_baguette_value", "%s (%s times)");
+        en_gb.setProperty("profile_animal", "Favourite Animal");
+        en_gb.setProperty("profile_nofavourite", "No Favourite");
+        en_gb.setProperty("profile_msi", "Most Shared Interaction");
+        en_gb.setProperty("profile_mri", "Most Received Interaction");
+
+        en_gb.setProperty("profile_title_creator", "Creator");
+        en_gb.setProperty("profile_title_supporter", "Supporter");
+        en_gb.setProperty("profile_title_normal", "Master");
+
+        ////////////////// Interaction //////////////////
+
+        en_gb.setProperty("interaction_description_beg", "Beg someone");
+        en_gb.setProperty("interaction_description_birthday", "Wish someone a happy birthday");
+        en_gb.setProperty("interaction_description_bite", "Bite someone");
+        en_gb.setProperty("interaction_description_bully", "Bully someone");
+        en_gb.setProperty("interaction_description_cookie", "Give someone a cookie");
+        en_gb.setProperty("interaction_description_cop", "Arrest someone");
+        en_gb.setProperty("interaction_description_dab", "Dab on someone");
+        en_gb.setProperty("interaction_description_flex", "Flex on someone");
+        en_gb.setProperty("interaction_description_highfive", "Give someone a high five");
+        en_gb.setProperty("interaction_description_hug", "Hug someone");
+        en_gb.setProperty("interaction_description_kiss", "Kiss someone");
+        en_gb.setProperty("interaction_description_lick", "Lick someone");
+        en_gb.setProperty("interaction_description_pat", "Pat someone");
+        en_gb.setProperty("interaction_description_poke", "Poke someone");
+        en_gb.setProperty("interaction_description_shame", "Shame \uD83D\uDD14 Shame \uD83D\uDD14 Shame \uD83D\uDD14");
+        en_gb.setProperty("interaction_usage_shame", "Shame someone");
+        en_gb.setProperty("interaction_description_slap", "Slap someone");
+        en_gb.setProperty("interaction_description_wave", "Wave to someone");
+        en_gb.setProperty("interaction_description_wink", "Wink to someone");
+        en_gb.setProperty("interaction_usage", "**%s**\n" +
+                "Command: `%s%s [@user]`\n" +
+                "Example: `%s%s @Servant`");
+
+        en_gb.setProperty("interaction_shared_beg", "%s begged %s generous people.");
+        en_gb.setProperty("interaction_received_beg", "%s was begged by %s filthy leechers.");
+        en_gb.setProperty("interaction_shared_birthday", "%s congratulated %s times to a birthday.");
+        en_gb.setProperty("interaction_received_birthday", "%s got congratulated on their birthday %s times.");
+        en_gb.setProperty("interaction_shared_bite", "%s bit %s people. And all of them deserved it! ò.ó");
+        en_gb.setProperty("interaction_received_bite", "%s got bitten by %s crazy people.");
+        en_gb.setProperty("interaction_shared_bully", "%s bullied %s poor kids.");
+        en_gb.setProperty("interaction_received_bully", "%s got bullied by %s meanies.");
+        en_gb.setProperty("interaction_shared_cookie", "%s gave a cookie to %s cuties.");
+        en_gb.setProperty("interaction_received_cookie", "%s noms their %s. cookie.");
+        en_gb.setProperty("interaction_shared_cop", "%s arrested %s loli hunters.");
+        en_gb.setProperty("interaction_received_cop", "%s was arrested by %s FBI agents.");
+        en_gb.setProperty("interaction_shared_dab", "%s d4bb3d 0n %s n00b5.");
+        en_gb.setProperty("interaction_received_dab", "%s sneered at %s Fortnite kiddies.");
+        en_gb.setProperty("interaction_shared_flex", "%s flexed on %s weaklings.");
+        en_gb.setProperty("interaction_received_flex", "%s got flexed on by %s wanna-be body builders.");
+        en_gb.setProperty("interaction_shared_highfive", "%s clapped %s raised hands.");
+        en_gb.setProperty("interaction_received_highfive", "%s tried to wave %s times, but got clapped by some weird dude.");
+        en_gb.setProperty("interaction_shared_hug", "%s hugged %s comfy peeps.");
+        en_gb.setProperty("interaction_received_hug", "%s got hugged by %s cuties.");
+        en_gb.setProperty("interaction_shared_kiss", "%s kissed %s random people.");
+        en_gb.setProperty("interaction_received_kiss", "%s wrote %s sexual assault reports.");
+        en_gb.setProperty("interaction_shared_lick", "%s licked %s strangers.");
+        en_gb.setProperty("interaction_received_lick", "%s washed their face %s times.");
+        en_gb.setProperty("interaction_shared_pat", "%s patted %s catgirls. uwu");
+        en_gb.setProperty("interaction_received_pat", "%s tried to explain %s times that they aren't a catgirl.");
+        en_gb.setProperty("interaction_shared_poke", "%s poked %s people. (｀ω´)");
+        en_gb.setProperty("interaction_received_poke", "%s got annoyed %s times.");
+        en_gb.setProperty("interaction_shared_slap", "%s smacked %s meanies.");
+        en_gb.setProperty("interaction_received_slap", "%s got bullied %s times... oh wait, wrong command (◯Δ◯∥)");
+        en_gb.setProperty("interaction_shared_shame", "%s lead %s sinners through the walk of atonement.");
+        en_gb.setProperty("interaction_received_shame", "%s cosplayed Cersei %s times.");
+        en_gb.setProperty("interaction_shared_wave", "%s greeted %s lovely derps.");
+        en_gb.setProperty("interaction_received_wave", "%s `✓✓Read` %s times.");
+        en_gb.setProperty("interaction_shared_wink", "%s winked to %s people.");
+        en_gb.setProperty("interaction_received_wink", "%s blushed %s times.");
+
+        ////////////////// Moderation //////////////////
+
+        // Clear
+        en_gb.setProperty("clear_description", "Deletes up to 100 messages\n" +
+                "Can delete user specific messages from the past 100 messages");
+        en_gb.setProperty("clear_usage", "**Delete some messages**\n" +
+                "Command: `%s%s [1 - 100 OR @user]`\n" +
+                "Example 1: `%s%s 50`\n" +
+                "Example 2: `%s%s @Servant`");
+        en_gb.setProperty("clear_hint", "The range is inclusively, so you can also delete just 1 or a total of 100 messages.");
+
+        en_gb.setProperty("clear_input", "You only can put in numbers or a user mention!");
+        en_gb.setProperty("clear_invalid", "Your input is invalid. Try a smaller number.");
+        en_gb.setProperty("clear_sub_one", "Input cannot be lower than 1.");
+        en_gb.setProperty("clear_cleared", "%s messages cleared");
+
+        // EditEmbed
+        en_gb.setProperty("editembed_description", "Edit an embed message from %s");
+        en_gb.setProperty("editembed_usage", "**Edit an embed**\n" +
+                "Command: `%s%s [message link]`\n" +
+                "Example: `%s%s %s`");
+        en_gb.setProperty("editembed_hint", "**How to get the message link:**\n" +
+                "- Desktop: Hover over message > Use the 3 dots menu > Copy Message Link\n" +
+                "- Android: Press and hold message > Share > Copy\n" +
+                "- iOS: Press and hold message > Copy Message Link");
+
+        en_gb.setProperty("editembed_args_length", "Please provide a valid message link. Type `%seditembed` to see all information needed.");
+        en_gb.setProperty("editembed_tc_not_found", "The given text channel cannot be found.");
+        en_gb.setProperty("editembed_invalid_message_id", "The provided message ID is invalid. Check `%seditembed` for help.");
+        en_gb.setProperty("editembed_missingpermission", "You need to be able to write in the given channel to access embeds.");
+        en_gb.setProperty("editembed_notbyme", "This is not a message made by me.");
+        en_gb.setProperty("editembed_noembed", "I cannot find an embed for this message.");
+        en_gb.setProperty("editembed_notfound", "I cannot find this message.");
+        en_gb.setProperty("embed_timeout", "This configuration timed out.");
+        en_gb.setProperty("editembed_introduction", "With this command, you can edit an embed from %s.\n" +
+                "- The embed must not be longer than 6000 characters in total.\n" +
+                "- Everytime you have to click a reacton or write an answer, you have a time limit of 15 minutes.\n" +
+                "Are you prepared?");
+        en_gb.setProperty("embed_field_remove_q", "Do you want to remove the current fields?");
+        en_gb.setProperty("embed_authorline_q", "Alright! Do you want to use an **author line**?");
+        en_gb.setProperty("embed_authorname_i", "Please provide the **author name**:");
+        en_gb.setProperty("embed_authorurl_q", "Do you want to use an **author url** (not the icon)?");
+        en_gb.setProperty("embed_authorurl_i", "Please provide the **author url** (not the icon url!):");
+        en_gb.setProperty("embed_authorurl_i_fail", "Your input is invalid. Please provide a valid url:");
+        en_gb.setProperty("embed_authoricon_q", "Do you want to use an **author icon**?");
+        en_gb.setProperty("embed_authoricon_i", "Please provide the **author icon url** (direct link!):");
+        en_gb.setProperty("embed_authoricon_i_fail", "Your input is invalid. Please provide a valid direct url:");
+        en_gb.setProperty("embed_thumbnail_q", "Do you want to use a **thumbnail**?");
+        en_gb.setProperty("embed_thumbnail_i", "Please provide the **thumbnail url** (direct link!):");
+        en_gb.setProperty("embed_thumbnail_i_fail", "Your input is invalid. Please provide a valid direct url:");
+        en_gb.setProperty("embed_title_q", "Do you want to use a **title**?");
+        en_gb.setProperty("embed_title_i", "Please provide the **title**:");
+        en_gb.setProperty("embed_url_q", "Do you want to use a **title URL**?");
+        en_gb.setProperty("embed_url_i", "Please provide the **title url**:");
+        en_gb.setProperty("embed_url_i_fail", "Your input is invalid. Please provide a valid url:");
+        en_gb.setProperty("embed_description_q", "Do you want to use a **description**?");
+        en_gb.setProperty("embed_description_i", "Please provide the **description**:");
+        en_gb.setProperty("embed_field_q", "Do you want to add a **field**?");
+        en_gb.setProperty("embed_field_name_i", "Please provide the **field name**:");
+        en_gb.setProperty("embed_field_value_i", "Please provide the **field value**:");
+        en_gb.setProperty("embed_field_inline_i", "Should this field be inline?");
+        en_gb.setProperty("embed_image_q", "Do you want to use an **image**?");
+        en_gb.setProperty("embed_image_i", "Please provide the **image url** (direct link!):");
+        en_gb.setProperty("embed_image_i_fail", "Your input is invalid. Please provide a valid direct url:");
+        en_gb.setProperty("embed_footer_q", "Do you want to use a **footer**?");
+        en_gb.setProperty("embed_footer_text_i", "Please provide the **footer text**:");
+        en_gb.setProperty("embed_footer_icon_q", "Do you want to use a **footer icon**?");
+        en_gb.setProperty("embed_footer_icon_i", "Please provide the **footer icon url** (direct link!):");
+        en_gb.setProperty("embed_footer_icon_i_fail", "Your input is invalid. Please provide a valid direct url:");
+        en_gb.setProperty("embed_empty", "Either the embed is empty or it has over 6000 characters.\nBoth is not allowed!");
+        en_gb.setProperty("embed_timestamp_q", "Do you want to use a **timestamp**?");
+        en_gb.setProperty("embed_timestamp_i", "Please provide a **timestamp**.\nYou either can say `now` or provide a date and time like this: `yyyy-MM-dd HH:mm` (uses server offset):");
+        en_gb.setProperty("embed_timestamp_i_fail", "Your input is invalid.\nYou either can say `now` or provide a date and time like this: `yyyy-MM-dd HH:mm` (uses server offset).\nTry again:");
+        en_gb.setProperty("editembed_confirm", "We're done! Please confirm you want to overwrite the old embed.");
+
+        ////////////////// Owner //////////////////
+
+        // Blacklist
+        en_gb.setProperty("blacklist_missingid", "Add an ID");
+        en_gb.setProperty("blacklist_empty", "No blacklisted ID's.");
+
+        // Thread
+        en_gb.setProperty("thread_title", "Stats for Nerds");
+        en_gb.setProperty("thread_stats_k", "General Stats");
+        en_gb.setProperty("thread_stats_v", "Available Processors: %s\nCurrent Threads: %s");
+        en_gb.setProperty("thread_fixed_k", "Fixed Thread Pool");
+        en_gb.setProperty("thread_cached_k", "Cached Thread Pool");
+        en_gb.setProperty("thread_scheduled_k", "Scheduled Service");
+        en_gb.setProperty("thread_period_k", "Period Service");
+        en_gb.setProperty("thread_pool_service_v", "Is Running: %s\nPool Size: %s\nActive Threads: %s\nQueued Tasks: %s\nCompleted Tasks: %s");
+        en_gb.setProperty("thread_database_k", "Database");
+        en_gb.setProperty("thread_database_v", "Active Connections: %s\nTotal Connections: %s\nMaximum Pool Size: %s");
+        en_gb.setProperty("thread_msg_cache_k", "Message Cache");
+        en_gb.setProperty("thread_deleted_msg_cache_k", "Deleted Message Cache");
+        en_gb.setProperty("thread_cache_v", "Size: %s");
+
+        // ServerList
+        en_gb.setProperty("serverlist_integer", "That's not an integer.");
+        en_gb.setProperty("serverlist_members", "Members");
+        en_gb.setProperty("serverlist_connected", " Servers that **%s** is connected to");
+
+        // Shutdown
+        en_gb.setProperty("shutdown_goodnight", "Good Night %s");
+
+        ////////////////// Random //////////////////
+
+        en_gb.setProperty("random_empty", "I couldn't find anything with this keyword.");
+
+        ////////////////// Standard //////////////////
+
+        // BotInfo
+        en_gb.setProperty("botinfo_authorname", "%s - Info");
+        en_gb.setProperty("botinfo_description", "Greetings master! I am %s!\n" +
+                "I will help you to moderate, organize and entertain your Discord server.\n" +
+                "\n" +
+                "I am fully customizable. Any command, plugin, feature and category can be toggled on or off.\n" +
+                "You can find a detailed help [here](%s).\n" +
+                "If you have any questions, feel free to join the [support server](%s).\n" +
+                "\n" +
+                "To get started, take a look into the dashboard. There you can set up everything!\n" +
+                "[Simply visit the website and hit the login button!](%s)");
+        en_gb.setProperty("botinfo_links_name", "Links");
+        en_gb.setProperty("botinfo_links_value", "[Visit the website and dashboard](%s)\n" +
+                "[Invite Servant](%s)\n" +
+                "[Join Support Server](%s)\n" +
+                "[Upvote the bot at top.gg](%s)");
+        en_gb.setProperty("botinfo_stats", "Statistics");
+        en_gb.setProperty("botinfo_users", "Users");
+        en_gb.setProperty("botinfo_channels", "Channels");
+        en_gb.setProperty("botinfo_shard", "This shard");
+        en_gb.setProperty("botinfo_restart", "Last restart");
+
+        // Help
+        en_gb.setProperty("help_detailed", "Type a command to get detailed help, e.g. `%stimezone`");
+        en_gb.setProperty("help_standard", "Standard Commands");
+        en_gb.setProperty("help_additional", "For additional help, contact %s#%s or join %s");
+        en_gb.setProperty("help_blocking_dm", "Help cannot be sent because you are blocking Direct Messages.");
+
+        // Patreon
+        en_gb.setProperty("supporter_supportservant", "Support Servant");
+        en_gb.setProperty("supporter_description", "As a Servant-Supporter you can choose a custom color for embed messages and personalize your profile with a background!\n" +
+                "There are three way to become a Servant-Supporter:");
+        en_gb.setProperty("supporter_patreontitle", "Patreon: Subscription");
+        en_gb.setProperty("supporter_subscription", "Price: Only $1 / month!\n" +
+                "Duration: As long as you pledge.\n" +
+                "[Patreon page](https://www.patreon.com/tancred)");
+        en_gb.setProperty("supporter_donationtitle", "PayPal: Donation");
+        en_gb.setProperty("supporter_donation", "Price: Only $5 (in total)\n" +
+                "Duration: Lifetime\n" +
+                "[PayPal.me page](https://www.paypal.me/servantdiscord)");
+        en_gb.setProperty("supporter_serverboosttitle", "Support Server: Server Boost");
+        en_gb.setProperty("supporter_serverboost", "Price: FREE\n" +
+                "Duration: As long as you boost.\n" +
+                "[Join Support Server](https://support.servant.gg/)");
+        en_gb.setProperty("supporter_thanks", "Thanks to every supporter <3");
+
+        ////////////////// Utility //////////////////
+
+        // Giveaway
+        en_gb.setProperty("giveaway_description", "Start a giveaway that draws a given amount of people as winners after a given time.\n" +
+                "List all running giveaways of the current server.");
+        en_gb.setProperty("giveaway_usage", "**Start giveaway**\n" +
+                "Command: `%sgiveaway \"[prize name]\" [time & winners]`\n" +
+                "Example: `%sgiveaway \"100 Cookies\" 1w 12h 2w 30 min`\n" +
+                "⤷ `1w` + `12h` + `2w` + `30 min` = 3 Winners, 12 Hours, 30 Minutes\n" +
+                "\n" +
+                "**List giveaways**\n" +
+                "Command: `%sgiveaway list`");
+        en_gb.setProperty("giveaway_hint", valid_args + "\n- Winners: winners, winner, w");
+
+        en_gb.setProperty("giveaway_emptyprize", "You cannot leave the prize empty.");
+        en_gb.setProperty("giveaway_zerowinners", "There has to be at least one winner.");
+        en_gb.setProperty("giveaway_30_days", "Giveaway cannot be further in the future than 30 days.");
+
+        en_gb.setProperty("giveaway_title", "Giveaway: %s");
+        en_gb.setProperty("giveaway_description_running", "Host: **%s**\n" +
+                "Amount of winners: **%s**\n" +
+                "React with %s to enter the giveaway!");
+        en_gb.setProperty("giveaway_description_end", "Host: **%s**\n" +
+                "Amount of winners: **%s**\n\n" +
+                "Congratulations to these winners:");
+        en_gb.setProperty("giveaway_description_nowinner", "Host: **%s**\n" +
+                "Amount of winners: **%s**\n\n" +
+                "Nobody participated. Therefore, nobody won.");
+        en_gb.setProperty("giveaway_end_manually", "%s, to end this giveaway manually click on ❌");
+        en_gb.setProperty("giveaway_endsat", "Ends at");
+        en_gb.setProperty("giveaway_endedat", "Ended at");
+
+        en_gb.setProperty("giveaway_current", "Current giveaways on this server");
+        en_gb.setProperty("giveaway_nocurrent", "There are no giveaways running!");
+
+        en_gb.setProperty("giveaway_messageid", "**Message ID:**");
+        en_gb.setProperty("giveaway_prize", "**Prize:**");
+
+        // Polls
+        en_gb.setProperty("poll_ends_at", "Ends at");
+        en_gb.setProperty("poll_ended", "This poll has ended.");
+        en_gb.setProperty("poll_end_manually", "%s, to end this poll manually click on ❌");
+        en_gb.setProperty("poll_30_days", "Poll cannot be further in the future than 30 days.");
+
+        /// Poll
+        en_gb.setProperty("poll_description", "Create a poll with up to 10 custom answers");
+        en_gb.setProperty("poll_usage", "**Start a poll**\n" +
+                "Command: `%s%s \"[question]/[answer1]/(...)/[answer10]\" [time arguments]`\n" +
+                "Example: `%s%s \"When do you have time?/Mon/Tue/Wed/Thu/Fri/Sat/Sun\" 12h`");
+        en_gb.setProperty("poll_hint", "After executing this command, you will be asked if you want to allow multiple answers.\n\n" + valid_args);
+
+        en_gb.setProperty("poll_questions_answers", "Please provide a question and answers: `%spoll \"Your question? / Answer 1 / Answer 2 / (...) / Answer 10\" [time arguments]`");
+        en_gb.setProperty("poll_amount", "Invalid amount of arguments. There has to be at least one answer to your question and a maximum of 10 answers.");
+        en_gb.setProperty("poll_multiplechoice_q", "Allow multiple answers?");
+
+        en_gb.setProperty("poll_timeout", "Timeout! You didn't react on my question.");
+        en_gb.setProperty("poll_started", "%s started a poll!");
+        en_gb.setProperty("poll_multiple", "Multiple Answers: %s");
+        en_gb.setProperty("poll_allowed", "Allowed");
+        en_gb.setProperty("poll_forbidden", "Forbidden");
+        en_gb.setProperty("poll_ended_manually", "%s has ended the poll!");
+
+        /// QuickPoll
+        en_gb.setProperty("quickpoll_description", "An uncomplicated poll with %s or %s.");
+        en_gb.setProperty("quickpoll_usage", "**Start a quickpoll**\n" +
+                "Command: `%s%s \"Your question (optional)\" [time arguments]`\n\n" +
+                "Examples 1: `%s%s \"Create a meme channel?\" 15 min`\n" +
+                "Examples 2: `%s%s 15 min`");
+        en_gb.setProperty("quickpoll_hint", valid_args);
+
+        en_gb.setProperty("quickpoll_started", "%s started a quickpoll!");
+        en_gb.setProperty("quickpoll_ended", "%s has ended the quickpoll!");
+
+        // Rate
+        en_gb.setProperty("rate_description", "User rating out of 5");
+        en_gb.setProperty("rate_usage", "**Start a rating**\n" +
+                "Command: `%s%s \"Optional topic\" [time arguments]`\n" +
+                "Example 1: `%s%s \"Newest episode\" 10d`\n" +
+                "Example 2: `%s%s 10d`");
+        en_gb.setProperty("rate_hint", valid_args);
+
+        en_gb.setProperty("rate_30_days", "Rating must not be further in the future than 30 days.");
+        en_gb.setProperty("rate_end_manually", "%s, to end this rating manually click on ❌");
+        en_gb.setProperty("rate_ends_at", "Ends at");
+        en_gb.setProperty("rate_ended", "This rating ended.");
+        en_gb.setProperty("rate_title", "Rating!");
+        en_gb.setProperty("rate_title_topic", "Rate: %s");
+
+        // RemindMe
+        en_gb.setProperty("remindme_description", "Set up an RemindMe to a specific time.\n" +
+                "Other members can upvote the RemindMe to also get reminded.\n" +
+                "The RemindMe will have a message link.");
+        en_gb.setProperty("remindme_usage", "**Start a remind me**\n" +
+                "Command: `%s%s \"Optional topic\" [time arguments]`\n\n" +
+                "Example 1: `%s%s \"Pat Servant\" 3d 2h 1m`\n" +
+                "Example 2: `%s%s 3d 2h 1m`");
+        en_gb.setProperty("remindme_hint", "The author will always be reminded, no matter whether they reacted or not.\n\n" + valid_args);
+
+        en_gb.setProperty("remindme_30_days", "RemindMe must not be further in the future than 30 days.");
+        en_gb.setProperty("remindme_of", "RemindMe of %s");
+        en_gb.setProperty("remindme_topic", "Topic: %s");
+        en_gb.setProperty("remindme_also",  "If you also want to be reminded, just click %s");
+        en_gb.setProperty("remindme_at", "RemindMe at");
+        en_gb.setProperty("remindme_success",  "You've been reminded %s");
+        en_gb.setProperty("remindme_remind", "Hi master, here is your requested reminder.");
+        en_gb.setProperty("remindme_jump", "Click here to jump to the context.");
+
+        // Signup
+        en_gb.setProperty("signup_description", "Easy event organisation by letting users sign up");
+        en_gb.setProperty("signup_usage", "**Start a signup**\n" +
+                "Command: `%s%s \"Optional topic\" [time & participants]`\n" +
+                "Example 1: `%s%s \"Raiding Event\" 3d 2h 1m 10p`\n" +
+                "Example 2: `%s%s 3d 2h 1m 10p`\n" +
+                "⮡ `3d` + `2h` + `1m` + `10p` = 3 Days, 2 Hours, 1 Minute, 10 Participants");
+        en_gb.setProperty("signup_hint", "- The amount of participants has to be within 1 and 100 inclusively.\n\n" + valid_args + "\n- Participants: participants, participant, p");
+
+        en_gb.setProperty("signup_missing_participants", "You have to provide how many people can participate. E.g.: `%ssignup \"Optional Title\" 10p 1d`");
+        en_gb.setProperty("signup_30_days", "Signup must not be further in the future than 30 days.");
+
+        en_gb.setProperty("signup_embedtitle", "Sign up");
+        en_gb.setProperty("signup_embedtitle_topic", "Sign up for %s");
+        en_gb.setProperty("signup_embeddescription", "Click on %s to participate.\n" +
+                "%s people can participate!\n\n" +
+                "Remove said reaction if you have changed your mind.\n" +
+                "%s, to manually end this signup click on ❌");
+        en_gb.setProperty("signup_embeddescriptionend", "%s people could participate!\n" +
+                "These are the participants:");
+        en_gb.setProperty("signup_nobody", "Nobody signed up");
+        en_gb.setProperty("signup_event", "Event at");
+        en_gb.setProperty("signup_ended", "This signup ended.");
+
+        // Timezone
+        en_gb.setProperty("timezone_description", "Convert a date and time from one timezone to another");
+        en_gb.setProperty("timezone_usage", "**Convert a date and time to a different timezone**\n" +
+                "Command: `%s%s yyyy-mm-dd hh:mm [start timezone] [target timezone]`\n" +
+                "Example: `%s%s 2019-01-01 22:00 PST CET`");
+        en_gb.setProperty("timezone_hint", "This command uses the 24 hour system.");
+
+        en_gb.setProperty("timezone_missingargs", "Missing arguments.");
+        en_gb.setProperty("timezone_invalidzone_start", "Invalid starting timezone.");
+        en_gb.setProperty("timezone_invalidzone_target", "Invalid target timezone.");
+        en_gb.setProperty("timezone_conversion", "Timezone Conversion");
+        en_gb.setProperty("timezone_input", "Input");
+        en_gb.setProperty("timezone_output", "Output");
+        en_gb.setProperty("timezone_invalid", "Invalid input. Check your formatting.");
+
+        ///////////////////////////////////// Plugins /////////////////////////////////////
+
+        ////////////////// Moderation //////////////////
+
+        // BestOfImage & BestOfQuote
+        en_gb.setProperty("bestof_jump", "Click here to jump to the original message.");
+        en_gb.setProperty("bestof_footer", "%s votes | #%s");
+
+        // Birthday
+        en_gb.setProperty("birthday_gratulation", "Happy Birthday %s!");
+        en_gb.setProperty("birthday_countdown", "Countdown");
+        en_gb.setProperty("birthday_countdown_value_sin", "in %s day ");
+        en_gb.setProperty("birthday_countdown_value", "in %s days");
+        en_gb.setProperty("birthday_date", "Date");
+        en_gb.setProperty("birthday_name", "Name");
+        en_gb.setProperty("birthday_missing", "No birthdays were set.");
+        en_gb.setProperty("birthday_guild", "%s birthdays");
+        en_gb.setProperty("birthday_howtoadd", "Add your birthday in the [dashboard](%s)!");
+        en_gb.setProperty("birthday_as_of", "As of");
+
+        // Giveaway
+        en_gb.setProperty("giveaway_dm", "I counted your entry for [this](%s) giveaway!");
+        en_gb.setProperty("giveaway_dm_footer", "If there are more than 5000 reactions, the count may look scuffed, but I still counted you!");
+
+        // Join
+        en_gb.setProperty("join_author", "Welcome %s to %s");
+        en_gb.setProperty("join_embeddescription", "Enjoy your stay!");
+        en_gb.setProperty("join_footer", "Joined at");
+
+        // Leave
+        en_gb.setProperty("leave_author", "Farewell %s");
+        en_gb.setProperty("leave_embeddescription", "We are sorry to see you go!");
+        en_gb.setProperty("leave_footer", "Left at");
+
+        // Level (incl. LevelRole)
+        en_gb.setProperty("levelrole_levelup", "LEVEL UP");
+        en_gb.setProperty("level_up", "%s just reached level %s! \uD83C\uDF89");
+        en_gb.setProperty("levelrole_role_singular", "You also gained following role:");
+        en_gb.setProperty("levelrole_role_plural", "You also gained following roles:");
+        en_gb.setProperty("level_missingpermission_embed", "I don't have the permission to create embeds (Embed Links), that's why you're seeing the budget level up announcement.");
+        en_gb.setProperty("level_hierarchy", "Couldn't add one ore more roles, because they are higher than me in hierarchy.");
+
+        // Livestream
+        en_gb.setProperty("livestream_announcement_title", "Livestream!");
+        en_gb.setProperty("livestream_announcement", "%s just went live on [Twitch (click me)](%s)!");
+        en_gb.setProperty("livestream_announcement_game", "Streaming %s");
+
+        // Log
+        en_gb.setProperty("log_at", "Logged at");
+
+        en_gb.setProperty("log_category_create_title", "Category created");
+        en_gb.setProperty("log_category_delete_title", "Category deleted");
+        en_gb.setProperty("log_category_name", "Category Name");
+
+        en_gb.setProperty("log_emote_add_title", "Emote added");
+        en_gb.setProperty("log_emote_remove_title", "Emote removed");
+        en_gb.setProperty("log_emote_name", "Emote Name");
+
+        en_gb.setProperty("log_user_ban_title", "User banned");
+        en_gb.setProperty("log_banned_user", "Banned User");
+        en_gb.setProperty("log_banned_user_id", "Banned User ID");
+
+        en_gb.setProperty("log_invite_create_title", "Invite created");
+        en_gb.setProperty("log_invite_delete_title", "Invite deleted");
+        en_gb.setProperty("log_invite_channel", "To channel");
+
+        en_gb.setProperty("log_user_join_title", "User joined");
+        en_gb.setProperty("log_user_leave_title", "User left");
+
+        en_gb.setProperty("log_role_add_title", "User received role(s)");
+        en_gb.setProperty("log_role_remove_title", "User got role(s) removed");
+
+        en_gb.setProperty("log_msg_delete_title", "Message deleted");
+        en_gb.setProperty("log_msg_update_title", "Message updated");
+        en_gb.setProperty("log_msg_too_old_author", "Too old to fetch author name");
+        en_gb.setProperty("log_msg_too_old_content", "Too old to fetch previous content");
+        en_gb.setProperty("log_msg_old_content", "Old content");
+        en_gb.setProperty("log_msg_new_content", "New content");
+
+        en_gb.setProperty("log_user_unban_title", "User unbanned");
+        en_gb.setProperty("log_unbanned_user", "Unbanned User");
+        en_gb.setProperty("log_unbanned_user_id", "Unbanned User ID");
+
+        en_gb.setProperty("log_boost_count_title", "Boost count updated");
+        en_gb.setProperty("log_boost_tier_title", "Boost tier updated");
+        en_gb.setProperty("log_old_boost_count", "Old Boost Count");
+        en_gb.setProperty("log_new_boost_count", "New Boost Count");
+        en_gb.setProperty("log_changing_perks", "Changing Perks");
+        en_gb.setProperty("log_emote_slots", "Emote Slots");
+        en_gb.setProperty("log_max_bitrate", "Max Bitrate");
+
+        en_gb.setProperty("log_role_create_title", "Role created");
+        en_gb.setProperty("log_role_delete_title", "Role deleted");
+        en_gb.setProperty("log_role_name", "Role Name");
+
+        en_gb.setProperty("log_tc_create_title", "Text channel created");
+        en_gb.setProperty("log_tc_delete_title", "Text channel deleted");
+        en_gb.setProperty("log_tc_name", "Text Channel Name");
+
+        en_gb.setProperty("log_vc_join_title", "Voice channel joined");
+        en_gb.setProperty("log_vc_move_title", "Voice channel moved");
+        en_gb.setProperty("log_vc_leave_title", "Voice channel left");
+        en_gb.setProperty("log_vc_create_title", "Voice channel created");
+        en_gb.setProperty("log_vc_delete_title", "Voice channel deleted");
+        en_gb.setProperty("log_vc_name", "Voice Channel Name");
+
+        // MediaOnlyChannel
+        en_gb.setProperty("mediaonlychannel_warning", "%s, this is a media only channel!\n" +
+                "You are allowed to:\n" +
+                "- Send upload files with an optional description.\n" +
+                "- Post a valid url with an optional description.\n" +
+                "*This message will be deleted in 30 seconds.*");
+
+        // ReactionRole
+        en_gb.setProperty("reactionrole_insufficient", "Insufficient permissions or problem with hierarchy.");
+
+        // RemindMe
+        en_gb.setProperty("remindme_dm", "I counted your entry for [this](%s) reminder!");
+        en_gb.setProperty("remindme_dm_footer", "If there are more than 5000 reactions, the count may look scuffed, but I still counted you!");
+
+        // VoiceLobby
+        en_gb.setProperty("voicelobby_lobby", "Lobby");
+
+        ///////////////////////////////////// Features /////////////////////////////////////
+
+        // Achievement
+        en_gb.setProperty("achievement_console", "Console");
         en_gb.setProperty("achievement_excalibur", "Excalibur");
         en_gb.setProperty("achievement_unlimited_blade_works", "Unlimited Blade Works");
         en_gb.setProperty("achievement_gae_bolg", "The Legend of Lancer");
@@ -45,1069 +699,36 @@ public class LanguageFile {
         en_gb.setProperty("achievement_xmas", "Xmas Time");
         en_gb.setProperty("achievement_padoru", "Padoru Padoruu");
 
-        /// Invite
+        // EasterEggs
+        en_gb.setProperty("eastereggs_you_are_welcome", "You're welcome %s");
+
+        // Invite
         en_gb.setProperty("invite_author", "%s, at your service!");
         en_gb.setProperty("invite_description", "Thank you for choosing me to assist you and your server.\n" +
-                "I have a lot of features. Most of them are enabled by default but some of them are not.\n" +
-                "Type `%stoggle all show` to check the status of all available features.\n" +
-                "Then you can enable/disable the features to your desire.\n" +
+                "I have a lot of features. Most of them are enabled by default but some of them are not (e.g. the leveling system).\n" +
+                "For the start, I recommend to check out the [website](%s). There you will find a detailed help to all commands as well as a dashboard, where you can set up and toggle everything.\n" +
                 "\n" +
-                "To get started, I recommend you to use my `%shelp` command.\n" +
-                "To get detailed help, you simply can type the command name without any arguments. E.g. `%savatar`\n" +
-                "Alternatively you can visit [the website](https://servant.tanc.red) which has a list of all commands and an FAQ.\n" +
-                "\n" +
-                "If you need further help, you can join my support server or contact my creator directly.\n" +
-                "Support Server: [Join Servant's Kingdom](https://%s)\n" +
-                "Creator Name: %s#%s\n" +
-                "Email: `servant@tanc.red`\n" +
+                "Support Server: [Click here to join](%s)\n" +
                 "\n" +
                 "Have fun!");
         en_gb.setProperty("invite_footer", "You are receiving this message, because someone invited me to your server (%s).");
 
-        /// Kick
-        en_gb.setProperty("kick_author", "Farewell!");
-        en_gb.setProperty("kick_description", "It's very sad to hear, that you don't need me anymore.\n" +
-                "If there is anything to improve, I am always open for feedback.\n" +
-                "\n" +
-                "To submit feedback, you can join my support server or contact my creator directly.\n" +
-                "Support Server: [Join Servant's Kingdom](https://%s)\n" +
-                "Creator Name: %s#%s\n" +
-                "Email: `servant@tanc.red`\n");
-        en_gb.setProperty("kick_footer", "You are receiving this message, because someone kicked me from your server (%s) or your server was deleted.");
-
-        /// Patreon Handler
-        en_gb.setProperty("patreon_warning", "You have to be a %s to use this feature!");
-
-        /// Presence
+        // Presence
         en_gb.setProperty("presence_0", "v%s | %shelp");
-        en_gb.setProperty("presence_1", "%s masters | %shelp");
+        en_gb.setProperty("presence_1", "%s users | %shelp");
         en_gb.setProperty("presence_2", "%s servers | %shelp");
-        en_gb.setProperty("presence_3", "%spatreon | %shelp");
-        en_gb.setProperty("presence_4", "https://servant.tanc.red");
+        en_gb.setProperty("presence_3", "%ssupporter | %shelp");
+        en_gb.setProperty("presence_4", "DASHBOARD: %s");
         en_gb.setProperty("presence_5", "#StayAtHome | %shelp");
+        en_gb.setProperty("presence_6", "#BLM | %shelp");
 
-        // Owner
-        /// Add Gif
-        en_gb.setProperty("addgif_description", "This is a command to add gifs for the interaction commands.");
-        en_gb.setProperty("addgif_usage", "**Add a gif**\n" +
-                "Command: `%s%s [interaction] [gifUrl]`\n" +
-                "Example: `%s%s slap https://i.imgur.com/bbXmAx2.gif`\n");
-        en_gb.setProperty("addgif_hint", "Image url has to be a [direct link](https://www.urbandictionary.com/define.php?term=direct%20link).");
-        en_gb.setProperty("addgif_args", "2 arguments are needed.\n... [interaction] [gifUrl]");
-        en_gb.setProperty("addgif_interaction", "Invalid interaction.");
-        en_gb.setProperty("addgif_direct_link", "Not a valid gif url. It has to be a direct link!");
+        // Supporter
+        en_gb.setProperty("supporter_dono", "%s just donated some money via PayPal.\nThey are now a supporter!");
+        en_gb.setProperty("supporter_patron", "%s just became a Patron.\nThey are now a supporter!");
+        en_gb.setProperty("supporter_boost", "%s just boosted the server.\nThey are now a supporter!");
 
-        /// Blacklist
-        en_gb.setProperty("blacklist_missingid", "Add an ID");
-        en_gb.setProperty("blacklist_empty", "No blacklisted ID's.");
-
-        /// Server List
-        en_gb.setProperty("guildlist_members", "Members");
-        en_gb.setProperty("guildlist_connected", " Servers that **%s** is connected to");
-        en_gb.setProperty("blacklist_empty", "No blacklisted ID's.");
-
-        // Moderation
-        /// Auto Role
-        en_gb.setProperty("autorole_description", "This role will be automatically given to any new member.");
-        en_gb.setProperty("autorole_usage", "**Setting up an autorole**\n" +
-                "Command: `%s%s set [@role] [optinal delay]`\n" +
-                "Example 1: `%s%s set @Member`\n" +
-                "Example 2: `%s%s set @Member 10` - Role after 10 minutes.\n" +
-                "\n" +
-                "**Unsetting the autorole**\n" +
-                "Command: `%s%s unset`\n" +
-                "\n" +
-                "**Showing current autorole**\n" +
-                "Command: `%s%s show`");
-        en_gb.setProperty("autorole_hint", "Pinging the role on setup, will also ping anyone with this role.\n" +
-                "Execute the command in a hidden channel to prevent pinging many people.");
-        en_gb.setProperty("autorole_no_role", "You did not provide a role.");
-        en_gb.setProperty("autorole_missing", "No autorole was set.");
-        en_gb.setProperty("autorole_no_current", "There is no current autorole.");
-        en_gb.setProperty("autorole_current", "The current autorole is: %s (%s) with a delay of %s minutes.");
-        en_gb.setProperty("autorole_first_arg", "Invalid first argument.\nEither `set`, `unset` or `show`");
-
-        /// Birthday
-        en_gb.setProperty("birthday_description", "Manage the birthdays on this server:\n" +
-                "- Members can add their birthday to the list.\n" +
-                "- Members can remove their birthday from the list.\n" +
-                "- Members can create a one-time list of all birthdays of this server.\n" +
-                "- Moderators can set up a notification channel, where %s will post a Happy-Birthday-Message.\n" +
-                "- Moderators can create a list of all birthdays of this server, which will be updated regulary.\n" +
-                "- Moderators can add or remove %s's birthday.");
-        en_gb.setProperty("birthday_usage", "**Set notification channel**\n" +
-                "Command: `%s%s #channel`\n" +
-                "**Unset notification channel**\n" +
-                "Command: `%s%s unsetchannel`\n" +
-                "**Create an auto updating birthday list**\n" +
-                "Command: `%s%s updatelist`\n" +
-                "**Set birthday**\n" +
-                "Command: `%s%s yyyy-MM-dd`\n" +
-                "Example: `%s%s 1990-12-31`\n" +
-                "**Unset birthday**\n" +
-                "Command: `%s%s unsetbirthday`\n" +
-                "**Create a non-updating birthday list**\n" +
-                "Command: `%s%s list`\n" +
-                "**Add/Remove %s's birthday**\n" +
-                "Command: `%s%s %s`");
-        en_gb.setProperty("birthday_hint", "The commands have different required permissions.\n" +
-                "See description:\n" +
-                "- \"Members\": No permission required\n" +
-                "- \"Moderators\": Manage Channels");
-        en_gb.setProperty("birthday_countdown", "Countdown");
-        en_gb.setProperty("birthday_countdown_value", "in %s days");
-        en_gb.setProperty("birthday_date", "Date");
-        en_gb.setProperty("birthday_name", "Name");
-        en_gb.setProperty("birthday_missing", "No birthdays were set.");
-        en_gb.setProperty("birthday_guild", "%s birthdays");
-        en_gb.setProperty("birthday_as_of", "As of");
-        en_gb.setProperty("birthday_gratulation", "Happy Birthday %s!");
-        en_gb.setProperty("birthday_not_set", "You never set a birthday.");
-        en_gb.setProperty("birthday_invalid", "Invalid argument.\n" +
-                "Mods can...\n" +
-                "... mention a channel to set up the notification channel.\n" +
-                "... type `unsetchannel` to unset the notification channel.\n" +
-                "... type `updatelist` to create a list of all birthdays, that will update itself every day.\n" +
-                "Users can...\n" +
-                "... enter their birthday (yyyy-MM-dd) to enter the birthday list.\n" +
-                "... type `unsetbirthday` to leave the birthday list.\n" +
-                "... type `list` to create a list of all birthdays, that shows the current state, but does not update itself.");
-        en_gb.setProperty("birthday_howtoadd", "Add your birthday with `!birthday 1990-12-31`");
-
-        /// Best of's
-        en_gb.setProperty("bestof_usage", "**Set up vote-emote/emoji**\n" +
-                "Command: `%s%s [emoji or emote]`\n" +
-                "Example (Emoji): `%s%s ⭐`\n" +
-                "Example (Emote): `%s%s` %s\n" +
-                "\n" +
-                "**Set up best of channel**\n" +
-                "Command: `%s%s #channel`\n" +
-                "\n" +
-                "**Set up a number of people that have to vote**\n" +
-                "Command: `%s%s [number]`\n" +
-                "Example: `%s%s 10`\n" +
-                "\n" +
-                "**Set up a percentage of online members that have to vote**\n" +
-                "Command: `%s%s [percentage]%s`\n" +
-                "Example: `%s%s 50%s`\n" +
-                "\n" +
-                "**Show current set up**\n" +
-                "Command: `%s%s show`");
-        en_gb.setProperty("bestof_hint", "Setting up both number and percentage has a big advantage:\n" +
-                "- As your sever is growing it is nice to have a percentage based amount of online members that have to vote.\n" +
-                "- But at night, there may be just a few members who could abuse this, so you can set up a minimum number of votes.");
-        en_gb.setProperty("bestof_emote", "Emote/Emoji");
-        en_gb.setProperty("bestof_noemote", "No emote/emoji set");
-        en_gb.setProperty("bestof_number", "Number");
-        en_gb.setProperty("bestof_nonumber", "No number set");
-        en_gb.setProperty("bestof_percentage", "Percentage");
-        en_gb.setProperty("bestof_nopercentage", "No percentage set");
-        en_gb.setProperty("bestof_channel", "Channel");
-        en_gb.setProperty("bestof_nochannel", "No channel set");
-        en_gb.setProperty("bestof_numbertoobig", "This number is way too big!");
-        en_gb.setProperty("bestof_invalidpercentage", "This percentage is invalid.");
-        en_gb.setProperty("bestof_invalidemote", "I cannot find that emote! Make sure I have access to it!");
-        en_gb.setProperty("bestof_invalidemoji", "Invalid emoji, master!");
-        en_gb.setProperty("bestof_jump", "Click here to jump to original message.");
-        en_gb.setProperty("bestof_footer", "%s votes | #%s");
-
-        /// Best of Image
-        en_gb.setProperty("bestofimage_description", "Users can vote images that will be posted in a best of channel.\n" +
-                "You can set up the vote-emote/emoji, the best of channel and the amount of people that have to vote (fix number and/or percentage of online users).");
-        en_gb.setProperty("bestofimage_setup", "Best Of Image Setup");
-
-        /// Best of Quote
-        en_gb.setProperty("bestofquote_description", "Users can vote messages that will be posted in a best of channel.\n" +
-                "You can set up the vote-emote/emoji, the best of channel and the amount of people that have to vote (fix number and/or percentage of online users).");
-        en_gb.setProperty("bestofquote_setup", "Best Of Quote Setup");
-
-        /// Clear
-        en_gb.setProperty("clear_description", "Deletes up to 100 messages.\n" +
-                "Can delete user specific messages from the past 100 messages.\n" +
-                "Messages older than two weeks cannot be deleted because of Discord's restrictions.");
-        en_gb.setProperty("clear_usage", "**Delete some messages**\n" +
-                "Command: `%s%s [1 - 100 OR @user]`\n" +
-                "Example 1: `%s%s 50`\n" +
-                "Example 2: `%s%s @name");
-        en_gb.setProperty("clear_hint", "The range is inclusively, so you can also delete just 1 or a total of 100 messages.");
-        en_gb.setProperty("clear_input", "You only can put in numbers or a user mention!");
-        en_gb.setProperty("clear_sub_one", "Input cannot be lower than 1.");
-        en_gb.setProperty("clear_cleared", "%s messages cleared");
-        en_gb.setProperty("clear_invalid", "Your input is invalid. Try a smaller number.");
-
-        /// Join + Leave general
-        en_gb.setProperty("joinleave_nochannel_mention", "No channel was mentioned.");
-        en_gb.setProperty("joinleave_unset_fail", "No channel was set yet.");
-        en_gb.setProperty("joinleave_nochannel_set", "No channel is set.");
-        en_gb.setProperty("joinleave_current", "Current channel: %s");
-        en_gb.setProperty("joinleave_firstarg", "Either `set`, `unset` or `show`");
-
-        /// Join
-        en_gb.setProperty("join_description", "The bot will post a notification once a user joins the server.");
-        en_gb.setProperty("join_usage", "**Setting up a join notification channel**\n" +
-                "Command: `%s%s set [#channel]`\n" +
-                "Example: `%s%s set #welcome`\n" +
-                "\n" +
-                "**Unsetting this channel**\n" +
-                "Command: `%s%s unset`\n" +
-                "\n" +
-                "**Showing current notification channel**\n" +
-                "Command: `%s%s show`");
-        en_gb.setProperty("join_hint", "Shows a message like \"Name#1234 just joined Servername!\"");
-        en_gb.setProperty("join_author", "Welcome %s#%s to %s");
-        en_gb.setProperty("join_embeddescription", "Enjoy your stay!");
-        en_gb.setProperty("join_footer", "Joined at");
-
-        /// Leave
-        en_gb.setProperty("leave_description", "The bot will post a notification once a user leaves the server.");
-        en_gb.setProperty("leave_usage", "**Setting up a leave notification channel**\n" +
-                "Command: `%s%s set [#channel]`\n" +
-                "Example: `%s%s set #welcome`\n" +
-                "\n" +
-                "**Unsetting this channel**\n" +
-                "Command: `%s%s unset`\n" +
-                "\n" +
-                "**Showing current notification channel**\n" +
-                "Command: `%s%s show`");
-        en_gb.setProperty("leave_hint", "Shows a message like \"Name#1234 just left Servername!\"");
-        en_gb.setProperty("leave_left", "%s#%s just left %s!");
-        en_gb.setProperty("leave_author", "Farewell %s#%s");
-        en_gb.setProperty("leave_embeddescription", "We are sorry to see you go!");
-        en_gb.setProperty("leave_footer", "Left at");
-
-        /// Level Role
-        en_gb.setProperty("levelrole_description", "Set up roles that are assigned if a member hits a certain level.");
-        en_gb.setProperty("levelrole_usage", "**Set up a role**\n" +
-                "- Command: `%s%s set [level] @role`\n" +
-                "- Example: `%s%s set 10 @SuperMember`\n" +
-                "\n" +
-                "**Unset a role**\n" +
-                "- Command: `%s%s unset [level] @role`\n" +
-                "- Example: `%s%s unset 10 @SuperMember`\n" +
-                "\n" +
-                "**Show current levelroles**\n" +
-                "- Command: `%s%s show`\n" +
-                "\n" +
-                "**Refresh**\n" +
-                "- Command: `%s%s refresh`");
-        en_gb.setProperty("levelrole_hint", "You can set up multiple roles for one level.\n" +
-                "With refresh, you can reassign the roles to the members in case they somehow didn't get it. This does not remove any roles.");
-        en_gb.setProperty("levelrole_missing", "You have to provide a level and mention a role.");
-        en_gb.setProperty("levelrole_invalidlevel", "Invalid level.");
-        en_gb.setProperty("levelrole_levelrole", "Level Role");
-        en_gb.setProperty("levelrole_empty", "No level roles set up.");
-        en_gb.setProperty("levelrole_current", "Current Level Roles");
-        en_gb.setProperty("levelrole_alreadyset", "This role was already set for this level.");
-        en_gb.setProperty("levelrole_role_singular", "You also gained following role:");
-        en_gb.setProperty("levelrole_role_plural", "You also gained following roles:");
-        en_gb.setProperty("levelrole_levelup", "LEVEL UP");
-        en_gb.setProperty("level_missingpermission_embed", "I don't have the permission to create embeds (Embed Links), that's why you see the budget level up announcement.");
-        en_gb.setProperty("level_hierarchy", "Couldn't add role \"%s\", because they are higher than me in hierarchy.");
-
-        /// Livestream
-        en_gb.setProperty("livestream_description", "You can set up streamers, one stream notification channel and one streamer role.\n" +
-                "Once a streamer goes online, a notification **with** @here will be posted and the streamer will receive the set role.\n" +
-                "If you toggle the streamer mode `off`, a notification **without** @here will be posted and the member will receive the set role.");
-        en_gb.setProperty("livestream_usage", "**(Un)setting a streamer**\n" +
-                "Set: `%s%s set @user`\n" +
-                "Unset: `%s%s unset @user`\n" +
-                "\n" +
-                "**(Un)setting the notification channel**\n" +
-                "Set: `%s%s set #channel`\n" +
-                "Unset: `%s%s unset #channel`\n" +
-                "\n" +
-                "**(Un)settings the streaming role**\n" +
-                "Set: `%s%s set @role`\n" +
-                "Unset: `%s%s unset @role`\n" +
-                "\n" +
-                "**Toggle streamer mode**\n" +
-                "Command: `%s%s toggle`\n" +
-                "\n" +
-                "**Showing current stream settings**\n" +
-                "Command: `%s%s show`");
-        en_gb.setProperty("livestream_hint", "Streamer Mode: Only set up streamers will get notifications and roles.\n" +
-                "Public Mode: Anyone will get notifications and roles.");
-        en_gb.setProperty("livestream_missingmention", "You didn't mention a channel, user nor role.");
-        en_gb.setProperty("livestream_toomanymentions", "You mentioned too much. One at a time!");
-        en_gb.setProperty("livestream_nochannel", "There was no channel set.");
-        en_gb.setProperty("livestream_nostreamer", "This user is not a streamer.");
-        en_gb.setProperty("livestream_norole", "This role was not set.");
-        en_gb.setProperty("livestream_firstarg", "Either `set`, `unset` or `show`");
-        en_gb.setProperty("livestream_settings", "Livetream Settings");
-        en_gb.setProperty("livestream_notificationchannel", "Notification Channel");
-        en_gb.setProperty("livestream_role", "Livestreaming Role");
-        en_gb.setProperty("livestream_mode", "Streamer Mode");
-        en_gb.setProperty("livestream_streamers", "Streamers");
-        en_gb.setProperty("livestream_nochannelset", "No channel set");
-        en_gb.setProperty("livestream_noroleset", "No role set");
-        en_gb.setProperty("livestream_publicmode", "Public Mode");
-        en_gb.setProperty("livestream_nostreamersset", "No streamers set");
-        en_gb.setProperty("livestream_announcement_title", "Livestream!");
-        en_gb.setProperty("livestream_announcement", "%s just went live on [Twitch (click me)](%s)!");
-        en_gb.setProperty("livestream_announcement_game", "Streaming %s");
-
-        /// Log
-        en_gb.setProperty("log_description", "Log stuff that happens in your server.");
-        en_gb.setProperty("log_usage", "**Set/update the log channel**\n" +
-                "Command: `%s%s set [#channel]`\n" +
-                "Example: `%s%s set #log`\n" +
-                "\n" +
-                "**Unset the log** (This will delete all log settings)\n" +
-                "Command: `%s%s unset`\n" +
-                "\n" +
-                "**Show current log settings**\n" +
-                "Command: `%s%s show`\n" +
-                "\n" +
-                "**Toggle event status**\n" +
-                "Command: `%s%s toggle [event name]`\n" +
-                "Example: `%s%s toggle role_add`");
-        en_gb.setProperty("log_hint", "Full list of event names:\n" +
-                "* boost_count\n" +
-                "* member_join\n" +
-                "* member_leave\n" +
-                "* role_add\n" +
-                "* role_remove");
-        en_gb.setProperty("log_invalidmention", "You have to mention a channel.");
-        en_gb.setProperty("log_unset", "There is nothing to unset.");
-        en_gb.setProperty("log_settings", "Log Settings");
-        en_gb.setProperty("log_channel", "Log Channel");
-        en_gb.setProperty("log_events", "Events");
-        en_gb.setProperty("log_on", "On");
-        en_gb.setProperty("log_off", "Off");
-        en_gb.setProperty("log_boost_count_title", "Boost Count Update");
-        en_gb.setProperty("log_boost_count_description", "New boost count: %s");
-        en_gb.setProperty("log_member_join_title", "Member Joined");
-        en_gb.setProperty("log_member_join_description", "%s just joined.");
-        en_gb.setProperty("log_member_leave_title", "Member Left");
-        en_gb.setProperty("log_member_leave_description", "%s just left.");
-        en_gb.setProperty("log_role_add_title", "Role(s) Add");
-        en_gb.setProperty("log_role_add_description", "%s just received following role(s): %s");
-        en_gb.setProperty("log_role_remove_title", "Role(s) Remove");
-        en_gb.setProperty("log_role_remove_description", "%s just got following role(s) removed: %s");
-        en_gb.setProperty("log_toggle_args", "You have to state which event to toggle. Use `%s%s show` for a complete list.");
-        en_gb.setProperty("log_toggle_invalid_args", "You have to state a valid event. Use `%s%s show` for a complete list.");
-
-        /// Media Only Channel
-        en_gb.setProperty("mediaonlychannel_description", "If a member writes a normal message into a text channel that is marked as mediaonlychannel, the message will be removed and a warning will be posted.\n" +
-                "Members only can post links or upload files.\n" +
-                "This can be very handy for e.g. a memes channel.");
-        en_gb.setProperty("mediaonlychannel_usage", "**Setting up an media only channel**\n" +
-                "Command: `%s%s set [#channel]`\n" +
-                "Example: `%s%s set #images`\n" +
-                "\n" +
-                "**Unsetting an media only channel**\n" +
-                "Command: `%s%sunset [#channel]`\n" +
-                "Example: `%s%s unset #images`\n" +
-                "\n" +
-                "**Showing current media only channels**\n" +
-                "Command: `%s%s show`");
-        en_gb.setProperty("mediaonlychannel_hint", "You can have multiple media only channels.");
-        en_gb.setProperty("mediaonlychannel_missingmention", "You did not provide a channel mention.");
-        en_gb.setProperty("mediaonlychannel_invalidchannel", "The given channel is invalid.");
-        en_gb.setProperty("mediaonlychannel_unset_fail", "This channel was not set as an media only channel.");
-        en_gb.setProperty("mediaonlychannel_nochannels", "There are no media only channels.");
-        en_gb.setProperty("mediaonlychannel_firstarg", "Invalid first argument.\nEither `set`, `unset` or `show`");
-        en_gb.setProperty("mediaonlychannel_warning", "%s, this is a media only channel!\n" +
-                "You are allowed to:\n" +
-                "- Send upload files with an optional description.\n" +
-                "- Post a valid url with an optional description.\n" +
-                "*This message will be deleted in 30 seconds.*");
-        en_gb.setProperty("mediaonlychannel_alreadyset", "This channel was already set.");
-
-        /// Reaction Role
-        en_gb.setProperty("reactionrole_description", "You can add reaction to a message via this command. Once a member clicks on the corresponding reaction, he will get the designated role\n" +
-                "This allows you easy role management via reactions.");
-        en_gb.setProperty("reactionrole_usage", "**Set up a reaction to manage user roles**\n" +
-                "Command: `%s%s set [#channel | channel ID] [message ID] [emoji/emote] [@role | role ID]`\n" +
-                "Example: %s%s set #test-channel 999999999999999999 %s @role\n" +
-                "\n" +
-                "**Unset a reaction role**\n" +
-                "Command: `%s%s unset [#channel | channel ID] [message Id] [emoji/emote]`\n" +
-                "Example: %s%s unset #test-channel 999999999999999999 %s");
-        en_gb.setProperty("reactionrole_hint", "**How to get ID's:**\n" +
-                "Possibility 1: Post in chat: `\\@role`, `\\#channel`, etc. - THIS ALSO PINGS. Maybe do this is a non public channel.\n" +
-                "Possibility 2:\n" +
-                "- Discord Settings → Appearance → ADVANCED → Enable Developer Mode\n" +
-                "- Rightclick on channel, role, etc. → Copy ID");
-        en_gb.setProperty("reactionrole_toofewargs", "Too few arguments. You have to declare the channel ID, message ID, an emoji or emote and a role mention or role ID behind `set`.");
-        en_gb.setProperty("reactionrole_alreadyset", "This emoji or emote was already set. Unset first if you want to update the emoji or emote.");
-        en_gb.setProperty("reactionrole_notset", "This emoji or emote was not set.");
-        en_gb.setProperty("reactionrole_firstarg", "Either `set` or `unset` a reaction.");
-        en_gb.setProperty("reactionrole_insufficient", "Insufficient permissions or problem with hierarchy.");
-        en_gb.setProperty("reactionrole_invalidmessageid", "Invalid message ID.");
-        en_gb.setProperty("reactionrole_unavailable_emote", "The given emote is unavailable in the current channel.");
-
-        /// Role
-        en_gb.setProperty("role_description", "Assing or remove roles from members.");
-        en_gb.setProperty("role_usage", "Command: `%s%s @user [roleName]`\n" +
-                "Example: `%s%s @name member`");
-        en_gb.setProperty("role_hint", "I will remove the role if the member already has it and provide it if the member doesn't have it already.");
-        en_gb.setProperty("role_missing", "Missing role name.");
-        en_gb.setProperty("role_notfound", "Sorry, master! I couldn't find a role with that name.");
-        en_gb.setProperty("role_missingrolename", "Please also provide the role name.");
-        en_gb.setProperty("role_cantinteract", "I cannot interact with that user! (Check permissions)");
-
-        /// Server
-        en_gb.setProperty("server_description", "With this command you can personalize the bot to your server's desire.");
-        en_gb.setProperty("server_usage", "**Setting an offset**\n" +
-                "Command: `%s%s set offset [offset]`\n" +
-                "Example: `%s%s set offset +01:00`\n" +
-                "\n" +
-                "**Unsetting the offset**\n" +
-                "Command: `%s%s unset offset`\n" +
-                "\n" +
-                "**Setting an server specific prefix**\n" +
-                "Command: `%s%s set prefix [prefix]`\n" +
-                "Example: `%s%s set prefix -`\n" +
-                "\n" +
-                "**Unsettings the prefix**\n" +
-                "Command: `%s%s unset prefix`\n" +
-                "\n" +
-                "**Setting a language**\n" +
-                "Command: `%s%s set language [language code]`\n" +
-                "Example: `%s%s set language de_de`\n" +
-                "\n" +
-                "**Unsettings the language**\n" +
-                "Command: `%s%s unset language`\n" +
-                "\n" +
-                "**Show your current settings**\n" +
-                "Command: `%s%s show`");
-        en_gb.setProperty("server_hint", "Unsetting an offset will just remove your custom offset and you will use the default offset (%s) again.\n" +
-                "Offset always adds on UTC.\n" +
-                "Unsettings the prefix, recovers the default bot prefix (%s)\n\n" +
-                "Current available languages:\n" +
-                "- en_gb - English (British)\n" +
-                "- de_de - German (Deutsch)");
-        en_gb.setProperty("server_args_set", "To set a setting, there have to be 3 arguments.\n" +
-                "... set [setting] [value]");
-        en_gb.setProperty("server_offset", "Invalid offset.");
-        en_gb.setProperty("server_prefix", "Invalid prefix.");
-        en_gb.setProperty("server_language", "Invalid language.");
-        en_gb.setProperty("server_invalidsetting", "This setting does not exist.");
-        en_gb.setProperty("server_args_unset", "To unset a setting, there have to be 2 arguments.\n" +
-                "... unset [setting]");
-        en_gb.setProperty("server_offset_text", "Offset");
-        en_gb.setProperty("server_prefix_text", "Prefix");
-        en_gb.setProperty("server_language_text", "Language");
-        en_gb.setProperty("server_settings", "Server Settings");
-        en_gb.setProperty("server_firstarg", "The first argument has to be either `set`, `unset` or `show`.");
-
-        /// Server Setup
-        en_gb.setProperty("setupwizard_introduction", "Welcome to the server setup wizard!\n" +
-                "After doing this, you have all (3) base settings set up and we are ready to go!\n" +
-                "On each question you have 15 minutes to answer, otherwise this setup will time out.\n" +
-                "Do you want to start?");
-        en_gb.setProperty("setupwizard_timeout", "The setup wizard timed out.");
-        en_gb.setProperty("setupwizard_language", "Please state in what language you want me to speak in.\n" +
-                "Currently available languages:\n" +
-                "   \u200B⤷ `en_gb` - English (British)\n" +
-                "   \u200B⤷ `de_de` - German (Deutsch)\n" +
-                "**Provide the language code:**");
-        en_gb.setProperty("setupwizard_language_repeated", "This language is not available.\n" +
-                "Currently available languages:\n" +
-                "   \u200B⤷ `en_gb` - English (British)\n" +
-                "   \u200B⤷ `de_de` - German (Deutsch)\n" +
-                "**Try again:**");
-        en_gb.setProperty("setupwizard_prefix", "%s Language set.\n" +
-                "Please provide a prefix you want to use.\n" +
-                "If you don't want to change the prefix, just type `%s`:");
-        en_gb.setProperty("setupwizard_prefix_repeated", "This prefix is not suitable.\n" +
-                "If you don't want to change the prefix, just type `%s`\n" +
-                "Try again:");
-        en_gb.setProperty("setupwizard_offset", "%s Prefix set.\n" +
-                "Please provide an offset to UTC to represent your timezone.\n" +
-                "The format is: `+HH:mm` or `-HH:mm`. E.g. `+01:00`\n" +
-                "To use UTC/GMT, just type `00:00`:");
-        en_gb.setProperty("setupwizard_offset_repeated", "This offset is invalid.\n" +
-                "The format is: `+HH:mm` or `-HH:mm`. E.g. `+01:00`\n" +
-                "To use UTC/GMT, just type `00:00`\n" +
-                "Try again:");
-        en_gb.setProperty("setupwizard_done", "We are done :)");
-
-        /// Toggle
-        en_gb.setProperty("toggle_description", "You can toggle almost every feature on or off.\n" +
-                "The level-feature is off by default in case you want to use it.\n" +
-                "To check what features are toggleable, just use `%s%s all show`");
-        en_gb.setProperty("toggle_usage", "**Manage one feature**\n" +
-                "Command: `%s%s [feature] [on|off|show]`\n" +
-                "Example 1: `%s%s level on`\n" +
-                "Example 2: `%s%s level off`\n" +
-                "Example 3: `%s%s level show`\n" +
-                "\n" +
-                "**Manage all features**\n" +
-                "Command: `%s%s all [on|off|show]`\n" +
-                "Example 1: `%s%s all on`\n" +
-                "Example 2: `%s%s all off`\n" +
-                "Example 3: `%s%s all show`\n");
-        en_gb.setProperty("toggle_hint", "Be careful with toggling all features on or off, as you may delete your perfect setup.\n" +
-                "You may write `everything` instead of `all`.\n" +
-                "You may write `status` instead of `show`.\n" +
-                "Show will only show the current status without changing any values.");
-        en_gb.setProperty("toggle_args", "Too few arguments.\n" +
-                "toggle [feature] [on|off|show]\n" +
-                "e.g.: toggle level off");
-        en_gb.setProperty("toggle_invalid_feature", "Invalid feature.");
-        en_gb.setProperty("toggle_invalid_argument", "Argument has to be `on`, `off` or `show`.");
-
-        /// User
-        en_gb.setProperty("user_description", "With this command you can personalize the bot to your desire.");
-        en_gb.setProperty("user_usage", "**Setting an offset**\n" +
-                "Command: `%s%s set offset [offset]`\n" +
-                "Example: `%s%s set offset +02:00`\n" +
-                "\n" +
-                "**Unsetting the offset**\n" +
-                "Command: `%s%s unset offset`\n" +
-                "\n" +
-                "**Setting a prefix**\n" +
-                "Command: `%s%s set prefix [prefix]`\n" +
-                "Example: `%s%s set prefix -`\n" +
-                "\n" +
-                "**Unsetting the prefix**\n" +
-                "Command: `%s%s unset prefix`\n" +
-                "\n" +
-                "**Setting a language**\n" +
-                "Command: `%s%s set language [language code]`\n" +
-                "Example: `%s%s set language de_de`\n" +
-                "\n" +
-                "**Unsetting the language**\n" +
-                "Command: `%s%s unset language`\n" +
-                "\n" +
-                "**Hide yourself from stream highlighting**\n" +
-                "Command: `%s%s streamhide [opt. server ID]`\n" +
-                "\n" +
-                "**Setting an embed colour**\n" +
-                "Command: `%s%s set colour [color code]`\n" +
-                "Example: `%s%s set colour #FFFFFF`\n" +
-                "\n" +
-                "**Unsetting the embed colour**\n" +
-                "Command: `%s%s unset colour`\n" +
-                "\n" +
-                "**Show your current settings**\n" +
-                "Command: `%s%s show`");
-        en_gb.setProperty("user_hint", "You can set a custom embed colour. ($10 Patron)\n" +
-                "An embed colour is the colour you can see right know on the left of this text field thingy.\n" +
-                "Settings like offset, prefix and language only work in DM's. For server settings please refer to `%sserver`." +
-                "Available languages:\n" +
-                "- en_gb - English (British)\n" +
-                "- de_de - German (Deutsch)\n" +
-                "You can hide yourself from being highlighted with streaming role while streaming (server specific).");
-        en_gb.setProperty("user_streamhide_description", "You have to use this in a server to specify what server you want to be muted on.\n" +
-                "If you want to do this secretly, you can also provide a server ID:\n" +
-                "Command: `%s%s streamhide [server ID]`\n" +
-                "Example: `%s%s streamhide 99999999999999999`");
-        en_gb.setProperty("user_streamhide_hidden", "You are now hidden!");
-        en_gb.setProperty("user_streamhide_visible", "You are now visible!");
-        en_gb.setProperty("user_args_set", "To set a setting, there have to be 3 arguments.\n" +
-                "... set [setting] [value]");
-        en_gb.setProperty("user_invalidcolor", "The given colour code is invalid.");
-        en_gb.setProperty("user_invalidsetting", "This setting does not exist.");
-        en_gb.setProperty("user_args_unset", "To unset a setting, there have to be 2 arguments.\n" +
-                        "... unset [setting]");
-        en_gb.setProperty("user_unset_fail", "Nothing to unset.");
-        en_gb.setProperty("user_color_text", "Color");
-        en_gb.setProperty("user_prefix_text", "Prefix");
-        en_gb.setProperty("user_offset_text", "Offset");
-        en_gb.setProperty("user_language_text", "Language");
-        en_gb.setProperty("user_noservers", "No servers");
-        en_gb.setProperty("user_streamhideservers", "Stream Hide Servers");
-        en_gb.setProperty("user_settings", "User Settings");
-        en_gb.setProperty("user_firstarg", "The first argument has to be either `set`, `unset` or `show`.");
-
-        /// Voice Lobby
-        en_gb.setProperty("voicelobby_description", "If a member joins an voice channel that is marked as lobby, a copy of this voice channel will be made.\n" +
-                "Then the member will be moved into this new voice channel.\n" +
-                "Once everyone left the new channel, it will be deleted automatically.\n" +
-                "This will save you a lot of space from unused voice channels.");
-        en_gb.setProperty("voicelobby_usage", "**Set a voice channel lobby**\n" +
-                "Command: `%s%s set [Voice Channel ID]`\n" +
-                "Example: `%s%s set 999999999999999999`\n" +
-                "\n" +
-                "**Unset a voice channel lobby**\n" +
-                "Command: `%s%s unset [Voice Channel ID]`\n" +
-                "Example: `%s%s unset 999999999999999999`\n" +
-                "\n" +
-                "**Show current voice channel lobbies**\n" +
-                "Command: `%s%s show`");
-        en_gb.setProperty("voicelobby_hint", "**How to get ID's:**\n" +
-                "1. Activate Discord Developer Mode: User Settings → Appearance → ADVANCED → Developer Mode\n" +
-                "2. Rightclick voice channel → Copy ID");
-        en_gb.setProperty("voicelobby_missingid", "Too few arguments. Please provide a voice channel ID.");
-        en_gb.setProperty("voicelobby_invalidid", "Invalid voice channel ID.");
-        en_gb.setProperty("voicelobby_unset_fail", "Nothing to unset.");
-        en_gb.setProperty("voicelobby_noneset", "No lobbies set!");
-        en_gb.setProperty("voicelobby_current", "Current Lobbies");
-        en_gb.setProperty("voicelobby_footer", "Type `%slobby` to get help.");
-        en_gb.setProperty("voicelobby_firstarg", "Invalid argument. Either `set`, `unset` or `show`.");
-        en_gb.setProperty("voicelobby_already_set", "This channel was already set as an voice lobby.");
-
-        // Information
-        /// Bot Info
-        en_gb.setProperty("botinfo_authorname", "%s - Info");
-        en_gb.setProperty("botinfo_description", "Greetings master! I am %s, your multifunctional Discord bot.\n\n" +
-                "I will help you to moderate, organize and entertain your Discord server by providing over 50 unique features. You can now go from a standard Discord server to a premium one!\n\n" +
-                "[Visit the Website to see all the commands and more detailed information!](https://servant.tanc.red)");
-        en_gb.setProperty("botinfo_links_name", "Links");
-        en_gb.setProperty("botinfo_links_value", "Get The Bot: [Invite Servant](https://inviteservant.tanc.red)\n" +
-                "Get Support: [Join Servant's Kingdom](https://servantskingdom.tanc.red)");
-        en_gb.setProperty("botinfo_stats", "Statistics");
-        en_gb.setProperty("botinfo_users", "Users");
-        en_gb.setProperty("botinfo_channels", "Channels");
-        en_gb.setProperty("botinfo_shard", "This shard");
-        en_gb.setProperty("botinfo_restart", "Last restart");
-
-        /// Patreon
-        en_gb.setProperty("patreon_supportserver", "Support Servant");
-        en_gb.setProperty("patreon_description", "You can support Servant in three different ways:");
-        en_gb.setProperty("patreon_patreontitle", "Patreon");
-        en_gb.setProperty("patreon_subscription", "You can become a patron and support Servant with a monthly payment.\n" +
-                "Each patreon rank will have its own embed colour and profile background image.\n" +
-                "[Click here to get to the Patreon page.](https://www.patreon.com/tancred)");
-        en_gb.setProperty("patreon_$1", "✓ Caster Profile Background Image\n✓ Orange Embeds");
-        en_gb.setProperty("patreon_$3", "✓ Lancer Profile Background Image\n✓ Yellow Embeds");
-        en_gb.setProperty("patreon_$5", "✓ Archer Profile Background Image\n✓ Green Embeds");
-        en_gb.setProperty("patreon_$10", "✓ Saber Profile Background Image\n✓ Blue Embeds\n✓ Custom Colour Embeds");
-        en_gb.setProperty("patreon_donationtitle", "Donation");
-        en_gb.setProperty("patreon_donation", "You can send Servant a donation.\n" +
-                "Add your Discord Name#1234 into the donation message so I can see who sent the donation.\n" +
-                "[Click here to get to the PayPal.me donation page.](https://www.paypal.me/servantdiscord)\n");
-        en_gb.setProperty("patreon_donation_$5", "✓ Assassin Profile Image\n✓ Red Embeds");
-        en_gb.setProperty("patreon_serverboosttitle", "Server Boost");
-        en_gb.setProperty("patreon_serverboost", "You can boost Servant's Kingdom with Discord Nitro to unlock new Discord server perks.\n" +
-                "[Click here to join Servant's Kingdom](https://discord.gg/4GpaH5V)\n" +
-                "✓ Berserker Profile Image\n" +
-                "✓ Pink Embeds");
-        en_gb.setProperty("patreon_thanks", "Thanks to every supporter <3");
-
-        /// Server Info
-        en_gb.setProperty("serverinfo_owner", "Owner: %s");
-        en_gb.setProperty("serverinfo_name", "%s (ID: %s)");
-        en_gb.setProperty("serverinfo_region", "Region: %s");
-        en_gb.setProperty("serverinfo_textcount", "Text Channel Count");
-        en_gb.setProperty("serverinfo_voicecount", "Voice Channel Count");
-        en_gb.setProperty("serverinfo_membercount", "Member Count");
-        en_gb.setProperty("serverinfo_rolecount", "Role Count");
-        en_gb.setProperty("serverinfo_categorycount", "Category Count");
-        en_gb.setProperty("serverinfo_emotecount", "Emote Count");
-        en_gb.setProperty("serverinfo_afktimeout", "AFK Timeout");
-        en_gb.setProperty("serverinfo_timeout", "%s seconds");
-        en_gb.setProperty("serverinfo_afkchannel", "AFK Channel");
-        en_gb.setProperty("serverinfo_noafkchannel", "No AFK channel");
-        en_gb.setProperty("serverinfo_systemchannel", "System Channel");
-        en_gb.setProperty("serverinfo_nosystemchannel", "No system channel");
-        en_gb.setProperty("serverinfo_vanity", "Vanity Url");
-        en_gb.setProperty("serverinfo_novanity", "No vanity url");
-        en_gb.setProperty("serverinfo_mfa", "MFA Level");
-        en_gb.setProperty("serverinfo_explicit", "Explicit Content Level");
-        en_gb.setProperty("serverinfo_verification", "Verification Level");
-        en_gb.setProperty("serverinfo_botsettings", "**%s Settings:**");
-        en_gb.setProperty("serverinfo_prefix", "Prefix");
-        en_gb.setProperty("serverinfo_offset", "Offset");
-        en_gb.setProperty("serverinfo_language", "Language");
-        en_gb.setProperty("serverinfo_bdaychannel", "Birthday Channel");
-        en_gb.setProperty("serverinfo_nobdaychannel", "No birthday channel");
-        en_gb.setProperty("serverinfo_autorole", "Auto Role");
-        en_gb.setProperty("serverinfo_noautorole", "No Auto Role");
-        en_gb.setProperty("serverinfo_autorole_value", "%s\nAfter %s minutes");
-        en_gb.setProperty("serverinfo_livestream", "Livestream");
-        en_gb.setProperty("serverinfo_nolivestream_channel", "No livestream channel");
-        en_gb.setProperty("serverinfo_nolivestream_role", "No livestream role");
-        en_gb.setProperty("serverinfo_streamermode", "Streamer Mode");
-        en_gb.setProperty("serverinfo_publicmode", "Public Mode");
-        en_gb.setProperty("serverinfo_voicelobbies", "Voice Lobbies");
-        en_gb.setProperty("serverinfo_novoicelobbies", "No Voice Lobbies");
-        en_gb.setProperty("serverinfo_mediaonlychannels", "Media Only Channels");
-        en_gb.setProperty("serverinfo_nomediaonlychannels", "No Media Only Channels");
-        en_gb.setProperty("serverinfo_join", "Join Notification Channel");
-        en_gb.setProperty("serverinfo_nojoin", "No join notification channel");
-        en_gb.setProperty("serverinfo_leave", "Leave Notification Channel");
-        en_gb.setProperty("serverinfo_noleave", "No leave notification channel");
-        en_gb.setProperty("serverinfo_none", "None");
-        en_gb.setProperty("serverinfo_low", "Low");
-        en_gb.setProperty("serverinfo_medium", "Medium");
-        en_gb.setProperty("serverinfo_high", "(╯°□°)╯︵ ┻━┻");
-        en_gb.setProperty("serverinfo_veryhigh", "┻━┻ ミヽ(ಠ益ಠ)ノ彡┻━┻");
-        en_gb.setProperty("serverinfo_none_desc", "Unrestricted");
-        en_gb.setProperty("serverinfo_low_desc", "Must have a verified email on their Discord account.");
-        en_gb.setProperty("serverinfo_medium_desc", "Must have a verified email on their Discord account.\n" +
-                "Must also be registered on Discord for longer than 5 Minutes.");
-        en_gb.setProperty("serverinfo_high_desc", "Must have a verified email on their Discord account.\n" +
-                "Must also be registered on Discord for longer than 5 minutes.\n" +
-                "Must also be a member of this server for longer than 10 minutes.");
-        en_gb.setProperty("serverinfo_veryhigh_desc", "Must have a verified email on their Discord account.\n" +
-                "Must also be registered on Discord for longer than 5 minutes.\n" +
-                "Must also be a member of this server for longer than 10 minutes.\n" +
-                "Must have a verified phone on their Discordd account.");
-
-        // Useful
-        /// Giveaway
-        en_gb.setProperty("giveaway_description", "- Start a giveaway that draws a given amount of people as winners after a given time.\n" +
-                "- List all running giveaways of the current server.");
-        en_gb.setProperty("giveaway_usage", "- Start giveaway: `%sgiveaway \"[prize name]\" [amount of winners] [time]`\n" +
-                "   \u200B⤷ Example: `%sgiveaway \"100 Cookies\" 1 12h`\n" +
-                "- List giveaways: `%sgiveaway list`");
-        en_gb.setProperty("giveaway_hint", "- Time formats: d = days, h = hours, m = minutes\n" +
-                "   \u200B⤷ Also, you can use as many time-arguments as you want\n" +
-                "   \u200B⤷ Example: `%sgiveaway \"100 cookies\" 1 2d 12h 36m 1d`\n" +
-                "   \u200B⤷ Time result: `2d` + `12h` + `36m` + `1d` = 3 days, 12 hours, 36 minutes\n" +
-                "- Seconds are not supported.");
-        en_gb.setProperty("giveaway_current", "Current giveaways on this server");
-        en_gb.setProperty("giveaway_days", "%s days");
-        en_gb.setProperty("giveaway_hours", "%s hours");
-        en_gb.setProperty("giveaway_minutes", "%s minutes");
-        en_gb.setProperty("giveaway_from", "Giveaway from %s!");
-        en_gb.setProperty("giveaway_endsat", "Ends at");
-        en_gb.setProperty("giveaway_endedat", "Ended at");
-        en_gb.setProperty("giveaway_messageid", "**Message ID:**");
-        en_gb.setProperty("giveaway_prize", "**Prize:**");
-        en_gb.setProperty("giveaway_noreactions", "Sorry, I can't find any reactions for this giveaway (Message ID: %s)!");
-        en_gb.setProperty("giveaway_invalidtime", "Invalid Time.");
-        en_gb.setProperty("giveaway_wrongargument", "Wrong argument");
-        en_gb.setProperty("giveaway_nocurrent", "There are no giveaways running!");
-        en_gb.setProperty("giveaway_invalidwinneramount", "Invalid amount of winners. Only numbers!");
-        en_gb.setProperty("giveaway_messedupargs", "You messed up your arguments.");
-        en_gb.setProperty("giveaway_zerowinners", "That makes no sense. There has to be at least one winner.");
-        en_gb.setProperty("giveaway_emptyprize", "You cannot leave the prize empty.");
-        en_gb.setProperty("giveaway_description_running", "Prize: **%s**\n" +
-                "Amount of winners: **%s**\n" +
-                "Time remaining: **%s**\n" +
-                "React with %s to enter the giveaway!");
-        en_gb.setProperty("giveaway_description_end", "Prize: **%s**\n" +
-                "Amount of winners: **%s**\n\n" +
-                "The winners are:\n" +
-                "%s\n" +
-                "Congratulations!");
-        en_gb.setProperty("giveaway_description_nowinner", "Prize: **%s**\n" +
-                "Amount of winners: **%s**\n\n" +
-                "Nobody participated. Therefore, nobody won.");
-        en_gb.setProperty("giveaway_end_manually", "%s, to end this giveaway manually click on ❌");
-
-        /// RemindMe
-        en_gb.setProperty("remindme_description", "Set up an RemindMe to a specific time.\n" +
-                "Other members can upvote the RemindMe to also get reminded.\n" +
-                "The RemindMe will have a jump URL to the context.");
-        en_gb.setProperty("remindme_usage", "Command: `%s%s \"Optional Topic\" [time]`\n\n" +
-                "**Example 1 → Using Time Arguments**\n" +
-                "With topic: `%s%s \"Pat Servant\" 3d 2h 1m`\n" +
-                "W/o topic: `%s%s 5m`\n\n" +
-                "**Example 2 → Using a Date and Time**\n" +
-                "With topic: `%s%s \"Pat Servant\" 2020-31-12 23:59`\n" +
-                "W/o topic: `%s%s 2020-31-12 23:59`");
-        en_gb.setProperty("remindme_hint", "The command author will always be reminded, even without upvoting.\n" +
-                "A RemindMe must not be further in the future than 1 month.\n" +
-                "**Time Arguments**\n" +
-                "- Time formats: d = days, h = hours, m = minutes\n" +
-                "   \u200B⤷ Also, you can use as many time arguments as you want\n" +
-                "   \u200B⤷ Example: `%s%s \"Pat Servant\" 2d 12h 36m 1d`\n" +
-                "   \u200B⤷ Time result: `2d` + `12h` + `36m` + `1d` = 3 days, 12 hours, 36 minutes\n" +
-                "- Seconds are not supported.\n\n" +
-                "**Date and Time**\n" +
-                "- You cannot set reminders in the past.\n" +
-                "- You have to use the 24-hour system.\n" +
-                "- It take your timezone into account.\n" +
-                "- If you didn't set one up, it will use UTC.\n" +
-                "- To set one up, use the `%suser` command.");
-        en_gb.setProperty("remindme_invalidtime", "Invalid Time.");
-        en_gb.setProperty("remindme_wrongargument", "Wrong argument");
-        en_gb.setProperty("remindme_messedupargs", "You messed up your arguments.");
-        en_gb.setProperty("remindme_remind", "Hi master, here is your requested RemindMe.");
-        en_gb.setProperty("remindme_invalidtopic", "Invalid Topic: No ending quotation mark.");
-        en_gb.setProperty("remindme_topiclength", "Invalid Topic Length: The topic must not be longer than 1000 characters.");
-        en_gb.setProperty("remindme_missingtime", "Missing Time: You have to add time arguments or a date and time.");
-        en_gb.setProperty("remindme_toobig", "Invalid Time: The given value is too big.");
-        en_gb.setProperty("remindme_past", "You cannot set up a RemindMe in the past!");
-        en_gb.setProperty("remindme_month", "A RemindMe must not be further in the future than 1 month.");
-        en_gb.setProperty("remindme_of", "RemindMe of %s");
-        en_gb.setProperty("remindme_topic", "Topic: %s");
-        en_gb.setProperty("remindme_also",  "If you also want to be reminded, just click %s");
-        en_gb.setProperty("remindme_at", "RemindMe at");
-        en_gb.setProperty("remindme_success",  "You got reminded %s");
-        en_gb.setProperty("remindme_jump", "Click here to jump to the context.");
-
-        /// Signup
-        en_gb.setProperty("signup_description", "Let people sign up for an event (e.g. a raid).\n" +
-                "The signup will be completed if either of the following happens:\n" +
-                "1. The given amount of people have signed up (reacted).\n" +
-                "2. The given expiring date (or the default one if not given) was reached (see last hint).\n" +
-                "3. The signup creator clicked the :x: reaction.");
-        en_gb.setProperty("signup_usage", "Command: `%s%s \"Title\" [amount of participants] [event date and time]`\n" +
-                "Example 1: `%s%s \"Holy Grail War\" 10 2019-12-31 23:30`\n" +
-                "Example 2: `%s%s 10 2019-12-31 23:30`\n" +
-                "Example 3: `%s%s \"Holy Grail War\" 10`\n" +
-                "Example 4: `%s%s 10`");
-        en_gb.setProperty("signup_hint", "- The amount of participants has to be within 1 and 100 inclusively.\n" +
-                "- The event date and time has to be within the next 4 weeks.\n" +
-                "- If you don't set the event date and time, the signup will expire in 4 weeks.\n" +
-                "- The event date and time will use the server's offset. You can check it by typing `!serverinfo` -> Servant Settings -> Offset\n" +
-                "- If you set an event date, the signup will expire 30 minutes earlier, so you have time to organize the group.");
-        en_gb.setProperty("signup_invalidtitle", "Invalid Title: No ending quotation mark.");
-        en_gb.setProperty("signup_titlelength", "Invalid Title Length: The title must not be longer than 256 characters.");
-        en_gb.setProperty("signup_invalidamount", "Invalid Amount: No amount of participants was found.");
-        en_gb.setProperty("signup_invalidamountrange", "Invalid Amount Size: The amount has to be within 1 and 100 participants.");
-        en_gb.setProperty("signup_invalidamountparse", "Invalid Amount Parse: %s");
-        en_gb.setProperty("signup_missingamount", "Missing Amount: You have to add an amount of allowed participants.");
-        en_gb.setProperty("signup_invaliddate", "Invalid Date and Time");
-        en_gb.setProperty("signup_invaliddatedistance", "Invalid Date and Time: The given date and time must not be farther away than 4 weeks and it must not be in the past.\n" +
-                "Keep in mind the custom event date will be processed 30 min earlier, so the next 30 minutes will be considered to be the \"past\".");
-        en_gb.setProperty("signup_invaliddateday", "Invalid Date and Time: The given date does not exist. (e.g. Feb 31)");
-        en_gb.setProperty("signup_embedtitle_empty", "Sign up");
-        en_gb.setProperty("signup_embedtitle_notempty", "Sign up for %s");
-        en_gb.setProperty("signup_embeddescription", "Click on %s to participate.\n" +
-                "%s people can participate!\n\n" +
-                "Remove said reaction if you have changed your mind." +
-                "%s\n" +
-                "%s, to manually end this signup click on ❌");
-        en_gb.setProperty("signup_embeddescription_custom", "\nThe signup will close 30 minutes prior to the scheduled event.");
-        en_gb.setProperty("signup_embeddescriptionend", "%s people could participate!\n\n" +
-                "These are the participants:");
-        en_gb.setProperty("signup_nobody", "Nobody signed up");
-        en_gb.setProperty("signup_timeout", "Times out at");
-        en_gb.setProperty("signup_event", "Event at");
-        en_gb.setProperty("signup_timeout_finish", "Ended at");
-
-        /// Timezone
-        en_gb.setProperty("timezone_description", "Convert a date and time from one timezone to another");
-        en_gb.setProperty("timezone_usage", "Command: `%s%s yyyy-MM-dd HH:mm [current timezone] [target timezone]`\n" +
-                "Example: `%s%s 2019-01-01 22:00 PST CET`");
-        en_gb.setProperty("timezone_hint", "This command uses the 24 hour system.");
-        en_gb.setProperty("timezone_missingargs", "Missing arguments.");
-        en_gb.setProperty("timezone_conversion", "Timezone Conversion");
-        en_gb.setProperty("timezone_input", "Input");
-        en_gb.setProperty("timezone_output", "Output");
-        en_gb.setProperty("timezone_invalidzone_start", "Invalid starting timezone.");
-        en_gb.setProperty("timezone_invalidzone_target", "Invalid target timezone.");
-        en_gb.setProperty("timezone_invalid", "Invalid input. Check your formatting.");
-
-        // Polls
-        en_gb.setProperty("votes_active", "Ends at");
-        en_gb.setProperty("votes_inactive", "This poll has ended.");
-        en_gb.setProperty("votes_end_manually", "%s, to end this poll manually click on ❌");
-
-        /// QuickPoll
-        en_gb.setProperty("quickvote_started", "%s started a quickpoll!");
-        en_gb.setProperty("quickvote_ended", "%s has ended the quickpoll!");
-        en_gb.setProperty("quickvote_missing_db", "Greetings mediator! I couldn't remove a succesful quick poll ending from the database.");
-
-        /// Poll
-        en_gb.setProperty("vote_description", "Create a poll with up to 10 custom answers.");
-        en_gb.setProperty("vote_usage", "Command: `%s%s [question]/[answer1]/(...)/[answer10]`\n" +
-                "Example: `%s%s When do you have time?/Mon/Tue/Wed/Thu/Fri/Sat/Sun`");
-        en_gb.setProperty("vote_hint", "After executing this command, you will be asked if you want to allow multiple answers.");
-        en_gb.setProperty("vote_amount", "Invalid amount of arguments. There has to be at least one answer to your question and a maximum of 10 answers.");
-        en_gb.setProperty("vote_timeout", "Timeout! You didn't react on my question.");
-        en_gb.setProperty("vote_started", "%s started a poll!");
-        en_gb.setProperty("vote_ended", "%s has ended the poll!");
-        en_gb.setProperty("vote_missing_db", "Greetings mediator! I couldn't remove a succesful vote ending from the database.");
-        en_gb.setProperty("vote_multiple", "Multiple Answers: %s");
-        en_gb.setProperty("vote_allowed", "Allowed");
-        en_gb.setProperty("vote_forbidden", "Forbidden");
-
-        // Fun
-        /// Achievements
-        en_gb.setProperty("achievements_title", "%s%s Achievements");
-
-        /// Avatar
-        en_gb.setProperty("avatar_stolen", "%s just stole %s's avatar!");
-        en_gb.setProperty("avatar_self", "%s just stole their own avatar!");
-
-        /// Baguette
-        en_gb.setProperty("baguette_49", "Unlucky");
-        en_gb.setProperty("baguette_50", "JACKPOT! Now you're cool.");
-
-        /// Bio
-        en_gb.setProperty("bio_maxlength", "Bio max length is 30.");
-
-        /// Coin Flip
-        en_gb.setProperty("coinflip_head", "Head!");
-        en_gb.setProperty("coinflip_tail", "Tail!");
-
-        /// Embed (for both create and edit)
-        en_gb.setProperty("embed_timeout", "This configuration timed out.");
-        en_gb.setProperty("embed_authorline_q", "Alright! Do you want to use an author line?");
-        en_gb.setProperty("embed_authorname_i", "Please provide the **author name**:");
-        en_gb.setProperty("embed_authorurl_q", "Do you want to use an **author url** (not the icon)?");
-        en_gb.setProperty("embed_authorurl_i", "Please provide the **author url** (not the icon url!):");
-        en_gb.setProperty("embed_authorurl_i_fail", "Your input is invalid. Please provide a valid url:");
-        en_gb.setProperty("embed_authoricon_q", "Do you want to use an **author icon**?");
-        en_gb.setProperty("embed_authoricon_i", "Please provide the **author icon url** (direct link!):");
-        en_gb.setProperty("embed_authoricon_i_fail", "Your input is invalid. Please provide a valid direct url:");
-        en_gb.setProperty("embed_thumbnail_q", "Do you want to use a thumbnail?");
-        en_gb.setProperty("embed_thumbnail_i", "Please provide the **thumbnail url** (direct link!):");
-        en_gb.setProperty("embed_thumbnail_i_fail", "Your input is invalid. Please provide a valid direct url:");
-        en_gb.setProperty("embed_title_q", "Do you want to use a title?");
-        en_gb.setProperty("embed_title_i", "Please provide the **title**:");
-        en_gb.setProperty("embed_url_q", "Do you want to use a title URL?");
-        en_gb.setProperty("embed_url_i", "Please provide the **title url**:");
-        en_gb.setProperty("embed_url_i_fail", "Your input is invalid. Please provide a valid url:");
-        en_gb.setProperty("embed_description_q", "Do you want to use a description?");
-        en_gb.setProperty("embed_description_i", "Please provide the **description**:");
-        en_gb.setProperty("embed_field_q", "Do you want to add a field?");
-        en_gb.setProperty("embed_field_name_i", "Please provide the **field name**:");
-        en_gb.setProperty("embed_field_value_i", "Please provide the **field value**:");
-        en_gb.setProperty("embed_field_inline_i", "Should this field be inline?");
-        en_gb.setProperty("embed_image_q", "Do you want to use an image?");
-        en_gb.setProperty("embed_image_i", "Please provide the **image url** (direct link!):");
-        en_gb.setProperty("embed_image_i_fail", "Your input is invalid. Please provide a valid direct url:");
-        en_gb.setProperty("embed_footer_q", "Do you want to use a footer?");
-        en_gb.setProperty("embed_footer_text_i", "Please provide the **footer text**:");
-        en_gb.setProperty("embed_footer_icon_q", "Do you want to use a footer icon?");
-        en_gb.setProperty("embed_footer_icon_i", "Please provide the **footer icon url** (direct link!):");
-        en_gb.setProperty("embed_footer_icon_i_fail", "Your input is invalid. Please provide a valid direct url:");
-        en_gb.setProperty("embed_empty", "Either the embed is empty or it has over 6000 characters.\nBoth is not allowed!");
-        en_gb.setProperty("embed_timestamp_q", "Do you want to use a timestamp?");
-        en_gb.setProperty("embed_timestamp_i", "Please provide a timestamp.\nYou either can say `now` or provide a date and time like this: `yyyy-MM-dd HH:mm` (uses server offset):");
-        en_gb.setProperty("embed_timestamp_i_fail", "Your input is invalid.\nYou either can say `now` or provide a date and time like this: `yyyy-MM-dd HH:mm` (uses server offset).\nTry again:");
-
-        //// Create Embed
-        en_gb.setProperty("createembed_introduction", "With this command, you can create your own embed.\n" +
-                "- You cannot create an empty embed.\n" +
-                "- The embed must not be longer than 6000 characters in total.\n" +
-                "- Everytime you have to click a reacton or write an answer, you have a time limit of 15 minutes.\n" +
-                "Are you prepared?");
-        en_gb.setProperty("createembed_author_name", "Author name (can point to URL)");
-        en_gb.setProperty("createembed_title", "Title (can point to URL)");
-        en_gb.setProperty("createembed_description", "Description\n" +
-                "The title will be white if it's not a hyperlink.\n" +
-                "Any image URL's have to be direct links.\n" +
-                "The timestamp is not part of the footer text, but a standalone date and time.");
-        en_gb.setProperty("createembed_field_name_inline", "Inline field name"); // dis
-        en_gb.setProperty("createembed_field_value1", "Field value");
-        en_gb.setProperty("createembed_field_value2", "Up to 3 in a line.");
-        en_gb.setProperty("createembed_field_value3", "You can have up to 25 fields.");
-        en_gb.setProperty("createembed_field_name_noninline", "Non-inline field name");
-        en_gb.setProperty("createembed_field_value_noninline", "Non-inline fields take the while width of the embed.");
-        en_gb.setProperty("createembed_footer", "Footer text");
-        en_gb.setProperty("createembed_done", "We're done! Please mention a text channel to post this embed in (e.g. #channel):");
-        en_gb.setProperty("createembed_done_repeated", "Invalid input! You either didn't mention a channel (e.g. #channel) or you are not allowed to write in the given channel.\nTry again:");
-
-        //// Edit Embed
-        en_gb.setProperty("editembed_description", "Edit an embed that was made by %s.");
-        en_gb.setProperty("editembed_usage", "Command: `%s%s #channel [message ID of the embed]`\n" +
-                "Example: `%s%s #info 999999999999999999`");
-        en_gb.setProperty("editembed_hint", "**How to get ID's:**\n" +
-                "1. Activate Discord Developer Mode: User Settings → Appearance → ADVANCED → Developer Mode\n" +
-                "2. Hover over message → Menu buttons at the right → Copy ID");
-        en_gb.setProperty("editembed_missing_channel", "You have to mention a channel. Check `%seditembed` for help.");
-        en_gb.setProperty("editembed_missing_message_id", "You have to provide a message ID. Check `%seditembed` for help.");
-        en_gb.setProperty("editembed_invalid_message_id", "The provided message ID is invalid. Check `%seditembed` for help.");
-        en_gb.setProperty("editembed_notbyme", "This is not a message made by me.");
-        en_gb.setProperty("editembed_noembed", "I cannot find an embed for this message.");
-        en_gb.setProperty("editembed_introduction", "With this command, you can edit an embed from %s.\n" +
-                "- You cannot create an empty embed.\n" +
-                "- The embed must not be longer than 6000 characters in total.\n" +
-                "- Everytime you have to click a reacton or write an answer, you have a time limit of 15 minutes.\n" +
-                "Are you prepared?");
-        en_gb.setProperty("editembed_confirm", "We're done! Please confirm you want to overwrite the old embed.");
-        en_gb.setProperty("editembed_notfound", "I cannot find this message, master!");
-        en_gb.setProperty("editembed_missingpermission", "You need to be able to write in the given channel to access embeds.");
-        en_gb.setProperty("embed_field_remove_q", "Do you want to remove the current fields?");
-
-        /// Flip
-        en_gb.setProperty("flip_description", "Flip a user.");
-        en_gb.setProperty("flip_usage", "Command: `%s%s @user`");
-        en_gb.setProperty("flip_hint", "Check out `%sunflip @user`");
-
-        /// Leaderboard
-        en_gb.setProperty("leaderboard_title", "%s%s Leaderboard");
-        en_gb.setProperty("leaderboard_noentry", "No entries!");
-
-        /// Level
-        en_gb.setProperty("level_leaderboard_empty", "Leaderboard is empty");
-        en_gb.setProperty("level_leaderboard_authorname", "%s Leaderboard");
-        en_gb.setProperty("level_level", "Level");
-        en_gb.setProperty("level_rank", "Rank");
-        en_gb.setProperty("level_up", "%s just reached level %s! \uD83C\uDF89");
-        en_gb.setProperty("level_footer", "Also try %s and \"%slevel leaderboard\"!");
-
-        /// Love
-        en_gb.setProperty("love_description","Ship two people or just one with themselves.");
-        en_gb.setProperty("love_usage", "Command: `%s%s @user1 @user2`\n" +
-                "Command: `%s%s @user`");
-        en_gb.setProperty("love_hint", "You only need to mention a person once, if you want to ship them with themselves.");
-        en_gb.setProperty("love_self_100", "Damn! Straight to the fap!");
-        en_gb.setProperty("love_self_90", "Pretty self confident, don't you think?");
-        en_gb.setProperty("love_self_80", "So narcissistic...");
-        en_gb.setProperty("love_self_70", "You love yourself more than others love you.");
-        en_gb.setProperty("love_self_69", "Nice.");
-        en_gb.setProperty("love_self_60", "Seems like you are accepting yourself.");
-        en_gb.setProperty("love_self_50", "You seem to be undecided if you like yourself or not.");
-        en_gb.setProperty("love_self_42", "You found the answer.");
-        en_gb.setProperty("love_self_40", "Now you can look into the mirror with pride.");
-        en_gb.setProperty("love_self_30", "A bit unsecure, but I'm sure you can handle it.");
-        en_gb.setProperty("love_self_20", "You are doing great. Build some self confidence!");
-        en_gb.setProperty("love_self_10", "Believe in yourself!");
-        en_gb.setProperty("love_self_0", "Thats tough. We still love you <3");
-        en_gb.setProperty("love_noself_100", "Damn! Thats a match!");
-        en_gb.setProperty("love_noself_90", "Get up and invite them for a dinner.");
-        en_gb.setProperty("love_noself_80", "You sure, you don't wanna date?");
-        en_gb.setProperty("love_noself_70", "I call a sis-/bromance.");
-        en_gb.setProperty("love_noself_69", "Nice.");
-        en_gb.setProperty("love_noself_60", "There is a chance.");
-        en_gb.setProperty("love_noself_50", "I bet you can be friends. :)");
-        en_gb.setProperty("love_noself_42", "You found the answer.");
-        en_gb.setProperty("love_noself_40", "At least you are trying.");
-        en_gb.setProperty("love_noself_30", "I don't think this will work out.");
-        en_gb.setProperty("love_noself_20", "At least a bit, amirite.");
-        en_gb.setProperty("love_noself_10", "Dats pretty low, tho.");
-        en_gb.setProperty("love_noself_0", "Well, that won't work out.");
-        en_gb.setProperty("love_fallback", "Urgh!");
-
-        /// MostUsedCommands
-        en_gb.setProperty("mostusedcommands_title", "%s%s Most Used Commands");
-
-        /// Profile
-        en_gb.setProperty("profile_noachievements", "No achievements");
-        en_gb.setProperty("profile_nocommands", "No commands were used yet");
-        en_gb.setProperty("profile_level", "Level");
-        en_gb.setProperty("profile_rank",  "Rank");
-        en_gb.setProperty("profile_generalinfo", "General info");
-        en_gb.setProperty("profile_commandstats", "Command stats");
-        en_gb.setProperty("profile_mostused", "Most used commands");
-        en_gb.setProperty("profile_achievements", "Achievements");
-        en_gb.setProperty("profile_footer1", "Also try \"%s%s @user\"");
-        en_gb.setProperty("profile_footer2", "Also try \"%s%s\"");
-        en_gb.setProperty("profile_baguettecounter", "Baguette Statistics");
-        en_gb.setProperty("profile_nobaguette", "No baguette yet");
-        en_gb.setProperty("profile_baguette", "Biggest Baguette");
-        en_gb.setProperty("profile_baguette_value", "%s (%s times)");
-        en_gb.setProperty("profile_total_muc", "Commands Used");
-        en_gb.setProperty("profile_total_ap", "Achivement Points");
-        en_gb.setProperty("profile_title_creator", "The Creator");
-        en_gb.setProperty("profile_title_vip", "The VIP");
-        en_gb.setProperty("profile_title_$10", "The Saber");
-        en_gb.setProperty("profile_title_$5", "The Archer");
-        en_gb.setProperty("profile_title_$3", "The Lancer");
-        en_gb.setProperty("profile_title_$1", "The Caster");
-        en_gb.setProperty("profile_title_donator", "The Assassin");
-        en_gb.setProperty("profile_title_booster", "The Berserker");
-        en_gb.setProperty("profile_title_normal", "The Master");
-        en_gb.setProperty("profile_animal", "Favourite Animal");
-        en_gb.setProperty("profile_bird", "Bird");
-        en_gb.setProperty("profile_cat", "Cat");
-        en_gb.setProperty("profile_dog", "Dog");
-        en_gb.setProperty("profile_nofavourite", "No Favourite");
-        en_gb.setProperty("profile_msi", "Most Shared Interaction");
-        en_gb.setProperty("profile_mri", "Most Received Interaction");
-
-
-        // Random
-        en_gb.setProperty("random_empty", "I couldn't find anything with this keyword.");
-        en_gb.setProperty("random_photo", "Photo");
-        en_gb.setProperty("random_by", "by");
-
-        /// Unflip
-        en_gb.setProperty("unflip_description", "Unlip a user.");
-        en_gb.setProperty("unflip_usage", "Command: `%s%s @user`");
-        en_gb.setProperty("unflip_hint", "Check out `%sflip @user`");
-
-        // Interaction
-        en_gb.setProperty("interaction_description", "Interaction commands are like reactions, but way better.\n" +
-                "Share your feelings or cookies with other people.");
-        en_gb.setProperty("interaction_usage", "**%s%s someone**\n" +
-                "Command: `%s%s [@user]`\n" +
-                "Example: `%s%s @Servant`");
-        en_gb.setProperty("interaction_usage_on", "**%s%s on someone**\n" +
-                "Command: `%s%s [@user]`\n" +
-                "Example: `%s%s @Servant`");
+        // UsageEmbed
+        en_gb.setProperty("usageembed_birthday_settings", "The birthday settings are now in the dashboard!");
 
 
         en_gb.store(os,
@@ -1121,7 +742,27 @@ public class LanguageFile {
         var de_de = new OrderedProperties();
         var os = new FileOutputStream(System.getProperty("user.dir") + "/resources/lang/de_de.ini");
 
-        // General
+        ///////////////////////////////////// Global Arguments /////////////////////////////////////
+
+        var valid_args = "Gültige Angaben:\n" +
+                "- Tage: days, day, d\n" +
+                "- Stunden: hours, hour, h\n" +
+                "- Minuten: minutes, minute, min, m";
+
+        ///////////////////////////////////// General /////////////////////////////////////
+
+        de_de.setProperty("no_ending_quotation_mark", "Kein endendes Anführungszeichen.");
+        de_de.setProperty("topic_too_long", "Titellänge zu lang.");
+        de_de.setProperty("missing_time_unit", "Zeitangabe unvollständig. Wert oder Zeiteinheit fehlt.");
+        de_de.setProperty("invalid_char", "Ungültiger Buchstabe: '%s'");
+        de_de.setProperty("jump", "Sprung");
+        de_de.setProperty("tmp_disabled", "Dieser Befehl wurde temporär wegen eines Fehlers deaktiviert.");
+        de_de.setProperty("cooldown_warning", "Dieser Befehl hat noch eine Abklingszeit von %s Sekunden");
+        de_de.setProperty("invalid_channel", "Dieser Befehl kann in diesem Kanal nicht verwendet werden!");
+        de_de.setProperty("hastobe_vc", "Du musst in einem Sprachkanal sein um dies zu tun!");
+        de_de.setProperty("permission_bot", "%s Ich brauch die Berechtigung \"%s\" in diesem/r %s!");
+        de_de.setProperty("permission_user", "%s Du brauchst die Berechtigung \"%s\" in diesem/r %s um dies zu tun!");
+        de_de.setProperty("forbidden_dm", "Dieser Befehl kann nicht in privaten Nachrichten ausgeführt werden.");
         de_de.setProperty("permission", ":x: Du brauchst in diesem Server die Berechtigung %s, um dies zu tun!");
         de_de.setProperty("blocking_dm", "Die Hilfe konnte nicht gesendet werden, da Du private Nachrichten blockierst.");
         de_de.setProperty("invalid_mention", "Ungültige Erwähnung.");
@@ -1129,10 +770,642 @@ public class LanguageFile {
         de_de.setProperty("unknown_message", "Unbekannte Nachricht.");
         de_de.setProperty("apostrophe", "'");
         de_de.setProperty("apostrophe_s", "s");
-        de_de.setProperty("times", "mal");
+        de_de.setProperty("times", "Mal");
+        de_de.setProperty("ap", "Erfolgspunkte");
+        de_de.setProperty("commands_used", "Genutzte Befehle");
+        de_de.setProperty("commands", "Befehle");
+        de_de.setProperty("missing_args", "Fehlende Angaben");
+        de_de.setProperty("missing_time_args", "Fehlende Zeitangaben");
+        de_de.setProperty("member", "Mitglied");
+        de_de.setProperty("role_s", "Rolle(n)");
+        de_de.setProperty("author", "Autor");
+        de_de.setProperty("msg_id", "Nachrichten ID");
+        de_de.setProperty("category_id", "Kategorie ID");
+        de_de.setProperty("emote_id", "Emote ID");
+        de_de.setProperty("emote", "Emote");
+        de_de.setProperty("invite", "Einladung");
+        de_de.setProperty("user", "Nutzer");
+        de_de.setProperty("user_id", "Nutzer ID");
+        de_de.setProperty("vc", "Sprachkanal");
+        de_de.setProperty("vc_id", "Sprachkanal ID");
+        de_de.setProperty("role_id", "Rolle ID");
+        de_de.setProperty("tc_id", "Textkanal ID");
+        de_de.setProperty("general_error", "Etwas lief schief! Der Entwickler des Bots wird sich so bald wie möglich darum kümmern.");
+        de_de.setProperty("description", "Description");
+        de_de.setProperty("usage", "Usage");
+        de_de.setProperty("alias", "Alias");
+        de_de.setProperty("aliases", "Aliases");
+        de_de.setProperty("hint", "Hint");
+        de_de.setProperty("channel", "Kanal");
+        de_de.setProperty("guild", "Server");
 
-        // Features
-        /// Achievement
+        ///////////////////////////////////// Commands /////////////////////////////////////
+
+        ////////////////// Dashboard //////////////////
+
+        // Dashboard
+        de_de.setProperty("dashboard_link", "Das Dashboard findet man hier: <%s>");
+        de_de.setProperty("dashboard_discontinued", "Diese Befehl wurde abgeschaltet.\n" +
+                "Dies geschiet, weil Du nun alles, das dieser Befehl gemacht hat, im Dashboard machen kannst: <%s>");
+        de_de.setProperty("dashboard_birthday_settings", "Die Geburtstagseinstellungen sind nun im Dashboard!");
+
+        // Discontinued
+        de_de.setProperty("discontinued", "Diese Befehl wurde abgeschaltet.");
+
+        // Leaderboard
+        de_de.setProperty("leaderboard_website", "Die Rangliste kann nun hier eingesehen werden: <https://servant.gg/leaderboard/%s>");
+
+        ////////////////// Fun //////////////////
+
+        // Avatar
+        de_de.setProperty("avatar_avatar", "Avatar");
+        de_de.setProperty("avatar_self", "%s sich selbst das Avatar geklaut!");
+        de_de.setProperty("avatar_stolen", "%s hat gerade %s Avatar geklaut!");
+
+        // Baguette
+        de_de.setProperty("baguette_49", "Mies Brudi");
+        de_de.setProperty("baguette_50", "JACKPOT! Jetzt bist du cool.");
+
+        // BubbleWrap
+        de_de.setProperty("bubblewrap_title", "Knickerfolie!");
+        de_de.setProperty("bubblewrap_subtitle", "Lass es poppen!");
+        de_de.setProperty("bubblewrap_footer", "Knick knickediknack, uh yeah!");
+
+        // Coinflip
+        de_de.setProperty("coinflip_head", "Kopf!");
+        de_de.setProperty("coinflip_tail", "Zahl!");
+
+        // Flip
+        de_de.setProperty("flip_description", "Wirf einen Nutzer um.");
+        de_de.setProperty("flip_usage", "**Wird einen Nutzer um**\n" +
+                "Befehl: `%s%s @Nutzer`\n" +
+                "\n" +
+                "**Stell einen Nutzer wieder richtig rum hin**\n" +
+                "Befehl: `%s%s @Nutzer`");
+
+        // Love
+        de_de.setProperty("love_description", "Verkuppel zwei Leute oder auch nur einen mit sich selbst.");
+        de_de.setProperty("love_usage", "**Verkuppel Dich mit jemandem**\n" +
+                "Befehl: `%s%s @Nutzer`\n" +
+                "\n" +
+                "**Verkuppel zwei Nutzer**\n" +
+                "Befehl: `%s%s @Nutzer1 @Nutzer2`");
+
+        de_de.setProperty("love_self_100", "Verdammt! Direkt zum Fap!");
+        de_de.setProperty("love_self_90", "Ziemlich selbstsicher, oder?");
+        de_de.setProperty("love_self_80", "So selbstverliebt...");
+        de_de.setProperty("love_self_70", "Du liebst Dich selbst mehr als es andere tun.");
+        de_de.setProperty("love_self_69", "Nice.");
+        de_de.setProperty("love_self_60", "Sieht so aus als würdest Du Dich selbst akzeptieren.");
+        de_de.setProperty("love_self_50", "Du scheinst unsicher zu sein ob Du dich magst oder nicht.");
+        de_de.setProperty("love_self_42", "Du hast die Antwort gefunden.");
+        de_de.setProperty("love_self_40", "Jetzt kannst du in den Spiegel mit stolz gucken.");
+        de_de.setProperty("love_self_30", "Ein bisschen unsicher, aber ich bin mir sicher, dass Du dies bewerkstelligen kannst.");
+        de_de.setProperty("love_self_20", "Du schlägst Dich gut. Baue ein wenig mehr selbstvertrauen auf!");
+        de_de.setProperty("love_self_10", "Glaube an Dich selbst!");
+        de_de.setProperty("love_self_0", "Das ist hart. Wir lieben Dich trotzdem <3");
+
+        de_de.setProperty("love_noself_100", "Verdammt! Das passt super!");
+        de_de.setProperty("love_noself_90", "Raff Dich auf und lade die Person zum Essen ein.");
+        de_de.setProperty("love_noself_80", "Seid ihr euch sicher, dass ihr euch nicht daten wollt?");
+        de_de.setProperty("love_noself_70", "Ich sag das ist eine gesunde Geschwisterliebe.");
+        de_de.setProperty("love_noself_69", "Nice.");
+        de_de.setProperty("love_noself_60", "Es besteht die Chance.");
+        de_de.setProperty("love_noself_50", "Ich wette ihr könnt Freunde sein. :)");
+        de_de.setProperty("love_noself_42", "Du hast die Antwort gefunden.");
+        de_de.setProperty("love_noself_40", "Immerhin bist du stets bemüht.");
+        de_de.setProperty("love_noself_30", "Ich denke nicht, dass das klappt...");
+        de_de.setProperty("love_noself_20", "Immerhin etwas, wa?");
+        de_de.setProperty("love_noself_10", "Das ist ziemlich niedrig...");
+        de_de.setProperty("love_noself_0", "Gut, das wird nicht funktionieren.");
+
+        de_de.setProperty("love_fallback", "Urgh!");
+
+        // Achievements
+        de_de.setProperty("achievements_title", "%s%s Erfolge");
+
+        // Commands
+        de_de.setProperty("commands_title", "%s%s Befehle");
+        de_de.setProperty("commands_footer", "Falls du diesen Befehl in der Hoffnung eine Befehlsliste zu finden benutzt hast, probiere Mal %shelp oder öffne die Webseite: %s");
+
+        /// Profile
+        de_de.setProperty("profile_footer1", "Siehe auch \"%s%s @nutzer\"");
+        de_de.setProperty("profile_footer2", "Siehe auch \"%s%s\"");
+
+        de_de.setProperty("profile_generalinfo", "Allgemeine Infos");
+        de_de.setProperty("profile_commandstats", "Befehlstatistiken");
+        de_de.setProperty("profile_mostused", "Meist genutzte Befehle");
+        de_de.setProperty("profile_nocommands", "Bisher keine genutzten Befehle");
+        de_de.setProperty("profile_achievements", "Errungenschaften");
+        de_de.setProperty("profile_noachievements", "Keine Errungenschaften");
+
+        de_de.setProperty("profile_level", "Stufe");
+        de_de.setProperty("profile_rank",  "Rang");
+
+
+        de_de.setProperty("profile_baguette", "Größtes Baguette");
+        de_de.setProperty("profile_nobaguette", "Bisher keine Baguettes");
+        de_de.setProperty("profile_baguette_value", "%s (%s mal)");
+        de_de.setProperty("profile_animal", "Lieblingstier");
+        de_de.setProperty("profile_nofavourite", "Kein Favorit");
+        de_de.setProperty("profile_msi", "Meist verteile Interaktion");
+        de_de.setProperty("profile_mri", "Meist erhaltene Interaktion");
+
+        de_de.setProperty("profile_title_creator", "Erschaffer");
+        de_de.setProperty("profile_title_supporter", "Unterstützer");
+        de_de.setProperty("profile_title_normal", "Meister");
+
+        ////////////////// Interaction //////////////////
+
+        de_de.setProperty("interaction_description_beg", "Bettel jemanden an");
+        de_de.setProperty("interaction_description_birthday", "Wünsche jemanden alles Gute zum Geburtstag");
+        de_de.setProperty("interaction_description_bite", "Beiße jemanden");
+        de_de.setProperty("interaction_description_bully", "Mobbe jemanden");
+        de_de.setProperty("interaction_description_cookie", "Gib jemanden einen Keks");
+        de_de.setProperty("interaction_description_cop", "Nehme jemanden fest");
+        de_de.setProperty("interaction_description_dab", "Dab auf jemanden");
+        de_de.setProperty("interaction_description_flex", "Flex auf jemanden");
+        de_de.setProperty("interaction_description_highfive", "Gib jemandem ein High-Five");
+        de_de.setProperty("interaction_description_hug", "Umarme jemanden");
+        de_de.setProperty("interaction_description_kiss", "Küsse jemanden");
+        de_de.setProperty("interaction_description_lick", "Lecke jemanden ab");
+        de_de.setProperty("interaction_description_pat", "Pat jemanden");
+        de_de.setProperty("interaction_description_poke", "Stups jemanden an");
+        de_de.setProperty("interaction_description_shame", "Schande \uD83D\uDD14 Schande \uD83D\uDD14 Schande \uD83D\uDD14");
+        de_de.setProperty("interaction_usage_shame", "Schäme jemanden");
+        de_de.setProperty("interaction_description_slap", "Schlage jemanden");
+        de_de.setProperty("interaction_description_wave", "Winke zu jemandem");
+        de_de.setProperty("interaction_description_wink", "Zwinker zu jemandenm");
+        de_de.setProperty("interaction_usage", "**%s**\n" +
+                "Befehl: `%s%s [@nutzer]`\n" +
+                "Beispiel: `%s%s @Servant`");
+
+        de_de.setProperty("interaction_shared_beg", "%s bettelte %s großzügige Menschen an.");
+        de_de.setProperty("interaction_received_beg", "%s wurde von %s schmierigen Bettlern belästigt.");
+        de_de.setProperty("interaction_shared_birthday", "%s wünschte %s wundervolle Geburtstage.");
+        de_de.setProperty("interaction_received_birthday", "%s wurde am Geburtstag %s Mal beglückwünscht.");
+        de_de.setProperty("interaction_shared_bite", "%s biss %s Menschen. Und alle haben es verdient! ò.ó");
+        de_de.setProperty("interaction_received_bite", "%s wurde von %s verrückten Menschen gebissen.");
+        de_de.setProperty("interaction_shared_bully", "%s mobbte %s arme Kinder.");
+        de_de.setProperty("interaction_received_bully", "%s wurde von %s Rabauken gemobbt.");
+        de_de.setProperty("interaction_shared_cookie", "%s gab einen Keks an %s liebe Leute.");
+        de_de.setProperty("interaction_received_cookie", "%s nomt den %s. Keks.");
+        de_de.setProperty("interaction_shared_cop", "%s brachte %s Loli-Jäger hinter Gitter.");
+        de_de.setProperty("interaction_received_cop", "%s wurde von %s FBI Agenten verhaftet.");
+        de_de.setProperty("interaction_shared_dab", "%s d4bt3 4uf %s n00b5.");
+        de_de.setProperty("interaction_received_dab", "%s schmunzelte über %s Fortnite Kids.");
+        de_de.setProperty("interaction_shared_flex", "%s zeigte %s Schwächlingen die Muskeln.");
+        de_de.setProperty("interaction_received_flex", "%s wurde von %s Möchtegern-Pumpern angepöbelt.");
+        de_de.setProperty("interaction_shared_highfive", "%s schlug in %s erhobenen Händen ein.");
+        de_de.setProperty("interaction_received_highfive", "%s versuchte %s Mal zu winken, bekam aber High-Fives von komischen Leuten.");
+        de_de.setProperty("interaction_shared_hug", "%s umarmte %s süße Leute.");
+        de_de.setProperty("interaction_received_hug", "%s wurde von %s süßen Leuten geknuddelt.");
+        de_de.setProperty("interaction_shared_kiss", "%s küsste %s zufällige Leute.");
+        de_de.setProperty("interaction_received_kiss", "%s schrieb %s Anzeigen wegen sexueller Belästigung.");
+        de_de.setProperty("interaction_shared_lick", "%s leckte an %s Fremden.");
+        de_de.setProperty("interaction_received_lick", "%s hat sich %s Mal das Gesicht gewaschen.");
+        de_de.setProperty("interaction_shared_pat", "%s tätschelte den Kopf von %s Catgirls. uwu");
+        de_de.setProperty("interaction_received_pat", "%s versuchte %s Mal zu erklären, dass es keine Catgirls gibt.");
+        de_de.setProperty("interaction_shared_poke", "%s piekste %s Leute. (｀ω´)");
+        de_de.setProperty("interaction_received_poke", "%s wurde von %s Leuten genervt.");
+        de_de.setProperty("interaction_shared_slap", "%s schlug %s Rabauken.");
+        de_de.setProperty("interaction_received_slap", "%s wurde %s Mal gemobbt... Oh warte, falscher Befehl (◯Δ◯∥)");
+        de_de.setProperty("interaction_shared_shame", "%s geleitete %s Sünder durch den Gang der Buße.");
+        de_de.setProperty("interaction_received_shame", "%s cosplayte %s Mal Cersei.");
+        de_de.setProperty("interaction_shared_wave", "%s grüßte %s liebevolle Derps.");
+        de_de.setProperty("interaction_received_wave", "%s `✓✓Gelesen` %s Mal.");
+        de_de.setProperty("interaction_shared_wink", "%s zwinkerte %s Leuten zu.");
+        de_de.setProperty("interaction_received_wink", "%s errötete %s Mal.");
+
+        ////////////////// Moderation //////////////////
+
+        // Clear
+        de_de.setProperty("clear_description", "Löscht bis zu 100 Nachrichten.\n" +
+                "Kann nutzerspezifische Nachrichten der letzten 100 Nachrichten löschen.");
+        de_de.setProperty("clear_usage", "**Lösche einige Nachrichten**\n" +
+                "Befehl: `%s%s [1 - 100 ODER @Nutzer]`\n" +
+                "Beispiel 1: `%s%s 50`\n" +
+                "Beispiel 2: `%s%s @Servant`");
+        de_de.setProperty("clear_hint", "Die Anzahl der Nachrichten ist inklusiv, d. h. Du kannst nur eine Nachricht oder auch ganze 100 löschen.");
+
+        de_de.setProperty("clear_input", "Du kannst nur eine Nummer oder eine Nutzererwähnung angeben!");
+        de_de.setProperty("clear_invalid", "Deine Eingabe ist ungültig. Versuche es mit einer kleineren Zahl.");
+        de_de.setProperty("clear_sub_one", "Die Eingabe darf nicht niedriger als 1 sein.");
+        de_de.setProperty("clear_cleared", "%s Nachrichten gelöscht");
+
+        // EditEmbed
+        de_de.setProperty("editembed_description", "Bearbeite ein Embed, das von %s gemacht wurde.");
+        de_de.setProperty("editembed_usage", "**Bearbeite ein Embed**\n" +
+                "Befehl: `%s%s [Nachrichtenlink]`\n" +
+                "Example: `%s%s %s`");
+        de_de.setProperty("editembed_hint", "**Wie man Nachtenlinks bekommt:**\n" +
+                "- PC: Über der Nachrichten hovern > 3 Punkte Menü > Nachrichtenlink kopieren\n" +
+                "- Android: Drücke & halte die Nachricht > Teilen > Kopieren\n" +
+                "- iOS: Drücke & halte die Nachricht > Nachrichtenlink kopieren");
+
+        de_de.setProperty("editembed_args_length", "Bitte gib einen gültigen Nachrichtenlink an. Schreibe `%seditembed` um alle nötigen Informationen zu erhalten.");
+        de_de.setProperty("editembed_tc_not_found", "Der gegebene Textkanal kann nicht gefunden werden.");
+        de_de.setProperty("editembed_invalid_message_id", "Die angegebene Nachrichten ID ist ungültig. Siehe `%seditembed` für Hilfe.");
+        de_de.setProperty("editembed_missingpermission", "Du musst die Rechte haben in den gegebenen Kanal schreiben zu dürfen, um die Embeds bedienen zu können.");
+        de_de.setProperty("editembed_notbyme", "Diese Nachricht ist nicht von mir.");
+        de_de.setProperty("editembed_noembed", "Ich kann kein Embed für diese Nachricht finden.");
+        de_de.setProperty("editembed_introduction", "Mit diesem Befehl kannst du Embeds von %s bearbeiten.\n" +
+                "- Das Embed darf ingesamt nicht länger als 6000 Zeichen sein.\n" +
+                "- Jedes mal wenn du reagieren oder eine Antwort schreiben musst, hast du 15 Minuten dafür Zeit.\n" +
+                "Bist du vorbereitet?");
+        de_de.setProperty("editembed_notfound", "Ich kann diese Nachricht nicht finden, Meister!");
+        de_de.setProperty("embed_field_remove_q", "Möchtest du die aktuellen Felder entfernen?");
+        de_de.setProperty("embed_timeout", "Diese Konfiguration ist timeoutet.");
+        de_de.setProperty("embed_authorline_q", "Alles klar! Möchtest Du den **Autor-Eintrag** verwenden?");
+        de_de.setProperty("embed_authorname_i", "Bitte gebe den **Autornamen** an:");
+        de_de.setProperty("embed_authorurl_q", "Möchtest Du die **Autor-URL** (Nicht das Icon) verwenden?");
+        de_de.setProperty("embed_authorurl_i", "Bitte gebe die **Autor-URL** (Nicht die Icon-URL!) an:");
+        de_de.setProperty("embed_authorurl_i_fail", "Deine Eingabe ist ungültig. Bitte gebe eine gültige URL an:");
+        de_de.setProperty("embed_authoricon_q", "Möchtest Du das **Autor-Icon** verwenden?");
+        de_de.setProperty("embed_authoricon_i", "Bitte gebe die **Autor-Icon-URL** (Direkt-Link!) an:");
+        de_de.setProperty("embed_authoricon_i_fail", "Deine Eingabe ist ungültig. Bitte gebe einen gültigen Direkt-Link an:");
+        de_de.setProperty("embed_thumbnail_q", "Möchtest Du das **Thumbnail** benutzen?");
+        de_de.setProperty("embed_thumbnail_i", "Bitte gebe eine **Thumbnail-URL** (Direkt-Link!) an:");
+        de_de.setProperty("embed_thumbnail_i_fail", "Deine Eingabe ist ungültig. Bitte gebe einen gültigen Direkt-Link an:");
+        de_de.setProperty("embed_title_q", "Möchtest Du einen **Titel** verwenden?");
+        de_de.setProperty("embed_title_i", "Bitte gebe einen **Titel** an:");
+        de_de.setProperty("embed_url_q", "Möchtest du eine **Titel-URL** verwenden?");
+        de_de.setProperty("embed_url_i", "Bitte gebe eine **Titel-URL** an:");
+        de_de.setProperty("embed_url_i_fail", "Deine Eingabe ist ungültig. Bitte gebe eine gültige URL an:");
+        de_de.setProperty("embed_description_q", "Möchtest du eine **Beschreibung** benutzen?");
+        de_de.setProperty("embed_description_i", "Bitte gebe eine **Beschreibung** an:");
+        de_de.setProperty("embed_field_q", "Möchtest du ein Feld hinzufügen?");
+        de_de.setProperty("embed_field_name_i", "Bitte gebe einen **Feldnamen** an:");
+        de_de.setProperty("embed_field_value_i", "Bitte gebe eine **Feldbeschreibung** an:");
+        de_de.setProperty("embed_field_inline_i", "Soll sich das Feld in eine Zeile einordnen?");
+        de_de.setProperty("embed_image_q", "Möchtest du ein **Bild** verwenden?");
+        de_de.setProperty("embed_image_i", "Bitte gebe eine **Bild-URL** (Direkt-Link!) an:");
+        de_de.setProperty("embed_image_i_fail", "Deine Eingabe ist ungültig. Bitte gebe einen gültigen Direkt-Link an:");
+        de_de.setProperty("embed_footer_q", "Möchtest du eine **Fußzeile** verwenden?");
+        de_de.setProperty("embed_footer_text_i", "Bitte gebe eine **Fußzeilenbeschreibung** an:");
+        de_de.setProperty("embed_footer_icon_q", "Möchtest du ein **Fußzeilen-Icon** verwenden?");
+        de_de.setProperty("embed_footer_icon_i", "Bitte gebe eine **Icon-URL** (Direkt-Link!) an:");
+        de_de.setProperty("embed_footer_icon_i_fail", "Deine Eingabe ist ungültig. Bitte gebe einen gültigen Direkt-Link an:");
+        de_de.setProperty("embed_empty", "Entweder ist das Embed leer, oder es hat über 6000 Zeichen.\nBeides geht leider nicht!");
+        de_de.setProperty("embed_timestamp_q", "Möchtest du einen **Zeitstempel** verwenden?");
+        de_de.setProperty("embed_timestamp_i", "Bitte gebe einen **Zeitstempel** an\nDu kannst entweder `now` (jetzt) schreiben oder ein Datum und Zeit wie folgt angeben: `yyyy-MM-dd HH:mm` (Benutzt Server Offset):");
+        de_de.setProperty("embed_timestamp_i_fail", "Deine Eingabe ist ungültig\nDu kannst entweder `now` (jetzt) schreiben oder ein Datum und Zeit wie folgt angeben: `yyyy-MM-dd HH:mm` (Benutzt Server Offset).\nVersuche es erneut:");
+        de_de.setProperty("editembed_confirm", "Wir sind fertig! Bitte bestätige, dass du das alte Embed überschreiben willst.");
+
+        ////////////////// Owner //////////////////
+
+        // Blacklist
+        de_de.setProperty("blacklist_missingid", "Füge eine ID hinzu");
+        de_de.setProperty("blacklist_empty", "Keine geblacklisteten IDs.");
+
+        // Thread
+        de_de.setProperty("thread_title", "Stats für Nerds");
+        de_de.setProperty("thread_stats_k", "Generelle Stats");
+        de_de.setProperty("thread_stats_v", "Verfügbare Prozessoren: %s\nAktuelle Threads: %s");
+        de_de.setProperty("thread_fixed_k", "Fixed Thread Pool");
+        de_de.setProperty("thread_cached_k", "Cached Thread Pool");
+        de_de.setProperty("thread_scheduled_k", "Scheduled Service");
+        de_de.setProperty("thread_period_k", "Period Service");
+        de_de.setProperty("thread_pool_service_v", "Läuft: %s\nPool Größe: %s\nAktive Threads: %s\nAufgaben in Warteschlange: %s\nErledigte Aufgaben: %s");
+        de_de.setProperty("thread_database_k", "Datenbank");
+        de_de.setProperty("thread_database_v", "Aktive Verbindungen: %s\nGesamte Verbindungen: %s\nMaximale Poolgröße: %s");
+        de_de.setProperty("thread_msg_cache_k", "Nachrichten Cache");
+        de_de.setProperty("thread_deleted_msg_cache_k", "Gelöschte Nachrichten Cache");
+        de_de.setProperty("thread_cache_v", "Größe: %s");
+
+        // ServerList
+        de_de.setProperty("serverlist_integer", "Das ist kein Integer.");
+        de_de.setProperty("serverlist_members", "Mitglieder");
+        de_de.setProperty("serverlist_connected", "Server, die mit **%s** verbunden sind");
+
+        // Shutdown
+        de_de.setProperty("shutdown_goodnight", "Gute Nacht %s");
+
+        ////////////////// Random //////////////////
+
+        de_de.setProperty("random_empty", "Ich konnte unter diesem Suchwort nichts finden.");
+
+        ////////////////// Standard //////////////////
+
+        // BotInfo
+        de_de.setProperty("botinfo_authorname", "%s - Info");
+        de_de.setProperty("botinfo_description", "Sei gegrüßt Master! Ich bin %s!\n" +
+                "Ich werde Dir dabei helfen Deinen Server zu moderieren, organisieren und unterhalten.\n" +
+                "\n" +
+                "Ich bin komplett anpassbar. Jeder Befehl, Befehlskategorie, Plugin und Feature kann an- bzw. ausgeschaltet werden.\n" +
+                "Du kannst eine detailierte Hilfe [hier](%s) finden.\n" +
+                "Falls Du eine Frage hast, kannst Du auch dem [Support Server](%s) beitreten.\n" +
+                "\n" +
+                "Um zu starten, wirf doch einfach Mal einen Blick ins Dashboard. Dort kannst du alles einstellen!\n" +
+                "[Öffne einfach die Webseite und drücke auf Login!](%s)");
+        de_de.setProperty("botinfo_links_name", "Links");
+        de_de.setProperty("botinfo_links_value", "[Öffne die Webseite und das Dashboard](%s)\n" +
+                "[Lade Servant ein](%s)\n" +
+                "[Trete dem Support Server bei](%s)\n" +
+                "[Upvote den Bot auf top.gg](%s)");
+        de_de.setProperty("botinfo_stats", "Statistiken");
+        de_de.setProperty("botinfo_users", "Nutzer");
+        de_de.setProperty("botinfo_channels", "Kanäle");
+        de_de.setProperty("botinfo_shard", "Diese Shard");
+        de_de.setProperty("botinfo_restart", "Letzter Neustart");
+
+        // Help
+        de_de.setProperty("help_detailed", "Benutze einen Befehl ohne Argumente, um eine detailierte Hilfe zu erhalten, z.B. `%stimezone`");
+        de_de.setProperty("help_standard", "Standart Befehle");
+        de_de.setProperty("help_additional", "Für weitere Hilfe, kontaktiere %s#%s oder tritt %s bei.");
+        de_de.setProperty("help_blocking_dm", "Die Hilfe konnte nicht gesendet werden, da Du private Nachrichten blockierst.");
+
+        // Supporter
+        de_de.setProperty("supporter_supportservant", "Unterstütze Servant");
+        de_de.setProperty("supporter_description", "Als Servant-Supporter kannst Du eine beliebige Farbe für Embed-Nachrichten einstellen und Dein Profil mit einem Hintergrund personalisieren!\n" +
+                "Du kannst Servant auf drei unterschiedliche Wege unterstützen:");
+        de_de.setProperty("supporter_patreontitle", "Patreon: Abonnement");
+        de_de.setProperty("supporter_subscription", "Preis: Nur $1 / Monat!\n" +
+                "Laufzeit: Solange du Abonnent bist.\n" +
+                "[Patreon](https://www.patreon.com/tancred)");
+        de_de.setProperty("supporter_donationtitle", "PayPal: Spende");
+        de_de.setProperty("supporter_donation", "Preis: Nur $5 (insgesamt)\n" +
+                "Laufzeit: Lebenszeit\n" +
+                "[PayPal.me Seite](https://www.paypal.me/servantdiscord)");
+        de_de.setProperty("supporter_serverboosttitle", "Support Server: Server Boost");
+        de_de.setProperty("supporter_serverboost", "Preis: GRATIS\n" +
+                "Laufzeit: Solange du boostest.\n" +
+                "[Support Server beitreten](https://support.servant.gg/)");
+        de_de.setProperty("supporter_thanks", "Danke an jeden einzelnen Unterstützer <3");
+
+        ////////////////// Utility //////////////////
+
+        // Giveaway
+        de_de.setProperty("giveaway_description", "Verantstalte ein Giveaway, das eine gegebene Anzahl an Leuten als Gewinner nach einer gewissen Zeit ermittelt.\n" +
+                "Liste alle aktuell laufenden Giveaways auf dem aktuellen Server auf.");
+        de_de.setProperty("giveaway_usage", "**Starte ein Giveaway**\n" +
+                "Befehl: `%sgiveaway \"[Preisname]\" [Gewinner und Zeit]`\n" +
+                "Beispiel: `%sgiveaway \"100 Kekse\" 1w 12h 2w 30 min`\n" +
+                "⤷ `1w` + `12h` + `2w` + `30 min` = 3 Gewinner, 12 Stunden, 30 Minuten\n" +
+                "\n" +
+                "**Liste Giveaways auf**\n" +
+                "Befehl: `%sgiveaway list`");
+        de_de.setProperty("giveaway_hint", valid_args + "\n- Gewinner: winners, winner, w");
+
+        de_de.setProperty("giveaway_emptyprize", "Du kannst den Preis nicht leer lassen.");
+        de_de.setProperty("giveaway_zerowinners", "Dies ergibt keinen Sinn. Es muss mindestens einen Gewinner geben.");
+        de_de.setProperty("giveaway_30_days", "Das Giveaway darf nicht weiter in der Zukunft sein als 30 Tage.");
+
+        de_de.setProperty("giveaway_title", "Giveaway: %s");
+        de_de.setProperty("giveaway_description_running", "Host: **%s**\n" +
+                "Anzahl Gewinner: **%s**\n" +
+                "Reagiere mit %s, um am Giveaway teilzunehmen!");
+        de_de.setProperty("giveaway_description_end", "Host: **%s**\n" +
+                "Anzahl Gewinner: **%s**\n\n" +
+                "Herzlichen Glückwunsch an folgende Gewinner:");
+        de_de.setProperty("giveaway_description_nowinner", "Host: **%s**\n" +
+                "Anzahl Gewinner: **%s**\n\n" +
+                "Keiner hat teilgenommen, daher hat auch keiner gewonnen.");
+        de_de.setProperty("giveaway_end_manually", "%s, um dieses Giveaway manuell zu beenden, drücke auf ❌");
+        de_de.setProperty("giveaway_endsat", "Endet am");
+        de_de.setProperty("giveaway_endedat", "Endete am");
+
+        de_de.setProperty("giveaway_current", "Aktuelle Giveaways auf diesem Server");
+        de_de.setProperty("giveaway_nocurrent", "Es laufen gerade keine Giveaways!");
+
+        de_de.setProperty("giveaway_messageid", "**Nachrichten-ID:**");
+        de_de.setProperty("giveaway_prize", "**Preis:**");
+
+        // Polls
+        de_de.setProperty("poll_ends_at", "Endet am");
+        de_de.setProperty("poll_ended", "Diese Abstimmung wurde beendet.");
+        de_de.setProperty("poll_end_manually", "%s, um diese Umfrage manuell zu beenden, drücke auf ❌");
+        de_de.setProperty("poll_30_days", "Die Umfrage darf nicht weiter in der Zukunft sein als 30 Tage.");
+
+        /// Poll
+        de_de.setProperty("poll_description", "Erstelle eine Umfrage mit bis zu 10 selbst erstellten Antwortmöglichkeiten.");
+        de_de.setProperty("poll_usage", "**Starte eine Umfrage**\n" +
+                "Befehl: `%s%s \"[Frage]/[Antwort1]/(...)/[Antwort10]\" [time arguments]`\n" +
+                "Beispiel: `%s%s \"Wann hast du Zeit?/Mo/Di/Mi/Do/Fr/Sa/So\" 12h`");
+        de_de.setProperty("poll_hint", "Nachdem der Befehl durchgeführt wurde, wirst Du gefragt, ob Du mehrere Antworten zulassen willst.\n\n" + valid_args);
+
+        de_de.setProperty("poll_questions_answers", "Bitte gebe eine Frage und dessen Antworten mit an: `%spoll \"Deine Frage? / Antwort 1 / Antwort 2 / (...) / Antwort 10\" [Zeitangaben]`");
+        de_de.setProperty("poll_amount", "Ungültige Anzahl an Angaben. Es muss mindestens eine und maximal 10 Antworten zu Deiner Frage geben.");
+        de_de.setProperty("poll_multiplechoice_q", "Erlaube mehrere Antworten?");
+
+        de_de.setProperty("poll_timeout", "Timeout! Du hast nicht auf meine Frage reagiert.");
+        de_de.setProperty("poll_started", "%s startete eine Umfrage!");
+        de_de.setProperty("poll_multiple", "Mehrere Antworten: %s");
+        de_de.setProperty("poll_allowed", "Erlaubt");
+        de_de.setProperty("poll_forbidden", "Verboten");
+        de_de.setProperty("poll_ended_manually", "%s beendete die Umfrage!");
+
+        /// QuickPoll
+        de_de.setProperty("quickpoll_description", "Eine unkomplizierte Umfrage bei der Nutzer mit %s or %s abstimmen können.");
+        de_de.setProperty("quickpoll_usage", "**Starte eine Quickpoll-Umfrage**\n" +
+                "Befehl: `%s%s \"Optionaler Betreff\" [Zeitangaben]`\n\n" +
+                "Beispiel 1: `%s%s \"Neuer Textkanal für Memes?\" 15 min`\n" +
+                "Beispiel 2: `%s%s 15 min`");
+        de_de.setProperty("quickpoll_hint", valid_args);
+
+        de_de.setProperty("quickpoll_started", "%s hat einen QuickPoll gestartet!");
+        de_de.setProperty("quickpoll_ended", "%s hat den QuickPoll beendet!");
+
+        // Rate
+        de_de.setProperty("rate_description", "Bewertung von 1 - 5");
+        de_de.setProperty("rate_usage", "**Starte eine Bewertung**\n" +
+                "Befehl: `%s%s \"Optionales Thema\" [Zeitangaben]`\n" +
+                "Beispiel 1: `%s%s \"Neuste Folge\" 10d`\n" +
+                "Beispiel 2: `%s%s 10d`");
+        de_de.setProperty("rate_hint", valid_args);
+
+        de_de.setProperty("rate_30_days", "Die Bewertung darf nicht weiter in der Zukunft sein als 30 Tage.");
+        de_de.setProperty("rate_end_manually", "%s, um diese Bewertung manuell zu beenden, drücke auf ❌");
+        de_de.setProperty("rate_ends_at", "Endet am");
+        de_de.setProperty("rate_ended", "Diese Bewertung endete.");
+        de_de.setProperty("rate_title", "Bewertung!");
+        de_de.setProperty("rate_title_topic", "Bewerte: %s");
+
+        // RemindMe
+        de_de.setProperty("remindme_description", "Erstelle eine Erinnerung zu einer spezifischen Zeit.\n" +
+                "Andere Member können die Erinnerungen upvoten, um auch erinnert zu werden.\n" +
+                "Die Erinnerung wird einen Nachrichtenlink haben.");
+        de_de.setProperty("remindme_usage", "**Starte eine Erinnerung**\n" +
+                "Befehl: `%s%s \"Optionale Beschreibung\" [Zeitangaben]`\n\n" +
+                "Beispiel 1: `%s%s \"Servant patten\" 3d 2h 1m`\n" +
+                "Beispiel 2: `%s%s 3d 2h 1m`");
+        de_de.setProperty("remindme_hint", "Der Befehlautor wird immer erinnert, auch wenn dieser nicht upvotet.\n\n" + valid_args);
+
+        de_de.setProperty("remindme_30_days", "Diese Erinnerung darf nicht weiter in der Zukunft sein als 30 Tage.");
+        de_de.setProperty("remindme_of", "Erinnerung von %s");
+        de_de.setProperty("remindme_topic", "Thema: %s");
+        de_de.setProperty("remindme_also",  "Wenn Du auch erinnert werden möchtest, drücke %s");
+        de_de.setProperty("remindme_at", "Erinnerung am");
+        de_de.setProperty("remindme_success",  "Du wurdest erinnert %s");
+        de_de.setProperty("remindme_remind", "Hi Meister, hier ist deine angeforderte Erinnerung.");
+        de_de.setProperty("remindme_jump", "Hier drücken um zum Kontext zu gelangen.");
+
+        // Signup
+        de_de.setProperty("signup_description", "Einfache Eventorganisation indem Leute sich anmelden können");
+        de_de.setProperty("signup_usage", "**Starte eine Anmeldung**\n" +
+                "Command: `%s%s \"Optionaler Titel\" [Zeitangaben und Teilnehmer]`\n" +
+                "Beispiel 1: `%s%s \"Raid Event\" 3d 2h 1m 10p`\n" +
+                "Beispiel 2: `%s%s 3d 2h 1m 10p`\n" +
+                "⮡ `3d` + `2h` + `1m` + `10p` = 3 Tage, 2 Stunden, 1 Minute, 10 Teilnehmer");
+        de_de.setProperty("signup_hint", "- Die Anzahl der Teilnehmer muss zwischen 1 und 100 sein.\n\n" + valid_args + "\n- Teilnehmer: participants, participant, p");
+
+        de_de.setProperty("signup_missing_participants", "Du musst angeben, wie viele Leute teilnehmen dürfen. Z.B.: `%ssignup \"Optionale Titel\" 10p 1d`");
+        de_de.setProperty("signup_30_days", "Diese Anmeldung darf nicht weiter in der Zukunft sein als 30 Tage.");
+
+        de_de.setProperty("signup_embedtitle", "Anmeldung");
+        de_de.setProperty("signup_embedtitle_topic", "Anmeldung für %s");
+        de_de.setProperty("signup_embeddescription", "Klicke auf %s um teilzunehmen.\n" +
+                "%s Leute können teilnehmen!\n\n" +
+                "Entferne besagte Reaktion falls du deine Meinung geändert hast.\n" +
+                "%s, um die Anmeldung manuell zu beenden, klicke auf ❌");
+        de_de.setProperty("signup_embeddescriptionend", "%s Leute konnten teilnehmen!\n" +
+                "Dies sind die Teilnehmer:");
+        de_de.setProperty("signup_nobody", "Keiner hat sich angemeldet");
+        de_de.setProperty("signup_event", "Event am");
+        de_de.setProperty("signup_ended", "Diese Anmeldung ist geschlossen.");
+
+        // Timezone
+        de_de.setProperty("timezone_description", "Konvertiert ein Datum und Zeit von einer Zeitzone in eine andere");
+        de_de.setProperty("timezone_usage", "**Konvertiere ein Datum und Zeit in eine andere Zeitzone**\n" +
+                "Befehl: `%s%s yyyy-mm-dd hh:mm [Start-Zeitzone] [Ziel-Zeitzone]`\n" +
+                "Beispiel: `%s%s 2019-01-01 22:00 PST CET`");
+        de_de.setProperty("timezone_hint", "Dieser Befehl benutzt das 24 Stunden System.");
+
+        de_de.setProperty("timezone_missingargs", "Fehlende Angaben.");
+        de_de.setProperty("timezone_invalidzone_start", "Ungültige Start-Zeitzone.");
+        de_de.setProperty("timezone_invalidzone_target", "Ungültige Ziel-Zeitzone.");
+        de_de.setProperty("timezone_conversion", "Zeitzonenkonvertierung");
+        de_de.setProperty("timezone_input", "Eingabe");
+        de_de.setProperty("timezone_output", "Ausgabe");
+        de_de.setProperty("timezone_invalid", "Ungültige Eingabe. Überprüfe deine Formatierungen.");
+
+        ///////////////////////////////////// Plugins /////////////////////////////////////
+
+        ////////////////// Moderation //////////////////
+
+        // BestOfImage & BestOfQuote
+        de_de.setProperty("bestof_jump", "Drücke hier, um zur orginalen Nachricht zu gelangen.");
+        de_de.setProperty("bestof_footer", "%s Stimmen | #%s");
+
+        // Birthday
+        de_de.setProperty("birthday_gratulation", "Herzlichen Glückwunsch zum Geburtstag %s!");
+        de_de.setProperty("birthday_countdown", "Countdown");
+        de_de.setProperty("birthday_countdown_value_sin", "in %s Tag  ");
+        de_de.setProperty("birthday_countdown_value", "in %s Tagen");
+        de_de.setProperty("birthday_date", "Datum");
+        de_de.setProperty("birthday_name", "Name");
+        de_de.setProperty("birthday_missing", "Keine Geburtstage vorhanden.");
+        de_de.setProperty("birthday_guild", "%s Geburtstage");
+        de_de.setProperty("birthday_howtoadd", "Füge deinen Geburtstag im [Dashboard](%s) hinzu!");
+        de_de.setProperty("birthday_as_of", "Stand");
+
+        // Giveaway
+        de_de.setProperty("giveaway_dm", "Ich habe deine Teilnahme für [dieses](%s) Giveaway gezählt!");
+        de_de.setProperty("giveaway_dm_footer", "Falls dort mehr als 5000 Reaktionen vorhanden sind, mag der Counter verbuggt aussehen, aber ich habe dich dennoch mitgezählt!");
+
+        // Join
+        de_de.setProperty("join_author", "Willkommen %s zu %s");
+        de_de.setProperty("join_embeddescription", "Genieße deinen Aufenthalt!");
+        de_de.setProperty("join_footer", "Trat bei am");
+
+        /// Leave
+        de_de.setProperty("leave_author", "Lebewohl %s");
+        de_de.setProperty("leave_embeddescription", "Es ist schade, Dich gehen zu sehen!");
+        de_de.setProperty("leave_footer", "Trat aus am");
+
+        // Level (incl. LevelRole)
+        de_de.setProperty("levelrole_levelup", "LEVEL UP");
+        de_de.setProperty("level_up", "%s erreichte soeben Level %s! \uD83C\uDF89");
+        de_de.setProperty("levelrole_role_singular", "Du hast zusätzlich folgende Rolle erhalten:");
+        de_de.setProperty("levelrole_role_plural", "Du hast zusätzelich folgende Rollen erhalten:");
+        de_de.setProperty("level_missingpermission_embed", "Ich habe keine Rechte Embeds zu erstellen (Links einbetten). Deshalb siehst du die Sparversion der Level-Up Benachrichtigung.");
+        de_de.setProperty("level_hierarchy", "Ich konnte ein oder mehrere Rollen nicht hinzufügen, weil der Nutzer höher in der Hierarchie ist als ich.");
+
+        // Livestream
+        de_de.setProperty("livestream_announcement_title", "Livestream!");
+        de_de.setProperty("livestream_announcement", "%s ging gerade auf [Twitch (click me)](%s) live!");
+        de_de.setProperty("livestream_announcement_game", "Streamt %s");
+
+        // Log
+        de_de.setProperty("log_at", "Gelogt am");
+
+        de_de.setProperty("log_category_create_title", "Kategorie erstellt");
+        de_de.setProperty("log_category_delete_title", "Kategorie gelöscht");
+        de_de.setProperty("log_category_name", "Kategoriename");
+
+        de_de.setProperty("log_emote_add_title", "Emote hinzugefügt");
+        de_de.setProperty("log_emote_remove_title", "Emote gelöscht");
+        de_de.setProperty("log_emote_name", "Emotename");
+
+        de_de.setProperty("log_user_ban_title", "Nutzer gebannt");
+        de_de.setProperty("log_banned_user", "Gebannter Nutzer");
+        de_de.setProperty("log_banned_user_id", "Gebannter Nutzer ID");
+
+        de_de.setProperty("log_invite_create_title", "Einladung erstellt");
+        de_de.setProperty("log_invite_delete_title", "Einladung gelöscht");
+        de_de.setProperty("log_invite_channel", "Zum Kanal");
+
+        de_de.setProperty("log_user_join_title", "Nutzer beigetreten");
+        de_de.setProperty("log_user_leave_title", "Nutzer verlassen");
+
+        de_de.setProperty("log_role_add_title", "Nutzer erhielt Rolle(n)");
+        de_de.setProperty("log_role_remove_title", "Nutzer hat Rolle(n) verloren");
+
+        de_de.setProperty("log_msg_delete_title", "Nachricht gelöscht");
+        de_de.setProperty("log_msg_update_title", "Nachricht editiert");
+        de_de.setProperty("log_msg_too_old_author", "Zu alt, um den Autorennamen zu bekommen");
+        de_de.setProperty("log_msg_too_old_content", "Zu alt, um den vorherigen Inhalt zu bekommen");
+        de_de.setProperty("log_msg_old_content", "Alter Inhalt");
+        de_de.setProperty("log_msg_new_content", "Neuer Inhalt");
+
+        de_de.setProperty("log_user_unban_title", "Nutzer entbannt");
+        de_de.setProperty("log_unbanned_user", "Entbannter Nutzer");
+        de_de.setProperty("log_unbanned_user_id", "Entbannter Nutzer ID");
+
+        de_de.setProperty("log_boost_count_title", "Boost-Anzahl aktualisiert");
+        de_de.setProperty("log_boost_tier_title", "Boost-Rang aktualisiert");
+        de_de.setProperty("log_old_boost_count", "Alte Boostanzahl");
+        de_de.setProperty("log_new_boost_count", "Neue Boostanzahl");
+        de_de.setProperty("log_changing_perks", "Ändernde Perks");
+        de_de.setProperty("log_emote_slots", "Emote Plätze");
+        de_de.setProperty("log_max_bitrate", "Max Bitrate");
+
+        de_de.setProperty("log_role_create_title", "Rolle erstellt");
+        de_de.setProperty("log_role_delete_title", "Rolle gelöscht");
+        de_de.setProperty("log_role_name", "Rollenname");
+
+        de_de.setProperty("log_tc_create_title", "Textkanal erstellt");
+        de_de.setProperty("log_tc_delete_title", "Textkanal deleted");
+        de_de.setProperty("log_tc_name", "Textkanalname");
+
+        de_de.setProperty("log_vc_join_title", "Sprachkanal beigetreten");
+        de_de.setProperty("log_vc_move_title", "Sprachkanal gewechselt");
+        de_de.setProperty("log_vc_leave_title", "Sprachkanal verlassen");
+        de_de.setProperty("log_vc_create_title", "Sprachkanal erstellt");
+        de_de.setProperty("log_vc_delete_title", "Sprachkanal gelöscht");
+        de_de.setProperty("log_vc_name", "Sprachkanalname");
+
+        // MediaOnlyChannel
+        de_de.setProperty("mediaonlychannel_warning", "%s, dies ist ein MediaOnly-Kanal!\n" +
+                "Du darfst:\n" +
+                "- Dateien mit einer optionalen Beschreibung hochladen.\n" +
+                "- Einen gültigen Link mit einer optionalen Beschreibung senden.\n" +
+                "*Diese Nachricht wird in 30 Sekunden gelöscht.*");
+
+        // ReactionRole
+        de_de.setProperty("reactionrole_insufficient", "Ungenügende Berechtigungen oder ein Problem mit der Hierarchie.");
+
+        // RemindMe
+        de_de.setProperty("remindme_dm", "Ich habe deine Teilnahme an [dieser](%s) Erinnerung gezählt!");
+        de_de.setProperty("remindme_dm_footer", "Falls dort mehr als 5000 Reaktionen vorhanden sind, mag der Counter verbuggt aussehen, aber ich habe dich dennoch mitgezählt!\"");
+
+        // VoiceLobby
+        de_de.setProperty("voicelobby_lobby", "Lobby");
+
+        ///////////////////////////////////// Features /////////////////////////////////////
+
+        // Achievement
+        de_de.setProperty("achievement_console", "Konsole");
         de_de.setProperty("achievement_excalibur", "Excalibur");
         de_de.setProperty("achievement_unlimited_blade_works", "Unlimited Blade Works");
         de_de.setProperty("achievement_gae_bolg", "Die Legende des Lancer");
@@ -1155,1054 +1428,37 @@ public class LanguageFile {
         de_de.setProperty("achievement_fiteme", "Fite me!!!");
         de_de.setProperty("achievement_xmas", "Xmas Time");
 
-        /// Invite
+        // EasterEggs
+        de_de.setProperty("eastereggs_you_are_welcome", "Sehr gerne, %s");
+
+        // Invite
         de_de.setProperty("invite_author", "%s, zu Ihren Diensten!");
         de_de.setProperty("invite_description", "Danke Dir, dass Du mich gewählt hast, Dich und Deinen Server zu unterstützen.\n" +
-                "Ich habe eine Menge Funktionen. Die meisten davon sind standardmäßig aktiviert, aber einige sind es nicht.\n" +
-                "Schreibe `%stoggle all show`, um den Status aller Funktionen nachzusehen.\n" +
-                "Danach kannst Du die Features nach belieben ein- bzw. ausschalten.\n" +
+                "Ich habe eine Menge Funktionen. Die meisten davon sind standardmäßig aktiviert, aber einige sind es nicht (z.B. das Leveling-System).\n" +
                 "\n" +
-                "Für den Start empfehle ich Dir den `%shelp` Befehl zu benutzen.\n" +
-                "Um eine detailierte Hilfe zu einem Befehl zu bekommen, gebe diesen einfach ohne Argumente ein. Z. B. `%savatar`\n" +
+                "Für den Start empfehle ich Dir, Dir die [Website](%s) anzusehen. Dort gibt es eine ausführliche Hilfe zu allen Befehlen, sowie ein Dashboard, in diesem Du alles mögliche einstellen oder an-/ausschalten kannst.\n" +
                 "\n" +
-                "Falls Du weitere Hilfe benötigst, kannst Du meinem Hilfsserver beitreten oder meinen Ersteller privat anschreiben.\n" +
-                "Hilfsserver: [Klicke um beizutreten](https://%s)\n" +
-                "Name des Erstellers: %s#%s\n" +
-                "E-Mail: `servant@tanc.red`\n" +
+                "Hilfsserver: [Klicke um beizutreten](%s)\n" +
                 "\n" +
                 "Viel Spaß!");
         de_de.setProperty("invite_footer", "Du hast diese Nachricht erhalten, da jemand mich zu Deinem Server (%s) eingeladen hat.");
 
-        /// Kick
-        de_de.setProperty("kick_author", "Lebewohl!");
-        de_de.setProperty("kick_description", "Es ist sehr traurig zu hören, dass Du mich nicht mehr benötigst.\n" +
-                "Falls es irgendetwas gibt, das ich an mir verbessern kann, lasse es mich bitte wissen.\n" +
-                "\n" +
-                "Um eine Rückmeldung zu geben kannst Du dem Hilfsserver beitreten oder meinen Erschaffer privat schreiben.\n" +
-                "Hilfsserver: [Click to join](https://%s)\n" +
-                "Name des Erschaffers: %s#%s\n" +
-                "E-Mail: `servant@tanc.red`\n");
-        de_de.setProperty("kick_footer", "Du hast diese Nachricht erhalten, da jemand mich von deinem Server (%s) gekickt hat oder dieser gelöscht wurde.");
-
-        /// Patreon Handler
-        de_de.setProperty("patreon_warning", "Du musst ein %s sein, um diese Funktion nutzen zu können!");
-
-        /// Presence
+        // Presence
         de_de.setProperty("presence_0", "v%s | %shelp");
-        de_de.setProperty("presence_1", "%s Meister | %shelp");
+        de_de.setProperty("presence_1", "%s Nutzer | %shelp");
         de_de.setProperty("presence_2", "%s Server | %shelp");
-        de_de.setProperty("presence_3", "%spatreon | %shelp");
-        de_de.setProperty("presence_4", "https://servant.tanc.red");
+        de_de.setProperty("presence_3", "%ssupporter | %shelp");
+        de_de.setProperty("presence_4", "DASHBOARD: %s");
+        de_de.setProperty("presence_5", "#StayAtHome | %shelp");
+        de_de.setProperty("presence_6", "#BLM | %shelp");
 
-        // Owner
-        /// Add Gif
-        de_de.setProperty("addgif_description", "Dies ist ein Befehl, um GIFs zu den Interaktion-Befehlen hinzuzufügen.");
-        de_de.setProperty("addgif_usage", "**Füge ein GIF hinzu**\n" +
-                "Befehl: `%s%s [interaktion] [GIF URL]`\n" +
-                "Beispiel: `%s%s slap https://i.imgur.com/bbXmAx2.gif`\n");
-        de_de.setProperty("addgif_hint", "Bild URL muss ein [direct link](https://www.urbandictionary.com/define.php?term=direct%20link) sein.");
-        de_de.setProperty("addgif_args", "2 Arugmente sind nötig.\n... [interaktion] [GIF URL]");
-        de_de.setProperty("addgif_interaction", "Ungültige Interaktion.");
-        de_de.setProperty("addgif_direct_link", "Keine gültige GIF URL. Es muss ein direct link sein!");
+        // Supporter
+        de_de.setProperty("supporter_dono", "%s hat gerade Geld über PayPal gespendet.\nHeißt einen neuen Supporter willkommen!");
+        de_de.setProperty("supporter_patron", "%s wurde gerade zum Patron.\nHeißt einen neuen Supporter willkommen!");
+        de_de.setProperty("supporter_boost", "%s hat gerade den Server geboostet.\nHeißt einen neuen Supporter willkommen!");
 
-        /// Blacklist
-        de_de.setProperty("blacklist_missingid", "Füge eine ID hinzu");
-        de_de.setProperty("blacklist_empty", "Keine geblacklisteten IDs.");
-
-        /// Server List
-        de_de.setProperty("guildlist_members", "Mitglieder");
-        de_de.setProperty("guildlist_connected", "Server, die mit **%s** verbunden sind");
-
-        // Moderation
-        /// Auto Role
-        de_de.setProperty("autorole_description", "Diese Rolle wird automatisch neuen Mitgliedern gegeben.");
-        de_de.setProperty("autorole_usage", "**Stelle eine neue autorole ein**\n" +
-                "Befehl: `%s%s set [@role] [optinal delay]`\n" +
-                "Beispiel 1: `%s%s set @Mitglied`\n" +
-                "Beispiel 2: `%s%s set @Mitglied 10` - Rolle nach 10 Minuten.\n" +
-                "\n" +
-                "**Setze die autorole zurück**\n" +
-                "Befehl: `%s%s unset`\n" +
-                "\n" +
-                "**Zeige die aktuelle autorole an**\n" +
-                "Befehl: `%s%s show`");
-        de_de.setProperty("autorole_hint", "Die Rolle beim Einstellen zu erwähnen, erwähnt auch jedes Mitglied mit dieser Rolle.\n" +
-                "Führe diesen Befehl in einem verstecktem Kanal aus, um das Erwähen vieler Mitglieder zu verhindern.");
-        de_de.setProperty("autorole_no_role", "Du hast keine Rolle erwähnt.");
-        de_de.setProperty("autorole_missing", "Es wurde noch keine autorole gesetzt.");
-        de_de.setProperty("autorole_no_current", "Es gibt aktuell keine autorole.");
-        de_de.setProperty("autorole_current", "Die aktuelle autorole ist: %s (%s) mit einer Verzögerung von %s Minuten.");
-        de_de.setProperty("autorole_first_arg", "Ungültiges erstes Argument.\nEntweder `set`, `unset` oder `show`");
-
-        /// Birthday
-        de_de.setProperty("birthday_description", "Verwalte die Geburtstage auf diesem Server:\n" +
-                "- Mitglieder können ihren Geburtstag der Liste hinzufügen.\n" +
-                "- Mitglieder können ihren Geburstag von der Liste enfernen.\n" +
-                "- Mitglieder können eine einmalige Liste aller Geburtstage des Servers erstellen.\n" +
-                "- Moderatoren können einen Benachrichtungskanal festlegen, in welchem %s den entsprechenden Mitgliedern gratulieren wird.\n" +
-                "- Moderatoren können eine Liste aller Geburtstage des Servers erstellen, welche sich regelmäßig aktualisiert.\n" +
-                "- Moderatoren können %ss Geburtstag hinuzfügen oder entfernen.");
-        de_de.setProperty("birthday_usage", "**Stelle einen Benachrichtungskanal ein**\n" +
-                "Befehl: `%s%s #kanal`\n" +
-                "**Setze den Benachrichtungskanal zurück**\n" +
-                "Befehl: `%s%s unsetchannel`\n" +
-                "**Erstelle eine automatisch aktualisierende Geburtstagsliste**\n" +
-                "Befehl: `%s%s updatelist`\n" +
-                "**Füge Deinen Geburtstag hinzu**\n" +
-                "Befehl: `%s%s yyyy-MM-dd`\n" +
-                "Beispiel: `%s%s 1990-12-31`\n" +
-                "**Entferne Deinen Geburtstag**\n" +
-                "Befehl: `%s%s unsetbirthday`\n" +
-                "**Erstelle eine einmalige Geburtstagsliste**\n" +
-                "Befehl: `%s%s list`\n" +
-                "**Füge/Entferne %ss Geburtstag hinzu**\n" +
-                "Befehl: `%s%s %s`");
-        de_de.setProperty("birthday_hint", "Die Befehle haben unterschiedliche benötigte Berechtigungen.\n" +
-                "Siehe Beschreibung:\n" +
-                "- \"Mitglieder\": Jeder\n" +
-                "- \"Moderatoren\": Kanäle verwalten");
-        de_de.setProperty("birthday_countdown", "Countdown");
-        de_de.setProperty("birthday_countdown_value", "in %s Tagen");
-        de_de.setProperty("birthday_date", "Datum");
-        de_de.setProperty("birthday_name", "Name");
-        de_de.setProperty("birthday_missing", "Keine Geburtstage vorhanden.");
-        de_de.setProperty("birthday_guild", "%s Geburtstage.");
-        de_de.setProperty("birthday_as_of", "Stand");
-        de_de.setProperty("birthday_gratulation", "Herzlichen Glückwunsch zum Geburtstag %s!");
-        de_de.setProperty("birthday_not_set", "Du hattest noch keinen Geburtstag gesetzt.");
-        de_de.setProperty("birthday_invalid", "Ungültiges Argument.\n" +
-                "Mods können...\n" +
-                "... einen Kanal erwähnen, um diesen als Benachrichtungskanal einzustellen.\n" +
-                "... `unsetchannel` schreiben, um den Benachrichtungskanal zurückzusetzen.\n" +
-                "... `updatelist` schreiben, um eine automatisch regelmäßig aktualisierende Geburtstagsliste zu erzeugen.\n" +
-                "Jeder kann...\n" +
-                "... ihren Geburtstag (yyyy-MM-dd) der Liste hinzufügen.\n" +
-                "... `unsetbirthday` schreiben, um ihren Geburtstag aus der Liste enfernen zu lassen.\n" +
-                "... `list` schreiben, um eine einmalige Geburtstagsliste zu bekommen.");
-        de_de.setProperty("birthday_howtoadd", "Füge deinen Geburtstag hinzu via `!birthday 1990-12-31`");
-
-        /// Best of's
-        de_de.setProperty("bestof_usage", "**Richte das Abstimmungs-Emote/Emoji ein**\n" +
-                "Befehl: `%s%s [Emoji oder Emote]`\n" +
-                "Beispiel (Emoji): `%s%s ⭐`\n" +
-                "Beispiel (Emote): `%s%s` %s\n" +
-                "\n" +
-                "**Richte einen Best-of-Kanal ein**\n" +
-                "Befehl: `%s%s #kanal`\n" +
-                "\n" +
-                "**Richte ein, wie viele Leute abstimmen müssen**\n" +
-                "Befehl: `%s%s [Nummer]`\n" +
-                "Beispiel: `%s%s 10`\n" +
-                "\n" +
-                "**Richte ein, wie viel Prozent der Online-Nutzer abstimmen müssen**\n" +
-                "Befehl: `%s%s [Prozentsatz]%s`\n" +
-                "Beispiel: `%s%s 50%s`\n" +
-                "\n" +
-                "**Zeige das aktuelle Setup an**\n" +
-                "Befehl: `%s%s show`");
-        de_de.setProperty("bestof_hint", "Sowohl eine Nummer als auch einen Prozentsatz einzurichten hat einen entscheidenen Vorteil:\n" +
-                "- Während dein Server wächst, ist es vorteilhaft einen Prozentsatz festzulegen, damit sich die Anzahl der Leute, die abstimmen müssen, automatisch anpasst.\n" +
-                "- Allerdings sind während der Nacht eventuell viel weniger Leute online und die Prozentzahl könnte missbraucht werden. Daher kannst Du eine Nummer festlegen, die immer erreicht werden muss.");
-        de_de.setProperty("bestof_emote", "Emote/Emoji");
-        de_de.setProperty("bestof_noemote", "Kein Emote/Emoji gesetzt");
-        de_de.setProperty("bestof_number", "Nummer");
-        de_de.setProperty("bestof_nonumber", "Keine Nummer gesetzt");
-        de_de.setProperty("bestof_percentage", "Prozentsatz");
-        de_de.setProperty("bestof_nopercentage", "Kein Prozentsatz gesetzt");
-        de_de.setProperty("bestof_channel", "Kanal");
-        de_de.setProperty("bestof_nochannel", "Kein Kanal gesetzt");
-        de_de.setProperty("bestof_numbertoobig", "Dise Number ist viel zu groß!");
-        de_de.setProperty("bestof_invalidpercentage", "Dieser Prozentsatz ist ungültig.");
-        de_de.setProperty("bestof_invalidemote", "Ich kann dieses Emote nicht finden! Stelle sicher, dass ich darauf Zugriff habe!");
-        de_de.setProperty("bestof_invalidemoji", "Ungültiges Emoji, Meister!");
-        de_de.setProperty("bestof_jump", "Drücke hier, um zur orginalen Nachricht zu gelangen.");
-        de_de.setProperty("bestof_footer", "%s Stimmen | #%s");
-
-        /// Best of Image
-        de_de.setProperty("bestofimage_description", "Nutzer können Bildern ihre Stimme geben, sodass dieses eventuell im Best-of-Kanal gepostet wird.\n" +
-                "Du kannst das Abstimmungs-Emote/Emoji, den Best-of-Kanal und die Anzahl an Leute, die abstimmen müssen numerisch und prozentual einstellen.");
-        de_de.setProperty("bestofimage_setup", "Best Of Image Setup");
-
-        /// Best of Quote
-        de_de.setProperty("bestofquote_description", "Nutzer können Nachrichten ihre Stimme geben, sodass diese eventuell im Best-of-Kanal gepostet wird.\n" +
-                "Du kannst das Abstimmungs-Emote/Emoji, den Best-of-Kanal und die Anzahl an Leute, die abstimmen müssen numerisch und prozentual einstellen.");
-        de_de.setProperty("bestofquote_setup", "Best Of Quote Setup");
-
-        /// Clear
-        de_de.setProperty("clear_description", "Löscht bis zu 100 Nachrichten.\n" +
-                "Kann nutzerspezifische Nachrichten der letzten 100 Nachrichten löschen.\n" +
-                "Nachrichten, die älter sind als zwei Wochen, können aufgrund von Discords Beschränkungen nicht automatisiert gelöscht werden.");
-        de_de.setProperty("clear_usage", "**Lösche einige Nachrichten**\n" +
-                "Befehl: `%s%s [1 - 100 ODER @Nutzer]`\n" +
-                "Beispiel 1: `%s%s 50`\n" +
-                "Beispiel 2: `%s%s @Name");
-        de_de.setProperty("clear_hint", "Die Anzahl der Nachrichten ist inklusiv, d. h. Du kannst nur eine Nachricht oder auch ganze 100 löschen.");
-        de_de.setProperty("clear_input", "Du kannst nur eine Nummer oder eine Nutzererwähnung angeben!");
-        de_de.setProperty("clear_sub_one", "Die Eingabe darf nicht niedriger als 1 sein.");
-        de_de.setProperty("clear_cleared", "%s Nachrichten gelöscht");
-        de_de.setProperty("clear_invalid", "Deine Eingabe ist ungültig. Versuche es mit einer kleineren Zahl.");
-
-        /// Join + Leave general
-        de_de.setProperty("joinleave_nochannel_mention", "Kein Kanal wurde erwähnt.");
-        de_de.setProperty("joinleave_unset_fail", "Kein Kanal wurde bisher gesetzt.");
-        de_de.setProperty("joinleave_nochannel_set", "Kein Kanal wurde gesetzt.");
-        de_de.setProperty("joinleave_current", "Aktueller Kanal: %s");
-        de_de.setProperty("joinleave_firstarg", "Entweder `set`, `unset` oder `show`");
-
-        /// Join
-        de_de.setProperty("join_description", "Der Bot wird eine Benachrichtigung posten, sobald ein Nutzer den Server betreten hat.");
-        de_de.setProperty("join_usage", "**Einrichten des Beitrittsbenachrichtigungskanals**\n" +
-                "Befehl: `%s%s set [#kanal]`\n" +
-                "Beispiel: `%s%s set #willkommen`\n" +
-                "\n" +
-                "**Zurücksetzen des Kanals**\n" +
-                "Befehl: `%s%s unset`\n" +
-                "\n" +
-                "**Anzeigen des aktuellen Kanals**\n" +
-                "Befehl: `%s%s show`");
-        de_de.setProperty("join_author", "Willkommen %s#%s zu %s");
-        de_de.setProperty("join_embeddescription", "Genieße deinen Aufenthalt!");
-        de_de.setProperty("join_footer", "Trat bei am");
-
-        /// Leave
-        de_de.setProperty("leave_description", "Der Bot wird eine Benachrichtung posten, sobald ein Nutzer den Server verlassen hat.");
-        de_de.setProperty("leave_usage", "**Einrichten des Austrittsbenachrichtungskanals**\n" +
-                "Befehl: `%s%s set [#kanal]`\n" +
-                "Beispiel: `%s%s set #willkommen`\n" +
-                "\n" +
-                "**Zurücksetzen des Kanals**\n" +
-                "Befehl: `%s%s unset`\n" +
-                "\n" +
-                "**Anzeigen des aktuellen Kanals**\n" +
-                "Befehl: `%s%s show`");
-        de_de.setProperty("leave_left", "%s#%s verließ %s!");
-        de_de.setProperty("leave_author", "Lebewohl %s#%s");
-        de_de.setProperty("leave_embeddescription", "Es ist schade, Dich gehen zu sehen!");
-        de_de.setProperty("leave_footer", "Trat aus am");
-
-        /// Level Role
-        de_de.setProperty("levelrole_description", "Richte Rollen ein, die einem Mitglied zugeteilt werden, sobald dieser ein bestimmtes Level erreicht.");
-        de_de.setProperty("levelrole_usage", "**Richte eine Rolle ein**\n" +
-                "- Befehl: `%s%s set [Level] @Rolle`\n" +
-                "- Beispiel: `%s%s set 10 @SuperMitglied`\n" +
-                "\n" +
-                "**Setze eine Rolle zurück**\n" +
-                "- Befehl: `%s%s unset [Level] @Rolle`\n" +
-                "- Beispiel: `%s%s unset 10 @SuperMitglied`\n" +
-                "\n" +
-                "**Zeige die aktuellen levelroles an**\n" +
-                "- Befehl: `%s%s show`\n" +
-                "\n" +
-                "**Aktualisieren**\n" +
-                "- Befehl: `%s%s refresh`");
-        de_de.setProperty("levelrole_hint", "Du kannst mehrere Rollen einem Level zuweisen.\n" +
-                "Mit refresh kannst du den Bot alle Mitglieder überprüfen lassen und die eventuell fehlenden Levelroles hinzufügen, sofern ein Mitglied diese nicht bekommen hat oder eine neue Levelrolle hinzugefügt wurde, welche unter dem Level eines Mitglieds ist. Hierbei werden keine Rollen entfernt.");
-        de_de.setProperty("levelrole_missing", "Du musst ein Level und eine Rollenerwähnung angeben.");
-        de_de.setProperty("levelrole_invalidlevel", "Ungültiges Level.");
-        de_de.setProperty("levelrole_levelrole", "Levelrolle");
-        de_de.setProperty("levelrole_empty", "Keine Levelrollen gesetzt.");
-        de_de.setProperty("levelrole_current", "Aktuelle Levelrollen");
-        de_de.setProperty("levelrole_alreadyset", "Diese Rolle wurde bereits für dieses Level gesetzt.");
-        de_de.setProperty("levelrole_role_singular", "Du hast zusätzlich folgende Rolle erhalten:");
-        de_de.setProperty("levelrole_role_plural", "Du hast zusätzelich folgende Rollen erhalten:");
-        de_de.setProperty("levelrole_levelup", "LEVEL UP");
-        de_de.setProperty("level_missingpermission_embed", "Ich habe keine Rechte Embeds zu erstellen (Links einbetten). Deshalb siehst du die Sparversion der Level-Up Benachrichtigung.");
-        de_de.setProperty("level_hierarchy", "Ich konnte die roll \"%s\" nicht hinzufügen, weil der Nutzer höher in der Hierarchie ist als ich.");
-
-        /// Livestream
-        de_de.setProperty("livestream_description", "Du kannst mehrere Streamer, einen Benachrichtigungskanal und eine Streamerrolle festlegen.\n" +
-                "Sobald ein Streamer online geht, wird eine Benachrichtigung **mit** @here gepostet und der Streamer bekommt die gesetzte Rolle.\n" +
-                "Falls Du den Streamer-Modus `off` togglest, wird eine Benachtigung **ohne** @here gepostet und das Mitglied bekommt die gesetzte Rolle.");
-        de_de.setProperty("livestream_usage", "**Hinzufügen/Löschen eines Streamers**\n" +
-                "Hinzufügen: `%s%s set @nutzer`\n" +
-                "Löschen: `%s%s unset @nutzer`\n" +
-                "\n" +
-                "**(Zurück)setzen des Benachrichtigungskanals**\n" +
-                "Setzen: `%s%s set #kanal`\n" +
-                "Zurücksetzen: `%s%s unset #kanal`\n" +
-                "\n" +
-                "**(Zurück)setzen der Streamer Rolle**\n" +
-                "Setzen: `%s%s set @rolle`\n" +
-                "Zurücksetzen: `%s%s unset @rolle`\n" +
-                "\n" +
-                "**Toggle Streamer-Mode**\n" +
-                "Befehl: `%s%s toggle`\n" +
-                "\n" +
-                "**Zeige die aktuellen Steameinstellungen an**\n" +
-                "Befehl: `%s%s show`");
-        de_de.setProperty("livestream_hint", "Streamer-Modus: Nur gesetze Streamer lösen eine Benachrichtigung aus und erhalten eine Rolle.\n" +
-                "Öffentlicher Modus: Jeder löst eine Benachrichtigung aus und erhält eine Rolle.");
-        de_de.setProperty("livestream_missingmention", "Du kannst keinen Kanal, User oder Rolle erwähnt..");
-        de_de.setProperty("livestream_toomanymentions", "Du hast zu viel erwähnt. Eins nach dem anderen!");
-        de_de.setProperty("livestream_nochannel", "Es wurde kein Kanal gesetzt.");
-        de_de.setProperty("livestream_nostreamer", "Dieser Nutzer ist kein Streamer.");
-        de_de.setProperty("livestream_norole", "Diese Rolle wurde nicht gesetzt.");
-        de_de.setProperty("livestream_firstarg", "Entweder `set`, `unset` oder `show`");
-        de_de.setProperty("livestream_settings", "Livetream Einstellungen");
-        de_de.setProperty("livestream_notificationchannel", "Benachrichtigungskanal");
-        de_de.setProperty("livestream_role", "Livestreaming Rolle");
-        de_de.setProperty("livestream_mode", "Streamer-Modus");
-        de_de.setProperty("livestream_streamers", "Streamer");
-        de_de.setProperty("livestream_nochannelset", "Kein Kanal gesetzt");
-        de_de.setProperty("livestream_noroleset", "Keine Rolle gesetzt");
-        de_de.setProperty("livestream_publicmode", "Öffentlicher Modus");
-        de_de.setProperty("livestream_nostreamersset", "Keine Streamer gesetzt");
-        de_de.setProperty("livestream_announcement_title", "Livestream!");
-        de_de.setProperty("livestream_announcement", "%s ging gerade auf [Twitch (click me)](%s) live!");
-        de_de.setProperty("livestream_announcement_game", "Streamt %s");
-
-        /// Log
-        de_de.setProperty("log_description", "Dokumentiere Sachen, die in deinem Server passieren.");
-        de_de.setProperty("log_usage", "**Setze/aktualisiere den Log-Kanal**\n" +
-                "Befehl: `%s%s set [#kanal]`\n" +
-                "Beispiel: `%s%s set #log`\n" +
-                "\n" +
-                "**Setze den Log zurück** (Dies löscht alle Log-Einstellungen)\n" +
-                "Befehl: `%s%s unset`\n" +
-                "\n" +
-                "**Zeige die aktuellen Log-Einstellungen an**\n" +
-                "Befehl: `%s%s show`\n" +
-                "\n" +
-                "**(De)aktiviere zu dokumentierende Events**\n" +
-                "Befehl: `%s%s toggle [Eventname]`\n" +
-                "Beispiel: `%s%s toggle role_add`");
-        de_de.setProperty("log_hint", "Indem du `%s%s show` eingibst, kannst du eine volle Liste der Eventnamen erhalten.");
-        de_de.setProperty("log_invalidmention", "Du musst einen Kanal erwähnen.");
-        de_de.setProperty("log_unset", "Es gibt nichts zum zurücksetzen.");
-        de_de.setProperty("log_settings", "Log-Einstellungen");
-        de_de.setProperty("log_channel", "Log-Kanal");
-        de_de.setProperty("log_events", "Events");
-        de_de.setProperty("log_on", "An");
-        de_de.setProperty("log_off", "Aus");
-        de_de.setProperty("log_boost_count_title", "Boost Zähler Aktualisierung");
-        de_de.setProperty("log_boost_count_description", "Neue Boost-Anzahl: %s");
-        de_de.setProperty("log_member_join_title", "Mitglied ist dem Server beigetreten");
-        de_de.setProperty("log_member_join_description", "%s ist soeben diesem Server beigetreten.");
-        de_de.setProperty("log_member_leave_title", "Mitglied hat den Server verlassen");
-        de_de.setProperty("log_member_leave_description", "%s hat soeben den Server verlassen.");
-        de_de.setProperty("log_role_add_title", "Rolle(n) hinzugefügt");
-        de_de.setProperty("log_role_add_description", "%s erhielt soeben folgende Rolle(n): %s");
-        de_de.setProperty("log_role_remove_title", "Rolle(n) entfernt");
-        de_de.setProperty("log_role_remove_description", "%s verlor soeben folgende Rolle(n): %s");
-        de_de.setProperty("log_toggle_args", "Du musst angeben, welches Event Du togglen willst. Benutze `%s%s show`, um eine komplette Liste zu erhalten.");
-        de_de.setProperty("log_toggle_invalid_args", "Du musst einen gültigen Eventnamen angeben. Benutze `%s%s show`, um eine komplette Liste zu erhalten.");
-
-        /// Media Only Channel
-        de_de.setProperty("mediaonlychannel_description", "Falls ein Mitglied eine normale Nachricht in einen Textkanal, der als MediaOnlyChannel markiert ist, schreibt, wird die Nachricht gelöscht und eine Warnung wird gesendet.\n" +
-                "Mitglieder können nur Links posten oder Dateien hochladen.\n" +
-                "Dies kann sehr nützlich sein für z.B. einen Meme Kanal.");
-        de_de.setProperty("mediaonlychannel_usage", "**Richte den MediaOnlyChannel ein**\n" +
-                "Befehl: `%s%s set [#kanal]`\n" +
-                "Beispiel: `%s%s set #memes`\n" +
-                "\n" +
-                "**Zurücksetzen eines MediaOnlyChannels**\n" +
-                "Befehl: `%s%sunset [#kanal]`\n" +
-                "Beispiel: `%s%s unset #memes`\n" +
-                "\n" +
-                "**Zeige die aktuellen MediaOnlychannel Einstellungen an**\n" +
-                "Befehl: `%s%s show`");
-        de_de.setProperty("mediaonlychannel_hint", "Du kannst mehrere MediaOnlyChannel haben.");
-        de_de.setProperty("mediaonlychannel_missingmention", "Du hast keinen Kanal erwähnt.");
-        de_de.setProperty("mediaonlychannel_invalidchannel", "Der gegebene Kanal ist ungültig.");
-        de_de.setProperty("mediaonlychannel_unset_fail", "Dieser Kanal war nicht als MediaOnlyChannel gesetzt.");
-        de_de.setProperty("mediaonlychannel_nochannels", "Es existieren keine MediaOnlyChannel.");
-        de_de.setProperty("mediaonlychannel_firstarg", "Ungültiges erstes Argument.\n" +
-                "Entweder `set`, `unset` oder `show`");
-        de_de.setProperty("mediaonlychannel_warning", "%s, dies ist ein MediaOnlyChannel!\n" +
-                "Du darfst:\n" +
-                "- Dateien mit einer optionalen Beschreibung hochladen.\n" +
-                "- Einen gültigen Link mit einer optionalen Beschreibung senden.\n" +
-                "*Diese Nachricht wird in 30 Sekunden gelöscht.*");
-        de_de.setProperty("mediaonlychannel_alreadyset", "Dieser Kanal wurde bereits gesetzt.");
-
-        /// Reaction Role
-        de_de.setProperty("reactionrole_description", "Mit diesem Befehl kannst Du Reaktionen an eine Nachricht binden. Sobald ein Mitglied auf eine dieser Reaktionen drückt, erhält der die festgelegte Rolle.\n" +
-                "Dies erlaubt Dir ein einfaches Rollenverwaltungssystem via Reaktionen.");
-        de_de.setProperty("reactionrole_usage", "**Richte eine Reaktion zur Verwaltung der Rollen ein**\n" +
-                "Befehl: `%s%s set [#kanal | Kanal-ID] [Nachrichten-ID] [emoji/emote] [@rolle | Rollen-ID]`\n" +
-                "Beispiel: %s%s set #test-kanal 999999999999999999 %s @rolle\n" +
-                "\n" +
-                "**Setze eine Reaktion zurück**\n" +
-                "Befehl: `%s%s unset [#kanal | Kanal-ID] [Nachrichten-ID] [emoji/emote]`\n" +
-                "Beispiel: %s%s unset #test-kanal 999999999999999999 %s");
-        de_de.setProperty("reactionrole_hint", "**Wie man IDs erhält:**\n" +
-                "Möglichkeit 1: Im Chat posten: `\\@rolle`, `\\#kanal`, etc. - DIES WIRD DIE ROLLE AUCH ANPINGEN. Vielleicht solltest Du das in keinem öffentlichen Kanal senden.\n" +
-                "Möglichkeit 2:\n" +
-                "- Discord Einstellungen → Erscheinungsbild → ERWEITERT → Entwicklermodus anschalten\n" +
-                "- Rechtsklick auf Kanal, Rolle, etc. → ID kopieren");
-        de_de.setProperty("reactionrole_toofewargs", "Zu wenige Argumente. Du musst die Kanal-ID, Nachrichten-ID, ein Emoji oder Emote und eine Rollenerwähnung oder Rollen-ID hinter `set` angeben.");
-        de_de.setProperty("reactionrole_alreadyset", "Dieses Emoji oder Emote wurde bereits gesetzt. Setze das erste zurück falls du das Emoji oder Emote aktualisieren möchtest.");
-        de_de.setProperty("reactionrole_notset", "Dieses Emoji oder Emote wurde nicht gesetzt.");
-        de_de.setProperty("reactionrole_firstarg", "Entweder `set` oder `unset` eine Reaktion.");
-        de_de.setProperty("reactionrole_insufficient", "Ungenügende Berechtigungen oder ein Problem mit der Hierarchie.");
-        de_de.setProperty("reactionrole_invalidmessageid", "Ungültige Nachrichten ID.");
-        de_de.setProperty("reactionrole_unavailable_emote", "Das mitgelieferte Emote ist nicht in diesem Kanal verfügbar.");
-
-        /// Role
-        de_de.setProperty("role_description", "Orde Mitgliedern neuen Rollen zu oder nehme ihnen diese weg.");
-        de_de.setProperty("role_usage", "Befehl: `%s%s @user [Rollenname]`\n" +
-                "Beispiel: `%s%s @name Mitglied`");
-        de_de.setProperty("role_hint", "Ich werde die Rolle entfernen falls das Mitglied sie bereits hatte und sie ihm geben falls nicht.");
-        de_de.setProperty("role_missing", "Fehlender Rollenname.");
-        de_de.setProperty("role_notfound", "Verzeichung, Meister! Ich konnte keine Rolle mit diesem Namen finden.");
-        de_de.setProperty("role_missingrolename", "Bitte gebe auch den Rollennamen an.");
-        de_de.setProperty("role_cantinteract", "Ich kann nicht mit diesem User interagieren. (Überprüfe die Berechtigungen)");
-
-        /// Server
-        de_de.setProperty("server_description", "Mit diesem Befehl kannst Du den Bot nach deinen Wünschen für diesen Server einrichten.");
-        de_de.setProperty("server_usage", "**Richte einen Offset ein**\n" +
-                "Befehl: `%s%s set offset [offset]`\n" +
-                "Beispiel: `%s%s set offset +01:00`\n" +
-                "\n" +
-                "**Setze den Offset zurück**\n" +
-                "Befehl: `%s%s unset offset`\n" +
-                "\n" +
-                "**Richte einen serverspezifischen Prefix ein**\n" +
-                "Befehl: `%s%s set prefix [prefix]`\n" +
-                "Beispiel: `%s%s set prefix -`\n" +
-                "\n" +
-                "**Setze den Prefix zurück**\n" +
-                "Befehl: `%s%s unset prefix`\n" +
-                "\n" +
-                "**Setlle eine Sprache ein**\n" +
-                "Befehl: `%s%s set language [Sprachenschlüssel]`\n" +
-                "Beispiel: `%s%s set language de_de`\n" +
-                "\n" +
-                "**Setze die Sprache zurück**\n" +
-                "Befehl: `%s%s unset language`\n" +
-                "\n" +
-                "**Zeige deine aktuellen Einstellungen**\n" +
-                "Befehl: `%s%s show`");
-        de_de.setProperty("server_hint", "Sofern du den Offset zurücksetzt, wird lediglich Dein eingesteller zurückgesetzt und der Standardoffset (%s) wird wieder genutzt.\n" +
-                "Offsets nehmen immer UTC als Basis.\n" +
-                "Wenn du den Prefix zurücksetzt, wird der Defaultprefix (%s) genutzt\n\n" +
-                "Aktuell verfügbare Sprachen:\n" +
-                "- en_gb - English (British)\n" +
-                "- de_de - German (Deutsch)");
-        de_de.setProperty("server_args_set", "Um eine Einstellung einzurichten, müssen 3 Argumente mitgegeben werden.\n" +
-                "... set [Einstellung] [Wert]");
-        de_de.setProperty("server_offset", "Ungültiger Offset.");
-        de_de.setProperty("server_prefix", "Ungültiger Prefix.");
-        de_de.setProperty("server_language", "Ungültigee Sprache.");
-        de_de.setProperty("server_invalidsetting", "Diese Einstellung existiert nicht.");
-        de_de.setProperty("server_args_unset", "Um eine Einstellung zurückuzsetzen, müssen 2 Argumente mitgegeben werden.\n" +
-                "... unset [Einstellung]");
-        de_de.setProperty("server_offset_text", "Offset");
-        de_de.setProperty("server_prefix_text", "Prefix");
-        de_de.setProperty("server_language_text", "Sprache");
-        de_de.setProperty("server_settings", "Server Einstellungen");
-        de_de.setProperty("server_firstarg", "Das erste Arugment muss entweder `set`, `unset` oder `show` sein.");
-
-        /// Server Setup
-        de_de.setProperty("setupwizard_introduction", "Willkommen zu dem Server Setup Wizard!\n" +
-                "Nachdem wir dies abgeschlossen haben, wirst Du alle (3) Grundeinstellungen eingerichtet haben und wir sind bereit loszulegen!\n" +
-                "Bei jeder frage hast Du 15 Minuten zu antworten, andererseits wird das Setup unterbrechen.\n" +
-                "Möchtest Du starten?");
-        de_de.setProperty("setupwizard_timeout", "Der Setup Wizard wurde unterbrochen.");
-        de_de.setProperty("setupwizard_language", "Bitte gebe an in welche Sprache Du mich sprechen lassen willst.\n" +
-                "Aktuell verfügbare Sprachen:\n" +
-                "   \u200B⤷ `en_gb` - English (British)\n" +
-                "   \u200B⤷ `de_de` - German (Deutsch)\n" +
-                "**Gebe den Sprachenschlüssel an:**");
-        de_de.setProperty("setupwizard_language_repeated", "Diese Sprache ist nicht verfügbar.\n" +
-                "Aktuell verfügbare Sprachen:\n" +
-                "   \u200B⤷ `en_gb` - English (British)\n" +
-                "   \u200B⤷ `de_de` - German (Deutsch)\n" +
-                "**Versuche es erneut:**");
-        de_de.setProperty("setupwizard_prefix", "%s Sprache wurde gesetzt.\n" +
-                "Bitte gebe einen Prefix an, den du Nutzen möchtest.\n" +
-                "Falls du diesen nicht ändern möchtest, schreibe einfach `%s`:");
-        de_de.setProperty("setupwizard_prefix_repeated", "Dieser Prefix ist nicht geeignet.\n" +
-                "Falls du diesen nicht ändern möchtest, schreibe einfach `%s`\n" +
-                "**Versuche es erneut:**");
-        de_de.setProperty("setupwizard_offset", "%s Prefix wurde gesetzt.\n" +
-                "Bitte gebe einen Offset zu UTC an, um deine Zeitzone einzustellen.\n" +
-                "Das Format lautet: `+HH:mm` oder `-HH:mm`. Z.B. `+01:00`\n" +
-                "Um UTC/GMT zu benutzen, schreibe einfach `00:00`:");
-        de_de.setProperty("setupwizard_offset_repeated", "Dieses Offset ist ungültig.\n" +
-                "Das Format lautet: `+HH:mm` oder `-HH:mm`. Z.B. `+01:00`\n" +
-                "Um UTC/GMT zu benutzen, schreibe einfach `00:00`\n" +
-                "**Versuche es erneut:**");
-        de_de.setProperty("setupwizard_done", "Wir sind fertig :)");
-
-        /// Toggle
-        de_de.setProperty("toggle_description", "Du kannst fast jedes Feature an oder ausschalten.\n" +
-                "Das Level-Feature ist standardmäßig ausgeschaltet falls Du dies nutzen möchtest.\n" +
-                "Um zu sehen, welche Features (de)aktivierbar sind, benutze einfach `%s%s all show`");
-        de_de.setProperty("toggle_usage", "**Verwalte ein Feature**\n" +
-                "Befehl: `%s%s [Feature] [on|off|show]`\n" +
-                "Beispiel 1: `%s%s level on`\n" +
-                "Beispiel 2: `%s%s level off`\n" +
-                "Beispiel 3: `%s%s level show`\n" +
-                "\n" +
-                "**Verwalte alle Features**\n" +
-                "Befehl: `%s%s all [on|off|show]`\n" +
-                "Beispiel 1: `%s%s all on`\n" +
-                "Beispiel 2: `%s%s all off`\n" +
-                "Beispiel 3: `%s%s all show`\n");
-        de_de.setProperty("toggle_hint", "Sei vorsichtig wenn du alle Features verwaltest, da Du damit eventuell Dein perfektes Setup überschreibst.\n" +
-                "Du kannst auch `everything` statt `all` schreiben.\n" +
-                "Du kannst auch `status` statt `show` schreiben.\n" +
-                "Show wird nur den aktuell Status anzeigen ohne irgendetwas zu verändern.");
-        de_de.setProperty("toggle_args", "Zu wenig Angaben.\n" +
-                "toggle [feature] [on|off|show]\n" +
-                "z.B.: toggle level off");
-        de_de.setProperty("toggle_invalid_feature", "Ungültiges Feature.");
-        de_de.setProperty("toggle_invalid_argument", "Angabe muss entweder `on`, `off` oder `show` sein.");
-
-        /// User
-        de_de.setProperty("user_description", "Mit diesem Befehl kannst Du den Bot nach Deinen Wünschen anpassen.");
-        de_de.setProperty("user_usage", "**Richte einen Offset ein**\n" +
-                "Befehl: `%s%s set offset [Offset]`\n" +
-                "Beispiel: `%s%s set offset +02:00`\n" +
-                "\n" +
-                "**Setze den Offset zurück**\n" +
-                "Befehl: `%s%s unset offset`\n" +
-                "\n" +
-                "**Richte einen Prefix ein**\n" +
-                "Befehl: `%s%s set prefix [Prefix]`\n" +
-                "Beispiel: `%s%s set prefix -`\n" +
-                "\n" +
-                "**Setze den Prefix zurück**\n" +
-                "Befehl: `%s%s unset prefix`\n" +
-                "\n" +
-                "**Richte eine Sprache ein**\n" +
-                "Befehl: `%s%s set language [Sprachenschlüssel]`\n" +
-                "Beispiel: `%s%s set language de_de`\n" +
-                "\n" +
-                "**Setze die Sprache zurück**\n" +
-                "Befehl: `%s%s unset language`\n" +
-                "\n" +
-                "**Verstecke Dich vor Livestream-Hervorhebungen**\n" +
-                "Befehl: `%s%s streamhide [opt. Server ID]`\n" +
-                "\n" +
-                "**Richte eine Embed-Farbe ein**\n" +
-                "Befehl: `%s%s set colour [Farbcode]`\n" +
-                "Beispiel: `%s%s set colour #FFFFFF`\n" +
-                "\n" +
-                "**Setze die Farbe zurück**\n" +
-                "Befehl: `%s%s unset colour`\n" +
-                "\n" +
-                "**Zeige deine aktuellen Einstellungen an**\n" +
-                "Befehl: `%s%s show`");
-        de_de.setProperty("user_hint", "Du kannst eine eigene Embed-Farbe einstellen. ($10 Patron)\n" +
-                "Eine Embed-Farbe ist die Farbe, die du gerade eben an der linken Seite dieses Textfeldes sehen kannst.\n" +
-                "Einstellungen wie Offset, Prefix und Sprache funktionieren nur in DMs. Für Servereinstellungen, benutze bitte `%sserver`." +
-                "Verfügbare Sprachen:\n" +
-                "- en_gb - British English\n" +
-                "- de_de - German (Deutsch)\n" +
-                "Du kannst dich vor Livestream-Hervorhebungen verstecken während du streamst (Server-spezifisch).");
-        de_de.setProperty("user_streamhide_description", "Du musst dies in einem Server benutzen, um zu zeigen in welchem Server Du nicht angezeigt werden möchtest.\n" +
-                "Wenn Du dies heimlich machen willst, kannst du auch die Server ID mit angeben:\n" +
-                "Befehl: `%s%s streamhide [Server ID]`\n" +
-                "Beispiel: `%s%s streamhide 99999999999999999`");
-        de_de.setProperty("user_streamhide_hidden", "Du bist nun versteckt!");
-        de_de.setProperty("user_streamhide_visible", "Du bist nun sichtbar!");
-        de_de.setProperty("user_args_set", "Um eine Einstellung einzurichten brauchst Du drei Angaben.\n" +
-                "... set [setting] [value]");
-        de_de.setProperty("user_invalidcolor", "Der gegebene Farbcode ist ungültig.");
-        de_de.setProperty("user_invalidsetting", "Diese Einstellung existiert nicht.");
-        de_de.setProperty("user_args_unset", "Um eine Einstellung zurückzusetzen brauchst Du zwei Angaben.\n" +
-                "... unset [setting]");
-        de_de.setProperty("user_unset_fail", "Dort gibt es nichts zurückzusetzen.");
-        de_de.setProperty("user_color_text", "Farbe");
-        de_de.setProperty("user_prefix_text", "Prefix");
-        de_de.setProperty("user_offset_text", "Offset");
-        de_de.setProperty("user_language_text", "Sprache");
-        de_de.setProperty("user_noservers", "Keine Server");
-        de_de.setProperty("user_streamhideservers", "Versteckte Livestream Server");
-        de_de.setProperty("user_settings", "Nutzer Einstellungen");
-        de_de.setProperty("user_firstarg", "Die erste Angabe muss entweder `set`, `unset` oder `show` sein.");
-
-        /// Voice Lobby
-        de_de.setProperty("voicelobby_description", "Falls ein Member einen Sprachkanal betritt, der als VoiceLobby eingerichtet wurde, wird eine Kopie dessen erstellt.\n" +
-                "Dann wird der Member in diesen Sprachkanal bewegt.\n" +
-                "Sobald alle diesen neuen Kanal verlassen haben, wird dieser automatisch gelöscht.\n" +
-                "Dies wird dir eine Menge Platz mit leeren Sprachkanälen ersparen.");
-        de_de.setProperty("voicelobby_usage", "**Richte eine VoiceLobby ein**\n" +
-                "Befehl: `%s%s set [Sprachkanal ID]`\n" +
-                "Beispiel: `%s%s set 999999999999999999`\n" +
-                "\n" +
-                "**Setze einen Sprachkanal zurück**\n" +
-                "Befehl: `%s%s unset [Voice Channel ID]`\n" +
-                "Beispiel: `%s%s unset 999999999999999999`\n" +
-                "\n" +
-                "**Zeige die aktuellen VoiceLobbys**\n" +
-                "Befehl: `%s%s show`");
-        de_de.setProperty("voicelobby_hint", "**Wie man IDs bekommt:**\n" +
-                "1. Aktiviere den Discord Entwickler Modus: Benutzereinstellungen → Erscheinungsbild → ERWEITERT → Enticklermodus\n" +
-                "2. Rechtsklick auf einen Sprachkanal → ID kopieren");
-        de_de.setProperty("voicelobby_missingid", "Zu wenig Angaben. Bitte gebe eine Sprachkanal ID mit an.");
-        de_de.setProperty("voicelobby_invalidid", "Ungültige Sprachkanal ID.");
-        de_de.setProperty("voicelobby_unset_fail", "Hier gibt es nicht zurückzusetzen.");
-        de_de.setProperty("voicelobby_noneset", "Keine VoiceLobbys gesetzt!");
-        de_de.setProperty("voicelobby_current", "Aktuelle VoiceLobbys");
-        de_de.setProperty("voicelobby_footer", "Schreibe `%slobby`, um Hilfe zu erhalten.");
-        de_de.setProperty("voicelobby_firstarg", "Ungültige Angabe. Entweder `set`, `unset` oder `show`.");
-        de_de.setProperty("voicelobby_already_set", "Dieser Sprachkanal wurde bereits als VoiceLobby eingerichtet.");
-
-        // Information
-        /// Bot Info
-        de_de.setProperty("botinfo_authorname", "%s - Info");
-        de_de.setProperty("botinfo_description", "Sei gegrüßt Master! Ich bin %s, dein multifunktionaler Discord Bot.\n\n" +
-                "Ich werde dir dabei helfen deinen Discord Server zu moderieren, organisieren und zu unterhalten, indem ich 50 einzigartige Features bereitstelle. Du kannst jetzt deinen Standard- zu einem Premium Discord Server aufwerten!\n\n" +
-                "[Besuche die Webseite um alle Befehle und mehr detailierte Informationen einzusehen!](https://servant.tanc.red)");
-        de_de.setProperty("botinfo_links_name", "Links");
-        de_de.setProperty("botinfo_links_value", "Hole Dir den Bot: [Lade Servant ein](https://inviteservant.tanc.red)\n" +
-                "Hole Dir Hilfe: [Tritt Servant's Kingdom bei](https://servantskingdom.tanc.red)");
-        de_de.setProperty("botinfo_stats", "Statistiken");
-        de_de.setProperty("botinfo_users", "Nutzer");
-        de_de.setProperty("botinfo_channels", "Kanäle");
-        de_de.setProperty("botinfo_shard", "Diese Shard");
-        de_de.setProperty("botinfo_restart", "Letzter Neustart");
-
-        /// Patreon
-        de_de.setProperty("patreon_supportserver", "Unterstütze Servant");
-        de_de.setProperty("patreon_description", "Du kannst Servant auf drei unterschiedliche Wege unterstützen:");
-        de_de.setProperty("patreon_patreontitle", "Patreon");
-        de_de.setProperty("patreon_subscription", "Du kannst ein Patron werden und Servant mit einer monatlichen Zahlung unterstützen.\n" +
-                "Jeder Patreon Rang hat seine eigene Embed-Farbe und Profilhintergrundbild.\n" +
-                "[Klicke hier, um zur Patreon Seite zu gelangen.](https://www.patreon.com/tancred)");
-        de_de.setProperty("patreon_$1", "✓ Beschwörer Profilhintergrundbild\n✓ Orangene Embeds");
-        de_de.setProperty("patreon_$3", "✓ Lancer Profilhintergrundbild\n✓ Gelbe Embeds");
-        de_de.setProperty("patreon_$5", "✓ Bogenschütze Profilhintergrundbild\n✓ Grüne Embeds");
-        de_de.setProperty("patreon_$10", "✓ Saber Profilhintergrundbild\n✓ Blaue Embeds\n✓ Eigene Embed-Farben");
-        de_de.setProperty("patreon_donationtitle", "Spende");
-        de_de.setProperty("patreon_donation", "Du kannst Servant eine Spende senden.\n" +
-                "Füge deinen Discord Namen#1234 der Spendennachricht hinzu, sodass ich sehe von wem diese stammt.\n" +
-                "[Klicke hier, um zur PayPal.me Spendenseite zu gelangen.](https://www.paypal.me/servantdiscord)\n");
-        de_de.setProperty("patreon_donation_$5", "✓ Assassinen Profilhintergrundbild\n✓ Rote Embeds");
-        de_de.setProperty("patreon_serverboosttitle", "Server Boost");
-        de_de.setProperty("patreon_serverboost", "Du kannst Servant's Kingdom mit Discord Nitro boosten, um neue Discordserver Vorteile freizuschalten.\n" +
-                "[Klicke hier um Servant's Kingdom beizutreten](https://discord.gg/4GpaH5V)\n" +
-                "✓ Berserker Profilhintergrundbild\n" +
-                "✓ Pinke Embeds");
-        de_de.setProperty("patreon_thanks", "Danke an jeden einzelnen Unterstützer <3");
-
-        /// Server Info
-        de_de.setProperty("serverinfo_owner", "Besitzer: %s");
-        de_de.setProperty("serverinfo_name", "%s (ID: %s)");
-        de_de.setProperty("serverinfo_region", "Region: %s");
-        de_de.setProperty("serverinfo_textcount", "Anzahl Textkanäle");
-        de_de.setProperty("serverinfo_voicecount", "Anzahl Sprachkanäle");
-        de_de.setProperty("serverinfo_membercount", "Anzahl Member");
-        de_de.setProperty("serverinfo_rolecount", "Anzahl Rollen");
-        de_de.setProperty("serverinfo_categorycount", "Anzahl Kategorien");
-        de_de.setProperty("serverinfo_emotecount", "Anzahl Emotes");
-        de_de.setProperty("serverinfo_afktimeout", "AFK Timeout");
-        de_de.setProperty("serverinfo_timeout", "%s Sekunden");
-        de_de.setProperty("serverinfo_afkchannel", "AFK-Kanal");
-        de_de.setProperty("serverinfo_noafkchannel", "Kein AFK-Kanal");
-        de_de.setProperty("serverinfo_systemchannel", "Kanal für Systembenachrichtigungen");
-        de_de.setProperty("serverinfo_nosystemchannel", "Keine Systembenachrichtigungen");
-        de_de.setProperty("serverinfo_vanity", "Vanity-URL");
-        de_de.setProperty("serverinfo_novanity", "Keine Vanity-URL");
-        de_de.setProperty("serverinfo_mfa", "MFA Level");
-        de_de.setProperty("serverinfo_explicit", "Filter für anstößige Medieninhalte");
-        de_de.setProperty("serverinfo_verification", "Verifizierungsstufe");
-        de_de.setProperty("serverinfo_botsettings", "**%s Einstellungen:**");
-        de_de.setProperty("serverinfo_prefix", "Prefix");
-        de_de.setProperty("serverinfo_offset", "Offset");
-        de_de.setProperty("serverinfo_language", "Sprache");
-        de_de.setProperty("serverinfo_bdaychannel", "Geburtstagskanal");
-        de_de.setProperty("serverinfo_nobdaychannel", "Kein Geburtstagskanal");
-        de_de.setProperty("serverinfo_autorole", "Auto-Rolle");
-        de_de.setProperty("serverinfo_noautorole", "Keine Auto-Rolle");
-        de_de.setProperty("serverinfo_autorole_value", "%s\nNach %s Minuten");
-        de_de.setProperty("serverinfo_livestream", "Livestream");
-        de_de.setProperty("serverinfo_nolivestream_channel", "Kein Livestreamkanal");
-        de_de.setProperty("serverinfo_nolivestream_role", "Keine Livestreamrolle");
-        de_de.setProperty("serverinfo_streamermode", "Streamer Modus");
-        de_de.setProperty("serverinfo_publicmode", "Öffentlicher Modus");
-        de_de.setProperty("serverinfo_voicelobbies", "VoiceLobbys");
-        de_de.setProperty("serverinfo_novoicelobbies", "Keine VoiceLobbys");
-        de_de.setProperty("serverinfo_mediaonlychannels", "Nur-Medien-Kanaäle");
-        de_de.setProperty("serverinfo_nomediaonlychannels", "Keine Nur-Medien-Kanäle");
-        de_de.setProperty("serverinfo_join", "Beitrittsbenachrichtigungskanal");
-        de_de.setProperty("serverinfo_nojoin", "Kein Beitrittsbenachrichtigungskanal");
-        de_de.setProperty("serverinfo_leave", "Austrittsbenachrichtigungskanal");
-        de_de.setProperty("serverinfo_noleave", "Kein Austrittsbenachrichtigungskanal");
-        de_de.setProperty("serverinfo_none", "Keine");
-        de_de.setProperty("serverinfo_low", "Niedrig");
-        de_de.setProperty("serverinfo_medium", "Mittel");
-        de_de.setProperty("serverinfo_high", "(╯°□°)╯︵ ┻━┻");
-        de_de.setProperty("serverinfo_veryhigh", "┻━┻ ミヽ(ಠ益ಠ)ノ彡┻━┻");
-        de_de.setProperty("serverinfo_none_desc", "Uneingeschränkt");
-        de_de.setProperty("serverinfo_low_desc", "Muss über eine verifizierte E-Mail-Adresse auf dem Discord-Account verfügen.");
-        de_de.setProperty("serverinfo_medium_desc", "Muss über eine verifizierte E-Mail-Adresse auf dem Discord-Account verfügen.\n" +
-                "Muss länger als 5 Minuten auf Discord registriert sein.");
-        de_de.setProperty("serverinfo_high_desc", "Muss über eine verifizierte E-Mail-Adresse auf dem Discord-Account verfügen..\n" +
-                "Muss länger als 5 Minuten auf Discord registriert sein.\n" +
-                "Muss länger als 10 Minuten Mitglied dieses Servers sein.");
-        de_de.setProperty("serverinfo_veryhigh_desc", "Muss über eine verifizierte E-Mail-Adresse auf dem Discord-Account verfügen.\n" +
-                "Muss länger als 5 Minuten auf Discord registriert sein.\n" +
-                "Muss länger als 10 Minuten Mitglied dieses Servers sein.\n" +
-                "Muss über ein verifiziertes Handy auf dem Discord-Account verfügen.");
-
-        // Useful
-        /// Giveaway
-        de_de.setProperty("giveaway_description", "- Verantstalte ein Giveaway, das eine gegebene Anzahl an Leuten als Gewinner nach einer gewissen Zeit ermittelt.\n" +
-                "- Liste alle aktuell laufenden Giveaways auf dem aktuellen Server auf.");
-        de_de.setProperty("giveaway_usage", "- Starte ein Giveaway: `%sgiveaway \"[Preisname]\" [Anzahl Gewinner] [Zeit]`\n" +
-                "   \u200B⤷ Beispiel: `%sgiveaway \"100 Kekse\" 1 12h`\n" +
-                "- Liste Giveaways auf: `%sgiveaway list`");
-        de_de.setProperty("giveaway_hint", "- Zeitformate: d = Tage, h = Stunden, m = Minuten\n" +
-                "   \u200B⤷ Außerdem kannst du so viele Zeitangaben haben, wie Du willst.\n" +
-                "   \u200B⤷ Beispiel: `%sgiveaway \"100 Kekse\" 1 2d 12h 36m 1d`\n" +
-                "   \u200B⤷ Zeitergebnis: `2d` + `12h` + `36m` + `1d` = 3 Tage, 12 Stunden, 36 Minuten\n" +
-                "- Sekunden werden nicht unterstützt.");
-        de_de.setProperty("giveaway_current", "Aktuelle Giveaways auf diesem Server");
-        de_de.setProperty("giveaway_days", "%s Tage");
-        de_de.setProperty("giveaway_hours", "%s Stunden");
-        de_de.setProperty("giveaway_minutes", "%s Minuten");
-        de_de.setProperty("giveaway_from", "Giveaway von %s!");
-        de_de.setProperty("giveaway_endsat", "Endet am");
-        de_de.setProperty("giveaway_endedat", "Endete am");
-        de_de.setProperty("giveaway_messageid", "**Nachrichten-ID:**");
-        de_de.setProperty("giveaway_prize", "**Preis:**");
-        de_de.setProperty("giveaway_noreactions", "Sorry, I konnte keine Reaktionen zu diesem Giveaway finden (Nachrichten-ID: %s)!");
-        de_de.setProperty("giveaway_invalidtime", "Ungültige Zeit.");
-        de_de.setProperty("giveaway_wrongargument", "Falsche Angabe");
-        de_de.setProperty("giveaway_nocurrent", "Es laufen gerade keine Giveaways!");
-        de_de.setProperty("giveaway_invalidwinneramount", "Ungültige Anzahl an Gewinnern. Nur Nummern!");
-        de_de.setProperty("giveaway_messedupargs", "Du hast deine Angaben durcheinander gebracht.");
-        de_de.setProperty("giveaway_zerowinners", "Dies ergibt keinen Sinn. Es muss mindestens einen Gewinner geben.");
-        de_de.setProperty("giveaway_emptyprize", "Du kannst den Preis nicht leer lassen.");
-        de_de.setProperty("giveaway_description_running", "Preis: **%s**\n" +
-                "Anzahl Gewinner: **%s**\n" +
-                "Verbleibene Zeit: **%s**\n" +
-                "Reagiere mit %s, um am Giveaway teilzunehmen!");
-        de_de.setProperty("giveaway_description_end", "Preis: **%s**\n" +
-                "Anzahl Gewinner: **%s**\n\n" +
-                "Die Gewinner lauten:\n" +
-                "%s\n" +
-                "Herzlichen Glückwunsch!");
-        de_de.setProperty("giveaway_description_nowinner", "Preis: **%s**\n" +
-                "Anzahl Gewinner: **%s**\n\n" +
-                "Keiner hat teilgenommen, daher hat auch keiner gewonnen.");
-        de_de.setProperty("giveaway_end_manually", "%s, um dieses Giveaway manuell zu beenden, drücke auf ❌");
-
-        /// RemindMe
-        de_de.setProperty("remindme_description", "Erstelle eine Erinnerung zu einer spezifischen Zeit.\n" +
-                "Andere Member können die Erinnerungen upvoten, um auch erinnert zu werden.\n" +
-                "Die Erinnerung wird eine Sprung-URL zum Kontext haben.");
-        de_de.setProperty("remindme_usage", "Befehl: `%s%s \"Optionale Beschreibung\" [time]`\n\n" +
-                "**Beispiel 1 → Mit Zeitangaben**\n" +
-                "Mit Beschreibung: `%s%s \"Pat Servant\" 3d 2h 1m`\n" +
-                "Ohne Beschreibung: `%s%s 5m`\n\n" +
-                "**Beispiel 2 → Mit Datum und Zeit**\n" +
-                "Mit Beschreibung: `%s%s \"Pat Servant\" 2020-31-12 23:59`\n" +
-                "Ohne Beschreibung: `%s%s 2020-31-12 23:59`");
-        de_de.setProperty("remindme_hint", "Der Befehlautor wird immer erinnert, auch wenn dieser nicht upvotet.\n" +
-                "Eine Erinnerung darf nicht weiter in der Zukunft sein als einen Monat\n" +
-                "**Zeitangaben**\n" +
-                "- Zeit Formate: d = Tage, h = Stunden, m = Minuten\n" +
-                "   \u200B⤷ Außerdem kannst du so viele Zeitangaben setzen wie du willst.t\n" +
-                "   \u200B⤷ Beispiel: `%s%s \"Pat Servant\" 2d 12h 36m 1d`\n" +
-                "   \u200B⤷ Zeitergebnis: `2d` + `12h` + `36m` + `1d` = 3 Tage, 12 Stunden, 36 Minuten\n" +
-                "- Sekunden werden nicht unterstützt.\n\n" +
-                "**Datum und Zeit**\n" +
-                "- Du kannst keine Erinnerungen in der Vergangenheit erstellen.\n" +
-                "- Du musst das 24-Stunden-System benutzen.\n" +
-                "- Es benutzt deine eingestellte Zeitzone.\n" +
-                "- Wenn du keine eingestellt hast, wird UTC benutzt.\n" +
-                "- Um eine einzustellen benutze den `%suser` Befehl.");
-        de_de.setProperty("remindme_invalidtime", "Ungültige Zeit.");
-        de_de.setProperty("remindme_wrongargument", "Falsche Eingabe.");
-        de_de.setProperty("remindme_messedupargs", "Du hast deine Eingaben durcheinander gebracht.");
-        de_de.setProperty("remindme_remind", "Hi Meister, hier ist deine angeforderte Erinnerung.");
-        de_de.setProperty("remindme_invalidtopic", "Ungültige Beschreibung: Kein abschließendes Anführungszeichen.");
-        de_de.setProperty("remindme_topiclength", "Ungültige Länge der Beschreibung: Die Beschreibung darf nicht mehr als 1000 Zeichen beinhalten.");
-        de_de.setProperty("remindme_missingtime", "Fehlende Zeitangabe: Du musst Zeitangaben hinzufügen.");
-        de_de.setProperty("remindme_toobig", "Ungültige Zeitangabe: Die gegebenen Zeitangaben sind zu groß.");
-        de_de.setProperty("remindme_past", "Du kannst keinen RemindMe in der Vergangenheit einstellen!");
-        de_de.setProperty("remindme_month", "Eine Erinnerung darf nicht weiter in der Zukunft sein als einen Monat.");
-        de_de.setProperty("remindme_of", "Erinnerung von %s");
-        de_de.setProperty("remindme_topic", "Thema: %s");
-        de_de.setProperty("remindme_also",  "Wenn Du auch erinnert werden möchtest, drücke %s");
-        de_de.setProperty("remindme_at", "Erinnerung am");
-        de_de.setProperty("remindme_success",  "Du wurdest erinnert %s");
-        de_de.setProperty("remindme_jump", "Hier drücken um zum Kontext zu gelangen.");
-
-        /// Signup
-        de_de.setProperty("signup_description", "Lass Leute sich für ein Event anmelden (z.B. ein Raid).\n" +
-                "Bei einen der drei Möglichkeiten wird die Anmeldung beendet:\n" +
-                "1. Die gegebene Anzahl an Leuten haben sich angemeldet (reagiert).\n" +
-                "2. Das gegebene Datum (bzw. das Standarddatum falls keins eingetragen wurde) wurde erreicht (Siehe letzter Hinweis).\n" +
-                "3. Der Ersteller der Anmeldung hat die :x:-Reaktion gedrückt.");
-        de_de.setProperty("signup_usage", "Command: `%s%s \"Titel\" [Anzahl Teilnehmer] [Eventtag und -zeit]`\n" +
-                "Beispiel 1: `%s%s \"Heiliger Gral Krieg\" 10 2019-12-31 23:30`\n" +
-                "Beispiel 2: `%s%s 10 2019-12-31 23:30`\n" +
-                "Beispiel 3: `%s%s \"Heiliger Gral Krieg\" 10`\n" +
-                "Beispiel 4: `%s%s 10`");
-        de_de.setProperty("signup_hint", "- Die Anzahl der Teilnehmer muss zwischen 1 und 100 sein.\n" +
-                "- Der Eventtag und -zeit muss innerhalb der nächten vier Wochen sein.\n" +
-                "- Falls du kein Eventtag- und zeit gesetzt hast, wird die Anmeldung in vier Wochen automatisch beendet.\n" +
-                "- Der Eventtag und -zeit wird den Offset des Servers benutzen. Diesen kannst du via `!serverinfo` -> Servant Einstellungen -> Offset\n" +
-                "- Falls du einen Eventtag und -zeit eingerichtet hast, wird die Anmeldung 30 Minuten eher geschlossen, sodass Du Zeit hast die Gruppe zu organisieren.");
-        de_de.setProperty("signup_invalidtitle", "Ungültiger Titel: Keine endenen Anführungszeichen.");
-        de_de.setProperty("signup_titlelength", "Ungültige Länge des Titels: Der Titel darf nicht länger sein als 256 Zeichen.");
-        de_de.setProperty("signup_invalidamount", "Ungültige Anzahl: Keine Anzahl an Teilnehmern gefunden.");
-        de_de.setProperty("signup_invalidamountrange", "Ungültige Anzahl: Die Anzahl an Teilnehmern muss zwischen einschließlich 1 und 100 sein.");
-        de_de.setProperty("signup_invalidamountparse", "Ungültige Ermittlung der Anzahl: %s");
-        de_de.setProperty("signup_missingamount", "Fehlende Anzahl: Du musst eine Anzahl an erlaubten Teilnehmern angeben.");
-        de_de.setProperty("signup_invaliddate", "Ungültiger Tag und Zeit");
-        de_de.setProperty("signup_invaliddatedistance", "Ungültiger Tag und Zeit: Der gegebene Tag und Zeit darf nicht weiter in der Zukunft sein als vier Wochen und es darf sich nicht in der Vergangenheit befinden.\n" +
-                "Bitte beachte, dass der selbst gesetzte Tag und Zeit 30 Minuten eher beendet wird, daher sind die nächten 30 Minuten als \"Vergangenheit\" zu betrachten.");
-        de_de.setProperty("signup_invaliddateday", "Ungültiger Tag und Zeit: Das gegebene Datum existiert nicht. (z.B. 31. Februar)");
-        de_de.setProperty("signup_embedtitle_empty", "Anmeldung");
-        de_de.setProperty("signup_embedtitle_notempty", "Anmeldung für %s");
-        de_de.setProperty("signup_embeddescription", "Klicke auf %s um teilzunehmen.\n" +
-                "%s Leute können teilnehmen!\n\n" +
-                "Entferne besagte Reaktion falls du deine Meinung geändert hast." +
-                "%s\n" +
-                "%s, um die Anmeldung manuell zu beenden, klicke auf ❌");
-        de_de.setProperty("signup_embeddescription_custom", "Die Anmeldung wird 30 Minuten vor dem geplanten Event beendet.\n");
-        de_de.setProperty("signup_embeddescriptionend", "%s Leute konnten teilnehmen!\n\n" +
-                "Dies sind die Teilnehmer:");
-        de_de.setProperty("signup_nobody", "Keiner hat sich angemeldet");
-        de_de.setProperty("signup_timeout", "Wird beendet am");
-        de_de.setProperty("signup_event", "Event am");
-        de_de.setProperty("signup_timeout_finish", "Endete am");
-
-        /// Timezone
-        de_de.setProperty("timezone_description", "Konvertiert ein Datum und Zeit von einer Zeitzone in eine andere.");
-        de_de.setProperty("timezone_usage", "Command: `%s%s yyyy-MM-dd HH:mm [Start-Zeitzone] [Ziel-Zeitzone]`\n" +
-                "Beispiel: `%s%s 2019-01-01 22:00 PST CET`");
-        de_de.setProperty("timezone_hint", "Dieser Befehl benutzt das 24 Stunden System.");
-        de_de.setProperty("timezone_missingargs", "Fehlende Angaben.");
-        de_de.setProperty("timezone_conversion", "Zeitzonenkonvertierung");
-        de_de.setProperty("timezone_input", "Eingabe");
-        de_de.setProperty("timezone_output", "Ausgabe");
-        de_de.setProperty("timezone_invalidzone_start", "Ungültige Start-Zeitzone.");
-        de_de.setProperty("timezone_invalidzone_target", "Ungültige Ziel-Zeitzone.");
-        de_de.setProperty("timezone_invalid", "Ungültige Eingabe. Überprüfe deine Formatierungen.");
-
-        // Polls
-        de_de.setProperty("votes_active", "Endet am");
-        de_de.setProperty("votes_inactive", "Diese Abstimmung wurde beendet.");
-        de_de.setProperty("votes_end_manually", "%s, um diese Umfrage manuell zu beenden, drücke auf ❌");
-
-        /// QuickPoll
-        de_de.setProperty("quickvote_started", "%s hat einen QuickPoll gestartet!");
-        de_de.setProperty("quickvote_ended", "%s hat den QuickPoll beendet!");
-        de_de.setProperty("quickvote_missing_db", "Seid gegrüßt Meister! Ich konnte ein erfolgreiches QuickPoll Ende nicht von der Datenbank entfernen.");
-
-        /// Poll
-        de_de.setProperty("vote_description", "Erstelle eine Umfrage mit bis zu 10 selbst erstellten Antwortmöglichkeiten.");
-        de_de.setProperty("vote_usage", "Befehl: `%s%s [Frage]/[Antwort1]/(...)/[Antwort10]`\n" +
-                "Beispiel: `%s%s Wann hast du Zeit?/Mo/Di/Mi/Do/Fr/Sa/So`");
-        de_de.setProperty("vote_hint", "Nachdem der Befehl durchgeführt wurde, wirst Du gefragt, ob Du mehrere Antworten zulassen willst.");
-        de_de.setProperty("vote_amount", "Ungültige Anzahl an Angaben. Es muss mindestens eine und maximal 10 Antworten zu Deiner Frage geben.");
-        de_de.setProperty("vote_timeout", "Timeout! Du hast nicht auf meine Frage reagiert.");
-        de_de.setProperty("vote_started", "%s startete eine Umfrage!");
-        de_de.setProperty("vote_ended", "%s beendete die Umfrage!");
-        de_de.setProperty("vote_missing_db", "Seid gegrüßt Meister! Ich konnte ein erfolgreiches Poll Ende nicht von der Datenbank entfernen.");
-        de_de.setProperty("vote_multiple", "Mehrere Antworten: %s");
-        de_de.setProperty("vote_allowed", "Erlaubt");
-        de_de.setProperty("vote_forbidden", "Verboten");
-
-        // Fun
-        /// Achievements
-        de_de.setProperty("achievements_title", "%s%s Erfolge");
-
-        /// Avatar
-        de_de.setProperty("avatar_stolen", "%s hat gerade %ss Avatar geklaut!");
-        de_de.setProperty("avatar_self", "%s sich selbst das Avatar geklaut!");
-
-        /// Baguette
-        de_de.setProperty("baguette_49", "Mies Brudi");
-        de_de.setProperty("baguette_50", "JACKPOT! Jetzt bist du cool.");
-
-        /// Bio
-        de_de.setProperty("bio_maxlength", "Die maximale länge der Bio beträgt 30 Zeichen.");
-
-        /// Coin Flip
-        de_de.setProperty("coinflip_head", "Kopf!");
-        de_de.setProperty("coinflip_tail", "Zahl!");
-
-        /// Embed (for both create and edit)
-        de_de.setProperty("embed_timeout", "Diese Konfiguration ist timeoutet.");
-        de_de.setProperty("embed_authorline_q", "Alles klar! Möchtest Du den Autor-Eintrag verwenden?");
-        de_de.setProperty("embed_authorname_i", "Bitte gebe den **Autornamen** an:");
-        de_de.setProperty("embed_authorurl_q", "Möchtest Du die **Autor-URL** (Nicht das Icon) verwenden??");
-        de_de.setProperty("embed_authorurl_i", "Bitte gebe die **Autor-URL** (Nicht die Icon-URL!) an:");
-        de_de.setProperty("embed_authorurl_i_fail", "Deine Eingabe ist ungültig. Bitte gebe eine gültige URL an:");
-        de_de.setProperty("embed_authoricon_q", "Möchtest Du das **Autor-Icon** verwenden?");
-        de_de.setProperty("embed_authoricon_i", "Bitte gebe die **Autor-Icon-URL** (Direkt-Link!) an:");
-        de_de.setProperty("embed_authoricon_i_fail", "Deine Eingabe ist ungültig. Bitte gebe einen gültigen Direkt-Link an:");
-        de_de.setProperty("embed_thumbnail_q", "Möchtest Du das Thumbnail benutzen?");
-        de_de.setProperty("embed_thumbnail_i", "Bitte gebe eine Thumbnail-URL (Direkt-Link!) an:");
-        de_de.setProperty("embed_thumbnail_i_fail", "Deine Eingabe ist ungültig. Bitte gebe einen gültigen Direkt-Link an:");
-        de_de.setProperty("embed_title_q", "Möchtest Du einen Titel verwenden?");
-        de_de.setProperty("embed_title_i", "Bitte gebe einen **Titel** an:");
-        de_de.setProperty("embed_url_q", "Möchtest du eine Titel-URL verwenden?");
-        de_de.setProperty("embed_url_i", "Bitte gebe eine **Titel-URL** an:");
-        de_de.setProperty("embed_url_i_fail", "Deine Eingabe ist ungültig. Bitte gebe eine gültige URL an:");
-        de_de.setProperty("embed_description_q", "Möchtest du eine Beschreibung benutzen?");
-        de_de.setProperty("embed_description_i", "Bitte gebe eine **Beschreibung** an:");
-        de_de.setProperty("embed_field_q", "Möchtest du ein Feld hinzufügen?");
-        de_de.setProperty("embed_field_name_i", "Bitte gebe einen **Feldnamen** an:");
-        de_de.setProperty("embed_field_value_i", "Bitte gebe eine **Feldbeschreibung** an:");
-        de_de.setProperty("embed_field_inline_i", "Soll sich das Feld in eine Zeile einordnen?");
-        de_de.setProperty("embed_image_q", "Möchtest du ein Bild verwenden?");
-        de_de.setProperty("embed_image_i", "Bitte gebe eine **Bild-URL** (Direkt-Link!) an:");
-        de_de.setProperty("embed_image_i_fail", "Deine Eingabe ist ungültig. Bitte gebe einen gültigen Direkt-Link an:");
-        de_de.setProperty("embed_footer_q", "Möchtest du eine Fußzeile verwenden?");
-        de_de.setProperty("embed_footer_text_i", "Bitte gebe eine **Fußzeilenbeschreibung** an:");
-        de_de.setProperty("embed_footer_icon_q", "Möchtest du ein Fußzeilen-Icon verwenden?");
-        de_de.setProperty("embed_footer_icon_i", "Bitte gebe eine **Icon-URL** (Direkt-Link!) an:");
-        de_de.setProperty("embed_footer_icon_i_fail", "Deine Eingabe ist ungültig. Bitte gebe einen gültigen Direkt-Link an:");
-        de_de.setProperty("embed_empty", "Entweder ist das Embed leer, oder es hat über 6000 Zeichen.\nBeides geht leider nicht!");
-        de_de.setProperty("embed_timestamp_q", "Möchtest du einen Zeitstempel verwenden?");
-        de_de.setProperty("embed_timestamp_i", "Bitte gebe einen Zeitstempel an\nDu kannst entweder `now` (jetzt) schreiben oder ein Datum und Zeit wie folgt angeben: `yyyy-MM-dd HH:mm` (Benutzt Server Offset):");
-        de_de.setProperty("embed_timestamp_i_fail", "Deine Eingabe ist ungültig\nDu kannst entweder `now` (jetzt) schreiben oder ein Datum und Zeit wie folgt angeben: `yyyy-MM-dd HH:mm` (Benutzt Server Offset).\nVersuche es erneut:");
-
-        //// Create Embed
-        de_de.setProperty("createembed_introduction", "Mit diesem Befehl kannst Du dein eigenes Embed erstellen.\n" +
-                "- Du kannst kein leeres Embed erstellen.\n" +
-                "- Das Embed darf ingesamt nicht länger als 6000 Zeichen sein.\n" +
-                "- Jedes mal wenn du reagieren oder eine Antwort schreiben musst, hast du 15 Minuten dafür Zeit.\n" +
-                "Bist du vorbereitet?");
-        de_de.setProperty("createembed_author_name", "Autorname (Kann zu einer URL verweisen)");
-        de_de.setProperty("createembed_title", "Titel (Kann zu einer URL verweisen)");
-        de_de.setProperty("createembed_description", "Beschreibung\n" +
-                "Der Titel wird weiß sein sofern dieser auf keine URL verweist.\n" +
-                "Jegliche Bilder-URLs müssen Direkt-Links sein.\n" +
-                "Der Zeitstempel ist nicht Teil der Fußzeile, sondern ein eigenständiges Datum und Zeit.");
-        de_de.setProperty("createembed_field_name_inline", "Eingereihter Feldname"); // dis
-        de_de.setProperty("createembed_field_value1", "Feldbeschreibung");
-        de_de.setProperty("createembed_field_value2", "Bis zu drei Felder in einer Reihe.");
-        de_de.setProperty("createembed_field_value3", "Du kannst maximal 25 Felder haben.");
-        de_de.setProperty("createembed_field_name_noninline", "Nicht-eingereihter Feldname");
-        de_de.setProperty("createembed_field_value_noninline", "Nicht-eingereite Felder nehmen die gesamte Breite des Embeds in Anspruch.");
-        de_de.setProperty("createembed_footer", "Fußtextbeschreibung");
-        de_de.setProperty("createembed_done", "Wir sind fertig! Bitte pinge einen Textkanal an, in den ich dieses Embed posten soll (z.B. #kanal):");
-        de_de.setProperty("createembed_done_repeated", "Ungültige Eingabe, Du musst einen Kanal **anpingen** (z.B. #kanal):");
-
-        //// Edit Embed
-        de_de.setProperty("editembed_description", "Bearbeite ein Embed, das von %s gemacht wurde.");
-        de_de.setProperty("editembed_usage", "Befehl: `%s%s #kanal [Nachrichten ID des Embeds]`\n" +
-                "Example: `%s%s #info 999999999999999999`");
-        de_de.setProperty("editembed_hint", "**Wie man IDs bekommt:**\n" +
-                "1. Aktiviere den Discord Entwickler Modus: Benutzereinstellungen → Erscheinungsbild → ERWEITERT → Enticklermodus\n" +
-                "2. Rechtsklick auf einen Sprachkanal → ID kopieren");
-        de_de.setProperty("editembed_missing_channel", "Du musst einen Kanal anpingen. Siehe `%seditembed` für Hilfe.");
-        de_de.setProperty("editembed_missing_message_id", "Du musst eine Nachrichten ID angeben. Siehe `%seditembed` für Hilfe.");
-        de_de.setProperty("editembed_invalid_message_id", "Die angegebene Nachrichten ID ist ungültig. Siehe `%seditembed` für Hilfe.");
-        de_de.setProperty("editembed_notbyme", "Diese Nachricht ist nicht von mir.");
-        de_de.setProperty("editembed_noembed", "Ich kann kein Embed für diese Nachricht finden.");
-        de_de.setProperty("editembed_introduction", "Mit diesem Befehl kannst du Embeds von %s bearbeiten.\n" +
-                "- Du kannst keine leeren Embeds erstellen.\n" +
-                "- Das Embed darf ingesamt nicht länger als 6000 Zeichen sein.\n" +
-                "- Jedes mal wenn du reagieren oder eine Antwort schreiben musst, hast du 15 Minuten dafür Zeit.\n" +
-                "Bist du vorbereitet?");
-        de_de.setProperty("editembed_confirm", "Wir sind fertig! Bitte bestätige, dass du das alte Embed überschreiben willst.");
-        de_de.setProperty("editembed_notfound", "Ich kann diese Nachricht nicht finden, Meister!");
-        de_de.setProperty("editembed_missingpermission", "Du musst die Rechte haben in den gegebenen Kanal schreiben zu dürfen, um die Embeds bedienen zu können.");
-        de_de.setProperty("embed_field_remove_q", "Möchtest du die aktuellen Felder entfernen?");
-
-        /// Flip
-        de_de.setProperty("flip_description", "Wirf einen Nutzer um.");
-        de_de.setProperty("flip_usage", "Befehl: `%s%s @nutzer`");
-        de_de.setProperty("flip_hint", "Siehe auch `%sunflip @nutzer`");
-
-        /// Leaderboard
-        de_de.setProperty("leaderboard_title", "%s%s Rangliste");
-        de_de.setProperty("leaderboard_noentry", "Keine Einträge!");
-
-        /// Level
-        de_de.setProperty("level_up", "%s erreichte soeben Level %s! \uD83C\uDF89");
-
-        /// Love
-        de_de.setProperty("love_description", "Verkuppel zwei Leute oder auch nur einen mit sich selbst.");
-        de_de.setProperty("love_usage", "Befehl: `%s%s @Nutzer1 @Nutzer2`\n" +
-                "Befehl: `%s%s @Nutzer`");
-        de_de.setProperty("love_hint", "Du brauchst nur eine Person anpingen, wenn Du Dich selbst mit ihr verkuppeln lassen willst.");
-        de_de.setProperty("love_self_100", "Verdammt! Direkt zum Fap!");
-        de_de.setProperty("love_self_90", "Ziemlich selbstsicher, oder?");
-        de_de.setProperty("love_self_80", "So selbstverliebt...");
-        de_de.setProperty("love_self_70", "Du liebst Dich selbst mehr als es andere tun.");
-        de_de.setProperty("love_self_69", "Nice.");
-        de_de.setProperty("love_self_60", "Sieht so aus als würdest Du Dich selbst akzeptieren.");
-        de_de.setProperty("love_self_50", "Du scheinst unsicher zu sein ob Du dich magst oder nicht.");
-        de_de.setProperty("love_self_42", "Du hast die Antwort gefunden.");
-        de_de.setProperty("love_self_40", "Jetzt kannst du in den Spiegel mit stolz gucken.");
-        de_de.setProperty("love_self_30", "Ein bisschen unsicher, aber ich bin mir sicher, dass Du dies bewerkstelligen kannst.");
-        de_de.setProperty("love_self_20", "Du schlägst Dich gut. Baue ein wenig mehr selbstvertrauen auf!");
-        de_de.setProperty("love_self_10", "Glaube an Dich selbst!");
-        de_de.setProperty("love_self_0", "Das ist hart. Wir lieben Dich trotzdem <3");
-        de_de.setProperty("love_noself_100", "Verdammt! Das passt super!");
-        de_de.setProperty("love_noself_90", "Raff Dich auf und lade die Person zum Essen ein.");
-        de_de.setProperty("love_noself_80", "Seid ihr euch sicher, dass ihr euch nicht daten wollt?");
-        de_de.setProperty("love_noself_70", "Ich sag das ist eine gesunde Geschwisterliebe.");
-        de_de.setProperty("love_noself_69", "Nice.");
-        de_de.setProperty("love_noself_60", "Es besteht die Chance.");
-        de_de.setProperty("love_noself_50", "Ich wette ihr könnt Freunde sein. :)");
-        de_de.setProperty("love_noself_42", "Du hast die Antwort gefunden.");
-        de_de.setProperty("love_noself_40", "Immerhin bist du stets bemüht.");
-        de_de.setProperty("love_noself_30", "Ich denke nicht, dass das klappt...");
-        de_de.setProperty("love_noself_20", "Immerhin etwas, wa?");
-        de_de.setProperty("love_noself_10", "Das ist ziemlich niedrig...");
-        de_de.setProperty("love_noself_0", "Gut, das wird nicht funktionieren.");
-        de_de.setProperty("love_fallback", "Urgh!");
-
-        /// MostUsedCommands
-        de_de.setProperty("mostusedcommands_title", "%s%s Meist genutzte Befehle");
-
-        /// Profile
-        de_de.setProperty("profile_noachievements", "Keine Errungenschaften");
-        de_de.setProperty("profile_nocommands", "Bisher keine genutzten Befehle");
-        de_de.setProperty("profile_level", "Stufe");
-        de_de.setProperty("profile_rank",  "Rang");
-        de_de.setProperty("profile_generalinfo", "Allgemeine Infos");
-        de_de.setProperty("profile_commandstats", "Befehlstatistiken");
-        de_de.setProperty("profile_mostused", "Meist genutzte Befehle");
-        de_de.setProperty("profile_achievements", "Errungenschaften");
-        de_de.setProperty("profile_footer1", "Siehe auch \"%s%s @nutzer\"");
-        de_de.setProperty("profile_footer2", "Siehe auch \"%s%s\"");
-        de_de.setProperty("profile_baguettecounter", "Baguette Statistiken");
-        de_de.setProperty("profile_nobaguette", "Bisher keine Baguettes");
-        de_de.setProperty("profile_baguette", "Größtes Baguette");
-        de_de.setProperty("profile_baguette_value", "%s (%s mal)");
-        de_de.setProperty("profile_total_muc", "Genutzte Befehle");
-        de_de.setProperty("profile_total_ap", "Erfolgspunkte");
-        de_de.setProperty("profile_title_creator", "Der Erschaffer");
-        de_de.setProperty("profile_title_vip", "VIP");
-        de_de.setProperty("profile_title_$10", "Saber");
-        de_de.setProperty("profile_title_$5", "Bogenschütze");
-        de_de.setProperty("profile_title_$3", "Lancer");
-        de_de.setProperty("profile_title_$1", "Beschwörer");
-        de_de.setProperty("profile_title_donator", "Assassine");
-        de_de.setProperty("profile_title_booster", "Berserker");
-        de_de.setProperty("profile_title_normal", "Meister");
-        de_de.setProperty("profile_animal", "Lieblingstier");
-        de_de.setProperty("profile_bird", "Vogel");
-        de_de.setProperty("profile_cat", "Katze");
-        de_de.setProperty("profile_dog", "Hund");
-        de_de.setProperty("profile_nofavourite", "Kein Favorit");
-        de_de.setProperty("profile_msi", "Meist verteile Interaktion");
-        de_de.setProperty("profile_mri", "Meist erhaltene Interaktion");
-
-        // Random
-        de_de.setProperty("random_empty", "Ich konnte unter diesem Suchwort nichts finden.");
-        de_de.setProperty("random_photo", "Foto");
-        de_de.setProperty("random_by", "von");
-
-        /// Unflip
-        de_de.setProperty("unflip_description", "Richte einen Nutzer wieder auf.");
-        de_de.setProperty("unflip_usage", "Befehl: `%s%s @nutzer`");
-        de_de.setProperty("unflip_hint", "Siehe auch `%sflip @nutzer`");
-
-        // Interaction
-        de_de.setProperty("interaction_description", "Interaktionsbefehle sind wie Reaktionen, aber viel besser.\n" +
-                "Teile Deine Gefühle oder Kekse mit anderen Leuten.");
-        de_de.setProperty("interaction_usage", "**%s%s jemanden**\n" +
-                "Befehl: `%s%s [@nutzer]`\n" +
-                "Beispiel: `%s%s @Servant`");
-        de_de.setProperty("interaction_usage_on", "**%s%s auf jemanden**\n" +
-                "Befehl: `%s%s [@nutzer]`\n" +
-                "Beispiel: `%s%s @Servant`");
+        // UsageEmbed
+        de_de.setProperty("usageembed_birthday_settings", "The birthday settings are now in the dashboard!");
 
         de_de.store(os,
                 "Project: Servant\n" +

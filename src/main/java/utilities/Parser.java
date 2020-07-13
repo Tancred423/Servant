@@ -1,26 +1,121 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package utilities;
 
-import net.dv8tion.jda.api.entities.Guild;
+import files.language.LanguageHandler;
 import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 
-import java.awt.*;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.HashMap;
 
 public class Parser {
+    public static String parseText(String lang, String args, int maxLength) throws ParseException {
+        // other stuff "blah blah" other stuff
+        args = args.trim().replaceAll(" +", " ");
+
+        var qmCount = args.length() - args.replace("\"", "").length();
+        if (qmCount != 0 && qmCount != 2)
+            throw new ParseException(LanguageHandler.get(lang, "no_ending_quotation_mark"), 0);
+
+        if (qmCount == 0) return null; // No topic
+
+        var firstIndex = args.indexOf("\"");
+        var lastIndex = args.lastIndexOf("\"");
+
+        args = args.substring(firstIndex + 1, lastIndex).trim();
+
+        if (maxLength != 0 && args.length() > maxLength)
+            throw new ParseException(LanguageHandler.get(lang, "topic_too_long"), 0);
+
+        return args;
+    }
+
+    public static HashMap<Character, Integer> parseArguments(String lang, String args) throws ParseException {
+        // 1 p 1min "prize or topic" 1w   2d a y 3w 5 min  10p a r t i c i p a n t s
+
+        args = args.toLowerCase().replaceAll(" ", "");
+        args = args.replaceAll("days", "d")
+                .replaceAll("day", "d")
+                .replaceAll("hours", "h")
+                .replaceAll("hour", "h")
+                .replaceAll("minutes", "m")
+                .replaceAll("minute", "m")
+                .replaceAll("mins", "m")
+                .replaceAll("min", "m")
+                .replaceAll("winners", "w")
+                .replaceAll("winner", "w")
+                .replaceAll("participants", "p")
+                .replaceAll("participant", "p");
+
+        // 1p1m"prizeortopic"1w2d3w5m10p
+
+        var sb = new StringBuilder();
+
+        var firstIndex = args.indexOf("\"");
+        if (firstIndex > 0) sb.append(args, 0, firstIndex);
+
+        var lastIndex = args.lastIndexOf("\"");
+        sb.append(args.substring(lastIndex + 1));
+
+        args = sb.toString();
+
+        var argMap = new HashMap<Character, Integer>();
+
+        if (args.isEmpty()) return argMap;
+
+        // 1w2d3w5m10p
+        sb = new StringBuilder();
+        int integer;
+        char character;
+        for (var i = 0; i < args.length(); i++) {
+            var c = args.charAt(i);
+            if (Character.isDigit(c) && sb.toString().matches(".*[a-z].*")) {
+                var arg = sb.toString();
+                var argSplit = arg.split("(?<=\\D)(?=\\d)|(?<=\\d)(?=\\D)");
+                integer = Integer.parseInt(argSplit[0]);
+                character = argSplit[1].charAt(0);
+
+                argMap.merge(character, integer, Integer::sum);
+
+                sb = new StringBuilder();
+            }
+            sb.append(c);
+        }
+
+        var arg = sb.toString();
+        var argSplit = arg.split("(?<=\\D)(?=\\d)|(?<=\\d)(?=\\D)");
+
+        if (argSplit.length != 2) {
+            throw new ParseException(LanguageHandler.get(lang, "missing_time_unit"), 0);
+        }
+
+        integer = Integer.parseInt(argSplit[0]);
+        character = argSplit[1].charAt(0);
+        argMap.merge(character, integer, Integer::sum);
+
+        // [w, 4], [d, 2], [m, 5], [p, 10]
+
+        var validArgs = new ArrayList<>(Arrays.asList('d', 'h', 'm', 'w', 'p'));
+
+        for (var entry : argMap.entrySet()) {
+            if (!validArgs.contains(entry.getKey()))
+                throw new ParseException(String.format(LanguageHandler.get(lang, "invalid_char"), entry.getKey()), 0);
+        }
+
+        return argMap;
+    }
+
     public static boolean isValidMessageId(MessageChannel channel, String id) {
         try {
             channel.retrieveMessageById(id).queue(ISnowflake::getId, Throwable::getMessage);
@@ -28,10 +123,6 @@ public class Parser {
         } catch (IllegalArgumentException e) {
             return false;
         }
-    }
-
-    public static boolean isValidLanguage(String language) {
-        return language.equalsIgnoreCase("de_de") || language.equalsIgnoreCase("en_gb");
     }
 
     public static boolean isValidDateTime(String input) {
@@ -43,62 +134,11 @@ public class Parser {
         }
     }
 
-    public static boolean isValidDate(String input) {
-        if (input.length() != 10) return false;
-
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        sdf.setLenient(false);
-
-        try {
-            sdf.parse(input);
-            return true;
-        } catch (ParseException e) {
-            return false;
-        }
-    }
-
-    public static String parseColor(String colorCode) {
-        switch (colorCode.length()) {
-            case 6:
-                colorCode = "0x" + colorCode;
-                try {
-                    Color.decode(colorCode);
-                } catch (NumberFormatException e) {
-                    colorCode = null;
-                }
-                break;
-
-            case 7:
-                colorCode = colorCode.replaceAll("#", "0x");
-                try {
-                    Color.decode(colorCode);
-                } catch (NumberFormatException e) {
-                    colorCode = null;
-                }
-                break;
-
-            case 8:
-                try {
-                    Color.decode(colorCode);
-                } catch (NumberFormatException e) {
-                    colorCode = null;
-                }
-                break;
-
-            default:
-                colorCode = null;
-                break;
-        }
-
-        return colorCode;
-    }
-
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean hasMentionedUser(Message message) {
         return !message.getMentionedUsers().isEmpty();
     }
 
-    public static long getTimeDifferenceInMillis(ZonedDateTime now, ZonedDateTime futureDate) {
+    public static long getTimeDifferenceInMillis(Instant now, Instant futureDate) {
         return ChronoUnit.MILLIS.between(now, futureDate);
     }
 
@@ -123,22 +163,6 @@ public class Parser {
     }
 
     // Guild
-    public static boolean isValidOffset(String offset) throws NumberFormatException {
-        var isValidOffset = true;
-        if (offset.length() != 6) isValidOffset = false;
-        else {
-            if (!offset.startsWith("+") && !offset.startsWith("-")) isValidOffset = false;
-            if (!offset.substring(1, 3).matches("[0-9]+")) isValidOffset = false;
-            var hours = Integer.parseInt(offset.substring(1, 3));
-            if (hours < 0 || hours > 14) isValidOffset = false;
-            if (!offset.substring(3, 4).equals(":")) isValidOffset = false;
-            if (!offset.substring(4, 6).matches("[0-9]+")) isValidOffset = false;
-            var minutes = Integer.parseInt(offset.substring(4, 6));
-            if (minutes < 0 || minutes > 59) isValidOffset = false;
-        }
-        return isValidOffset;
-    }
-
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean isValidUrl(String urlString) {
         // Check for valid url.
@@ -160,29 +184,6 @@ public class Parser {
         }
         var contentType = connection.getHeaderField("Content-Type");
         return contentType.startsWith("image/");
-    }
-
-    public static boolean isValidPrefix(String prefix) {
-        var isValidPrefix = true;
-        if (prefix.length() > 32) isValidPrefix = false;
-
-        // I will handle this properly in the future.
-        List<String> someHardcodedStuff = new ArrayList<>();
-        someHardcodedStuff.add("select");
-        someHardcodedStuff.add("drop");
-        someHardcodedStuff.add("delete");
-        someHardcodedStuff.add("insert");
-        someHardcodedStuff.add("update");
-        if (someHardcodedStuff.contains(prefix)) isValidPrefix = false;
-
-        return isValidPrefix;
-    }
-
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    public static boolean isValidVoiceChannelId(Guild guild, String id) {
-        if (!id.matches("[0-9]+") || id.length() != 18) return false;
-        guild.getVoiceChannelById(id);
-        return true;
     }
 
     public static boolean isValidId(String id) {
