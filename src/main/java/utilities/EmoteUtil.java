@@ -7,6 +7,7 @@ import servant.LoggingTask;
 import servant.Servant;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static servant.Database.closeQuietly;
@@ -21,7 +22,9 @@ public class EmoteUtil {
             var select = connection.prepareStatement(
                     "SELECT emote_guild_id, emote_id " +
                             "FROM const_emotes " +
-                            "WHERE name=?");
+                            "WHERE name=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setString(1, name);
             var resultSet = select.executeQuery();
 
@@ -50,7 +53,9 @@ public class EmoteUtil {
             var select = connection.prepareStatement(
                     "SELECT emoji " +
                             "FROM const_emojis " +
-                            "WHERE name=?");
+                            "WHERE name=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setString(1, name);
             var resultSet = select.executeQuery();
             if (resultSet.first()) emoji = resultSet.getString("emoji");

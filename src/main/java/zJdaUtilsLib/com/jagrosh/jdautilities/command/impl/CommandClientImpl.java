@@ -535,7 +535,6 @@ public class CommandClientImpl implements CommandClient, EventListener {
     }
 
     private void startCommand(MessageReceivedEvent event, CommandEvent cevent, Command command, MyGuild myGuild, String name) {
-        event.getChannel().sendTyping().queue();
         ConsoleLog.send(event, false);
 
         if (listener != null) listener.onCommand(cevent, command);
@@ -545,7 +544,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
         if (event.isFromGuild()) {
             if (myGuild.featureIsEnabled("cmddeletion")) {
                 Servant.myDeletedMessageCache.put(event.getMessageIdLong(), "");
-                if (!name.equals("clear")) event.getMessage().delete().queue();
+                if (!name.equals("clear")) event.getMessage().delete().queue(s -> {}, f -> {});
             }
         }
     }

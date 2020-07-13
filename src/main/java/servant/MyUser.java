@@ -11,6 +11,7 @@ import utilities.Constants;
 import java.awt.*;
 import java.sql.Connection;
 import java.sql.Date;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -43,7 +44,9 @@ public class MyUser {
             var select = connection.prepareStatement(
                     "SELECT prefix " +
                             "FROM users " +
-                            "WHERE user_id=?");
+                            "WHERE user_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) prefix = resultSet.getString("prefix");
@@ -68,7 +71,9 @@ public class MyUser {
             var select = connection.prepareStatement(
                     "SELECT language_code " +
                             "FROM users " +
-                            "WHERE user_id=?");
+                            "WHERE user_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) languageCode = resultSet.getString("language_code");
@@ -91,7 +96,9 @@ public class MyUser {
             var select = connection.prepareStatement(
                     "SELECT color_code " +
                             "FROM users " +
-                            "WHERE user_id=?");
+                            "WHERE user_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) colorCode = resultSet.getString("color_code");
@@ -113,7 +120,9 @@ public class MyUser {
             var select = connection.prepareStatement(
                     "SELECT color_code " +
                             "FROM users " +
-                            "WHERE user_id=?");
+                            "WHERE user_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) colorCode = resultSet.getString("color_code");
@@ -136,7 +145,9 @@ public class MyUser {
             var select = connection.prepareStatement(
                     "SELECT bio " +
                             "FROM users " +
-                            "WHERE user_id=?");
+                            "WHERE user_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) bio = resultSet.getString("bio");
@@ -159,7 +170,9 @@ public class MyUser {
             var select = connection.prepareStatement(
                     "SELECT birthday " +
                             "FROM users " +
-                            "WHERE user_id=?");
+                            "WHERE user_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) birthday = resultSet.getDate("birthday");
@@ -210,7 +223,9 @@ public class MyUser {
                             "FROM users AS u " +
                             "INNER JOIN const_profile_images AS p " +
                             "ON u.profile_bg_id=p.id " +
-                            "WHERE user_id=?");
+                            "WHERE user_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) url = resultSet.getString("image_url");
@@ -226,7 +241,9 @@ public class MyUser {
                 var select = connection.prepareStatement(
                         "SELECT image_url " +
                                 "FROM const_profile_images " +
-                                "WHERE id=?");
+                                "WHERE id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 select.setInt(1, 1);
                 var resultSet = select.executeQuery();
                 if (resultSet.first()) url = resultSet.getString("image_url");
@@ -250,7 +267,9 @@ public class MyUser {
             var select = connection.prepareStatement(
                     "SELECT * " +
                             "FROM global_blacklist " +
-                            "WHERE user_or_guild_id=?");
+                            "WHERE user_or_guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) isBlacklisted = true;
@@ -271,7 +290,9 @@ public class MyUser {
                 connection = Servant.db.getHikari().getConnection();
                 var insert = connection.prepareStatement(
                         "INSERT INTO global_blacklist (user_or_guild_id) " +
-                                "VALUES (?)");
+                                "VALUES (?)",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 insert.setLong(1, userId);
                 insert.executeUpdate();
             }
@@ -290,7 +311,9 @@ public class MyUser {
                 connection = Servant.db.getHikari().getConnection();
                 var delete = connection.prepareStatement(
                         "DELETE FROM global_blacklist " +
-                                "WHERE user_or_guild_id=?");
+                                "WHERE user_or_guild_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 delete.setLong(1, userId);
                 delete.executeUpdate();
             }
@@ -314,7 +337,9 @@ public class MyUser {
                             "INNER JOIN const_achievements AS a " +
                             "ON u.achievement_id=a.id " +
                             "WHERE u.user_id=? " +
-                            "ORDER BY a.ap DESC");
+                            "ORDER BY a.ap DESC",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) {
@@ -341,7 +366,9 @@ public class MyUser {
                             "FROM user_achievements AS u " +
                             "INNER JOIN const_achievements AS a " +
                             "ON u.achievement_id=a.id " +
-                            "WHERE u.user_id=?");
+                            "WHERE u.user_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
             if (resultSet.first())
@@ -370,7 +397,9 @@ public class MyUser {
                             "INNER JOIN const_achievements AS a " +
                             "ON u.achievement_id=a.id " +
                             "WHERE u.user_id=? " +
-                            "AND a.name=?");
+                            "AND a.name=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, userId);
             select.setString(2, achievement.toLowerCase());
             var resultSet = select.executeQuery();
@@ -393,7 +422,9 @@ public class MyUser {
             var select = connection.prepareStatement(
                     "SELECT id " +
                             "FROM const_achievements " +
-                            "WHERE name=?");
+                            "WHERE name=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setString(1, name);
             var resultSet = select.executeQuery();
             if (resultSet.first()) achievementId = resultSet.getInt("id");
@@ -414,7 +445,9 @@ public class MyUser {
                 connection = Servant.db.getHikari().getConnection();
                 var insert = connection.prepareStatement(
                         "INSERT INTO user_achievements (user_id,achievement_id) " +
-                                "VALUES (?,?)");
+                                "VALUES (?,?)",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 insert.setLong(1, userId);
                 insert.setInt(2, getAchievementIdByName(achievement));
                 insert.executeUpdate();
@@ -435,7 +468,9 @@ public class MyUser {
                 var delete = connection.prepareStatement(
                         "DELETE FROM user_achievements " +
                                 "WHERE user_id=? " +
-                                "AND achievement_id=?");
+                                "AND achievement_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 delete.setLong(1, userId);
                 delete.setInt(2, getAchievementIdByName(achievement));
                 delete.executeUpdate();
@@ -458,7 +493,9 @@ public class MyUser {
                             "FROM user_achievements AS u " +
                             "INNER JOIN const_achievements AS a " +
                             "ON u.achievement_id=a.id " +
-                            "WHERE u.user_id=?");
+                            "WHERE u.user_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) do ap += resultSet.getInt("ap"); while (resultSet.next());
@@ -482,7 +519,9 @@ public class MyUser {
                     "SELECT * " +
                             "FROM user_exp " +
                             "WHERE user_id=? " +
-                            "AND guild_id=?");
+                            "AND guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, userId);
             select.setLong(2, guildId);
             var resultSet = select.executeQuery();
@@ -504,7 +543,9 @@ public class MyUser {
             if (getExp(guildId) == 0) {
                 var insert = connection.prepareStatement(
                         "INSERT INTO user_exp(user_id,guild_id,exp) " +
-                                "VALUES(?,?,?)");
+                                "VALUES(?,?,?)",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 insert.setLong(1, userId);
                 insert.setLong(2, guildId);
                 insert.setInt(3, exp);
@@ -516,7 +557,9 @@ public class MyUser {
                         "UPDATE user_exp " +
                                 "SET exp=? " +
                                 "WHERE user_id=? " +
-                                "AND guild_id=?");
+                                "AND guild_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 update.setInt(1, exp);
                 update.setLong(2, userId);
                 update.setLong(3, guildId);
@@ -540,7 +583,9 @@ public class MyUser {
                     "SELECT id " +
                             "FROM tmp_birthday_gratulated " +
                             "WHERE user_id=? " +
-                            "AND guild_id=?");
+                            "AND guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, userId);
             select.setLong(2, guildId);
             var resultSet = select.executeQuery();
@@ -562,7 +607,9 @@ public class MyUser {
                 connection = Servant.db.getHikari().getConnection();
                 var insert = connection.prepareStatement(
                         "INSERT INTO tmp_birthday_gratulated (user_id,guild_id) " +
-                                "VALUES(?,?)");
+                                "VALUES(?,?)",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 insert.setLong(1, userId);
                 insert.setLong(2, guildId);
                 insert.executeUpdate();
@@ -583,7 +630,9 @@ public class MyUser {
                 var delete = connection.prepareStatement(
                         "DELETE FROM tmp_birthday_gratulated " +
                                 "WHERE user_id=? " +
-                                "AND guild_id=?");
+                                "AND guild_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 delete.setLong(1, userId);
                 delete.setLong(2, guildId);
                 delete.executeUpdate();
@@ -608,7 +657,9 @@ public class MyUser {
                             "INNER JOIN const_commands AS c " +
                             "ON u.command_id=c.id " +
                             "WHERE u.user_id=? " +
-                            "ORDER BY u.count DESC");
+                            "ORDER BY u.count DESC",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) {
@@ -638,7 +689,9 @@ public class MyUser {
                     "SELECT count " +
                             "FROM user_command_counts " +
                             "WHERE user_id=? " +
-                            "AND command_id=?");
+                            "AND command_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, userId);
             select.setInt(2, commandId);
             var resultSet = select.executeQuery();
@@ -662,7 +715,9 @@ public class MyUser {
                     "SELECT id " +
                             "FROM user_command_counts " +
                             "WHERE user_id=? " +
-                            "AND command_id=?");
+                            "AND command_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, userId);
             select.setInt(2, commandId);
             var resultSet = select.executeQuery();
@@ -691,7 +746,9 @@ public class MyUser {
                         "UPDATE user_command_counts " +
                                 "SET count=? " +
                                 "WHERE user_id=? " +
-                                "AND command_id=?");
+                                "AND command_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 update.setInt(1, count + 1);
                 update.setLong(2, userId);
                 update.setInt(3, myCommand.getId());
@@ -699,7 +756,9 @@ public class MyUser {
             } else {
                 var insert = connection.prepareStatement(
                         "INSERT INTO user_command_counts (user_id,command_id,count) " +
-                                "VALUES (?,?,?)");
+                                "VALUES (?,?,?)",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 insert.setLong(1, userId);
                 insert.setInt(2, myCommand.getId());
                 insert.setInt(3, 1);
@@ -733,7 +792,9 @@ public class MyUser {
                             "OR c.name='panda' " +
                             "OR c.name='redpanda' " +
                             "OR c.name='sloth' ) " +
-                            "ORDER BY u.count DESC");
+                            "ORDER BY u.count DESC",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) {
@@ -763,7 +824,9 @@ public class MyUser {
                             "FROM user_interaction_counts AS u " +
                             "INNER JOIN const_interactions AS i " +
                             "ON u.interaction_id=i.id " +
-                            "WHERE u.user_id=?");
+                            "WHERE u.user_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
             if (resultSet.first())
@@ -794,7 +857,9 @@ public class MyUser {
                             "INNER JOIN const_interactions AS i " +
                             "ON u.interaction_id=i.id " +
                             "WHERE u.user_id=? " +
-                            "AND i.name=?");
+                            "AND i.name=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, userId);
             select.setString(2, interaction.toLowerCase());
             var resultSet = select.executeQuery();
@@ -820,7 +885,9 @@ public class MyUser {
                             "INNER JOIN const_interactions AS i " +
                             "ON u.interaction_id = i.id " +
                             "WHERE u.user_id=? " +
-                            "AND i.name=?");
+                            "AND i.name=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, userId);
             select.setString(2, interaction.toLowerCase());
             var resultSet = select.executeQuery();
@@ -845,7 +912,9 @@ public class MyUser {
             var select = connection.prepareStatement(
                     "SELECT id " +
                             "FROM const_interactions " +
-                            "WHERE name=?");
+                            "WHERE name=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setString(1, name);
             var resultSet = select.executeQuery();
             if (resultSet.first()) interactionId = resultSet.getInt("id");
@@ -870,7 +939,9 @@ public class MyUser {
                         "UPDATE user_interaction_counts " +
                                 "SET " + (isShared ? "shared" : "received") + "=? " +
                                 "WHERE user_id=? " +
-                                "AND interaction_id=?");
+                                "AND interaction_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 update.setInt(1, count + 1);
                 update.setLong(2, userId);
                 update.setInt(3, interactionId);
@@ -878,7 +949,9 @@ public class MyUser {
             } else {
                 var insert = connection.prepareStatement(
                         "INSERT INTO user_interaction_counts (user_id,interaction_id,shared,received) " +
-                                "VALUES (?,?,?,?)");
+                                "VALUES (?,?,?,?)",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 insert.setLong(1, userId);
                 insert.setInt(2, interactionId);
                 if (isShared) {
@@ -907,7 +980,9 @@ public class MyUser {
             var select = connection.prepareStatement(
                     "SELECT size, counter " +
                             "FROM user_baguettes " +
-                            "WHERE user_id=?");
+                            "WHERE user_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) baguette = new Baguette(resultSet.getInt("size"), resultSet.getInt("counter"));
@@ -929,7 +1004,9 @@ public class MyUser {
             var select = connection.prepareStatement(
                     "SELECT user_id " +
                             "FROM user_baguettes " +
-                            "WHERE user_id=?");
+                            "WHERE user_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
@@ -951,7 +1028,9 @@ public class MyUser {
                 var update = connection.prepareStatement(
                         "UPDATE user_baguettes " +
                                 "SET size=?, counter=? " +
-                                "WHERE user_id=?");
+                                "WHERE user_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 update.setInt(1, baguetteSize);
                 update.setInt(2, sizeCounter);
                 update.setLong(3, userId);
@@ -959,7 +1038,9 @@ public class MyUser {
             } else {
                 var insert = connection.prepareStatement(
                         "INSERT INTO user_baguettes (user_id,size,counter) " +
-                                "VALUES (?,?,?)");
+                                "VALUES (?,?,?)",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 insert.setLong(1, userId);
                 insert.setInt(2, baguetteSize);
                 insert.setInt(3, sizeCounter);

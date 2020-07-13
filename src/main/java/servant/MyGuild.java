@@ -35,168 +35,240 @@ public class MyGuild {
             connection = Servant.db.getHikari().getConnection();
 
             // Giveaway
-            var delete = connection.prepareStatement("DELETE FROM giveaways WHERE guild_id=?");
+            var delete = connection.prepareStatement("DELETE FROM giveaways WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.executeUpdate();
 
-            delete = connection.prepareStatement("DELETE FROM tmp_giveaway_participants WHERE guild_id=?");
+            delete = connection.prepareStatement("DELETE FROM tmp_giveaway_participants WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.executeUpdate();
 
             // AutoRole
-            delete = connection.prepareStatement("DELETE FROM guild_autoroles WHERE guild_id=?");
+            delete = connection.prepareStatement("DELETE FROM guild_autoroles WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.executeUpdate();
 
             // Best of Image
-            delete = connection.prepareStatement("DELETE FROM guild_best_of_images WHERE guild_id=?");
+            delete = connection.prepareStatement("DELETE FROM guild_best_of_images WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.executeUpdate();
 
-            delete = connection.prepareStatement("DELETE FROM tmp_best_of_image_bl WHERE guild_id=?");
+            delete = connection.prepareStatement("DELETE FROM tmp_best_of_image_bl WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.executeUpdate();
 
             // Best of Quote
-            delete = connection.prepareStatement("DELETE FROM guild_best_of_quotes WHERE guild_id=?");
+            delete = connection.prepareStatement("DELETE FROM guild_best_of_quotes WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.executeUpdate();
 
-            delete = connection.prepareStatement("DELETE FROM tmp_best_of_quote_bl WHERE guild_id=?");
+            delete = connection.prepareStatement("DELETE FROM tmp_best_of_quote_bl WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.executeUpdate();
 
             // Birthday
-            delete = connection.prepareStatement("DELETE FROM guild_birthdays WHERE guild_id=?");
+            delete = connection.prepareStatement("DELETE FROM guild_birthdays WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.executeUpdate();
 
-            delete = connection.prepareStatement("DELETE FROM tmp_birthday_gratulated WHERE guild_id=?");
+            delete = connection.prepareStatement("DELETE FROM tmp_birthday_gratulated WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.executeUpdate();
 
             // Command Counts
-            delete = connection.prepareStatement("DELETE FROM guild_command_counts WHERE guild_id=?");
+            delete = connection.prepareStatement("DELETE FROM guild_command_counts WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.executeUpdate();
 
             // Disabled Stuff
-            delete = connection.prepareStatement("DELETE FROM guild_disabled_categories WHERE guild_id=?");
+            delete = connection.prepareStatement("DELETE FROM guild_disabled_categories WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.executeUpdate();
 
-            delete = connection.prepareStatement("DELETE FROM guild_disabled_commands WHERE guild_id=?");
+            delete = connection.prepareStatement("DELETE FROM guild_disabled_commands WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.executeUpdate();
 
-            delete = connection.prepareStatement("DELETE FROM guild_disabled_features WHERE guild_id=?");
+            delete = connection.prepareStatement("DELETE FROM guild_disabled_features WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.executeUpdate();
 
-            delete = connection.prepareStatement("DELETE FROM guild_disabled_plugins WHERE guild_id=?");
+            delete = connection.prepareStatement("DELETE FROM guild_disabled_plugins WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.executeUpdate();
 
             // Join
-            delete = connection.prepareStatement("DELETE FROM guild_joins WHERE guild_id=?");
+            delete = connection.prepareStatement("DELETE FROM guild_joins WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.executeUpdate();
 
             // Leave
-            delete = connection.prepareStatement("DELETE FROM guild_leaves WHERE guild_id=?");
+            delete = connection.prepareStatement("DELETE FROM guild_leaves WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.executeUpdate();
 
             // Level Settings
-            delete = connection.prepareStatement("DELETE FROM guild_level WHERE guild_id=?");
+            delete = connection.prepareStatement("DELETE FROM guild_level WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.executeUpdate();
 
             // Level Roles
-            delete = connection.prepareStatement("DELETE FROM guild_level_roles WHERE guild_id=?");
+            delete = connection.prepareStatement("DELETE FROM guild_level_roles WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.executeUpdate();
 
             // Livestream
-            delete = connection.prepareStatement("DELETE FROM guild_livestreamers WHERE guild_id=?");
+            delete = connection.prepareStatement("DELETE FROM guild_livestreamers WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.executeUpdate();
 
-            delete = connection.prepareStatement("DELETE FROM guild_livestreams WHERE guild_id=?");
+            delete = connection.prepareStatement("DELETE FROM guild_livestreams WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.executeUpdate();
 
             // Log Settings
-            delete = connection.prepareStatement("DELETE FROM guild_logs WHERE guild_id=?");
+            delete = connection.prepareStatement("DELETE FROM guild_logs WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.executeUpdate();
 
             // Media Only Channel
-            delete = connection.prepareStatement("DELETE FROM guild_media_only_channels WHERE guild_id=?");
+            delete = connection.prepareStatement("DELETE FROM guild_media_only_channels WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.executeUpdate();
 
             // Mods
-            delete = connection.prepareStatement("DELETE FROM guild_mod_roles WHERE guild_id=?");
+            delete = connection.prepareStatement("DELETE FROM guild_mod_roles WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.executeUpdate();
 
             // Voice Lobby
-            delete = connection.prepareStatement("DELETE FROM guild_voice_lobbies WHERE guild_id=?");
+            delete = connection.prepareStatement("DELETE FROM guild_voice_lobbies WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.executeUpdate();
 
-            delete = connection.prepareStatement("DELETE FROM tmp_voice_lobbies_active WHERE guild_id=?");
+            delete = connection.prepareStatement("DELETE FROM tmp_voice_lobbies_active WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.executeUpdate();
 
             // Polls
-            delete = connection.prepareStatement("DELETE FROM polls WHERE guild_id=?");
+            delete = connection.prepareStatement("DELETE FROM polls WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.executeUpdate();
 
-            delete = connection.prepareStatement("DELETE FROM tmp_poll_participants WHERE guild_id=?");
+            delete = connection.prepareStatement("DELETE FROM tmp_poll_participants WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.executeUpdate();
 
             // Ratings
-            delete = connection.prepareStatement("DELETE FROM ratings WHERE guild_id=?");
+            delete = connection.prepareStatement("DELETE FROM ratings WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.executeUpdate();
 
-            delete = connection.prepareStatement("DELETE FROM tmp_rating_participants WHERE guild_id=?");
+            delete = connection.prepareStatement("DELETE FROM tmp_rating_participants WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.executeUpdate();
 
             // Reaction Roles
-            delete = connection.prepareStatement("DELETE FROM reaction_roles WHERE guild_id=?");
+            delete = connection.prepareStatement("DELETE FROM reaction_roles WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.executeUpdate();
 
-            delete = connection.prepareStatement("DELETE FROM reaction_role_fields WHERE guild_id=?");
+            delete = connection.prepareStatement("DELETE FROM reaction_role_fields WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.executeUpdate();
 
-            delete = connection.prepareStatement("DELETE FROM reaction_role_messages WHERE guild_id=?");
+            delete = connection.prepareStatement("DELETE FROM reaction_role_messages WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.executeUpdate();
 
             // Remind Me
-            delete = connection.prepareStatement("DELETE FROM remind_mes WHERE guild_id=?");
+            delete = connection.prepareStatement("DELETE FROM remind_mes WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.executeUpdate();
 
             // Signup
-            delete = connection.prepareStatement("DELETE FROM signups WHERE guild_id=?");
+            delete = connection.prepareStatement("DELETE FROM signups WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.executeUpdate();
 
-            delete = connection.prepareStatement("DELETE FROM tmp_signup_participants WHERE guild_id=?");
+            delete = connection.prepareStatement("DELETE FROM tmp_signup_participants WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.executeUpdate();
 
             // Guild
-            delete = connection.prepareStatement("DELETE FROM guilds WHERE guild_id=?");
+            delete = connection.prepareStatement("DELETE FROM guilds WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.executeUpdate();
         } catch (SQLException e) {
@@ -214,24 +286,32 @@ public class MyGuild {
             connection = Servant.db.getHikari().getConnection();
 
             // Giveaway
-            var delete = connection.prepareStatement("DELETE FROM giveaways WHERE guild_id=? AND tc_id=?");
+            var delete = connection.prepareStatement("DELETE FROM giveaways WHERE guild_id=? AND tc_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.setLong(2, tcId);
             delete.executeUpdate();
 
-            delete = connection.prepareStatement("DELETE FROM tmp_giveaway_participants WHERE guild_id=? AND tc_id=?");
+            delete = connection.prepareStatement("DELETE FROM tmp_giveaway_participants WHERE guild_id=? AND tc_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.setLong(2, tcId);
             delete.executeUpdate();
 
             // Best of Image
-            delete = connection.prepareStatement("DELETE FROM tmp_best_of_image_bl WHERE guild_id=? AND tc_id=?");
+            delete = connection.prepareStatement("DELETE FROM tmp_best_of_image_bl WHERE guild_id=? AND tc_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.setLong(2, tcId);
             delete.executeUpdate();
 
             // Best of Quote
-            delete = connection.prepareStatement("DELETE FROM tmp_best_of_quote_bl WHERE guild_id=? AND tc_id=?");
+            delete = connection.prepareStatement("DELETE FROM tmp_best_of_quote_bl WHERE guild_id=? AND tc_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.setLong(2, tcId);
             delete.executeUpdate();
@@ -239,7 +319,9 @@ public class MyGuild {
             // Birthday
             var myTC = new MyTextChannel(jda, guildId, tcId);
             if (myTC.containsBirthdayList()) {
-                delete = connection.prepareStatement("UPDATE guild_birthdays SET list_tc_id=?, list_msg_id=?, list_author_id=? WHERE guild_id=?");
+                delete = connection.prepareStatement("UPDATE guild_birthdays SET list_tc_id=?, list_msg_id=?, list_author_id=? WHERE guild_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 delete.setLong(1, 0L);
                 delete.setLong(2, 0L);
                 delete.setLong(3, 0L);
@@ -248,87 +330,117 @@ public class MyGuild {
             }
 
             if (myTC.isBirthdayAnnouncementTc()) {
-                delete = connection.prepareStatement("UPDATE guild_birthdays SET announcement_tc_id WHERE guild_id=?");
+                delete = connection.prepareStatement("UPDATE guild_birthdays SET announcement_tc_id WHERE guild_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 delete.setLong(1, 0L);
                 delete.setLong(2, guildId);
                 delete.executeUpdate();
             }
 
             // Join
-            delete = connection.prepareStatement("DELETE FROM guild_joins WHERE guild_id=? AND tc_id=?");
+            delete = connection.prepareStatement("DELETE FROM guild_joins WHERE guild_id=? AND tc_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.setLong(2, tcId);
             delete.executeUpdate();
 
             // Leave
-            delete = connection.prepareStatement("DELETE FROM guild_leaves WHERE guild_id=? AND tc_id=?");
+            delete = connection.prepareStatement("DELETE FROM guild_leaves WHERE guild_id=? AND tc_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.setLong(2, tcId);
             delete.executeUpdate();
 
             // Log Settings
-            delete = connection.prepareStatement("DELETE FROM guild_logs WHERE guild_id=? AND tc_id=?");
+            delete = connection.prepareStatement("DELETE FROM guild_logs WHERE guild_id=? AND tc_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.setLong(2, tcId);
             delete.executeUpdate();
 
             // Media Only Channel
-            delete = connection.prepareStatement("DELETE FROM guild_media_only_channels WHERE guild_id=? AND tc_id=?");
+            delete = connection.prepareStatement("DELETE FROM guild_media_only_channels WHERE guild_id=? AND tc_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.setLong(2, tcId);
             delete.executeUpdate();
 
             // Polls
-            delete = connection.prepareStatement("DELETE FROM polls WHERE guild_id=? AND tc_id=?");
+            delete = connection.prepareStatement("DELETE FROM polls WHERE guild_id=? AND tc_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.setLong(2, tcId);
             delete.executeUpdate();
 
-            delete = connection.prepareStatement("DELETE FROM tmp_poll_participants WHERE guild_id=? AND tc_id=?");
+            delete = connection.prepareStatement("DELETE FROM tmp_poll_participants WHERE guild_id=? AND tc_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.setLong(2, tcId);
             delete.executeUpdate();
 
             // Ratings
-            delete = connection.prepareStatement("DELETE FROM ratings WHERE guild_id=? AND tc_id=?");
+            delete = connection.prepareStatement("DELETE FROM ratings WHERE guild_id=? AND tc_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.setLong(2, tcId);
             delete.executeUpdate();
 
-            delete = connection.prepareStatement("DELETE FROM tmp_rating_participants WHERE guild_id=? AND tc_id=?");
+            delete = connection.prepareStatement("DELETE FROM tmp_rating_participants WHERE guild_id=? AND tc_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.setLong(2, tcId);
             delete.executeUpdate();
 
             // Reaction Roles
-            delete = connection.prepareStatement("DELETE FROM reaction_roles WHERE guild_id=? AND tc_id=?");
+            delete = connection.prepareStatement("DELETE FROM reaction_roles WHERE guild_id=? AND tc_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.setLong(2, tcId);
             delete.executeUpdate();
 
-            delete = connection.prepareStatement("DELETE FROM reaction_role_fields WHERE guild_id=? AND tc_id=?");
+            delete = connection.prepareStatement("DELETE FROM reaction_role_fields WHERE guild_id=? AND tc_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.setLong(2, tcId);
             delete.executeUpdate();
 
-            delete = connection.prepareStatement("DELETE FROM reaction_role_messages WHERE guild_id=? AND tc_id=?");
+            delete = connection.prepareStatement("DELETE FROM reaction_role_messages WHERE guild_id=? AND tc_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.setLong(2, tcId);
             delete.executeUpdate();
 
             // Remind Me
-            delete = connection.prepareStatement("DELETE FROM remind_mes WHERE guild_id=? AND tc_id=?");
+            delete = connection.prepareStatement("DELETE FROM remind_mes WHERE guild_id=? AND tc_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.setLong(2, tcId);
             delete.executeUpdate();
 
             // Signup
-            delete = connection.prepareStatement("DELETE FROM signups WHERE guild_id=? AND tc_id=?");
+            delete = connection.prepareStatement("DELETE FROM signups WHERE guild_id=? AND tc_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.setLong(2, tcId);
             delete.executeUpdate();
 
-            delete = connection.prepareStatement("DELETE FROM tmp_signup_participants WHERE guild_id=? AND tc_id=?");
+            delete = connection.prepareStatement("DELETE FROM tmp_signup_participants WHERE guild_id=? AND tc_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.setLong(2, tcId);
             delete.executeUpdate();
@@ -347,7 +459,9 @@ public class MyGuild {
             connection = Servant.db.getHikari().getConnection();
 
             // Voice Lobby
-            var delete = connection.prepareStatement("DELETE FROM guild_voice_lobbies WHERE guild_id=? AND vc_id=?");
+            var delete = connection.prepareStatement("DELETE FROM guild_voice_lobbies WHERE guild_id=? AND vc_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.setLong(2, vcTc);
             delete.executeUpdate();
@@ -371,12 +485,16 @@ public class MyGuild {
             if (myMessage.isGiveaway()) {
                 System.out.println("Purging giveaway... Guild ID: " + guildId + " Message ID: " + msgId);
 
-                delete = connection.prepareStatement("DELETE FROM giveaways WHERE guild_id=? AND msg_id=?");
+                delete = connection.prepareStatement("DELETE FROM giveaways WHERE guild_id=? AND msg_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 delete.setLong(1, guildId);
                 delete.setLong(2, msgId);
                 delete.executeUpdate();
 
-                delete = connection.prepareStatement("DELETE FROM tmp_giveaway_participants WHERE guild_id=? AND msg_id=?");
+                delete = connection.prepareStatement("DELETE FROM tmp_giveaway_participants WHERE guild_id=? AND msg_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 delete.setLong(1, guildId);
                 delete.setLong(2, msgId);
                 delete.executeUpdate();
@@ -386,7 +504,9 @@ public class MyGuild {
             else if (myMessage.isBirthdayList()) {
                 System.out.println("Purging birthday list... Guild ID: " + guildId + " Message ID: " + msgId);
 
-                delete = connection.prepareStatement("UPDATE guild_birthdays SET list_tc_id=?, list_msg_id=?, list_author_id=? WHERE guild_id=?");
+                delete = connection.prepareStatement("UPDATE guild_birthdays SET list_tc_id=?, list_msg_id=?, list_author_id=? WHERE guild_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 delete.setLong(1, 0);
                 delete.setLong(2, 0);
                 delete.setLong(3, 0);
@@ -398,12 +518,16 @@ public class MyGuild {
             else if (myMessage.isRadiopoll() || myMessage.isQuickpoll() || myMessage.isCheckpoll()) {
                 System.out.println("Purging poll... Guild ID: " + guildId + " Message ID: " + msgId);
 
-                delete = connection.prepareStatement("DELETE FROM polls WHERE guild_id=? AND msg_id=?");
+                delete = connection.prepareStatement("DELETE FROM polls WHERE guild_id=? AND msg_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 delete.setLong(1, guildId);
                 delete.setLong(2, msgId);
                 delete.executeUpdate();
 
-                delete = connection.prepareStatement("DELETE FROM tmp_poll_participants WHERE guild_id=? AND msg_id=?");
+                delete = connection.prepareStatement("DELETE FROM tmp_poll_participants WHERE guild_id=? AND msg_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 delete.setLong(1, guildId);
                 delete.setLong(2, msgId);
                 delete.executeUpdate();
@@ -413,12 +537,16 @@ public class MyGuild {
             else if (myMessage.isRating()) {
                 System.out.println("Purging rating... Guild ID: " + guildId + " Message ID: " + msgId);
 
-                delete = connection.prepareStatement("DELETE FROM ratings WHERE guild_id=? AND msg_id=?");
+                delete = connection.prepareStatement("DELETE FROM ratings WHERE guild_id=? AND msg_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 delete.setLong(1, guildId);
                 delete.setLong(2, msgId);
                 delete.executeUpdate();
 
-                delete = connection.prepareStatement("DELETE FROM tmp_rating_participants WHERE guild_id=? AND msg_id=?");
+                delete = connection.prepareStatement("DELETE FROM tmp_rating_participants WHERE guild_id=? AND msg_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 delete.setLong(1, guildId);
                 delete.setLong(2, msgId);
                 delete.executeUpdate();
@@ -428,17 +556,23 @@ public class MyGuild {
             else if (myMessage.isReactionRole()) {
                 System.out.println("Purging reaction role... Guild ID: " + guildId + " Message ID: " + msgId);
 
-                delete = connection.prepareStatement("DELETE FROM reaction_roles WHERE guild_id=? AND msg_id=?");
+                delete = connection.prepareStatement("DELETE FROM reaction_roles WHERE guild_id=? AND msg_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 delete.setLong(1, guildId);
                 delete.setLong(2, msgId);
                 delete.executeUpdate();
 
-                delete = connection.prepareStatement("DELETE FROM reaction_role_fields WHERE guild_id=? AND msg_id=?");
+                delete = connection.prepareStatement("DELETE FROM reaction_role_fields WHERE guild_id=? AND msg_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 delete.setLong(1, guildId);
                 delete.setLong(2, msgId);
                 delete.executeUpdate();
 
-                delete = connection.prepareStatement("DELETE FROM reaction_role_messages WHERE guild_id=? AND msg_id=?");
+                delete = connection.prepareStatement("DELETE FROM reaction_role_messages WHERE guild_id=? AND msg_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 delete.setLong(1, guildId);
                 delete.setLong(2, msgId);
                 delete.executeUpdate();
@@ -448,7 +582,9 @@ public class MyGuild {
             else if (myMessage.isRemindMe()) {
                 System.out.println("Purging remindme... Guild ID: " + guildId + " Message ID: " + msgId);
 
-                delete = connection.prepareStatement("DELETE FROM remind_mes WHERE guild_id=? AND msg_id=?");
+                delete = connection.prepareStatement("DELETE FROM remind_mes WHERE guild_id=? AND msg_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 delete.setLong(1, guildId);
                 delete.setLong(2, msgId);
                 delete.executeUpdate();
@@ -458,12 +594,16 @@ public class MyGuild {
             else if (myMessage.isSignup()) {
                 System.out.println("Purging signup... Guild ID: " + guildId + " Message ID: " + msgId);
 
-                delete = connection.prepareStatement("DELETE FROM signups WHERE guild_id=? AND msg_id=?");
+                delete = connection.prepareStatement("DELETE FROM signups WHERE guild_id=? AND msg_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 delete.setLong(1, guildId);
                 delete.setLong(2, msgId);
                 delete.executeUpdate();
 
-                delete = connection.prepareStatement("DELETE FROM tmp_signup_participants WHERE guild_id=? AND msg_id=?");
+                delete = connection.prepareStatement("DELETE FROM tmp_signup_participants WHERE guild_id=? AND msg_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 delete.setLong(1, guildId);
                 delete.setLong(2, msgId);
                 delete.executeUpdate();
@@ -473,7 +613,9 @@ public class MyGuild {
             if (myMessage.isBestOfImageBlacklisted()) {
                 System.out.println("Purging best of image... Guild ID: " + guildId + " Message ID: " + msgId);
 
-                delete = connection.prepareStatement("DELETE FROM tmp_best_of_image_bl WHERE guild_id=? AND msg_id=?");
+                delete = connection.prepareStatement("DELETE FROM tmp_best_of_image_bl WHERE guild_id=? AND msg_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 delete.setLong(1, guildId);
                 delete.setLong(2, msgId);
                 delete.executeUpdate();
@@ -483,7 +625,9 @@ public class MyGuild {
             if (myMessage.isBestOfQuoteBlacklisted()) {
                 System.out.println("Purging best of quote... Guild ID: " + guildId + " Message ID: " + msgId);
 
-                delete = connection.prepareStatement("DELETE FROM tmp_best_of_quote_bl WHERE guild_id=? AND msg_id=?");
+                delete = connection.prepareStatement("DELETE FROM tmp_best_of_quote_bl WHERE guild_id=? AND msg_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 delete.setLong(1, guildId);
                 delete.setLong(2, msgId);
                 delete.executeUpdate();
@@ -505,7 +649,9 @@ public class MyGuild {
             var select = connection.prepareStatement(
                     "SELECT prefix " +
                             "FROM guilds " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first()){
@@ -533,7 +679,9 @@ public class MyGuild {
                             "FROM guilds AS g " +
                             "INNER JOIN const_languages AS l " +
                             "ON g.language_code = l.code " +
-                            "WHERE g.guild_id=?");
+                            "WHERE g.guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) languageCode = resultSet.getString("code");
@@ -558,7 +706,9 @@ public class MyGuild {
                             "FROM guilds AS g " +
                             "INNER JOIN const_timezones AS t " +
                             "ON g.timezone_id = t.id " +
-                            "WHERE g.guild_id=?");
+                            "WHERE g.guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) timezone = TimeZone.getTimeZone(resultSet.getString("timezone"));
@@ -581,11 +731,13 @@ public class MyGuild {
             var select = connection.prepareStatement(
                     "SELECT role_id " +
                             "FROM guild_mod_roles " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) {
-                var modRoleId = resultSet.getLong("mod_role_id");
+                var modRoleId = resultSet.getLong("role_id");
                 Role modRole = guild.getRoleById(modRoleId);
                 if (modRole == null) unsetModRole(); // Unsetting it because the role doesn't exist anymore.
                 else modRoles.add(modRole);
@@ -607,7 +759,9 @@ public class MyGuild {
             var update = connection.prepareStatement(
                     "UPDATE guilds " +
                             "SET mod_role_id=? " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             update.setLong(1, 0L);
             update.setLong(2, guildId);
             update.executeUpdate();
@@ -628,10 +782,15 @@ public class MyGuild {
             else if (member.hasPermission(Permission.ADMINISTRATOR))
                 isMod = true;
             else {
-                var modRole = getModRoles();
-                if (modRole != null) {
-                    if (member.getRoles().contains(modRole))
-                        isMod = true;
+                var modRoles = getModRoles();
+                var memberRoles = member.getRoles();
+                if (modRoles != null) {
+                    for (var modRole : modRoles) {
+                        if (memberRoles.contains(modRole)) {
+                            isMod = true;
+                            break;
+                        }
+                    }
                 }
             }
         }
@@ -651,7 +810,9 @@ public class MyGuild {
                             "FROM guild_disabled_commands AS d " +
                             "INNER JOIN const_commands AS c " +
                             "ON d.command_id=c.id " +
-                            "WHERE d.guild_id=? AND c.name=?");
+                            "WHERE d.guild_id=? AND c.name=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             select.setString(2, command);
             var resultSet = select.executeQuery();
@@ -660,8 +821,9 @@ public class MyGuild {
                 select = connection.prepareStatement(
                         "SELECT guild_id" + " " +
                                 "FROM guilds" + " " +
-                                "WHERE guild_id=?"
-                );
+                                "WHERE guild_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 select.setLong(1, guildId);
                 resultSet = select.executeQuery();
                 if (!resultSet.first()) isEnabled = ToggleUtil.commandIsEnabledByDefault(command);
@@ -686,7 +848,9 @@ public class MyGuild {
                             "FROM guild_disabled_features AS d " +
                             "INNER JOIN const_features AS f " +
                             "ON d.feature_id=f.id " +
-                            "WHERE d.guild_id=? AND f.name=?");
+                            "WHERE d.guild_id=? AND f.name=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             select.setString(2, feature);
             var resultSet = select.executeQuery();
@@ -695,7 +859,9 @@ public class MyGuild {
                 select = connection.prepareStatement(
                         "SELECT guild_id " +
                                 "FROM guilds " +
-                                "WHERE guild_id=?");
+                                "WHERE guild_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 select.setLong(1, guildId);
                 resultSet = select.executeQuery();
                 if (!resultSet.first()) isEnabled = ToggleUtil.featureIsEnabledByDefault(feature);
@@ -720,7 +886,9 @@ public class MyGuild {
                             "FROM guild_disabled_categories AS d " +
                             "INNER JOIN const_categories AS c " +
                             "ON d.category_id=c.id " +
-                            "WHERE d.guild_id=? AND c.name=?");
+                            "WHERE d.guild_id=? AND c.name=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             select.setString(2, category);
             var resultSet = select.executeQuery();
@@ -729,7 +897,9 @@ public class MyGuild {
                 select = connection.prepareStatement(
                         "SELECT guild_id " +
                                 "FROM guilds " +
-                                "WHERE guild_id=?");
+                                "WHERE guild_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 select.setLong(1, guildId);
                 resultSet = select.executeQuery();
                 if (!resultSet.first()) isEnabled = ToggleUtil.categoryIsEnabledByDefault(category);
@@ -754,7 +924,9 @@ public class MyGuild {
                             "FROM guild_disabled_plugins AS d " +
                             "INNER JOIN const_plugins AS p " +
                             "ON d.plugin_id=p.id " +
-                            "WHERE d.guild_id=? AND p.name=?");
+                            "WHERE d.guild_id=? AND p.name=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             select.setString(2, plugin);
             var resultSet = select.executeQuery();
@@ -763,7 +935,9 @@ public class MyGuild {
                 select = connection.prepareStatement(
                         "SELECT guild_id " +
                                 "FROM guilds " +
-                                "WHERE guild_id=?");
+                                "WHERE guild_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 select.setLong(1, guildId);
                 resultSet = select.executeQuery();
                 if (!resultSet.first()) isEnabled = ToggleUtil.pluginIsEnabledByDefault(plugin);
@@ -787,7 +961,9 @@ public class MyGuild {
             var select = connection.prepareStatement(
                     "SELECT guild_id " +
                             "FROM guild_birthdays " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
@@ -809,7 +985,9 @@ public class MyGuild {
             var select = connection.prepareStatement(
                     "SELECT announcement_tc_id " +
                             "FROM guild_birthdays " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) {
@@ -836,7 +1014,9 @@ public class MyGuild {
                 var update = connection.prepareStatement(
                         "UPDATE guild_birthdays " +
                             "SET announcement_tc_id=? " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 update.setLong(1, 0L);
                 update.setLong(2, guildId);
                 update.executeUpdate();
@@ -857,7 +1037,9 @@ public class MyGuild {
             var select = connection.prepareStatement(
                     "SELECT list_tc_id " +
                             "FROM guild_birthdays " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) channelId = resultSet.getLong("list_tc_id");
@@ -879,7 +1061,9 @@ public class MyGuild {
             var select = connection.prepareStatement(
                     "SELECT list_msg_id " +
                             "FROM guild_birthdays " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) messageId = resultSet.getLong("list_msg_id");
@@ -898,10 +1082,13 @@ public class MyGuild {
 
         try {
             connection = Servant.db.getHikari().getConnection();
+
             var select = connection.prepareStatement(
                     "SELECT list_author_id " +
                             "FROM guild_birthdays " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) messageId = resultSet.getLong("list_author_id");
@@ -923,7 +1110,9 @@ public class MyGuild {
                 var update = connection.prepareStatement(
                         "UPDATE guild_birthdays " +
                             "SET list_tc_id=?, list_msg_id=?, list_author_id=? " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 update.setLong(1, 0L);
                 update.setLong(2, 0L);
                 update.setLong(3, 0L);
@@ -946,7 +1135,9 @@ public class MyGuild {
             var select = connection.prepareStatement(
                     "SELECT servant_bday " +
                             "FROM guild_birthdays " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) usesServantBirthday = resultSet.getBoolean("servant_bday");
@@ -970,7 +1161,9 @@ public class MyGuild {
                             "FROM user_birthday_guilds AS b " +
                             "INNER JOIN users AS u " +
                             "ON b.user_id = u.user_id " +
-                            "WHERE b.guild_id=?");
+                            "WHERE b.guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first())
@@ -997,7 +1190,9 @@ public class MyGuild {
             var select = connection.prepareStatement(
                     "SELECT * " +
                             "FROM global_blacklist " +
-                            "WHERE user_or_guild_id=?");
+                            "WHERE user_or_guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) isBlacklisted = true;
@@ -1018,7 +1213,9 @@ public class MyGuild {
                 connection = Servant.db.getHikari().getConnection();
                 var insert = connection.prepareStatement(
                         "INSERT INTO global_blacklist (user_or_guild_id) " +
-                                "VALUES (?)");
+                                "VALUES (?)",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 insert.setLong(1, guildId);
                 insert.executeUpdate();
             }
@@ -1037,7 +1234,9 @@ public class MyGuild {
                 connection = Servant.db.getHikari().getConnection();
                 var delete = connection.prepareStatement(
                         "DELETE FROM global_blacklist " +
-                                "WHERE user_or_guild_id=?");
+                                "WHERE user_or_guild_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 delete.setLong(1, guildId);
                 delete.executeUpdate();
             }
@@ -1057,7 +1256,9 @@ public class MyGuild {
             connection = Servant.db.getHikari().getConnection();
             var select = connection.prepareStatement(
                     "SELECT emoji FROM guild_best_of_images " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) emoji = resultSet.getString("emoji");
@@ -1082,7 +1283,9 @@ public class MyGuild {
             connection = Servant.db.getHikari().getConnection();
             var select = connection.prepareStatement(
                     "SELECT tc_id FROM guild_best_of_images " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) channel = thisGuild.getTextChannelById(resultSet.getLong("tc_id"));
@@ -1106,7 +1309,9 @@ public class MyGuild {
             var select = connection.prepareStatement(
                     "SELECT min_votes_flat " +
                             "FROM guild_best_of_images " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) number = resultSet.getInt("min_votes_flat");
@@ -1128,7 +1333,9 @@ public class MyGuild {
             var select = connection.prepareStatement(
                     "SELECT min_votes_percent " +
                             "FROM guild_best_of_images " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) percentage = resultSet.getInt("min_votes_percent");
@@ -1149,7 +1356,9 @@ public class MyGuild {
             if (!bestOfImageIsBlacklisted(messageId)) {
                 var insert = connection.prepareStatement(
                         "INSERT INTO tmp_best_of_image_bl (msg_id,guild_id,tc_id) " +
-                                "VALUES (?,?,?)");
+                                "VALUES (?,?,?)",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 insert.setLong(1, messageId);
                 insert.setLong(2, guildId);
                 insert.setLong(3, tcId);
@@ -1171,7 +1380,9 @@ public class MyGuild {
             var select = connection.prepareStatement(
                     "SELECT * " +
                             "FROM tmp_best_of_image_bl " +
-                            "WHERE msg_id=?");
+                            "WHERE msg_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, messageId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) isBlacklisted = true;
@@ -1193,7 +1404,9 @@ public class MyGuild {
             connection = Servant.db.getHikari().getConnection();
             var select = connection.prepareStatement(
                     "SELECT emoji FROM guild_best_of_quotes " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) emoji = resultSet.getString("emoji");
@@ -1218,7 +1431,9 @@ public class MyGuild {
             connection = Servant.db.getHikari().getConnection();
             var select = connection.prepareStatement(
                     "SELECT tc_id FROM guild_best_of_quotes " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) channel = thisGuild.getTextChannelById(resultSet.getLong("tc_id"));
@@ -1240,7 +1455,9 @@ public class MyGuild {
             var select = connection.prepareStatement(
                     "SELECT min_votes_flat " +
                             "FROM guild_best_of_quotes " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) number = resultSet.getInt("min_votes_flat");
@@ -1262,7 +1479,9 @@ public class MyGuild {
             var select = connection.prepareStatement(
                     "SELECT min_votes_percent " +
                             "FROM guild_best_of_quotes " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) percentage = resultSet.getInt("min_votes_percent");
@@ -1283,7 +1502,9 @@ public class MyGuild {
             if (!bestOfQuoteIsBlacklisted(messageId)) {
                 var insert = connection.prepareStatement(
                         "INSERT INTO tmp_best_of_quote_bl (msg_id,guild_id,tc_id) " +
-                                "VALUES (?)");
+                                "VALUES (?)",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 insert.setLong(1, messageId);
                 insert.setLong(2, guildId);
                 insert.setLong(3, tcId);
@@ -1305,7 +1526,9 @@ public class MyGuild {
             var select = connection.prepareStatement(
                     "SELECT * " +
                             "FROM tmp_best_of_quote_bl " +
-                            "WHERE msg_id=?");
+                            "WHERE msg_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, messageId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) isBlacklisted = true;
@@ -1328,7 +1551,9 @@ public class MyGuild {
             var select = connection.prepareStatement(
                     "SELECT modifier " +
                             "FROM guild_level " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) modifier = resultSet.getFloat("modifier");
@@ -1350,7 +1575,9 @@ public class MyGuild {
             var select = connection.prepareStatement(
                     "SELECT notification " +
                             "FROM guild_level " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) isEnabled = resultSet.getBoolean("notification");
@@ -1373,7 +1600,9 @@ public class MyGuild {
                     "SELECT role_id " +
                             "FROM guild_level_roles " +
                             "WHERE guild_id=? " +
-                            "AND level=?");
+                            "AND level=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             select.setInt(2, level);
             var resultSet = select.executeQuery();
@@ -1399,7 +1628,9 @@ public class MyGuild {
             var select = connection.prepareStatement(
                     "SELECT * " +
                             "FROM guild_voice_lobbies " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first())
@@ -1426,7 +1657,9 @@ public class MyGuild {
                             "FROM guild_commands_count AS g " +
                             "INNER JOIN commands AS c " +
                             "WHERE g.guild_id=? " +
-                            "ORDER BY g.count DESC");
+                            "ORDER BY g.count DESC",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) {
@@ -1456,7 +1689,9 @@ public class MyGuild {
                     "SELECT count " +
                             "FROM guild_command_counts " +
                             "WHERE guild_id=? " +
-                            "AND command_id=?");
+                            "AND command_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             select.setInt(2, commandId);
             var resultSet = select.executeQuery();
@@ -1480,7 +1715,9 @@ public class MyGuild {
                     "SELECT id " +
                             "FROM guild_command_counts " +
                             "WHERE guild_id=? " +
-                            "AND command_id=?");
+                            "AND command_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             select.setInt(2, commandId);
             var resultSet = select.executeQuery();
@@ -1509,7 +1746,9 @@ public class MyGuild {
                         "UPDATE guild_command_counts " +
                                 "SET count=? " +
                                 "WHERE guild_id=? " +
-                                "AND command_id=?");
+                                "AND command_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 update.setInt(1, count + 1);
                 update.setLong(2, guildId);
                 update.setInt(3, myCommand.getId());
@@ -1517,7 +1756,9 @@ public class MyGuild {
             } else {
                 var insert = connection.prepareStatement(
                         "INSERT INTO guild_command_counts (guild_id,command_id,count) " +
-                                "VALUES (?,?,?)");
+                                "VALUES (?,?,?)",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 insert.setLong(1, guildId);
                 insert.setInt(2, myCommand.getId());
                 insert.setInt(3, 1);
@@ -1540,7 +1781,9 @@ public class MyGuild {
             var select = connection.prepareStatement(
                     "SELECT * " +
                             "FROM guild_autoroles " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             hasAutorole = resultSet.first();
@@ -1565,7 +1808,9 @@ public class MyGuild {
             var select = connection.prepareStatement(
                     "SELECT * " +
                             "FROM guild_autoroles " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) {
@@ -1596,7 +1841,9 @@ public class MyGuild {
                     "SELECT * " +
                             "FROM guild_media_only_channels " +
                             "WHERE guild_id=? " +
-                            "AND tc_id=?");
+                            "AND tc_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             select.setLong(2, channel.getIdLong());
             var resultSet = select.executeQuery();
@@ -1620,7 +1867,9 @@ public class MyGuild {
                     "SELECT * " +
                             "FROM guild_disabled_features " +
                             "WHERE guild_id=? " +
-                            "AND feature_id=?");
+                            "AND feature_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             select.setInt(2, 5);
             var resultSet = select.executeQuery();
@@ -1644,7 +1893,9 @@ public class MyGuild {
             var select = connection.prepareStatement(
                     "SELECT tc_id " +
                             "FROM guild_joins " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) {
@@ -1669,7 +1920,9 @@ public class MyGuild {
             var select = connection.prepareStatement(
                     "UPDATE guild_joins " +
                             "SET tc_id=?" +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, tcId);
             select.setLong(2, guildId);
             select.executeQuery();
@@ -1689,7 +1942,9 @@ public class MyGuild {
             var select = connection.prepareStatement(
                     "SELECT msg " +
                             "FROM guild_joins " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) msg = resultSet.getString("msg");
@@ -1712,7 +1967,9 @@ public class MyGuild {
             var select = connection.prepareStatement(
                     "SELECT tc_id " +
                             "FROM guild_leaves " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) {
@@ -1737,7 +1994,9 @@ public class MyGuild {
             var select = connection.prepareStatement(
                     "UPDATE guild_joins " +
                             "SET tc_id=? " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, tcId);
             select.setLong(2, guildId);
             select.executeUpdate();
@@ -1757,7 +2016,9 @@ public class MyGuild {
             var select = connection.prepareStatement(
                     "SELECT msg " +
                             "FROM guild_leaves " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) msg = resultSet.getString("msg");
@@ -1781,7 +2042,9 @@ public class MyGuild {
             var select = connection.prepareStatement(
                     "SELECT * FROM user_exp " +
                             "WHERE guild_id=? " +
-                            "ORDER BY exp DESC");
+                            "ORDER BY exp DESC",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) {
@@ -1810,7 +2073,9 @@ public class MyGuild {
             var select = connection.prepareStatement(
                     "SELECT is_public " +
                             "FROM guild_livestreams " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) isPublicMode = resultSet.getBoolean("is_public");
@@ -1832,7 +2097,9 @@ public class MyGuild {
             var select = connection.prepareStatement(
                     "SELECT tc_id " +
                             "FROM guild_livestreams " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) channelId = resultSet.getLong("tc_id");
@@ -1854,7 +2121,9 @@ public class MyGuild {
             var select = connection.prepareStatement(
                     "SELECT role_id " +
                             "FROM guild_livestreams " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) role = resultSet.getLong("role_id");
@@ -1876,7 +2145,9 @@ public class MyGuild {
             var select = connection.prepareStatement(
                     "SELECT role_id " +
                             "FROM guild_livestreamers " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) do streamerRoles.add(resultSet.getLong("role_id")); while (resultSet.next());
@@ -1899,7 +2170,9 @@ public class MyGuild {
             var select = connection.prepareStatement(
                     "SELECT * " +
                             "FROM guild_logs " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
@@ -1922,7 +2195,9 @@ public class MyGuild {
                 var select = connection.prepareStatement(
                         "SELECT * " +
                                 "FROM guild_logs " +
-                                "WHERE guild_id=?");
+                                "WHERE guild_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 select.setLong(1, guildId);
                 var resultSet = select.executeQuery();
                 if (resultSet.first()) {
@@ -1953,7 +2228,9 @@ public class MyGuild {
                 var select = connection.prepareStatement(
                         "SELECT * " +
                                 "FROM guild_logs " +
-                                "WHERE guild_id=?");
+                                "WHERE guild_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 select.setLong(1, guildId);
                 var resultSet = select.executeQuery();
                 if (resultSet.first()) isEnabled = resultSet.getBoolean(eventName);
@@ -1977,7 +2254,9 @@ public class MyGuild {
                 var select = connection.prepareStatement(
                         "SELECT tc_id " +
                                 "FROM guild_logs " +
-                                "WHERE guild_id=?");
+                                "WHERE guild_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 select.setLong(1, guildId);
                 var resultSet = select.executeQuery();
                 if (resultSet.first()) logChannelId = resultSet.getLong("tc_id");
@@ -2000,7 +2279,9 @@ public class MyGuild {
             connection = Servant.db.getHikari().getConnection();
             var select = connection.prepareStatement(
                     "SELECT * FROM giveaways " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) currentGiveaways = getRunningGiveaways(resultSet, lang);
@@ -2035,7 +2316,9 @@ public class MyGuild {
             connection = Servant.db.getHikari().getConnection();
             var preparedStatement = connection.prepareStatement(
                     "INSERT INTO giveaways(guild_id,tc_id,msg_id,author_id,prize,event_time,amount_winners) " +
-                            "VALUES(?,?,?,?,?,?,?)");
+                            "VALUES(?,?,?,?,?,?,?)",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             preparedStatement.setLong(1, guildId);
             preparedStatement.setLong(2, tcId);
             preparedStatement.setLong(3, msgId);

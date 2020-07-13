@@ -19,6 +19,7 @@ import files.language.LanguageHandler;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.TextChannel;
+import servant.MyGuild;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -68,6 +69,12 @@ public abstract class Command {
         // owner check
         if(ownerCommand && !(event.isOwner())) {
             terminate(event,null);
+            return;
+        }
+
+        // mod check
+        if (modCommand && event.getGuild() != null && !new MyGuild(event.getGuild()).isMod(event.getAuthor())) {
+            terminate(event, null);
             return;
         }
         
@@ -155,6 +162,7 @@ public abstract class Command {
         
         // run
         try {
+            event.getChannel().sendTyping().queue();
             execute(event);
         } catch(Throwable t) {
             if(event.getClient().getListener() != null) {

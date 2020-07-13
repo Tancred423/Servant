@@ -11,6 +11,7 @@ import servant.Servant;
 import utilities.EmoteUtil;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -482,7 +483,7 @@ public class Poll {
             message.editMessage(eb.build()).queue();
             message.clearReactions().queue();
             purge();
-        });
+        }, f -> {});
     }
 
     private String parseDesc(String desc) {
@@ -574,7 +575,9 @@ public class Poll {
                             "FROM polls AS p " +
                             "INNER JOIN const_poll_types AS t " +
                             "ON p.poll_type_id=t.id " +
-                            "WHERE poll_type=?");
+                            "WHERE poll_type=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setString(1, type);
             var resultSet = select.executeQuery();
             if (resultSet.first()) {

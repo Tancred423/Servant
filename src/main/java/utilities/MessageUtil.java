@@ -14,6 +14,7 @@ import servant.Servant;
 
 import java.awt.*;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -77,7 +78,9 @@ public class MessageUtil {
             var preparedStatement = connection.prepareStatement(
                     "SELECT prefix " +
                             "FROM " + (isFromGuild ? "guilds" : "users") + " " +
-                            "WHERE " + (isFromGuild ? "guild_id" : "user_id") + "=?");
+                            "WHERE " + (isFromGuild ? "guild_id" : "user_id") + "=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             preparedStatement.setLong(1, id);
             var resultSet = preparedStatement.executeQuery();
             if (resultSet.first()) {

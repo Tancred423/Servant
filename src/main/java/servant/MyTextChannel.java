@@ -3,6 +3,7 @@ package servant;
 import net.dv8tion.jda.api.JDA;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static servant.Database.closeQuietly;
@@ -27,7 +28,9 @@ public class MyTextChannel {
             var preparedStatement = connection.prepareStatement(
                     "SELECT list_tc_id " +
                             "FROM guild_birthdays " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             preparedStatement.setLong(1, guildId);
             var resultSet = preparedStatement.executeQuery();
             if (resultSet.first()) contains = tcId == resultSet.getLong("list_tc_id");
@@ -49,7 +52,9 @@ public class MyTextChannel {
             var preparedStatement = connection.prepareStatement(
                     "SELECT announcement_tc_id " +
                             "FROM guild_birthdays " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             preparedStatement.setLong(1, guildId);
             var resultSet = preparedStatement.executeQuery();
             if (resultSet.first()) contains = tcId == resultSet.getLong("announcement_tc_id");

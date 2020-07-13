@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.entities.User;
 import utilities.MessageUtil;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static servant.Database.closeQuietly;
@@ -33,7 +34,9 @@ public class MyMessage {
             var preparedStatement = connection.prepareStatement(
                     "SELECT list_msg_id " +
                             "FROM guild_birthdays " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             preparedStatement.setLong(1, guildId);
             var resultSet = preparedStatement.executeQuery();
             if (resultSet.first()) isBirthdayList = msgId == resultSet.getLong("list_msg_id");
@@ -55,7 +58,9 @@ public class MyMessage {
             var preparedStatement = connection.prepareStatement(
                     "SELECT msg_id " +
                             "FROM tmp_best_of_image_bl " +
-                            "WHERE msg_id=?");
+                            "WHERE msg_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             preparedStatement.setLong(1, msgId);
             var resultSet = preparedStatement.executeQuery();
             isBl = resultSet.first();
@@ -77,7 +82,9 @@ public class MyMessage {
             var preparedStatement = connection.prepareStatement(
                     "SELECT msg_id " +
                             "FROM tmp_best_of_quote_bl " +
-                            "WHERE msg_id=?");
+                            "WHERE msg_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             preparedStatement.setLong(1, msgId);
             var resultSet = preparedStatement.executeQuery();
             isBl = resultSet.first();
@@ -101,7 +108,9 @@ public class MyMessage {
                             "FROM giveaways " +
                             "WHERE guild_id=? " +
                             "AND tc_id=? " +
-                            "AND msg_id=?");
+                            "AND msg_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             preparedStatement.setLong(1, guildId);
             preparedStatement.setLong(2, tcId);
             preparedStatement.setLong(3, msgId);
@@ -130,7 +139,9 @@ public class MyMessage {
                             "WHERE p.guild_id=? " +
                             "AND p.tc_id=? " +
                             "AND p.msg_id=? " +
-                            "AND t.poll_type='quick'");
+                            "AND t.poll_type='quick'",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             preparedStatement.setLong(1, guildId);
             preparedStatement.setLong(2, tcId);
             preparedStatement.setLong(3, msgId);
@@ -159,7 +170,9 @@ public class MyMessage {
                             "WHERE p.guild_id=? " +
                             "AND p.tc_id=? " +
                             "AND p.msg_id=? " +
-                            "AND t.poll_type='check'");
+                            "AND t.poll_type='check'",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             preparedStatement.setLong(1, guildId);
             preparedStatement.setLong(2, tcId);
             preparedStatement.setLong(3, msgId);
@@ -188,7 +201,9 @@ public class MyMessage {
                             "WHERE p.guild_id=? " +
                             "AND p.tc_id=? " +
                             "AND p.msg_id=? " +
-                            "AND t.poll_type='radio'");
+                            "AND t.poll_type='radio'",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             preparedStatement.setLong(1, guildId);
             preparedStatement.setLong(2, tcId);
             preparedStatement.setLong(3, msgId);
@@ -212,7 +227,9 @@ public class MyMessage {
             var preparedStatement = connection.prepareStatement(
                     "SELECT id " +
                             "FROM remind_mes " +
-                            "WHERE msg_id=?");
+                            "WHERE msg_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             preparedStatement.setLong(1, msgId);
             var resultSet = preparedStatement.executeQuery();
             isRemindMe = resultSet.first();
@@ -234,7 +251,9 @@ public class MyMessage {
             var preparedStatement = connection.prepareStatement(
                     "SELECT id " +
                             "FROM signups " +
-                            "WHERE msg_id=?");
+                            "WHERE msg_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             preparedStatement.setLong(1, msgId);
             var resultSet = preparedStatement.executeQuery();
             isSignup = resultSet.first();
@@ -256,7 +275,9 @@ public class MyMessage {
             var preparedStatement = connection.prepareStatement(
                     "SELECT id " +
                             "FROM ratings " +
-                            "WHERE msg_id=?");
+                            "WHERE msg_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             preparedStatement.setLong(1, msgId);
             var resultSet = preparedStatement.executeQuery();
             isRemindMe = resultSet.first();
@@ -278,7 +299,9 @@ public class MyMessage {
             var preparedStatement = connection.prepareStatement(
                     "SELECT id " +
                             "FROM reaction_role_messages " +
-                            "WHERE msg_id=?");
+                            "WHERE msg_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             preparedStatement.setLong(1, msgId);
             var resultSet = preparedStatement.executeQuery();
             isRemindMe = resultSet.first();
@@ -305,7 +328,9 @@ public class MyMessage {
                 var preparedStatement = connection.prepareStatement(
                         "SELECT id " +
                                 "FROM custom_commands " +
-                                "WHERE invoke=?");
+                                "WHERE invoke=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 preparedStatement.setString(1, invoke);
                 var resultSet = preparedStatement.executeQuery();
                 isCustomCommand = resultSet.first();

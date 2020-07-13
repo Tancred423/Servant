@@ -7,6 +7,7 @@ import servant.LoggingTask;
 import servant.Servant;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,7 +23,9 @@ public class ImageUtil {
 
         try {
             connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT image_url FROM const_images WHERE image_name=?");
+            var select = connection.prepareStatement("SELECT image_url FROM const_images WHERE image_name=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setString(1, imageName);
             var resultSet = select.executeQuery();
             var imageUrls = new ArrayList<String>();

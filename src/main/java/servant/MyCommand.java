@@ -3,6 +3,7 @@ package servant;
 import net.dv8tion.jda.api.JDA;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static servant.Database.closeQuietly;
@@ -37,7 +38,9 @@ public class MyCommand {
                             "FROM const_commands AS com " +
                             "INNER JOIN const_categories AS cat " +
                             "ON com.category_id = cat.id " +
-                            "WHERE com.name=?");
+                            "WHERE com.name=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setString(1, name);
             var resultSet = select.executeQuery();
             if (resultSet.first()) {

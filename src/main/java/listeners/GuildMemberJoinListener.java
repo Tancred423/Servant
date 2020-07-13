@@ -16,7 +16,6 @@ import utilities.TimeUtil;
 import javax.annotation.Nonnull;
 import java.awt.*;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.Timer;
 import java.util.concurrent.CompletableFuture;
 
@@ -74,7 +73,7 @@ public class GuildMemberJoinListener extends ListenerAdapter {
                                     .setDescription(description == null ? LanguageHandler.get(lang, "join_embeddescription") : description)
                                     .setThumbnail(user.getEffectiveAvatarUrl())
                                     .setFooter(LanguageHandler.get(lang, "join_footer"), ImageUtil.getUrl(event.getJDA(), "clock"))
-                                    .setTimestamp(LocalDateTime.now())
+                                    .setTimestamp(Instant.now())
                                     .build()
                     ).queue();
                 }

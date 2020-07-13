@@ -7,6 +7,7 @@ import servant.LoggingTask;
 import servant.Servant;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,7 +33,9 @@ public class VoiceLobbyHandler {
             connection = Servant.db.getHikari().getConnection();
             var insert = connection.prepareStatement(
                     "INSERT INTO tmp_voice_lobbies_active (vc_id,guild_id) " +
-                            "VALUES (?,?)");
+                            "VALUES (?,?)",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             insert.setLong(1, channelId);
             insert.setLong(2, guildId);
             insert.executeUpdate();
@@ -50,7 +53,9 @@ public class VoiceLobbyHandler {
             connection = Servant.db.getHikari().getConnection();
             var delete = connection.prepareStatement(
                     "DELETE FROM tmp_voice_lobbies_active " +
-                            "WHERE vc_id=?");
+                            "WHERE vc_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, channelId);
             delete.executeUpdate();
         } catch (SQLException e) {
@@ -68,7 +73,9 @@ public class VoiceLobbyHandler {
             connection = Servant.db.getHikari().getConnection();
             var select = connection.prepareStatement(
                     "SELECT * " +
-                            "FROM tmp_voice_lobbies_active");
+                            "FROM tmp_voice_lobbies_active",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             var resultSet = select.executeQuery();
             if (resultSet.first())
                 do activeLobbies.add(resultSet.getLong("vc_id"));
@@ -91,7 +98,9 @@ public class VoiceLobbyHandler {
             connection = Servant.db.getHikari().getConnection();
             var select = connection.prepareStatement(
                     "SELECT * FROM guild_voice_lobbies " +
-                            "WHERE guild_id=?");
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
@@ -113,7 +122,9 @@ public class VoiceLobbyHandler {
             var select = connection.prepareStatement(
                     "SELECT * FROM guild_voice_lobbies " +
                             "WHERE guild_id=? " +
-                            "AND vc_id=?");
+                            "AND vc_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             select.setLong(2, channelId);
             var resultSet = select.executeQuery();
@@ -134,7 +145,9 @@ public class VoiceLobbyHandler {
             connection = Servant.db.getHikari().getConnection();
             var insert = connection.prepareStatement(
                     "INSERT INTO guild_voice_lobbies (guild_id,vc_id) " +
-                            "VALUES (?,?)");
+                            "VALUES (?,?)",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             insert.setLong(1, guildId);
             insert.setLong(2, channelId);
             insert.executeUpdate();
@@ -155,7 +168,9 @@ public class VoiceLobbyHandler {
                 var delete = connection.prepareStatement(
                         "DELETE FROM guild_voice_lobbies " +
                                 "WHERE guild_id=? " +
-                                "AND vc_id=?");
+                                "AND vc_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 delete.setLong(1, guildId);
                 delete.setLong(2, channelId);
                 delete.executeUpdate();

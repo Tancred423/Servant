@@ -8,6 +8,7 @@ import utilities.ImageUtil;
 
 import java.awt.*;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -106,7 +107,9 @@ public class RemindMe {
             connection = Servant.db.getHikari().getConnection();
             var select = connection.prepareStatement(
                     "SELECT * " +
-                            "FROM remind_mes");
+                            "FROM remind_mes",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             var resultSet = select.executeQuery();
             if (resultSet.first()) {
                 do {

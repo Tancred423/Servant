@@ -7,6 +7,7 @@ import servant.LoggingTask;
 import servant.Servant;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static servant.Database.closeQuietly;
@@ -26,7 +27,9 @@ public class BestOfQuoteHandler {
 
         try {
             connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT * FROM guild_best_of_quotes WHERE guild_id=?");
+            var select = connection.prepareStatement("SELECT * FROM guild_best_of_quotes WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             hasEntry = resultSet.first();
@@ -48,7 +51,9 @@ public class BestOfQuoteHandler {
 
         try {
             connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT * FROM guild_best_of_quotes WHERE guild_id=?");
+            var select = connection.prepareStatement("SELECT * FROM guild_best_of_quotes WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) {
@@ -71,7 +76,9 @@ public class BestOfQuoteHandler {
 
         try {
             connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT emoji FROM guild_best_of_quotes WHERE guild_id=?");
+            var select = connection.prepareStatement("SELECT emoji FROM guild_best_of_quotes WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) emoji = resultSet.getString("emoji");
@@ -94,7 +101,9 @@ public class BestOfQuoteHandler {
 
         try {
             connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT tc_id FROM guild_best_of_quotes WHERE guild_id=?");
+            var select = connection.prepareStatement("SELECT tc_id FROM guild_best_of_quotes WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) channel = guild.getTextChannelById(resultSet.getLong("tc_id"));
@@ -115,7 +124,9 @@ public class BestOfQuoteHandler {
 
         try {
             connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT min_votes_flat FROM guild_best_of_quotes WHERE guild_id=?");
+            var select = connection.prepareStatement("SELECT min_votes_flat FROM guild_best_of_quotes WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) number = resultSet.getInt("min_votes_flat");
@@ -134,7 +145,9 @@ public class BestOfQuoteHandler {
 
         try {
             connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT min_votes_percent FROM guild_best_of_quotes WHERE guild_id=?");
+            var select = connection.prepareStatement("SELECT min_votes_percent FROM guild_best_of_quotes WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) percentage = resultSet.getInt("min_votes_percent");
@@ -153,7 +166,9 @@ public class BestOfQuoteHandler {
         try {
             if (!isBlacklisted(msgId)) {
                 connection = Servant.db.getHikari().getConnection();
-                var insert = connection.prepareStatement("INSERT INTO tmp_best_of_quote_bl (msg_id,guild_id,tc_id) VALUES (?,?,?)");
+                var insert = connection.prepareStatement("INSERT INTO tmp_best_of_quote_bl (msg_id,guild_id,tc_id) VALUES (?,?,?)",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 insert.setLong(1, msgId);
                 insert.setLong(2, guildId);
                 insert.setLong(3, tcId);
@@ -172,7 +187,9 @@ public class BestOfQuoteHandler {
 
         try {
             connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT * FROM tmp_best_of_quote_bl WHERE msg_id=?");
+            var select = connection.prepareStatement("SELECT * FROM tmp_best_of_quote_bl WHERE msg_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, msgId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) isBlacklisted = true;

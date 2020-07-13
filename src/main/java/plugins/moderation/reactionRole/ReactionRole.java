@@ -5,6 +5,7 @@ import servant.LoggingTask;
 import servant.Servant;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -28,7 +29,9 @@ public class ReactionRole {
             var select = connection.prepareStatement(
                     "SELECT role_id, emoji " +
                             "FROM reaction_roles " +
-                            "WHERE msg_id=?");
+                            "WHERE msg_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, msgId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) do {
@@ -50,7 +53,9 @@ public class ReactionRole {
         try {
             connection = Servant.db.getHikari().getConnection();
             var delete = connection.prepareStatement(
-                    "DELETE FROM reaction_roles WHERE msg_id=? AND role_id=?");
+                    "DELETE FROM reaction_roles WHERE msg_id=? AND role_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, msgId);
             delete.setLong(2, roleId);
             delete.executeUpdate();

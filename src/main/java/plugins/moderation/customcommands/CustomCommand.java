@@ -9,6 +9,7 @@ import utilities.MessageUtil;
 
 import java.awt.*;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static servant.Database.closeQuietly;
@@ -32,7 +33,9 @@ public class CustomCommand {
             var preparedStatement = connection.prepareStatement(
                     "SELECT id " +
                             "FROM custom_commands " +
-                            "WHERE invoke=?");
+                            "WHERE invoke=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             preparedStatement.setString(1, invoke);
             var resultSet = preparedStatement.executeQuery();
             if (resultSet.first()) ccId = resultSet.getInt("id");
@@ -54,7 +57,9 @@ public class CustomCommand {
             var preparedStatement = connection.prepareStatement(
                     "SELECT normal_msg " +
                             "FROM custom_commands " +
-                            "WHERE invoke=?");
+                            "WHERE invoke=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             preparedStatement.setString(1, invoke);
             var resultSet = preparedStatement.executeQuery();
             if (resultSet.first()) normalMsg = resultSet.getString("normal_msg").trim();
@@ -76,7 +81,9 @@ public class CustomCommand {
             var preparedStatement = connection.prepareStatement(
                     "SELECT * " +
                             "FROM custom_commands_embeds " +
-                            "WHERE cc_id=?");
+                            "WHERE cc_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             preparedStatement.setInt(1, getCcId());
             var resultSet = preparedStatement.executeQuery();
             if (resultSet.first()) {
@@ -122,7 +129,9 @@ public class CustomCommand {
                     "SELECT * " +
                             "FROM custom_commands_fields " +
                             "WHERE cc_id=? " +
-                            "ORDER BY field_no ASC");
+                            "ORDER BY field_no ASC",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             preparedStatement.setInt(1, getCcId());
             resultSet = preparedStatement.executeQuery();
             if (resultSet.first()) {

@@ -14,7 +14,6 @@ import utilities.ImageUtil;
 
 import java.awt.*;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.concurrent.CompletableFuture;
 
 public class GuildMemberLeaveListener extends ListenerAdapter {
@@ -57,7 +56,7 @@ public class GuildMemberLeaveListener extends ListenerAdapter {
                                     .setDescription(description == null ? LanguageHandler.get(lang, "leave_embeddescription") : description)
                                     .setThumbnail(user.getEffectiveAvatarUrl())
                                     .setFooter(LanguageHandler.get(lang, "leave_footer"), ImageUtil.getUrl(event.getJDA(), "clock"))
-                                    .setTimestamp(LocalDateTime.now())
+                                    .setTimestamp(Instant.now())
                                     .build()
                     ).queue();
                 }
