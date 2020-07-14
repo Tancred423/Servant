@@ -33,6 +33,7 @@ class InteractionEmbed {
         eb.setDescription("**" + author.getName() + "** " + emoteMention + " **" + mentioned.getName() + "**\n\n" +
                 String.format(shared, author.getAsMention(), authorCount) + "\n" +
                 String.format(received, mentioned.getAsMention(), mentionedCount));
+        System.out.println(name + " GIF URL: " + gif);
         eb.setImage(gif);
         if (name.equalsIgnoreCase("birthday")) {
             eb.setFooter(LanguageHandler.get(lang, "dashboard_birthday_settings"));

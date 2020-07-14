@@ -45,7 +45,9 @@ public class Poll {
             var select = connection.prepareStatement(
                     "SELECT ending_date " +
                             "FROM polls " +
-                            "WHERE msg_id=?");
+                            "WHERE msg_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, msgId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) eventTime = resultSet.getTimestamp("ending_date").toInstant();
@@ -67,7 +69,9 @@ public class Poll {
             var select = connection.prepareStatement(
                     "SELECT amount_answers " +
                             "FROM polls " +
-                            "WHERE msg_id=?");
+                            "WHERE msg_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, msgId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) {
@@ -91,7 +95,9 @@ public class Poll {
             var select = connection.prepareStatement(
                     "SELECT id " +
                             "FROM const_poll_types " +
-                            "WHERE poll_type=?");
+                            "WHERE poll_type=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setString(1, type);
             var resultSet = select.executeQuery();
             if (resultSet.first()) pollTypeId = resultSet.getInt("id");
@@ -111,7 +117,9 @@ public class Poll {
             connection = Servant.db.getHikari().getConnection();
             var insert = connection.prepareStatement(
                     "INSERT INTO polls (guild_id,tc_id,msg_id,author_id,poll_type_id,ending_date,amount_answers) " +
-                            "VALUES (?,?,?,?,?,?,?)");
+                            "VALUES (?,?,?,?,?,?,?)",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             insert.setLong(1, guildId);
             insert.setLong(2, tcId);
             insert.setLong(3, msgId);
@@ -134,7 +142,9 @@ public class Poll {
             connection = Servant.db.getHikari().getConnection();
             var delete = connection.prepareStatement(
                     "DELETE FROM polls " +
-                            "WHERE msg_id=?");
+                            "WHERE msg_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, msgId);
             delete.executeUpdate();
         } catch (SQLException e) {
@@ -147,7 +157,9 @@ public class Poll {
             connection = Servant.db.getHikari().getConnection();
             var delete = connection.prepareStatement(
                     "DELETE FROM tmp_poll_participants " +
-                            "WHERE msg_id=?");
+                            "WHERE msg_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, msgId);
             delete.executeUpdate();
         } catch (SQLException e) {
@@ -168,7 +180,9 @@ public class Poll {
                             "FROM polls AS p " +
                             "INNER JOIN const_poll_types AS c " +
                             "ON p.poll_type_id = c.id " +
-                            "WHERE p.msg_id=?");
+                            "WHERE p.msg_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, msgId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) if (resultSet.getString("poll_type").equals("check")) isPoll = true;
@@ -192,7 +206,9 @@ public class Poll {
                             "FROM polls AS p " +
                             "INNER JOIN const_poll_types AS c " +
                             "ON p.poll_type_id = c.id " +
-                            "WHERE p.msg_id=?");
+                            "WHERE p.msg_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, msgId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) if (resultSet.getString("poll_type").equals("radio")) isRadiovote = true;
@@ -214,7 +230,9 @@ public class Poll {
             var select = connection.prepareStatement(
                     "SELECT author_id " +
                             "FROM polls " +
-                            "WHERE msg_id=?");
+                            "WHERE msg_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, msgId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) authorId = resultSet.getLong("author_id");
@@ -235,7 +253,9 @@ public class Poll {
             connection = Servant.db.getHikari().getConnection();
             var insert = connection.prepareStatement(
                     "INSERT INTO tmp_poll_participants (msg_id,user_id,reaction,guild_id,tc_id) " +
-                            "VALUES (?,?,?,?,?)");
+                            "VALUES (?,?,?,?,?)",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             insert.setLong(1, msgId);
             insert.setLong(2, userId);
             insert.setString(3, emoji);
@@ -258,7 +278,9 @@ public class Poll {
                     "DELETE FROM tmp_poll_participants " +
                             "WHERE msg_id=? " +
                             "AND user_id=? " +
-                            "AND reaction=?");
+                            "AND reaction=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, msgId);
             delete.setLong(2, userId);
             delete.setString(3, emoji);
@@ -279,7 +301,9 @@ public class Poll {
             var select = connection.prepareStatement(
                     "SELECT * FROM tmp_poll_participants " +
                             "WHERE msg_id=? " +
-                            "AND user_id=?");
+                            "AND user_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, msgId);
             select.setLong(2, userId);
             var resultSet = select.executeQuery();
@@ -303,7 +327,9 @@ public class Poll {
                     "SELECT reaction " +
                             "FROM tmp_poll_participants " +
                             "WHERE msg_id=? " +
-                            "AND user_id=?");
+                            "AND user_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, msgId);
             select.setLong(2, userId);
             var resultSet = select.executeQuery();
@@ -416,7 +442,9 @@ public class Poll {
                 var preparedStatement = connection.prepareStatement(
                         "SELECT user_id, reaction " +
                                 "FROM tmp_poll_participants " +
-                                "WHERE msg_id=?");
+                                "WHERE msg_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 preparedStatement.setLong(1, msgId);
                 var resultSet = preparedStatement.executeQuery();
                 if (resultSet.first()) {
@@ -498,7 +526,9 @@ public class Poll {
                     "SELECT * " +
                             "FROM polls AS p " +
                             "INNER JOIN const_poll_types AS c " +
-                            "ON p.poll_type_id = c.id");
+                            "ON p.poll_type_id = c.id",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             var resultSet = select.executeQuery();
             if (resultSet.first()) {
                 do {

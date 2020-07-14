@@ -69,6 +69,7 @@ public class LanguageFile {
         en_gb.setProperty("hint", "Hint");
         en_gb.setProperty("channel", "Channel");
         en_gb.setProperty("guild", "Server");
+        en_gb.setProperty("help", "Help");
 
         ///////////////////////////////////// Commands /////////////////////////////////////
 
@@ -181,6 +182,16 @@ public class LanguageFile {
         en_gb.setProperty("profile_msi", "Most Shared Interaction");
         en_gb.setProperty("profile_mri", "Most Received Interaction");
 
+        en_gb.setProperty("profile_animal_bird", "Bird");
+        en_gb.setProperty("profile_animal_cat", "Cat");
+        en_gb.setProperty("profile_animal_dog", "Dog");
+        en_gb.setProperty("profile_animal_fennec", "Fennec");
+        en_gb.setProperty("profile_animal_fox", "Fox");
+        en_gb.setProperty("profile_animal_koala", "Koala");
+        en_gb.setProperty("profile_animal_panda", "Panda");
+        en_gb.setProperty("profile_animal_redpanda", "RedPanda");
+        en_gb.setProperty("profile_animal_sloth", "Sloth");
+
         en_gb.setProperty("profile_title_creator", "Creator");
         en_gb.setProperty("profile_title_supporter", "Supporter");
         en_gb.setProperty("profile_title_normal", "Master");
@@ -231,7 +242,7 @@ public class LanguageFile {
         en_gb.setProperty("interaction_shared_hug", "%s hugged %s comfy peeps.");
         en_gb.setProperty("interaction_received_hug", "%s got hugged by %s cuties.");
         en_gb.setProperty("interaction_shared_kiss", "%s kissed %s random people.");
-        en_gb.setProperty("interaction_received_kiss", "%s wrote %s sexual assault reports.");
+        en_gb.setProperty("interaction_received_kiss", "%s received %s kisses yet.");
         en_gb.setProperty("interaction_shared_lick", "%s licked %s strangers.");
         en_gb.setProperty("interaction_received_lick", "%s washed their face %s times.");
         en_gb.setProperty("interaction_shared_pat", "%s patted %s catgirls. uwu");
@@ -380,10 +391,28 @@ public class LanguageFile {
         en_gb.setProperty("botinfo_restart", "Last restart");
 
         // Help
-        en_gb.setProperty("help_detailed", "Type a command to get detailed help, e.g. `%stimezone`");
-        en_gb.setProperty("help_standard", "Standard Commands");
-        en_gb.setProperty("help_additional", "For additional help, contact %s#%s or join %s");
-        en_gb.setProperty("help_blocking_dm", "Help cannot be sent because you are blocking Direct Messages.");
+        en_gb.setProperty("help_getting_started", "How to get started");
+        en_gb.setProperty("help_getting_started_content", "First of all, welcome and thank you for using Servant. %s\n" +
+                "\n" +
+                "[Click here](%s) to see how to get started with the bot.\n" +
+                "This link will bring you to the FAQ. You can also find other useful answers there.");
+
+        en_gb.setProperty("help_commands_content", "There are many commands that are divided into categories.\n" +
+                "Those categories are `Standard`, `Moderation`, `Utility`, `Fun`, `Interaction` and `Random`.\n" +
+                "\n" +
+                "You can find all commands on the website in the [Help](%s) section.\n" +
+                "You also can get a detailed help for a command here in Discord. Just type the command name like `%stimezone`.");
+
+        en_gb.setProperty("help_plugins_dashboard", "Plugins & Dashboard");
+        en_gb.setProperty("help_plugins_dashboard_content", "Plugins can be found in the [dashboard](%s). Those includes e.g. the birthday plugin, reaction roles and the leveling system.\n" +
+                "\n" +
+                "In the dashboard you also can set up Servant-Moderator roles.\n" +
+                "Every member of your server who has at least one of those roles is considered a Servant-Moderator and is able to execute commands from the moderation category as well as **access the dashboard of this server**.\n" +
+                "Give out this permission with care. Treat it like the Administrator permission!");
+
+        en_gb.setProperty("help_faq", "FAQ");
+        en_gb.setProperty("help_faq_content", "If you have any question, you can check out the [FAQ](%s).\n" +
+                "If you cannot find your question there, feel free to join the [support server](%s) and ask there directly.");
 
         // Patreon
         en_gb.setProperty("supporter_supportservant", "Support Servant");
@@ -396,6 +425,7 @@ public class LanguageFile {
         en_gb.setProperty("supporter_donationtitle", "PayPal: Donation");
         en_gb.setProperty("supporter_donation", "Price: Only $5 (in total)\n" +
                 "Duration: Lifetime\n" +
+                "**Please provide your Discord Name#1234!**\n" +
                 "[PayPal.me page](https://www.paypal.me/servantdiscord)");
         en_gb.setProperty("supporter_serverboosttitle", "Support Server: Server Boost");
         en_gb.setProperty("supporter_serverboost", "Price: FREE\n" +
@@ -723,9 +753,10 @@ public class LanguageFile {
         en_gb.setProperty("presence_6", "#BLM | %shelp");
 
         // Supporter
-        en_gb.setProperty("supporter_dono", "%s just donated some money via PayPal.\nThey are now a supporter!");
-        en_gb.setProperty("supporter_patron", "%s just became a Patron.\nThey are now a supporter!");
-        en_gb.setProperty("supporter_boost", "%s just boosted the server.\nThey are now a supporter!");
+        en_gb.setProperty("supporter_supporter", "supporter");
+        en_gb.setProperty("supporter_dono", "%s just donated $5+ via PayPal.\nThey are now a %s!");
+        en_gb.setProperty("supporter_patron", "%s just became a Patron.\nThey are now a %s!");
+        en_gb.setProperty("supporter_boost", "%s just boosted the server.\nThey are now a %s!");
 
         // UsageEmbed
         en_gb.setProperty("usageembed_birthday_settings", "The birthday settings are now in the dashboard!");
@@ -798,6 +829,7 @@ public class LanguageFile {
         de_de.setProperty("hint", "Hint");
         de_de.setProperty("channel", "Kanal");
         de_de.setProperty("guild", "Server");
+        de_de.setProperty("help", "Hilfe");
 
         ///////////////////////////////////// Commands /////////////////////////////////////
 
@@ -902,7 +934,6 @@ public class LanguageFile {
         de_de.setProperty("profile_level", "Stufe");
         de_de.setProperty("profile_rank",  "Rang");
 
-
         de_de.setProperty("profile_baguette", "Größtes Baguette");
         de_de.setProperty("profile_nobaguette", "Bisher keine Baguettes");
         de_de.setProperty("profile_baguette_value", "%s (%s mal)");
@@ -910,6 +941,16 @@ public class LanguageFile {
         de_de.setProperty("profile_nofavourite", "Kein Favorit");
         de_de.setProperty("profile_msi", "Meist verteile Interaktion");
         de_de.setProperty("profile_mri", "Meist erhaltene Interaktion");
+
+        de_de.setProperty("profile_animal_bird", "Vogel");
+        de_de.setProperty("profile_animal_cat", "Katze");
+        de_de.setProperty("profile_animal_dog", "Hund");
+        de_de.setProperty("profile_animal_fennec", "Fennek");
+        de_de.setProperty("profile_animal_fox", "Fuchs");
+        de_de.setProperty("profile_animal_koala", "Koala");
+        de_de.setProperty("profile_animal_panda", "Panda");
+        de_de.setProperty("profile_animal_redpanda", "RedPanda");
+        de_de.setProperty("profile_animal_sloth", "Faultier");
 
         de_de.setProperty("profile_title_creator", "Erschaffer");
         de_de.setProperty("profile_title_supporter", "Unterstützer");
@@ -961,7 +1002,7 @@ public class LanguageFile {
         de_de.setProperty("interaction_shared_hug", "%s umarmte %s süße Leute.");
         de_de.setProperty("interaction_received_hug", "%s wurde von %s süßen Leuten geknuddelt.");
         de_de.setProperty("interaction_shared_kiss", "%s küsste %s zufällige Leute.");
-        de_de.setProperty("interaction_received_kiss", "%s schrieb %s Anzeigen wegen sexueller Belästigung.");
+        de_de.setProperty("interaction_received_kiss", "%s erhielt bisher %s Küsse.");
         de_de.setProperty("interaction_shared_lick", "%s leckte an %s Fremden.");
         de_de.setProperty("interaction_received_lick", "%s hat sich %s Mal das Gesicht gewaschen.");
         de_de.setProperty("interaction_shared_pat", "%s tätschelte den Kopf von %s Catgirls. uwu");
@@ -1110,10 +1151,28 @@ public class LanguageFile {
         de_de.setProperty("botinfo_restart", "Letzter Neustart");
 
         // Help
-        de_de.setProperty("help_detailed", "Benutze einen Befehl ohne Argumente, um eine detailierte Hilfe zu erhalten, z.B. `%stimezone`");
-        de_de.setProperty("help_standard", "Standart Befehle");
-        de_de.setProperty("help_additional", "Für weitere Hilfe, kontaktiere %s#%s oder tritt %s bei.");
-        de_de.setProperty("help_blocking_dm", "Die Hilfe konnte nicht gesendet werden, da Du private Nachrichten blockierst.");
+        de_de.setProperty("help_getting_started", "Wie fange ich an");
+        de_de.setProperty("help_getting_started_content", "Zu aller erst willkommen und danke, dass du Servant verwendest. %s\n" +
+                "\n" +
+                "[Klicke hier](%s) um zu sehen, wie du mit Servant anfängst.\n" +
+                "Dieser Link bringt dich zum FAQ. Dort kannst du auch weitere nützliche Antworten finden.");
+
+        de_de.setProperty("help_commands_content", "Es gibt viele Befehle. Diese sind in verschiedene Kategories unterteilt.\n" +
+                "Diese Kategorien lauten `Standard`, `Moderation`, `Utility`, `Fun`, `Interaction` und `Random`.\n" +
+                "\n" +
+                "Du kannst alle Befehle in der [Help](%s) Sektion auf der Website finden.\n" +
+                "Du kannst auch hier in Discord eine detailierte Hilfe zu einem Befehl erhalten. Schreibe einfach einen Befehl, wie z.B. `%stimezone`.");
+
+        de_de.setProperty("help_plugins_dashboard", "Plugins & Dashboard");
+        de_de.setProperty("help_plugins_dashboard_content", "Plugins befinden sich im [Dashboard](%s). Darunter befindet sich z.B. das Birthday-Plugin, Reaction Roles und das Levelsystem.\n" +
+                "\n" +
+                "Im Dashboard kannst du ebenfalls die Servant-Moderatoren Rollen einstellen.\n" +
+                "Jedes Mitglied deines Servers das mindestens eine dieser Rollen hat, ist ein Servant-Moderator und ist in der Lage Befehle der Moderation-Kategorie auszuführen, sowie auf **das Dashboard deines Servers zuzugreifen**.\n" +
+                "Verteile dieses Recht mit Bedacht. Behandle es wie die Administrator-Berechtigung!");
+
+        de_de.setProperty("help_faq", "FAQ");
+        de_de.setProperty("help_faq_content", "Falls Du irgendwelche Fragen hast, kannst du [FAQ](%s) durchgucken.\n" +
+                "Falls Du dort deine Frage nicht finden kannst, kannst Du auch gerne dem [Support Server](%s) beitreten und dort direkt fragen.");
 
         // Supporter
         de_de.setProperty("supporter_supportservant", "Unterstütze Servant");
@@ -1126,6 +1185,7 @@ public class LanguageFile {
         de_de.setProperty("supporter_donationtitle", "PayPal: Spende");
         de_de.setProperty("supporter_donation", "Preis: Nur $5 (insgesamt)\n" +
                 "Laufzeit: Lebenszeit\n" +
+                "**Bitte gib deinen Discord Namen#1234 an!**\n" +
                 "[PayPal.me Seite](https://www.paypal.me/servantdiscord)");
         de_de.setProperty("supporter_serverboosttitle", "Support Server: Server Boost");
         de_de.setProperty("supporter_serverboost", "Preis: GRATIS\n" +
@@ -1453,9 +1513,10 @@ public class LanguageFile {
         de_de.setProperty("presence_6", "#BLM | %shelp");
 
         // Supporter
-        de_de.setProperty("supporter_dono", "%s hat gerade Geld über PayPal gespendet.\nHeißt einen neuen Supporter willkommen!");
-        de_de.setProperty("supporter_patron", "%s wurde gerade zum Patron.\nHeißt einen neuen Supporter willkommen!");
-        de_de.setProperty("supporter_boost", "%s hat gerade den Server geboostet.\nHeißt einen neuen Supporter willkommen!");
+        de_de.setProperty("supporter_supporter", "Unterstützer");
+        de_de.setProperty("supporter_dono", "%s hat gerade $5+ über PayPal gespendet.\nDu bist jetzt ein %s!");
+        de_de.setProperty("supporter_patron", "%s wurde gerade zum Patron.\nDu bist jetzt ein %s!");
+        de_de.setProperty("supporter_boost", "%s hat gerade den Server geboostet.\nDu bist jetzt ein %s!");
 
         // UsageEmbed
         de_de.setProperty("usageembed_birthday_settings", "The birthday settings are now in the dashboard!");

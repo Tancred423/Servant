@@ -232,7 +232,12 @@ public class ProfileImage {
         g2d.fill(shape);
         g2d.translate(commandsUsedX * -1, commandsUsedY * -1); // Reset
 
-        var commandsUsedValue = String.valueOf(myUser.getCommandCounts().size());
+        var commandsUsedValue = "";
+        var tmpCommandsUsedValue = 0;
+        var commandCounts = myUser.getCommandCounts();
+        for (var commandCount : commandCounts.entrySet()) tmpCommandsUsedValue += commandCount.getValue();
+        commandsUsedValue = String.valueOf(tmpCommandsUsedValue);
+
         var commandsUsedActualWidth = g2d.getFontMetrics().stringWidth(commandsUsedValue);
         commandsUsedX = generalInfoWidth - commandsUsedActualWidth;
 

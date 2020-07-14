@@ -96,7 +96,7 @@ public class ImageUtil {
                     put("meme", servantEmotes1.getEmoteById(673449239547740160L));
                     put("panda", servantEmotes1.getEmoteById(673449238952411138L));
                     put("pat", servantEmotes1.getEmoteById(673449239262789633L));
-                    put("servant/supporter", servantEmotes1.getEmoteById(673449239216390166L));
+                    put("supporter", servantEmotes1.getEmoteById(673449239216390166L));
                     put("pikachu", servantEmotes1.getEmoteById(673449239199875084L));
                     put("ping", servantEmotes1.getEmoteById(673449238717399058L));
                     put("poke", servantEmotes1.getEmoteById(673449242240483338L));
@@ -124,6 +124,9 @@ public class ImageUtil {
                     put("mostusedcommands", servantEmotes2.getEmoteById(673461657246367744L));
                     put("sloth", servantEmotes2.getEmoteById(673472485093801994L));
                     put("log", servantEmotes2.getEmoteById(687334387095830563L));
+                    put("shame", servantEmotes2.getEmoteById(732582351045001276L));
+                    put("rate", servantEmotes2.getEmoteById(732590489722683412L));
+                    put("help", servantEmotes2.getEmoteById(732591206143623179L));
                 }
             }
         }};

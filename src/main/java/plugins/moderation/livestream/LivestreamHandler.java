@@ -1,11 +1,13 @@
 package plugins.moderation.livestream;
 
 import files.language.LanguageHandler;
-import servant.MyGuild;
-import servant.MyUser;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
+import servant.MyGuild;
+import servant.MyUser;
+import utilities.ImageUtil;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -33,16 +35,16 @@ public class LivestreamHandler {
     public static void sendNotification(User author, Activity newActivity, net.dv8tion.jda.api.entities.Guild guild, MyGuild myGuild, boolean isStreamerMode, String lang, MyUser myUser) {
         if (myGuild.getStreamTcId() != 0 && myUser.isStreamer(guild.getIdLong())) {
             var tc = guild.getTextChannelById(myGuild.getStreamTcId());
-            if (tc != null) tc.sendMessage(getNotifyMessage(author, newActivity, new MyUser(author), isStreamerMode, lang)).queue();
+            if (tc != null) tc.sendMessage(getNotifyMessage(guild.getJDA(), author, newActivity, new MyUser(author), guild.getRoleById(myGuild.getStreamPingRoleId()), isStreamerMode, lang)).queue();
         }
     }
 
-    public static Message getNotifyMessage(User author, Activity newActivity, MyUser internalUser, boolean isStreamerMode, String lang) {
+    public static Message getNotifyMessage(JDA jda, User author, Activity newActivity, MyUser myUser, Role pingRole, boolean isStreamerMode, String lang) {
         MessageBuilder mb = new MessageBuilder();
         EmbedBuilder eb = new EmbedBuilder();
-        if (isStreamerMode) mb.setContent("@here");
-        eb.setColor(Color.decode(internalUser.getColorCode()));
-        eb.setAuthor(LanguageHandler.get(lang, "livestream_announcement_title"), newActivity.getUrl(), "https://i.imgur.com/BkMsIdz.png"); // Twitch Logo
+        if (isStreamerMode) mb.setContent(pingRole != null ? pingRole.getAsMention() : "");
+        eb.setColor(Color.decode(myUser.getColorCode()));
+        eb.setAuthor(LanguageHandler.get(lang, "livestream_announcement_title"), newActivity.getUrl(), ImageUtil.getUrl(jda, "twitch_logo"));
         eb.setTitle(newActivity.getName());
         eb.setDescription(String.format(LanguageHandler.get(lang, "livestream_announcement"), author.getAsMention(), newActivity.getUrl()));
         eb.setThumbnail(author.getAvatarUrl());

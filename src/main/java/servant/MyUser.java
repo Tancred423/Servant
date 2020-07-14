@@ -801,7 +801,7 @@ public class MyUser {
                 if (resultSet.getInt("count") == 0)
                     favoriteAnimal = LanguageHandler.get(lang, "profile_nofavourite");
                 else
-                    favoriteAnimal = resultSet.getString("name");
+                    favoriteAnimal = LanguageHandler.get(lang, "profile_animal_" + resultSet.getString("name"));
             }
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyUser#getFavoriteAnimal"));

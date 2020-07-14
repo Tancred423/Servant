@@ -49,7 +49,9 @@ public abstract class InteractionInterface extends Command {
         String gif;
         try {
             var json = JsonReader.readJsonFromUrl("https://api.servant.gg/" + this.name);
-            gif = json.get("image_url").toString();
+            do {
+                gif = json.get("image_url").toString();
+            } while (gif.isEmpty());
         } catch (IOException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, event.getJDA(), name, event));
             return;

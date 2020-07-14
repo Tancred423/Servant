@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Jul 13, 2020 at 02:39 PM
+-- Generation Time: Jul 14, 2020 at 04:44 PM
 -- Server version: 10.1.41-MariaDB-0+deb9u1
 -- PHP Version: 5.5.9-1ubuntu4
 
@@ -452,7 +452,8 @@ CREATE TABLE `guild_livestreams` (
   `guild_id` bigint(18) NOT NULL,
   `is_public` tinyint(1) NOT NULL,
   `role_id` bigint(18) NOT NULL,
-  `tc_id` bigint(18) NOT NULL
+  `tc_id` bigint(18) NOT NULL,
+  `ping_role_id` bigint(18) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------

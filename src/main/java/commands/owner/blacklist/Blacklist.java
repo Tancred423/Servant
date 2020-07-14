@@ -10,6 +10,7 @@ import servant.LoggingTask;
 import servant.Servant;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +30,9 @@ public class Blacklist {
 
         try {
             connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT * FROM blacklist_global");
+            var select = connection.prepareStatement("SELECT * FROM blacklist_global",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             var resultSet = select.executeQuery();
             if (resultSet.first())
                 do blacklistedIds.add(resultSet.getLong("id")); while (resultSet.next());

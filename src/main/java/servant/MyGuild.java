@@ -2088,6 +2088,30 @@ public class MyGuild {
         return isPublicMode;
     }
 
+    public long getStreamPingRoleId() {
+        Connection connection = null;
+        var pingRoleId = 0L;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement(
+                    "SELECT ping_role_id " +
+                            "FROM guild_livestreams " +
+                            "WHERE guild_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
+            select.setLong(1, guildId);
+            var resultSet = select.executeQuery();
+            if (resultSet.first()) pingRoleId = resultSet.getLong("ping_role_id");
+        } catch (SQLException e) {
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyGuild#getStreamPingRoleId"));
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return pingRoleId;
+    }
+
     public long getStreamTcId() {
         Connection connection = null;
         var channelId = 0L;

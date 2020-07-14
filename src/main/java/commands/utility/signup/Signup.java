@@ -37,7 +37,9 @@ public class Signup {
             var select = connection.prepareStatement(
                     "SELECT author_id " +
                             "FROM signups " +
-                            "WHERE msg_id=?");
+                            "WHERE msg_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, msgId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) authorId = resultSet.getLong("author_id");
@@ -59,7 +61,9 @@ public class Signup {
             var select = connection.prepareStatement(
                     "SELECT amount_participants " +
                             "FROM signups " +
-                            "WHERE msg_id=?");
+                            "WHERE msg_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, msgId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) amount = resultSet.getInt("amount_participants");
@@ -81,7 +85,9 @@ public class Signup {
             var select = connection.prepareStatement(
                     "SELECT title " +
                             "FROM signups " +
-                            "WHERE msg_id=?");
+                            "WHERE msg_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, msgId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) authorId = resultSet.getString("title");
@@ -103,7 +109,9 @@ public class Signup {
             var select = connection.prepareStatement(
                     "SELECT event_time " +
                             "FROM signups " +
-                            "WHERE msg_id=?");
+                            "WHERE msg_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, msgId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) expiration = resultSet.getTimestamp("event_time");
@@ -123,7 +131,9 @@ public class Signup {
             connection = Servant.db.getHikari().getConnection();
             var insert = connection.prepareStatement(
                     "INSERT INTO signups (guild_id,tc_id,msg_id,author_id,amount_participants,title,event_time) " +
-                            "VALUES (?,?,?,?,?,?,?)");
+                            "VALUES (?,?,?,?,?,?,?)",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             insert.setLong(1, guildId);
             insert.setLong(2, tcId);
             insert.setLong(3, msgId);
@@ -144,7 +154,9 @@ public class Signup {
 
         try {
             connection = Servant.db.getHikari().getConnection();
-            var delete = connection.prepareStatement("DELETE FROM signups WHERE msg_id=?");
+            var delete = connection.prepareStatement("DELETE FROM signups WHERE msg_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, msgId);
             delete.executeUpdate();
         } catch (SQLException e) {
@@ -157,7 +169,9 @@ public class Signup {
             connection = Servant.db.getHikari().getConnection();
             var delete = connection.prepareStatement(
                     "DELETE FROM tmp_signup_participants " +
-                            "WHERE msg_id=?");
+                            "WHERE msg_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, msgId);
             delete.executeUpdate();
         } catch (SQLException e) {
@@ -243,7 +257,9 @@ public class Signup {
                 var preparedStatement = connection.prepareStatement(
                         "SELECT user_id " +
                                 "FROM tmp_signup_participants " +
-                                "WHERE msg_id=?");
+                                "WHERE msg_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 preparedStatement.setLong(1, msgId);
                 var resultSet = preparedStatement.executeQuery();
                 if (resultSet.first()) {
@@ -300,7 +316,9 @@ public class Signup {
                 connection = Servant.db.getHikari().getConnection();
                 var insert = connection.prepareStatement(
                         "INSERT INTO tmp_signup_participants (msg_id,user_id,guild_id,tc_id) " +
-                                "VALUES (?,?,?,?)");
+                                "VALUES (?,?,?,?)",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 insert.setLong(1, msgId);
                 insert.setLong(2, userId);
                 insert.setLong(3, guildId);
@@ -324,7 +342,9 @@ public class Signup {
             var delete = connection.prepareStatement(
                     "DELETE FROM tmp_signup_participants " +
                             "WHERE msg_id=? " +
-                            "AND user_id=?");
+                            "AND user_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, msgId);
             delete.setLong(2, userId);
             delete.executeUpdate();

@@ -65,7 +65,9 @@ public class Rating {
             var select = connection.prepareStatement(
                     "SELECT author_id " +
                             "FROM ratings " +
-                            "WHERE msg_id=?");
+                            "WHERE msg_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, msgId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) authorId = resultSet.getLong("author_id");
@@ -97,7 +99,9 @@ public class Rating {
             var select = connection.prepareStatement(
                     "SELECT event_time " +
                             "FROM ratings " +
-                            "WHERE msg_id=?");
+                            "WHERE msg_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, msgId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) eventTime = resultSet.getTimestamp("event_time").toInstant();
@@ -119,7 +123,9 @@ public class Rating {
             var select = connection.prepareStatement(
                     "SELECT topic " +
                             "FROM ratings " +
-                            "WHERE msg_id=?");
+                            "WHERE msg_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, msgId);
             var resultSet = select.executeQuery();
             if (resultSet.first()) {
@@ -145,7 +151,9 @@ public class Rating {
                 var preparedStatement = connection.prepareStatement(
                         "SELECT user_id, reaction " +
                                 "FROM tmp_rating_participants " +
-                                "WHERE msg_id=?");
+                                "WHERE msg_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 preparedStatement.setLong(1, msgId);
                 var resultSet = preparedStatement.executeQuery();
                 if (resultSet.first()) {
@@ -171,7 +179,9 @@ public class Rating {
             connection = Servant.db.getHikari().getConnection();
             var insert = connection.prepareStatement(
                     "INSERT INTO ratings (guild_id,tc_id,msg_id,author_id,event_time,topic) " +
-                            "VALUES (?,?,?,?,?,?)");
+                            "VALUES (?,?,?,?,?,?)",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             insert.setLong(1, guildId);
             insert.setLong(2, tcId);
             insert.setLong(3, msgId);
@@ -194,7 +204,9 @@ public class Rating {
             connection = Servant.db.getHikari().getConnection();
             var insert = connection.prepareStatement(
                     "INSERT INTO tmp_rating_participants (msg_id,user_id,reaction,guild_id,tc_id) " +
-                            "VALUES (?,?,?,?,?)");
+                            "VALUES (?,?,?,?,?)",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             insert.setLong(1, msgId);
             insert.setLong(2, userId);
             insert.setString(3, emoji);
@@ -217,7 +229,9 @@ public class Rating {
                     "DELETE FROM tmp_rating_participants " +
                             "WHERE msg_id=? " +
                             "AND user_id=? " +
-                            "AND reaction=?");
+                            "AND reaction=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, msgId);
             delete.setLong(2, userId);
             delete.setString(3, emoji);
@@ -238,7 +252,9 @@ public class Rating {
             var select = connection.prepareStatement(
                     "SELECT * FROM tmp_rating_participants " +
                             "WHERE msg_id=? " +
-                            "AND user_id=?");
+                            "AND user_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, msgId);
             select.setLong(2, userId);
             var resultSet = select.executeQuery();
@@ -262,7 +278,9 @@ public class Rating {
                     "SELECT reaction " +
                             "FROM tmp_rating_participants " +
                             "WHERE msg_id=? " +
-                            "AND user_id=?");
+                            "AND user_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, msgId);
             select.setLong(2, userId);
             var resultSet = select.executeQuery();
@@ -346,7 +364,9 @@ public class Rating {
             connection = Servant.db.getHikari().getConnection();
             var delete = connection.prepareStatement(
                     "DELETE FROM ratings " +
-                            "WHERE msg_id=?");
+                            "WHERE msg_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, msgId);
             delete.executeUpdate();
         } catch (SQLException e) {
@@ -359,7 +379,9 @@ public class Rating {
             connection = Servant.db.getHikari().getConnection();
             var delete = connection.prepareStatement(
                     "DELETE FROM tmp_rating_participants " +
-                            "WHERE msg_id=?");
+                            "WHERE msg_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, msgId);
             delete.executeUpdate();
         } catch (SQLException e) {

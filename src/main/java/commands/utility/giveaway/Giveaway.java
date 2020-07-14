@@ -60,7 +60,9 @@ public class Giveaway {
                             "FROM giveaways " +
                             "WHERE guild_id=? " +
                             "AND tc_id=? " +
-                            "AND msg_id=?");
+                            "AND msg_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             select.setLong(2, tcId);
             select.setLong(3, msgId);
@@ -86,7 +88,9 @@ public class Giveaway {
                             "FROM giveaways " +
                             "WHERE guild_id=? " +
                             "AND tc_id=? " +
-                            "AND msg_id=?");
+                            "AND msg_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             select.setLong(2, tcId);
             select.setLong(3, msgId);
@@ -112,7 +116,9 @@ public class Giveaway {
                             "FROM giveaways " +
                             "WHERE guild_id=? " +
                             "AND tc_id=? " +
-                            "AND msg_id=?");
+                            "AND msg_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             select.setLong(2, tcId);
             select.setLong(3, msgId);
@@ -138,7 +144,9 @@ public class Giveaway {
                             "FROM giveaways " +
                             "WHERE guild_id=? " +
                             "AND tc_id=? " +
-                            "AND msg_id=?");
+                            "AND msg_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, guildId);
             select.setLong(2, tcId);
             select.setLong(3, msgId);
@@ -164,7 +172,9 @@ public class Giveaway {
                     "DELETE FROM giveaways " +
                             "WHERE guild_id=? " +
                             "AND tc_id=? " +
-                            "AND msg_id=?");
+                            "AND msg_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, guildId);
             delete.setLong(2, tcId);
             delete.setLong(3, msgId);
@@ -173,7 +183,9 @@ public class Giveaway {
             // Giveaway entries
             delete = connection.prepareStatement(
                     "DELETE FROM tmp_giveaway_participants " +
-                            "WHERE msg_id=?");
+                            "WHERE msg_id=?",
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
             delete.setLong(1, msgId);
             delete.executeUpdate();
         } catch (SQLException e) {
@@ -193,7 +205,9 @@ public class Giveaway {
                 var preparedStatement = connection.prepareStatement(
                         "SELECT user_id " +
                                 "FROM tmp_giveaway_participants " +
-                                "WHERE msg_id=?");
+                                "WHERE msg_id=?",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 preparedStatement.setLong(1, msgId);
                 var resultSet = preparedStatement.executeQuery();
                 if (resultSet.first()) {
@@ -219,7 +233,9 @@ public class Giveaway {
                 connection = Servant.db.getHikari().getConnection();
                 var insert = connection.prepareStatement(
                         "INSERT INTO tmp_giveaway_participants (msg_id,user_id,guild_id,tc_id) " +
-                                "VALUES (?,?,?,?)");
+                                "VALUES (?,?,?,?)",
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
                 insert.setLong(1, msgId);
                 insert.setLong(2, userId);
                 insert.setLong(3, guildId);
