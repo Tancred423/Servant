@@ -2160,7 +2160,7 @@ public class MyGuild {
         return role;
     }
 
-    public List<Long> getStreamerRoles() {
+    public List<Long> getStreamerRoleIds() {
         Connection connection = null;
         var streamerRoles = new ArrayList<Long>();
 
@@ -2176,7 +2176,7 @@ public class MyGuild {
             var resultSet = select.executeQuery();
             if (resultSet.first()) do streamerRoles.add(resultSet.getLong("role_id")); while (resultSet.next());
         } catch (SQLException e) {
-            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyGuild#getStreamers"));
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyGuild#getStreamerRoleIds"));
         } finally {
             closeQuietly(connection);
         }

@@ -5,6 +5,7 @@ import commands.fun.baguette.Baguette;
 import commands.interaction.Interaction;
 import files.language.LanguageHandler;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import utilities.Constants;
 
@@ -1054,18 +1055,12 @@ public class MyUser {
     }
 
     // Livestream
-    public boolean isStreamer(long guildId) {
-        var shardManager = jda.getShardManager();
-        if (shardManager == null) return false;
-        var guild = shardManager.getGuildById(guildId);
-        if (guild == null) return false;
+    public boolean isStreamer(Guild guild) {
         var member = guild.getMemberById(userId);
-        if (member == null) return false;
-        var roles = member.getRoles();
-        var streamerRoles = new MyGuild(guild).getStreamerRoles();
-
-        for (var role : roles) {
-            if (streamerRoles.contains(role.getIdLong())) return true;
+        if (member != null) {
+            var memberRoles = member.getRoles();
+            var streamerRoleIds = new MyGuild(guild).getStreamerRoleIds();
+            for (var memberRole : memberRoles) if (streamerRoleIds.contains(memberRole.getIdLong())) return true;
         }
 
         return false;

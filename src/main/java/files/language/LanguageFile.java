@@ -71,6 +71,9 @@ public class LanguageFile {
         en_gb.setProperty("guild", "Server");
         en_gb.setProperty("help", "Help");
 
+        // Parser
+        en_gb.setProperty("parser_invalid_time_arg", "Invalid time argument. Or maybe did you forget the quotation marks around your topic?");
+
         ///////////////////////////////////// Commands /////////////////////////////////////
 
         ////////////////// Dashboard //////////////////
@@ -830,6 +833,9 @@ public class LanguageFile {
         de_de.setProperty("channel", "Kanal");
         de_de.setProperty("guild", "Server");
         de_de.setProperty("help", "Hilfe");
+
+        // Parser
+        de_de.setProperty("parser_invalid_time_arg", "Ungültige Zeitangabe. Oder vielleicht hast Du die Anführungszeichen um das Thema vergessen?");
 
         ///////////////////////////////////// Commands /////////////////////////////////////
 

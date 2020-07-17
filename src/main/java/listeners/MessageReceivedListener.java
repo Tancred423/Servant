@@ -32,13 +32,8 @@ public class MessageReceivedListener extends ListenerAdapter {
         var author = event.getAuthor();
         var message = event.getMessage();
 
-        /* Certain conditions must meet, so this event is allowed to be executed:
-         * 1.   Ignore any request from the Discord Bot List as this big guild
-         *      invokes a lot of events, but never uses this bot actively.
-         * 2.   Ignore any request from bots to prevent infinite loops.
-         * 3.   Ignore any request from blacklisted users and guilds.
-         */
-        if (event.isFromGuild() && event.getGuild().getIdLong() == 264445053596991498L) return; // Discord Bot List
+        // Blacklist
+        if ((event.isFromGuild() ? event.getGuild().getIdLong() : 0) == Constants.DISCORD_BOT_LIST_ID) return;
         if (author.isBot()) return;
         if (Blacklist.isBlacklisted(event.isFromGuild() ? event.getGuild() : null, author)) return;
 

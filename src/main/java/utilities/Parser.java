@@ -83,6 +83,11 @@ public class Parser {
             if (Character.isDigit(c) && sb.toString().matches(".*[a-z].*")) {
                 var arg = sb.toString();
                 var argSplit = arg.split("(?<=\\D)(?=\\d)|(?<=\\d)(?=\\D)");
+
+                if (!argSplit[0].matches("\\d+")) {
+                    throw new ParseException(LanguageHandler.get(lang, "parser_invalid_time_arg"), 0);
+                }
+
                 integer = Integer.parseInt(argSplit[0]);
                 character = argSplit[1].charAt(0);
 

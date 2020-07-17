@@ -27,13 +27,8 @@ public class GuildJoinListener extends ListenerAdapter {
         if (guildOwner == null) return; // To eliminate errors. Will never occur.
         var user = guildOwner.getUser();
 
-        /* Certain conditions must meet, so this event is allowed to be executed:
-         * 1.   Ignore any request from the Discord Bot List as this big guild
-         *      invoke a lot of events, but never use this bot actively.
-         * 2.   Ignore any request from bots to prevent infinite loops.
-         * 3.   Ignore any request from blacklisted users and guilds.
-         */
-        if (guild.getIdLong() == 264445053596991498L) return; // Discord Bot List
+        // Blacklist
+        if (guild.getIdLong() == Constants.DISCORD_BOT_LIST_ID) return;
         if (user.isBot()) return;
         if (Blacklist.isBlacklisted(guild, user)) return;
 

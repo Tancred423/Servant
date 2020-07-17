@@ -24,6 +24,7 @@ import servant.MyGuild;
 import servant.MyMessage;
 import servant.MyUser;
 import servant.Servant;
+import utilities.Constants;
 import utilities.EmoteUtil;
 import utilities.TimeUtil;
 
@@ -46,13 +47,8 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
         var msgId = event.getMessageIdLong();
         var user = event.getUser();
 
-        /* Certain conditions must meet, so this event is allowed to be executed:
-         * 1.   Ignore any request from the Discord Bot List as this big guild
-         *      invoke a lot of events, but never use this bot actively.
-         * 2.   Ignore any request from bots to prevent infinite loops.
-         * 3.   Ignore any request from blacklisted users and guilds.
-         */
-        if (guild.getIdLong() == 264445053596991498L) return; // Discord Bot List
+        // Blacklist
+        if (guild.getIdLong() == Constants.DISCORD_BOT_LIST_ID) return;
         if (user.isBot()) return;
         if (Blacklist.isBlacklisted(guild, user)) return;
 

@@ -1,13 +1,15 @@
 package listeners;
 
 import commands.owner.blacklist.Blacklist;
-import plugins.moderation.livestream.LivestreamHandler;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.user.UserActivityEndEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import plugins.moderation.livestream.LivestreamHandler;
 import servant.MyGuild;
+import servant.MyUser;
 import servant.Servant;
+import utilities.Constants;
 
 import javax.annotation.Nonnull;
 import java.util.concurrent.CompletableFuture;
@@ -18,13 +20,8 @@ public class UserActivityEndListener extends ListenerAdapter {
         var guild = event.getGuild();
         var user = event.getUser();
 
-        /* Certain conditions must meet, so this event is allowed to be executed:
-         * 1.   Ignore any request from the Discord Bot List as this big guild
-         *      invoke a lot of events, but never use this bot actively.
-         * 2.   Ignore any request from bots to prevent infinite loops.
-         * 3.   Ignore any request from blacklisted users and guilds.
-         */
-        if (guild.getIdLong() == 264445053596991498L) return; // Discord Bot List
+        // Blacklist
+        if (guild.getIdLong() == Constants.DISCORD_BOT_LIST_ID) return;
         if (user.isBot()) return;
         if (Blacklist.isBlacklisted(guild, user)) return;
 
@@ -40,12 +37,20 @@ public class UserActivityEndListener extends ListenerAdapter {
 
     private static void processLivestream(UserActivityEndEvent event, net.dv8tion.jda.api.entities.Guild guild, User user, Activity oldActivity) {
         // Check if user is streamer if guild is in streamer mode.
-        var isPublic = new MyGuild(guild).streamIsPublic();
-        if (!isPublic)
-            if (!new MyGuild(guild).getStreamerRoles().contains(user.getIdLong())) return;
+        var myGuild = new MyGuild(guild);
+        var isPublic = myGuild.streamIsPublic();
+        var myUser = new MyUser(user);
+        var isStreamer = myUser.isStreamer(guild);
 
-        if (oldActivity.getType().name().equalsIgnoreCase("streaming")) {
+        // In streamer mode only streamers get the role removed.
+        // In public mode everyone is getting the role removed.
+        if (!isPublic && !isStreamer) return;
+
+        if (event.getMember().getActivities().stream().map(Activity::getType).noneMatch(it -> it == Activity.ActivityType.STREAMING)) {
             LivestreamHandler.removeRole(guild, event.getMember(), guild.getRoleById(new MyGuild(guild).getStreamRoleId()));
+
+            // Tracker
+            LivestreamHandler.activeStreamerIds.remove(user.getIdLong());
         }
     }
 }
