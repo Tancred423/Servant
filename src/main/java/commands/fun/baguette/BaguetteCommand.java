@@ -31,7 +31,7 @@ public class BaguetteCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        var random = MathUtil.randomBiased(50, 3.0f); // 1 is linear. The higher the rarer are high numbers.
+        var random = MathUtil.randomBiased(50, 3.5f); // 1 is linear. The higher the rarer are high numbers.
 
         var jda = event.getJDA();
 

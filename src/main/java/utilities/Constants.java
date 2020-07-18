@@ -2,7 +2,7 @@
 package utilities;
 
 public class Constants {
-    final public static String VERSION = "6.2.2";
+    final public static String VERSION = "6.2.3";
     final public static String LOG_OFFSET = "+02:00";
 
     // in seconds

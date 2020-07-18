@@ -680,6 +680,13 @@ public class MyUser {
         return commandCounts;
     }
 
+    public int getCommandsTotalCount() {
+        var totalCount = 0;
+        var commandCounts = getCommandCounts();
+        for (var commandCount : commandCounts.entrySet()) totalCount += commandCount.getValue();
+        return totalCount;
+    }
+
     private int getCommandCount(int commandId) {
         Connection connection = null;
         var featureCount = 0;

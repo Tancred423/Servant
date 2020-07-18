@@ -65,7 +65,7 @@ public class MessageReceivedListener extends ListenerAdapter {
     }
 
     private static void processCustomCommands(MessageReceivedEvent event, MyMessage myMessage) {
-        if (myMessage.isCustomCommand()) {
+        if (myMessage.isCustomCommand() && myMessage.startsWithPrefix()) {
             var myGuild = new MyGuild(event.getGuild());
             if (myGuild.categoryIsEnabled("moderation") && myGuild.pluginIsEnabled("customcommands"))
                 new CustomCommand(event).reply();

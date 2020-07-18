@@ -115,7 +115,7 @@ public class LanguageFile {
 
         // Commands
         en_gb.setProperty("commands_title", "%s%s commands");
-        en_gb.setProperty("commands_footer", "If you used this command in hope to see a command list, try using %shelp or visit the website: %s");
+        en_gb.setProperty("commands_footer", "If you've used this command in hope to see a command list, visit the \"Help\" section on the website: %s");
 
         // Flip
         en_gb.setProperty("flip_description", "Flip a user");
@@ -924,7 +924,7 @@ public class LanguageFile {
 
         // Commands
         de_de.setProperty("commands_title", "%s%s Befehle");
-        de_de.setProperty("commands_footer", "Falls du diesen Befehl in der Hoffnung eine Befehlsliste zu finden benutzt hast, probiere Mal %shelp oder öffne die Webseite: %s");
+        de_de.setProperty("commands_footer", "Falls du diesen Befehl in der Hoffnung eine Befehlsliste zu finden benutzt hast, besuche die \"Help\" Sektion der Webseite: %s");
 
         /// Profile
         de_de.setProperty("profile_footer1", "Siehe auch \"%s%s @nutzer\"");

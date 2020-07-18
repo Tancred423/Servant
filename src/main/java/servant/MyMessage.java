@@ -328,10 +328,12 @@ public class MyMessage {
                 var preparedStatement = connection.prepareStatement(
                         "SELECT id " +
                                 "FROM custom_commands " +
-                                "WHERE invoke=?",
+                                "WHERE guild_id=? " +
+                                "AND invoke=?",
                         ResultSet.TYPE_SCROLL_SENSITIVE,
                         ResultSet.CONCUR_UPDATABLE);
-                preparedStatement.setString(1, invoke);
+                preparedStatement.setLong(1, guildId);
+                preparedStatement.setString(2, invoke);
                 var resultSet = preparedStatement.executeQuery();
                 isCustomCommand = resultSet.first();
             } catch (SQLException e) {
@@ -342,6 +344,18 @@ public class MyMessage {
 
             return isCustomCommand;
         }
+    }
+
+    public boolean startsWithPrefix() {
+        var sm = jda.getShardManager();
+        if (sm != null) {
+            var guild = sm.getGuildById(guildId);
+            if (guild != null) {
+                var prefix = new MyGuild(guild).getPrefix();
+                return content.startsWith(prefix);
+            }
+        }
+        return false;
     }
 
     public String getContent() {

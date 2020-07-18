@@ -57,7 +57,7 @@ public class CommandsCommand extends Command {
                         user.getName(),
                         user.getName().endsWith("s") ? LanguageHandler.get(lang, "apostrophe") : LanguageHandler.get(lang, "apostrophe_s")
                         ), null, user.getEffectiveAvatarUrl())
-                .setDescription(LanguageHandler.get(lang, "commands_used") + ": " + myUser.getCommandCounts().size());
+                .setDescription(LanguageHandler.get(lang, "commands_used") + ": " + myUser.getCommandsTotalCount());
 
         var sb = new StringBuilder();
         var fieldValues = new ArrayList<String>();
