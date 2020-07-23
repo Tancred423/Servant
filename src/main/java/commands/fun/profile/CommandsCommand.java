@@ -83,7 +83,7 @@ public class CommandsCommand extends Command {
             eb.addField(" ", fieldValue, true);
             i++;
         }
-        eb.setFooter(String.format(LanguageHandler.get(lang, "commands_footer"), prefix, Constants.WEBSITE_HELP));
+        eb.setFooter(String.format(LanguageHandler.get(lang, "commands_footer"), Constants.WEBSITE_HELP));
 
         event.reply(eb.build());
     }

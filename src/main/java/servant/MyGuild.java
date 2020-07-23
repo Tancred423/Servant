@@ -5,6 +5,7 @@ import files.language.LanguageHandler;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
+import utilities.ConsoleLog;
 import utilities.ToggleUtil;
 
 import java.sql.*;
@@ -28,7 +29,7 @@ public class MyGuild {
 
     // Purge
     public void purge() {
-        System.out.println("Purging guild... Guild ID: " + guildId);
+        System.out.println(ConsoleLog.getTimestamp() + "Purging guild... Guild ID: " + guildId);
         Connection connection = null;
 
         try {
@@ -279,7 +280,7 @@ public class MyGuild {
     }
 
     public void purgeTc(long tcId) {
-        System.out.println("Purging text channel... Guild ID: " + guildId + " Text Channel ID: " + tcId);
+        System.out.println(ConsoleLog.getTimestamp() + "Purging text channel... Guild ID: " + guildId + " Text Channel ID: " + tcId);
         Connection connection = null;
 
         try {
@@ -330,7 +331,7 @@ public class MyGuild {
             }
 
             if (myTC.isBirthdayAnnouncementTc()) {
-                delete = connection.prepareStatement("UPDATE guild_birthdays SET announcement_tc_id WHERE guild_id=?",
+                delete = connection.prepareStatement("UPDATE guild_birthdays SET announcement_tc_id=? WHERE guild_id=?",
                         ResultSet.TYPE_SCROLL_SENSITIVE,
                         ResultSet.CONCUR_UPDATABLE);
                 delete.setLong(1, 0L);
@@ -452,7 +453,7 @@ public class MyGuild {
     }
 
     public void purgeVc(long vcTc) {
-        System.out.println("Purging voice channel... Guild ID: " + guildId + " Voice Channel ID: " + vcTc);
+        System.out.println(ConsoleLog.getTimestamp() + "Purging voice channel... Guild ID: " + guildId + " Voice Channel ID: " + vcTc);
         Connection connection = null;
 
         try {
@@ -483,7 +484,7 @@ public class MyGuild {
 
             // Giveaway
             if (myMessage.isGiveaway()) {
-                System.out.println("Purging giveaway... Guild ID: " + guildId + " Message ID: " + msgId);
+                System.out.println(ConsoleLog.getTimestamp() + "Purging giveaway... Guild ID: " + guildId + " Message ID: " + msgId);
 
                 delete = connection.prepareStatement("DELETE FROM giveaways WHERE guild_id=? AND msg_id=?",
                         ResultSet.TYPE_SCROLL_SENSITIVE,
@@ -502,7 +503,7 @@ public class MyGuild {
 
             // Birthday
             else if (myMessage.isBirthdayList()) {
-                System.out.println("Purging birthday list... Guild ID: " + guildId + " Message ID: " + msgId);
+                System.out.println(ConsoleLog.getTimestamp() + "Purging birthday list... Guild ID: " + guildId + " Message ID: " + msgId);
 
                 delete = connection.prepareStatement("UPDATE guild_birthdays SET list_tc_id=?, list_msg_id=?, list_author_id=? WHERE guild_id=?",
                         ResultSet.TYPE_SCROLL_SENSITIVE,
@@ -516,7 +517,7 @@ public class MyGuild {
 
             // Polls
             else if (myMessage.isRadiopoll() || myMessage.isQuickpoll() || myMessage.isCheckpoll()) {
-                System.out.println("Purging poll... Guild ID: " + guildId + " Message ID: " + msgId);
+                System.out.println(ConsoleLog.getTimestamp() + "Purging poll... Guild ID: " + guildId + " Message ID: " + msgId);
 
                 delete = connection.prepareStatement("DELETE FROM polls WHERE guild_id=? AND msg_id=?",
                         ResultSet.TYPE_SCROLL_SENSITIVE,
@@ -535,7 +536,7 @@ public class MyGuild {
 
             // Ratings
             else if (myMessage.isRating()) {
-                System.out.println("Purging rating... Guild ID: " + guildId + " Message ID: " + msgId);
+                System.out.println(ConsoleLog.getTimestamp() + "Purging rating... Guild ID: " + guildId + " Message ID: " + msgId);
 
                 delete = connection.prepareStatement("DELETE FROM ratings WHERE guild_id=? AND msg_id=?",
                         ResultSet.TYPE_SCROLL_SENSITIVE,
@@ -554,7 +555,7 @@ public class MyGuild {
 
             // Reaction Roles
             else if (myMessage.isReactionRole()) {
-                System.out.println("Purging reaction role... Guild ID: " + guildId + " Message ID: " + msgId);
+                System.out.println(ConsoleLog.getTimestamp() + "Purging reaction role... Guild ID: " + guildId + " Message ID: " + msgId);
 
                 delete = connection.prepareStatement("DELETE FROM reaction_roles WHERE guild_id=? AND msg_id=?",
                         ResultSet.TYPE_SCROLL_SENSITIVE,
@@ -580,7 +581,7 @@ public class MyGuild {
 
             // Remind Me
             else if (myMessage.isRemindMe()) {
-                System.out.println("Purging remindme... Guild ID: " + guildId + " Message ID: " + msgId);
+                System.out.println(ConsoleLog.getTimestamp() + "Purging remindme... Guild ID: " + guildId + " Message ID: " + msgId);
 
                 delete = connection.prepareStatement("DELETE FROM remind_mes WHERE guild_id=? AND msg_id=?",
                         ResultSet.TYPE_SCROLL_SENSITIVE,
@@ -592,7 +593,7 @@ public class MyGuild {
 
             // Signup
             else if (myMessage.isSignup()) {
-                System.out.println("Purging signup... Guild ID: " + guildId + " Message ID: " + msgId);
+                System.out.println(ConsoleLog.getTimestamp() + "Purging signup... Guild ID: " + guildId + " Message ID: " + msgId);
 
                 delete = connection.prepareStatement("DELETE FROM signups WHERE guild_id=? AND msg_id=?",
                         ResultSet.TYPE_SCROLL_SENSITIVE,
@@ -611,7 +612,7 @@ public class MyGuild {
 
             // Best of Image
             if (myMessage.isBestOfImageBlacklisted()) {
-                System.out.println("Purging best of image... Guild ID: " + guildId + " Message ID: " + msgId);
+                System.out.println(ConsoleLog.getTimestamp() + "Purging best of image... Guild ID: " + guildId + " Message ID: " + msgId);
 
                 delete = connection.prepareStatement("DELETE FROM tmp_best_of_image_bl WHERE guild_id=? AND msg_id=?",
                         ResultSet.TYPE_SCROLL_SENSITIVE,
@@ -623,7 +624,7 @@ public class MyGuild {
 
             // Best of Quote
             if (myMessage.isBestOfQuoteBlacklisted()) {
-                System.out.println("Purging best of quote... Guild ID: " + guildId + " Message ID: " + msgId);
+                System.out.println(ConsoleLog.getTimestamp() + "Purging best of quote... Guild ID: " + guildId + " Message ID: " + msgId);
 
                 delete = connection.prepareStatement("DELETE FROM tmp_best_of_quote_bl WHERE guild_id=? AND msg_id=?",
                         ResultSet.TYPE_SCROLL_SENSITIVE,

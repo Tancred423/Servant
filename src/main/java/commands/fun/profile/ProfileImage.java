@@ -472,17 +472,17 @@ public class ProfileImage {
         var sb = new StringBuilder();
         for (var bioPart : bioSplit) {
             if (sb.toString().isEmpty()) {
-                if (bioPart.length() >= 10) {
+                if (bioPart.length() > 10) {
                     lineBreaks.add(bioPart.substring(0, 11));
-                    bioPart = bioPart.substring(12);
+                    bioPart = bioPart.substring(11);
                 }
-                if (bioPart.length() >= 10) {
+                if (bioPart.length() > 10) {
                     lineBreaks.add(bioPart.substring(0, 11));
-                    bioPart = bioPart.substring(12);
+                    bioPart = bioPart.substring(11);
                 }
-                if (bioPart.length() >= 10) {
+                if (bioPart.length() > 10) {
                     lineBreaks.add(bioPart.substring(0, 11));
-                    bioPart = bioPart.substring(12);
+                    bioPart = bioPart.substring(11);
                 }
                 sb.append(bioPart);
             } else if ((sb.toString() + bioPart).length() < 12)
@@ -494,7 +494,12 @@ public class ProfileImage {
             }
         }
         lineBreaks.add(sb.toString());
-        return lineBreaks;
+
+        var lineBreaksResult = new ArrayList<String>();
+
+        for (var lineBreak : lineBreaks) if (!lineBreak.isEmpty()) lineBreaksResult.add(lineBreak);
+
+        return lineBreaksResult;
     }
 
     private Image getBg(MyUser myUser) {
