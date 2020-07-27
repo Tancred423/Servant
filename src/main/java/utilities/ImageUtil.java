@@ -127,6 +127,9 @@ public class ImageUtil {
                     put("shame", servantEmotes2.getEmoteById(732582351045001276L));
                     put("rate", servantEmotes2.getEmoteById(732590489722683412L));
                     put("help", servantEmotes2.getEmoteById(732591206143623179L));
+                    put("cheers", servantEmotes2.getEmoteById(737297654341697576L));
+                    put("frog", servantEmotes2.getEmoteById(737297654345760769L));
+                    put("wolf", servantEmotes2.getEmoteById(737297654412869753L));
                 }
             }
         }};
@@ -162,6 +165,7 @@ public class ImageUtil {
                     put("unlimited_blade_works", servantEmotes2.getEmoteById(673456739760472089L));
                     put("xmas", servantEmotes2.getEmoteById(673456739919593472L));
                     put("console", servantEmotes2.getEmoteById(726354898605703229L));
+                    put("arenanet", servantEmotes2.getEmoteById(737304992373014560L));
                 }
             }
         }};

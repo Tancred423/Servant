@@ -48,7 +48,7 @@ public class CommandsCommand extends Command {
         }
 
         var featureEmotes = ImageUtil.getFeatureEmotes(jda);
-        var featuresMap = myUser.getCommandCounts();
+        var commandMap = myUser.getCommandCounts();
 
         var eb = new EmbedBuilder()
                 .setColor(Color.decode(myUser.getColorCode()))
@@ -62,7 +62,7 @@ public class CommandsCommand extends Command {
         var sb = new StringBuilder();
         var fieldValues = new ArrayList<String>();
 
-        for (var entry : featuresMap.entrySet()) {
+        for (var entry : commandMap.entrySet()) {
             /* Max length for a field is 1024. 100 is the max length of one row.
              * In case this list is getting too long, we will make a new one.
              */

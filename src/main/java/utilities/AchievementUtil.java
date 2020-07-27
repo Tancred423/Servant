@@ -36,6 +36,8 @@ public class AchievementUtil {
 
             case "kind": return String.format(LanguageHandler.get(lang, "achievement_kind"), jda.getSelfUser().getName());
 
+            case "arenanet": return LanguageHandler.get(lang, "achievement_arenanet");
+
             default: return name;
         }
     }

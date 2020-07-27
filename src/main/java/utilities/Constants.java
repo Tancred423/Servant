@@ -2,7 +2,7 @@
 package utilities;
 
 public class Constants {
-    final public static String VERSION = "6.2.4";
+    final public static String VERSION = "6.3.0";
     final public static String LOG_OFFSET = "+02:00";
 
     // in seconds
@@ -29,4 +29,7 @@ public class Constants {
     // Discord Servers
     final public static long SERVANTS_KINGDOM_ID = 436925371577925642L;
     final public static long DISCORD_BOT_LIST_ID = 264445053596991498L;
+
+    // User/Bot IDs
+    final public static long STREAM_TEST_BOT_ID = 644609335279747123L;
 }

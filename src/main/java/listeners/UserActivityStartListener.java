@@ -9,6 +9,7 @@ import plugins.moderation.livestream.LivestreamHandler;
 import servant.MyGuild;
 import servant.MyUser;
 import servant.Servant;
+import utilities.Console;
 import utilities.Constants;
 
 import javax.annotation.Nonnull;
@@ -22,8 +23,10 @@ public class UserActivityStartListener extends ListenerAdapter {
 
         // Blacklist
         if (guild.getIdLong() == Constants.DISCORD_BOT_LIST_ID) return;
-        if (user.isBot()) return;
+        if (user.isBot() && user.getIdLong() != Constants.STREAM_TEST_BOT_ID) return;
         if (Blacklist.isBlacklisted(guild, user)) return;
+
+//        Console.log("ActivityStart: \"" + user.getName() + "\" & \"" + guild.getName() + "\" NOT blacklisted!");
 
         CompletableFuture.runAsync(() -> {
             var newActivity = event.getNewActivity();
@@ -31,8 +34,10 @@ public class UserActivityStartListener extends ListenerAdapter {
             var myGuild = new MyGuild(guild);
 
             // Livestream
-            if (myGuild.pluginIsEnabled("livestream") && myGuild.categoryIsEnabled("moderation"))
+            if (myGuild.pluginIsEnabled("livestream") && myGuild.categoryIsEnabled("moderation")) {
+//                Console.log("ActivityStart: Plugin & Activity for guild \"" + guild.getName() + "\" enabled!");
                 processLivestream(event, guild, user, newActivity, lang);
+            }
         }, Servant.fixedThreadPool);
     }
 
@@ -47,13 +52,27 @@ public class UserActivityStartListener extends ListenerAdapter {
         // In public mode, only streamers get annoucements, but everyone is getting a role.
         if (!isPublic && !isStreamer) return;
 
-        if (event.getMember().getActivities().stream().map(Activity::getType).anyMatch(it -> it == Activity.ActivityType.STREAMING)
-            && !LivestreamHandler.activeStreamerIds.contains(user.getIdLong())) {
-            if (isStreamer) LivestreamHandler.sendNotification(user, newActivity, guild, new MyGuild(guild), lang);
+//        Console.log("ActivityStart: \"" + guild.getName() + "\" is public: " + isPublic);
+//        Console.log("ActivityStart: \"" + user.getName() + "\" is streamer: " + isStreamer);
+
+        var isStreaming= event.getMember().getActivities().stream().map(Activity::getType).anyMatch(it -> it == Activity.ActivityType.STREAMING);
+        var isActiveStreamer = LivestreamHandler.activeStreamerIds.contains(user.getIdLong());
+
+//        Console.log("ActivityStart: \"" + user.getName() + "\" is now streaming: " + isStreaming);
+//        Console.log("ActivityStart: \"" + user.getName() + "\" is already an active streamer: " + isActiveStreamer);
+
+        if (isStreaming && !isActiveStreamer) {
+            if (isStreamer) {
+                Console.log("ActivityStart: Sending notification for \"" + user.getName() + "\" in \"" + guild.getName() + "\"!");
+                LivestreamHandler.sendNotification(user, newActivity, guild, new MyGuild(guild), lang);
+            }
+            Console.log("ActivityStart: Adding role for \"" + user.getName() + "\" in \"" + guild.getName() + "\"!");
             LivestreamHandler.addRole(guild, event.getMember(), guild.getRoleById(new MyGuild(guild).getStreamRoleId()));
 
             // Tracker
+            Console.log("ActivityStart: Adding active streamer for \"" + user.getName() + "\"!");
             LivestreamHandler.activeStreamerIds.add(user.getIdLong());
+//            Console.log("Current active streamers: " + LivestreamHandler.activeStreamerIds);
         }
     }
 }

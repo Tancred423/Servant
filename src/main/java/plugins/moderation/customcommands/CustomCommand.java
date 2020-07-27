@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import servant.*;
-import utilities.ConsoleLog;
+import utilities.Console;
 import utilities.MessageUtil;
 
 import java.awt.*;
@@ -161,7 +161,7 @@ public class CustomCommand {
 
     private void logAndStatistics() {
         // Log
-        ConsoleLog.send(event, true);
+        Console.logCmd(event, true);
 
         // Statistics
         new MyUser(event.getAuthor()).incrementCommandCount("customcommand");

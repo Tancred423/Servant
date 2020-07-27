@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 import servant.MyGuild;
 import servant.MyUser;
 import servant.Servant;
-import utilities.ConsoleLog;
+import utilities.Console;
 import utilities.Constants;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.*;
 import zJdaUtilsLib.com.jagrosh.jdautilities.commons.utils.FixedSizeCache;
@@ -535,7 +535,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
     }
 
     private void startCommand(MessageReceivedEvent event, CommandEvent cevent, Command command, MyGuild myGuild, String name) {
-        ConsoleLog.send(event, false);
+        Console.logCmd(event, false);
 
         if (listener != null) listener.onCommand(cevent, command);
         uses.put(command.getName(), uses.getOrDefault(command.getName(), 0) + 1);

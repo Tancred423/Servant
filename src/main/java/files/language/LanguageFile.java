@@ -190,10 +190,12 @@ public class LanguageFile {
         en_gb.setProperty("profile_animal_dog", "Dog");
         en_gb.setProperty("profile_animal_fennec", "Fennec");
         en_gb.setProperty("profile_animal_fox", "Fox");
+        en_gb.setProperty("profile_animal_frog", "Frog");
         en_gb.setProperty("profile_animal_koala", "Koala");
         en_gb.setProperty("profile_animal_panda", "Panda");
         en_gb.setProperty("profile_animal_redpanda", "RedPanda");
         en_gb.setProperty("profile_animal_sloth", "Sloth");
+        en_gb.setProperty("profile_animal_wolf", "Wolf");
 
         en_gb.setProperty("profile_title_creator", "Creator");
         en_gb.setProperty("profile_title_supporter", "Supporter");
@@ -205,6 +207,7 @@ public class LanguageFile {
         en_gb.setProperty("interaction_description_birthday", "Wish someone a happy birthday");
         en_gb.setProperty("interaction_description_bite", "Bite someone");
         en_gb.setProperty("interaction_description_bully", "Bully someone");
+        en_gb.setProperty("interaction_description_cheers", "Raise a toast to someone");
         en_gb.setProperty("interaction_description_cookie", "Give someone a cookie");
         en_gb.setProperty("interaction_description_cop", "Arrest someone");
         en_gb.setProperty("interaction_description_dab", "Dab on someone");
@@ -232,6 +235,8 @@ public class LanguageFile {
         en_gb.setProperty("interaction_received_bite", "%s got bitten by %s crazy people.");
         en_gb.setProperty("interaction_shared_bully", "%s bullied %s poor kids.");
         en_gb.setProperty("interaction_received_bully", "%s got bullied by %s meanies.");
+        en_gb.setProperty("interaction_shared_cheers", "%s raised a toast to %s people.");
+        en_gb.setProperty("interaction_received_cheers", "%s was toasted by %s people. \uD83C\uDF5E");
         en_gb.setProperty("interaction_shared_cookie", "%s gave a cookie to %s cuties.");
         en_gb.setProperty("interaction_received_cookie", "%s noms their %s. cookie.");
         en_gb.setProperty("interaction_shared_cop", "%s arrested %s loli hunters.");
@@ -731,6 +736,7 @@ public class LanguageFile {
         en_gb.setProperty("achievement_fiteme", "Fite me!!!");
         en_gb.setProperty("achievement_xmas", "Xmas Time");
         en_gb.setProperty("achievement_padoru", "Padoru Padoruu");
+        en_gb.setProperty("achievement_arenanet", "ArenaNet");
 
         // EasterEggs
         en_gb.setProperty("eastereggs_you_are_welcome", "You're welcome %s");
@@ -953,10 +959,12 @@ public class LanguageFile {
         de_de.setProperty("profile_animal_dog", "Hund");
         de_de.setProperty("profile_animal_fennec", "Fennek");
         de_de.setProperty("profile_animal_fox", "Fuchs");
+        de_de.setProperty("profile_animal_frog", "Frosch");
         de_de.setProperty("profile_animal_koala", "Koala");
         de_de.setProperty("profile_animal_panda", "Panda");
         de_de.setProperty("profile_animal_redpanda", "RedPanda");
         de_de.setProperty("profile_animal_sloth", "Faultier");
+        de_de.setProperty("profile_animal_wolf", "Wolf");
 
         de_de.setProperty("profile_title_creator", "Erschaffer");
         de_de.setProperty("profile_title_supporter", "Unterstützer");
@@ -968,6 +976,7 @@ public class LanguageFile {
         de_de.setProperty("interaction_description_birthday", "Wünsche jemanden alles Gute zum Geburtstag");
         de_de.setProperty("interaction_description_bite", "Beiße jemanden");
         de_de.setProperty("interaction_description_bully", "Mobbe jemanden");
+        de_de.setProperty("interaction_description_cheers", "Proste jemandem zu");
         de_de.setProperty("interaction_description_cookie", "Gib jemanden einen Keks");
         de_de.setProperty("interaction_description_cop", "Nehme jemanden fest");
         de_de.setProperty("interaction_description_dab", "Dab auf jemanden");
@@ -995,6 +1004,8 @@ public class LanguageFile {
         de_de.setProperty("interaction_received_bite", "%s wurde von %s verrückten Menschen gebissen.");
         de_de.setProperty("interaction_shared_bully", "%s mobbte %s arme Kinder.");
         de_de.setProperty("interaction_received_bully", "%s wurde von %s Rabauken gemobbt.");
+        de_de.setProperty("interaction_shared_cheers", "%s postete %s Menschen zu.");
+        de_de.setProperty("interaction_received_cheers", "%s wurde von %s Menschen zugeprostet.");
         de_de.setProperty("interaction_shared_cookie", "%s gab einen Keks an %s liebe Leute.");
         de_de.setProperty("interaction_received_cookie", "%s nomt den %s. Keks.");
         de_de.setProperty("interaction_shared_cop", "%s brachte %s Loli-Jäger hinter Gitter.");
@@ -1493,6 +1504,7 @@ public class LanguageFile {
         de_de.setProperty("achievement_deusvult", "DEUS VULT!");
         de_de.setProperty("achievement_fiteme", "Fite me!!!");
         de_de.setProperty("achievement_xmas", "Xmas Time");
+        de_de.setProperty("achievement_arenanet", "ArenaNet");
 
         // EasterEggs
         de_de.setProperty("eastereggs_you_are_welcome", "Sehr gerne, %s");

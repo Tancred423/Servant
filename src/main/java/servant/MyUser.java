@@ -795,11 +795,14 @@ public class MyUser {
                             "c.name='bird' " +
                             "OR c.name='cat' " +
                             "OR c.name='dog' " +
+                            "OR c.name='fennec' " +
                             "OR c.name='fox' " +
+                            "OR c.name='frog' " +
                             "OR c.name='koala' " +
                             "OR c.name='panda' " +
                             "OR c.name='redpanda' " +
-                            "OR c.name='sloth' ) " +
+                            "OR c.name='sloth' " +
+                            "OR c.name='wolf' ) " +
                             "ORDER BY u.count DESC",
                     ResultSet.TYPE_SCROLL_SENSITIVE,
                     ResultSet.CONCUR_UPDATABLE);

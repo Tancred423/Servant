@@ -9,6 +9,7 @@ import plugins.moderation.livestream.LivestreamHandler;
 import servant.MyGuild;
 import servant.MyUser;
 import servant.Servant;
+import utilities.Console;
 import utilities.Constants;
 
 import javax.annotation.Nonnull;
@@ -22,20 +23,23 @@ public class UserActivityEndListener extends ListenerAdapter {
 
         // Blacklist
         if (guild.getIdLong() == Constants.DISCORD_BOT_LIST_ID) return;
-        if (user.isBot()) return;
+        if (user.isBot() && user.getIdLong() != Constants.STREAM_TEST_BOT_ID) return;
         if (Blacklist.isBlacklisted(guild, user)) return;
 
+//        Console.log("ActivityEnd: \"" + user.getName() + "\" & \"" + guild.getName() + "\" NOT blacklisted!");
+
         CompletableFuture.runAsync(() -> {
-            var oldActivity = event.getOldActivity();
             var myGuild = new MyGuild(guild);
 
             // Livestream
-            if (myGuild.pluginIsEnabled("livestream") && myGuild.categoryIsEnabled("moderation"))
-                processLivestream(event, guild, user, oldActivity);
+            if (myGuild.pluginIsEnabled("livestream") && myGuild.categoryIsEnabled("moderation")) {
+//                Console.log("ActivityEnd: Plugin & Activity for guild \"" + guild.getName() + "\" enabled!");
+                processLivestream(event, guild, user);
+            }
         }, Servant.fixedThreadPool);
     }
 
-    private static void processLivestream(UserActivityEndEvent event, net.dv8tion.jda.api.entities.Guild guild, User user, Activity oldActivity) {
+    private static void processLivestream(UserActivityEndEvent event, net.dv8tion.jda.api.entities.Guild guild, User user) {
         // Check if user is streamer if guild is in streamer mode.
         var myGuild = new MyGuild(guild);
         var isPublic = myGuild.streamIsPublic();
@@ -46,11 +50,22 @@ public class UserActivityEndListener extends ListenerAdapter {
         // In public mode everyone is getting the role removed.
         if (!isPublic && !isStreamer) return;
 
-        if (event.getMember().getActivities().stream().map(Activity::getType).noneMatch(it -> it == Activity.ActivityType.STREAMING)) {
+//        Console.log("ActivityEnd: \"" + guild.getName() + "\" is public: " + isPublic);
+//        Console.log("ActivityEnd: \"" + user.getName() + "\" is streamer: " + isStreamer);
+
+        var isNotStreamingAnymore = event.getMember().getActivities().stream().map(Activity::getType).noneMatch(it -> it == Activity.ActivityType.STREAMING);
+        var isActiveStreamer = LivestreamHandler.activeStreamerIds.contains(user.getIdLong());
+
+//        Console.log("ActivityEnd: \"" + user.getName() + "\" is not streaming anymore: " + isNotStreamingAnymore);
+
+        if (isNotStreamingAnymore && isActiveStreamer) {
+            Console.log("ActivityEnd: Removing role from \"" + user.getName() + "\" in \"" + guild.getName() + "\"!");
             LivestreamHandler.removeRole(guild, event.getMember(), guild.getRoleById(new MyGuild(guild).getStreamRoleId()));
 
             // Tracker
+            Console.log("ActivityEnd: Removing active streamer for \"" + user.getName() + "\"!");
             LivestreamHandler.activeStreamerIds.remove(user.getIdLong());
+//            Console.log("ActivityEnd: Current active streamers: " + LivestreamHandler.activeStreamerIds);
         }
     }
 }

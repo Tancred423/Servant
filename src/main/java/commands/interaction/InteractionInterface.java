@@ -12,6 +12,7 @@ import utilities.Parser;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public abstract class InteractionInterface extends Command {
@@ -46,16 +47,20 @@ public abstract class InteractionInterface extends Command {
         var mentionedUser = event.getMessage().getMentionedMembers().get(0).getUser();
         var mentionedMaster = new MyUser(mentionedUser);
 
-        String gif;
+        String gif = null;
         try {
             var json = JsonReader.readJsonFromUrl("https://api.servant.gg/" + this.name);
-            do {
-                gif = json.get("image_url").toString();
-            } while (gif.isEmpty());
+            for (int i = 0; i < 5; i++) {
+                gif = json.get("imageUrl").toString();
+                if (!gif.isEmpty()) break;
+            }
+        } catch (FileNotFoundException ignored) {
         } catch (IOException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, event.getJDA(), name, event));
             return;
         }
+
+        if (gif != null && gif.isEmpty()) gif = null;
 
         // Increment author and mentioned command count.
         myUser.incrementInteractionCount(name, true);

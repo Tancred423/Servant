@@ -10,6 +10,7 @@ import commands.fun.bubbleWrap.BubbleWrapCommand;
 import commands.fun.coinFlip.CoinFlipCommand;
 import commands.fun.flip.FlipCommand;
 import commands.fun.love.LoveCommand;
+import commands.fun.mirror.MirrorCommand;
 import commands.fun.profile.AchievementsCommand;
 import commands.fun.profile.CommandsCommand;
 import commands.fun.profile.ProfileCommand;
@@ -37,6 +38,7 @@ import commands.utility.remindme.RemindMeCommand;
 import commands.utility.signup.SignupCommand;
 import files.ConfigFile;
 import files.language.LanguageHandler;
+import plugins.moderation.livestream.LivestreamHandler;
 import servant.guild.GuildManager;
 import listeners.*;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -104,6 +106,9 @@ public class Servant {
                 .expiration(30, TimeUnit.SECONDS)
                 .build();
 
+        // Livestream
+        LivestreamHandler.activeStreamerIds = new ArrayList<>();
+
         // JDA Stuff
         var waiter = new EventWaiter();
         var client = new CommandClientBuilder();
@@ -155,6 +160,7 @@ public class Servant {
                 new CommandsCommand(),
                 new FlipCommand(),
                 new LoveCommand(),
+                new MirrorCommand(),
                 new ProfileCommand(),
 
                 // Interaction
@@ -162,6 +168,7 @@ public class Servant {
                 new BirthdayCommand(),
                 new BiteCommand(),
                 new BullyCommand(),
+                new CheersCommand(),
                 new CookieCommand(),
                 new CopCommand(),
                 new DabCommand(),
@@ -184,11 +191,13 @@ public class Servant {
                 new DogCommand(),
                 new FennecCommand(),
                 new FoxCommand(),
+                new FrogCommand(),
                 new KoalaCommand(),
                 new PandaCommand(),
                 new PikachuCommand(),
                 new RedPandaCommand(),
-                new SlothCommand()
+                new SlothCommand(),
+                new WolfCommand()
         );
 
         new DefaultShardManagerBuilder()

@@ -633,17 +633,20 @@ public class ProfileImage {
             add("dog");
             add("fennec");
             add("fox");
+            add("frog");
             add("koala");
             add("panda");
             add("pikachu");
             add("redpanda");
             add("sloth");
+            add("wolf");
             add("beg");
             add("birthday");
             add("bite");
             add("bully");
             add("cookie");
             add("cop");
+            add("cheers");
             add("dab");
             add("flex");
             add("highfive");
@@ -697,6 +700,8 @@ public class ProfileImage {
             add("love69");
 
             add("kind");
+
+            add("arenanet");
         }};
     }
 
