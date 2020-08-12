@@ -8,7 +8,7 @@ import utilities.Constants;
 public class CheersCommand extends InteractionInterface {
     public CheersCommand() {
         this.name = "cheers";
-        this.aliases = new String[] { "toast", "prost" };
+        this.aliases = new String[] { "toast", "prost", "prosit" };
         this.help = "Raise a toast to someone";
         this.category = new Category("Interaction");
         this.arguments = "@user";

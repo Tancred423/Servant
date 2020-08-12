@@ -12,10 +12,9 @@ import servant.MyUser;
 import utilities.ImageUtil;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class LivestreamHandler {
-    public static List<Long> activeStreamerIds;
+    public static ArrayList<Livestreamer> activeStreamers;
 
     public static void addRole(net.dv8tion.jda.api.entities.Guild guild, Member member, Role role) {
         var selfMember = guild.getMemberById(guild.getJDA().getSelfUser().getIdLong());

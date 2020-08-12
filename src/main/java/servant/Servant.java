@@ -38,13 +38,13 @@ import commands.utility.remindme.RemindMeCommand;
 import commands.utility.signup.SignupCommand;
 import files.ConfigFile;
 import files.language.LanguageHandler;
-import plugins.moderation.livestream.LivestreamHandler;
-import servant.guild.GuildManager;
 import listeners.*;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
 import net.jodah.expiringmap.ExpiringMap;
+import plugins.moderation.livestream.LivestreamHandler;
+import servant.guild.GuildManager;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandClientBuilder;
 import zJdaUtilsLib.com.jagrosh.jdautilities.commons.waiter.EventWaiter;
@@ -107,7 +107,7 @@ public class Servant {
                 .build();
 
         // Livestream
-        LivestreamHandler.activeStreamerIds = new ArrayList<>();
+        LivestreamHandler.activeStreamers = new ArrayList<>();
 
         // JDA Stuff
         var waiter = new EventWaiter();
