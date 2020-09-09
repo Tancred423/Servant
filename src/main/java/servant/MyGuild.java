@@ -1926,7 +1926,7 @@ public class MyGuild {
                     ResultSet.CONCUR_UPDATABLE);
             select.setLong(1, tcId);
             select.setLong(2, guildId);
-            select.executeQuery();
+            select.executeUpdate();
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyGuild#unsetJoinTc"));
         } finally {
@@ -2357,5 +2357,28 @@ public class MyGuild {
         } finally {
             closeQuietly(connection);
         }
+    }
+
+    public List<String> getCustomCommands() {
+        Connection connection = null;
+        var customCommands = new ArrayList<String>();
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement(
+                    "SELECT invoke " +
+                            "FROM custom_commands " +
+                            "WHERE guild_id=? " +
+                            "ORDER BY invoke ASC");
+            select.setLong(1, guildId);
+            var resultSet = select.executeQuery();
+            while (resultSet.next()) customCommands.add(resultSet.getString("invoke"));
+        } catch (SQLException e) {
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyGuild#getCustomCommands"));
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return customCommands;
     }
 }

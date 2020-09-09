@@ -10,7 +10,6 @@ import plugins.moderation.livestream.Livestreamer;
 import servant.MyGuild;
 import servant.MyUser;
 import servant.Servant;
-import utilities.Console;
 import utilities.Constants;
 
 import javax.annotation.Nonnull;
@@ -59,17 +58,11 @@ public class UserActivityStartListener extends ListenerAdapter {
         }
 
         if (isStreaming && !isActiveStreamer) {
-            if (isStreamer) {
-                Console.log("ActivityStart: Sending notification for \"" + user.getName() + "\" in \"" + guild.getName() + "\"!");
-                LivestreamHandler.sendNotification(user, newActivity, guild, new MyGuild(guild), lang);
-            }
-            Console.log("ActivityStart: Adding role for \"" + user.getName() + "\" in \"" + guild.getName() + "\"!");
+            if (isStreamer) LivestreamHandler.sendNotification(user, newActivity, guild, new MyGuild(guild), lang);
             LivestreamHandler.addRole(guild, event.getMember(), guild.getRoleById(new MyGuild(guild).getStreamRoleId()));
 
             // Tracker
-            Console.log("ActivityStart: Adding active streamer for \"" + user.getName() + "\"!");
             LivestreamHandler.activeStreamers.add(new Livestreamer(guild.getIdLong(), user.getIdLong()));
-            Console.log("Current active streamers: " + LivestreamHandler.activeStreamers.size());
         }
     }
 }

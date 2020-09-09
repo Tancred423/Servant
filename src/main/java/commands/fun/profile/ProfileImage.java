@@ -611,6 +611,7 @@ public class ProfileImage {
             add("ping");
             add("clear");
             add("editembed");
+            add("customcommands");
             add("giveaway");
             add("poll");
             add("quickpoll");
@@ -648,6 +649,7 @@ public class ProfileImage {
             add("cop");
             add("cheers");
             add("dab");
+            add("f");
             add("flex");
             add("highfive");
             add("hug");

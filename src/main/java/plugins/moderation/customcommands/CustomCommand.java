@@ -1,27 +1,56 @@
 package plugins.moderation.customcommands;
 
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import servant.*;
+import servant.LoggingTask;
+import servant.MyGuild;
+import servant.MyUser;
+import servant.Servant;
 import utilities.Console;
-import utilities.MessageUtil;
 
 import java.awt.*;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import static servant.Database.closeQuietly;
 
 public class CustomCommand {
-    private final MessageReceivedEvent event;
+    private final JDA jda;
     private final String invoke;
 
-    public CustomCommand(MessageReceivedEvent event) {
-        this.event = event;
-        var tmpInvoke = event.getMessage().getContentDisplay().split(" ")[0];
-        this.invoke = MessageUtil.removePrefix(event.getJDA(), event.getGuild().getIdLong(), event.isFromGuild(), tmpInvoke);
+    public CustomCommand(JDA jda, String invoke) {
+        this.jda = jda;
+        this.invoke = invoke;
+    }
+
+    public String getInvoke() {
+        return invoke;
+    }
+
+    public ArrayList<String> getAliases() {
+        Connection connection = null;
+        var aliases = new ArrayList<String>();
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var preparedStatement = connection.prepareStatement(
+                    "SELECT alias " +
+                            "FROM custom_commands_aliases " +
+                            "WHERE cc_id=?");
+            preparedStatement.setInt(1, getCcId());
+            var resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) aliases.add(resultSet.getString("alias"));
+        } catch (SQLException e) {
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "CustomCommand#getCcId"));
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return aliases;
     }
 
     private int getCcId() {
@@ -40,7 +69,7 @@ public class CustomCommand {
             var resultSet = preparedStatement.executeQuery();
             if (resultSet.first()) ccId = resultSet.getInt("id");
         } catch (SQLException e) {
-            Servant.fixedThreadPool.submit(new LoggingTask(e, event.getJDA(), "CustomCommand#getCcId"));
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "CustomCommand#getCcId"));
         } finally {
             closeQuietly(connection);
         }
@@ -64,7 +93,7 @@ public class CustomCommand {
             var resultSet = preparedStatement.executeQuery();
             if (resultSet.first()) normalMsg = resultSet.getString("normal_msg").trim();
         } catch (SQLException e) {
-            Servant.fixedThreadPool.submit(new LoggingTask(e, event.getJDA(), "CustomCommand#getNormalMessage"));
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "CustomCommand#getNormalMessage"));
         } finally {
             closeQuietly(connection);
         }
@@ -143,7 +172,7 @@ public class CustomCommand {
                 } while (resultSet.next());
             }
         } catch (SQLException e) {
-            Servant.fixedThreadPool.submit(new LoggingTask(e, event.getJDA(), "CustomCommand#getEmbedMessage"));
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "CustomCommand#getEmbedMessage"));
         } finally {
             closeQuietly(connection);
         }
@@ -151,15 +180,16 @@ public class CustomCommand {
         return eb.build();
     }
 
-    public void reply() {
+    public void reply(MessageReceivedEvent event) {
+        if (event == null) return;
         var normalMsg = getNormalMessage();
         if (normalMsg.isEmpty()) event.getTextChannel().sendMessage(getEmbedMessage()).queue();
         else event.getTextChannel().sendMessage(normalMsg).queue();
 
-        logAndStatistics();
+        logAndStatistics(event);
     }
 
-    private void logAndStatistics() {
+    private void logAndStatistics(MessageReceivedEvent event) {
         // Log
         Console.logCmd(event, true);
 

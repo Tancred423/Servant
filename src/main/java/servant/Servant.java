@@ -30,6 +30,7 @@ import commands.standard.help.HelpCommand;
 import commands.standard.ping.PingCommand;
 import commands.standard.supporter.SupporterCommand;
 import commands.utility.TimezoneCommand;
+import commands.utility.customCommands.CustomCommandsCommand;
 import commands.utility.giveaway.GiveawayCommand;
 import commands.utility.polls.poll.PollCommand;
 import commands.utility.polls.quickpoll.QuickpollCommand;
@@ -97,12 +98,12 @@ public class Servant {
 
         // Message Cache
         myMessageCache = ExpiringMap.builder()
-                .maxSize(10000)
+                .maxSize(1000)
                 .expiration(1, TimeUnit.HOURS)
                 .build();
 
         myDeletedMessageCache = ExpiringMap.builder()
-                .maxSize(10000)
+                .maxSize(1000)
                 .expiration(30, TimeUnit.SECONDS)
                 .build();
 
@@ -143,6 +144,7 @@ public class Servant {
                 new EditEmbedCommand(waiter),
 
                 // Utility
+                new CustomCommandsCommand(),
                 new GiveawayCommand(),
                 new PollCommand(waiter),
                 new QuickpollCommand(),
@@ -172,6 +174,7 @@ public class Servant {
                 new CookieCommand(),
                 new CopCommand(),
                 new DabCommand(),
+                new FCommand(),
                 new FlexCommand(),
                 new HighfiveCommand(),
                 new HugCommand(),

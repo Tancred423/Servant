@@ -10,7 +10,6 @@ import plugins.moderation.livestream.Livestreamer;
 import servant.MyGuild;
 import servant.MyUser;
 import servant.Servant;
-import utilities.Console;
 import utilities.Constants;
 
 import javax.annotation.Nonnull;
@@ -61,13 +60,10 @@ public class UserActivityEndListener extends ListenerAdapter {
         }
 
         if (isNotStreamingAnymore && isActiveStreamer) {
-            Console.log("ActivityEnd: Removing role from \"" + user.getName() + "\" in \"" + guild.getName() + "\"!");
             LivestreamHandler.removeRole(guild, event.getMember(), guild.getRoleById(new MyGuild(guild).getStreamRoleId()));
 
             // Tracker
-            Console.log("ActivityEnd: Removing active streamer for \"" + user.getName() + "\"!");
             LivestreamHandler.activeStreamers.remove(livestreamer);
-            Console.log("ActivityEnd: Current active streamers: " + LivestreamHandler.activeStreamers.size());
         }
     }
 }

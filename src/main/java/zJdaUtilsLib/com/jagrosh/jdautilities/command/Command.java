@@ -51,24 +51,24 @@ public abstract class Command {
         var lang = LanguageHandler.getLanguage(event);
 
         // child check
-        if(!event.getArgs().isEmpty()) {
-            String[] parts = Arrays.copyOf(event.getArgs().split("\\s+",2), 2);
-            if(helpBiConsumer!=null && parts[0].equalsIgnoreCase(event.getClient().getHelpWord())) {
+        if (!event.getArgs().isEmpty()) {
+            String[] parts = Arrays.copyOf(event.getArgs().split("\\s+", 2), 2);
+            if (helpBiConsumer != null && parts[0].equalsIgnoreCase(event.getClient().getHelpWord())) {
                 helpBiConsumer.accept(event, this);
                 return;
             }
-            for(Command cmd: children) {
-                if(cmd.isCommandFor(parts[0])) {
-                    event.setArgs(parts[1]==null ? "" : parts[1]);
+            for (Command cmd : children) {
+                if (cmd.isCommandFor(parts[0])) {
+                    event.setArgs(parts[1] == null ? "" : parts[1]);
                     cmd.run(event);
                     return;
                 }
             }
         }
-        
+
         // owner check
-        if(ownerCommand && !(event.isOwner())) {
-            terminate(event,null);
+        if (ownerCommand && !(event.isOwner())) {
+            terminate(event, null);
             return;
         }
 
@@ -77,32 +77,32 @@ public abstract class Command {
             terminate(event, null);
             return;
         }
-        
+
         // category check
-        if(category!=null && !category.test(event)) {
+        if (category != null && !category.test(event)) {
             terminate(event, category.getFailureResponse());
             return;
         }
 
         // is allowed check
-        if(event.isFromType(ChannelType.TEXT) && !isAllowed(event.getTextChannel())) {
+        if (event.isFromType(ChannelType.TEXT) && !isAllowed(event.getTextChannel())) {
             terminate(event, LanguageHandler.get(lang, "invalid_channel"));
             return;
         }
-        
+
         // required role check
-        if(requiredRole!=null)
-            if(!event.isFromType(ChannelType.TEXT) || event.getMember().getRoles().stream().noneMatch(r -> r.getName().equalsIgnoreCase(requiredRole))) {
+        if (requiredRole != null)
+            if (!event.isFromType(ChannelType.TEXT) || event.getMember().getRoles().stream().noneMatch(r -> r.getName().equalsIgnoreCase(requiredRole))) {
                 terminate(event, event.getClient().getError() + " " + String.format(LanguageHandler.get(lang, "needed_role"), requiredRole));
                 return;
             }
-        
+
         // availability check
-        if(event.getChannelType()==ChannelType.TEXT) {
+        if (event.getChannelType() == ChannelType.TEXT) {
             // bot perms
-            for(Permission p: botPermissions) {
-                if(p.isChannel()) {
-                    if(p.name().startsWith("VOICE")) {
+            for (Permission p : botPermissions) {
+                if (p.isChannel()) {
+                    if (p.name().startsWith("VOICE")) {
                         var vs = event.getMember().getVoiceState();
                         if (vs != null) {
                             var vc = vs.getChannel();
@@ -115,28 +115,28 @@ public abstract class Command {
                             }
                         }
                     } else {
-                        if(!event.getSelfMember().hasPermission(event.getTextChannel(), p)) {
+                        if (!event.getSelfMember().hasPermission(event.getTextChannel(), p)) {
                             terminate(event, String.format(LanguageHandler.get(lang, "permission_bot"), event.getClient().getError(), p.name(), LanguageHandler.get(lang, "channel").toLowerCase()));
                             return;
                         }
                     }
                 } else {
-                    if(!event.getSelfMember().hasPermission(event.getTextChannel(), p)) {
+                    if (!event.getSelfMember().hasPermission(event.getTextChannel(), p)) {
                         terminate(event, String.format(LanguageHandler.get(lang, "permission_bot"), event.getClient().getError(), p.name(), LanguageHandler.get(lang, "guild").toLowerCase()));
                         return;
                     }
                 }
             }
-            
+
             //user perms
-            for(Permission p: userPermissions) {
-                if(p.isChannel()) {
-                    if(!event.getMember().hasPermission(event.getTextChannel(), p)) {
+            for (Permission p : userPermissions) {
+                if (p.isChannel()) {
+                    if (!event.getMember().hasPermission(event.getTextChannel(), p)) {
                         terminate(event, String.format(LanguageHandler.get(lang, "permission_user"), event.getClient().getError(), p.name(), LanguageHandler.get(lang, "channel")));
                         return;
                     }
                 } else {
-                    if(!event.getMember().hasPermission(p)) {
+                    if (!event.getMember().hasPermission(p)) {
                         terminate(event, String.format(LanguageHandler.get(lang, "permission_user"), event.getClient().getError(), p.name(), LanguageHandler.get(lang, "guild")));
                         return;
                     }
@@ -146,34 +146,35 @@ public abstract class Command {
             terminate(event, event.getClient().getError() + " " + LanguageHandler.get(lang, "forbidden_dm"));
             return;
         }
-        
+
         //cooldown check
-        if(cooldown>0) {
+        if (cooldown > 0) {
             String key = getCooldownKey(event);
             int remaining = event.getClient().getRemainingCooldown(key);
-            if(remaining>0) {
+            if (remaining > 0) {
                 String error = getCooldownError(event, remaining);
-                if(error!=null) {
+                if (error != null) {
                     terminate(event, error);
                     return;
                 }
             } else event.getClient().applyCooldown(key, cooldown);
         }
-        
-        // run
-        try {
-            event.getChannel().sendTyping().queue();
-            execute(event);
-        } catch(Throwable t) {
-            if(event.getClient().getListener() != null) {
-                event.getClient().getListener().onCommandException(event, this, t);
-                return;
-            }
-            // otherwise we rethrow
-            throw t;
-        }
 
-        if(event.getClient().getListener() != null) event.getClient().getListener().onCompletedCommand(event, this);
+        // run
+        event.getChannel().sendTyping().queue(success -> {
+            try {
+                execute(event);
+            } catch (Throwable t) {
+                if (event.getClient().getListener() != null) {
+                    event.getClient().getListener().onCommandException(event, this, t);
+                    return;
+                }
+                // otherwise we rethrow
+                throw t;
+            }
+        });
+
+        if (event.getClient().getListener() != null) event.getClient().getListener().onCompletedCommand(event, this);
     }
 
     public boolean isCommandFor(String input) {

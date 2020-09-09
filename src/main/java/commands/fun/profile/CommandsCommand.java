@@ -72,7 +72,7 @@ public class CommandsCommand extends Command {
             }
 
             var emote = featureEmotes.get(entry.getKey());
-            if (emote != null) sb.append(emote.getAsMention()).append(" ").append(entry.getKey()).append(": ").append(entry.getValue()).append(" ").append(LanguageHandler.get(lang, "times")).append("\n");
+            if (emote != null) sb.append(emote.getAsMention()).append(" ").append(prefix).append(entry.getKey()).append(": ").append(entry.getValue()).append(" ").append(LanguageHandler.get(lang, "times")).append("\n");
         }
 
         fieldValues.add(sb.toString());

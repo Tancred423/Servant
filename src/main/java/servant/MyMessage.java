@@ -2,6 +2,7 @@ package servant;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.User;
+import plugins.moderation.customcommands.CustomCommandsHandler;
 import utilities.MessageUtil;
 
 import java.sql.Connection;
@@ -315,35 +316,8 @@ public class MyMessage {
     }
 
     public boolean isCustomCommand() {
-        if (content == null) return false;
-        else {
-            Connection connection = null;
-            var isCustomCommand = false;
-
-            var invoke = content.split(" ")[0];
-            invoke = MessageUtil.removePrefix(jda, guildId != 0 ? guildId : author.getIdLong(), guildId != 0, invoke);
-
-            try {
-                connection = Servant.db.getHikari().getConnection();
-                var preparedStatement = connection.prepareStatement(
-                        "SELECT id " +
-                                "FROM custom_commands " +
-                                "WHERE guild_id=? " +
-                                "AND invoke=?",
-                        ResultSet.TYPE_SCROLL_SENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE);
-                preparedStatement.setLong(1, guildId);
-                preparedStatement.setString(2, invoke);
-                var resultSet = preparedStatement.executeQuery();
-                isCustomCommand = resultSet.first();
-            } catch (SQLException e) {
-                Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyMessage#isCustomCommand"));
-            } finally {
-                closeQuietly(connection);
-            }
-
-            return isCustomCommand;
-        }
+        var customCommand = CustomCommandsHandler.getCustomCommandFromInvokeOrAlias(jda, guildId, MessageUtil.removePrefix(jda, guildId, true, content.split(" ")[0]));
+        return customCommand != null;
     }
 
     public boolean startsWithPrefix() {

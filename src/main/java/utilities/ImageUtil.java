@@ -93,13 +93,13 @@ public class ImageUtil {
                     put("livestream", servantEmotes1.getEmoteById(673449239388487690L));
                     put("love", servantEmotes1.getEmoteById(673449239145218067L));
                     put("mediaonlychannel", servantEmotes1.getEmoteById(673449239078109194L));
-                    put("meme", servantEmotes1.getEmoteById(673449239547740160L));
                     put("panda", servantEmotes1.getEmoteById(673449238952411138L));
                     put("pat", servantEmotes1.getEmoteById(673449239262789633L));
                     put("supporter", servantEmotes1.getEmoteById(673449239216390166L));
                     put("pikachu", servantEmotes1.getEmoteById(673449239199875084L));
                     put("ping", servantEmotes1.getEmoteById(673449238717399058L));
                     put("poke", servantEmotes1.getEmoteById(673449242240483338L));
+                    put("customcommands", servantEmotes1.getEmoteById((748097130459168869L)));
 
                     // Servant Emotes #2
                     put("poll", servantEmotes2.getEmoteById(673449568825901076L));
@@ -109,7 +109,6 @@ public class ImageUtil {
                     put("redpanda", servantEmotes2.getEmoteById(673449568964313088L));
                     put("reminder", servantEmotes2.getEmoteById(673449568993804350L));
                     put("role", servantEmotes2.getEmoteById(673449569023164437L));
-                    put("server", servantEmotes2.getEmoteById(673449568972570630L));
                     put("serverinfo", servantEmotes2.getEmoteById(673449568678969345L));
                     put("serversetup", servantEmotes2.getEmoteById(673449568796540963L));
                     put("signup", servantEmotes2.getEmoteById(673449569081884672L));
@@ -130,6 +129,7 @@ public class ImageUtil {
                     put("cheers", servantEmotes2.getEmoteById(737297654341697576L));
                     put("frog", servantEmotes2.getEmoteById(737297654345760769L));
                     put("wolf", servantEmotes2.getEmoteById(737297654412869753L));
+                    put("f", servantEmotes2.getEmoteById(747417182014537798L));
                 }
             }
         }};

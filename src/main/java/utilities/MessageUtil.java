@@ -23,6 +23,10 @@ import java.util.regex.Pattern;
 import static servant.Database.closeQuietly;
 
 public class MessageUtil {
+    public static String getInvoke(JDA jda, long guildOrUserId, boolean isFromGuild, String content) {
+        return removePrefix(jda, guildOrUserId, isFromGuild, content.split(" ")[0]);
+    }
+
     public void sendAndExpire(MessageChannel channel, Message message, long cooldown) {
         channel.sendMessage(message).queue(sentMessage -> {
             Servant.myDeletedMessageCache.put(sentMessage.getIdLong(), "");

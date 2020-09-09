@@ -7,16 +7,7 @@ Your Multifunctional Discord Bot
 
 Greetings master! I am Servant, your multifunctional Discord bot.
 
-I will help you to moderate, organize and entertain your Discord server by providing over 50 unique features. You can now go from a standard Discord server to a premium one!
-
-What can I do you ask? A lot, I say:
-
-* Manage roles, birthdays, twitch streamers, text and voice channels!
-* Host giveaways, sign ups and polls!
-* Set up reminders, alarms or convert a date and time to a different timzone!
-* Entertain users by posting random animal pictures, ship members or let them interact with each other. (You ever wanted to slap someone for a bad joke?)
-* Reward active users with a leveling system and I can give them roles on certain levels!
-* And much more! You may be even lucky enough to find some easter eggs :)
+I will help you to moderate, organize and entertain your Discord server by providing over 50 unique features.
 
 ## Links
 * Detailed Information: [Visit Website](https://servant.tanc.red/)
@@ -28,7 +19,7 @@ What can I do you ask? A lot, I say:
 
 ## Built with
 * [Java 12](https://openjdk.java.net/projects/jdk/11/) - Programming Language
-* [JDA 4.0.0_61](https://github.com/DV8FromTheWorld/JDA) - Java Wrapper for Discord API
+* [JDA 4.1.1_110](https://github.com/DV8FromTheWorld/JDA) - Java Wrapper for Discord API
 * [JDA-Utilities 3.0.2](https://github.com/JDA-Applications/JDA-Utilities) - JDA Commands Extension
 * [Maven](https://maven.apache.org/) - Dependency Management
 * Heart ❤
@@ -38,7 +29,4 @@ What can I do you ask? A lot, I say:
 * [Maselkov](https://github.com/Maselkov) - Motivation & Support
 * fschill - Support
 * [MEE6](https://mee6.xyz/) - Inspiration
-* [Imgur](https://imgur.com) - Random Command
-* [Some Random API](https://some-random-api.ml) - Random Images
-* [Unsplash](https://unsplash.com/) - Random Sloth Photos
 * [John Grosh](https://github.com/jagrosh) - Inspiration & Libraries

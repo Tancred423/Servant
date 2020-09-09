@@ -211,6 +211,7 @@ public class LanguageFile {
         en_gb.setProperty("interaction_description_cookie", "Give someone a cookie");
         en_gb.setProperty("interaction_description_cop", "Arrest someone");
         en_gb.setProperty("interaction_description_dab", "Dab on someone");
+        en_gb.setProperty("interaction_decription_f", "Pay respects to someone");
         en_gb.setProperty("interaction_description_flex", "Flex on someone");
         en_gb.setProperty("interaction_description_highfive", "Give someone a high five");
         en_gb.setProperty("interaction_description_hug", "Hug someone");
@@ -241,6 +242,8 @@ public class LanguageFile {
         en_gb.setProperty("interaction_received_cookie", "%s noms their %s. cookie.");
         en_gb.setProperty("interaction_shared_cop", "%s arrested %s loli hunters.");
         en_gb.setProperty("interaction_received_cop", "%s was arrested by %s FBI agents.");
+        en_gb.setProperty("interaction_shared_f", "%s payed respects to %s.");
+        en_gb.setProperty("interaction_received_f", "%s got respected %s times.");
         en_gb.setProperty("interaction_shared_dab", "%s d4bb3d 0n %s n00b5.");
         en_gb.setProperty("interaction_received_dab", "%s sneered at %s Fortnite kiddies.");
         en_gb.setProperty("interaction_shared_flex", "%s flexed on %s weaklings.");
@@ -442,6 +445,10 @@ public class LanguageFile {
         en_gb.setProperty("supporter_thanks", "Thanks to every supporter <3");
 
         ////////////////// Utility //////////////////
+
+        // CustomCommands
+        en_gb.setProperty("customcommands_empty", "There are no custom commands on this server!");
+        en_gb.setProperty("customcommands_title", "Custom Commands on %s");
 
         // Giveaway
         en_gb.setProperty("giveaway_description", "Start a giveaway that draws a given amount of people as winners after a given time.\n" +
@@ -980,6 +987,7 @@ public class LanguageFile {
         de_de.setProperty("interaction_description_cookie", "Gib jemanden einen Keks");
         de_de.setProperty("interaction_description_cop", "Nehme jemanden fest");
         de_de.setProperty("interaction_description_dab", "Dab auf jemanden");
+        de_de.setProperty("interaction_decription_f", "Zolle jemanden Respekt");
         de_de.setProperty("interaction_description_flex", "Flex auf jemanden");
         de_de.setProperty("interaction_description_highfive", "Gib jemandem ein High-Five");
         de_de.setProperty("interaction_description_hug", "Umarme jemanden");
@@ -1012,6 +1020,8 @@ public class LanguageFile {
         de_de.setProperty("interaction_received_cop", "%s wurde von %s FBI Agenten verhaftet.");
         de_de.setProperty("interaction_shared_dab", "%s d4bt3 4uf %s n00b5.");
         de_de.setProperty("interaction_received_dab", "%s schmunzelte über %s Fortnite Kids.");
+        de_de.setProperty("interaction_shared_f", "%s zollte Respekt an %s.");
+        de_de.setProperty("interaction_received_f", "%s wurde %s Mal Respekt gezollt.");
         de_de.setProperty("interaction_shared_flex", "%s zeigte %s Schwächlingen die Muskeln.");
         de_de.setProperty("interaction_received_flex", "%s wurde von %s Möchtegern-Pumpern angepöbelt.");
         de_de.setProperty("interaction_shared_highfive", "%s schlug in %s erhobenen Händen ein.");
@@ -1211,6 +1221,10 @@ public class LanguageFile {
         de_de.setProperty("supporter_thanks", "Danke an jeden einzelnen Unterstützer <3");
 
         ////////////////// Utility //////////////////
+
+        // CustomCommands
+        de_de.setProperty("customcommands_empty", "Auf diesem Server sind keine benutzerdefinierten Befehle!");
+        de_de.setProperty("customcommands_title", "Benutzerdefinierte Befehle in %s");
 
         // Giveaway
         de_de.setProperty("giveaway_description", "Verantstalte ein Giveaway, das eine gegebene Anzahl an Leuten als Gewinner nach einer gewissen Zeit ermittelt.\n" +

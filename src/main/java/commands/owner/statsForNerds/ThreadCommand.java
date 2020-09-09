@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.Permission;
 import servant.MyUser;
 import servant.Servant;
 import utilities.Constants;
+import utilities.ImageUtil;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
@@ -102,6 +103,10 @@ public class ThreadCommand extends Command {
                 .addField(LanguageHandler.get(lang, "thread_msg_cache_k"), String.format(LanguageHandler.get(lang, "thread_cache_v"), Servant.myMessageCache.size()), true)
 
                 .addField(LanguageHandler.get(lang, "thread_deleted_msg_cache_k"), String.format(LanguageHandler.get(lang, "thread_cache_v"), Servant.myDeletedMessageCache.size()), true)
+
+                .setFooter(LanguageHandler.get(lang, "botinfo_restart"), ImageUtil.getUrl(event.getJDA(), "clock"))
+                .setTimestamp(event.getClient().getStartTime())
+
                 .build()
         );
     }

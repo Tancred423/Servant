@@ -1,7 +1,6 @@
 package listeners;
 
 import commands.fun.profile.Level;
-import plugins.moderation.customcommands.CustomCommand;
 import commands.owner.blacklist.Blacklist;
 import files.language.LanguageHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -12,6 +11,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
+import plugins.moderation.customcommands.CustomCommandsHandler;
 import servant.MyGuild;
 import servant.MyMessage;
 import servant.MyUser;
@@ -65,10 +65,13 @@ public class MessageReceivedListener extends ListenerAdapter {
     }
 
     private static void processCustomCommands(MessageReceivedEvent event, MyMessage myMessage) {
-        if (myMessage.isCustomCommand() && myMessage.startsWithPrefix()) {
+        var invokeOrAlias = MessageUtil.removePrefix(event.getJDA(), event.getGuild().getIdLong(), true, myMessage.getContent().split(" ")[0]);
+        var customCommand = CustomCommandsHandler.getCustomCommandFromInvokeOrAlias(event.getJDA(), event.getGuild().getIdLong(), invokeOrAlias);
+
+        if (customCommand != null && myMessage.startsWithPrefix()) {
             var myGuild = new MyGuild(event.getGuild());
             if (myGuild.categoryIsEnabled("moderation") && myGuild.pluginIsEnabled("customcommands"))
-                new CustomCommand(event).reply();
+                customCommand.reply(event);
         }
     }
 
