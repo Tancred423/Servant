@@ -211,7 +211,7 @@ public class LanguageFile {
         en_gb.setProperty("interaction_description_cookie", "Give someone a cookie");
         en_gb.setProperty("interaction_description_cop", "Arrest someone");
         en_gb.setProperty("interaction_description_dab", "Dab on someone");
-        en_gb.setProperty("interaction_decription_f", "Pay respects to someone");
+        en_gb.setProperty("interaction_description_f", "Pay respects to someone");
         en_gb.setProperty("interaction_description_flex", "Flex on someone");
         en_gb.setProperty("interaction_description_highfive", "Give someone a high five");
         en_gb.setProperty("interaction_description_hug", "Hug someone");
@@ -987,7 +987,7 @@ public class LanguageFile {
         de_de.setProperty("interaction_description_cookie", "Gib jemanden einen Keks");
         de_de.setProperty("interaction_description_cop", "Nehme jemanden fest");
         de_de.setProperty("interaction_description_dab", "Dab auf jemanden");
-        de_de.setProperty("interaction_decription_f", "Zolle jemanden Respekt");
+        de_de.setProperty("interaction_description_f", "Zolle jemanden Respekt");
         de_de.setProperty("interaction_description_flex", "Flex auf jemanden");
         de_de.setProperty("interaction_description_highfive", "Gib jemandem ein High-Five");
         de_de.setProperty("interaction_description_hug", "Umarme jemanden");
