@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Jul 14, 2020 at 04:44 PM
+-- Generation Time: Sep 10, 2020 at 04:33 PM
 -- Server version: 10.1.41-MariaDB-0+deb9u1
 -- PHP Version: 5.5.9-1ubuntu4
 
@@ -186,6 +186,18 @@ CREATE TABLE `custom_commands` (
   `guild_id` bigint(18) NOT NULL,
   `invoke` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `normal_msg` text COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `custom_commands_aliases`
+--
+
+CREATE TABLE `custom_commands_aliases` (
+  `id` int(11) NOT NULL,
+  `cc_id` int(11) NOT NULL,
+  `alias` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -948,6 +960,12 @@ ALTER TABLE `custom_commands`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `custom_commands_aliases`
+--
+ALTER TABLE `custom_commands_aliases`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `custom_commands_embeds`
 --
 ALTER TABLE `custom_commands_embeds`
@@ -1309,6 +1327,12 @@ ALTER TABLE `const_timezones`
 -- AUTO_INCREMENT for table `custom_commands`
 --
 ALTER TABLE `custom_commands`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `custom_commands_aliases`
+--
+ALTER TABLE `custom_commands_aliases`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
