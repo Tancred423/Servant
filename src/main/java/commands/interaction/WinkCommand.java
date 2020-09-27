@@ -4,7 +4,7 @@ package commands.interaction;
 import net.dv8tion.jda.api.Permission;
 import utilities.Constants;
 
-public class WinkCommand extends InteractionInterface {
+public class WinkCommand extends InteractionCommand {
     public WinkCommand() {
         this.name = "wink";
         this.aliases = new String[0];

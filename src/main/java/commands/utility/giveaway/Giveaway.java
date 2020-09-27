@@ -4,12 +4,14 @@ import files.language.LanguageHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import servant.*;
-import utilities.*;
+import utilities.EmoteUtil;
+import utilities.ImageUtil;
+import utilities.Parser;
+import utilities.TimeUtil;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
 import java.awt.*;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -60,14 +62,12 @@ public class Giveaway {
                             "FROM giveaways " +
                             "WHERE guild_id=? " +
                             "AND tc_id=? " +
-                            "AND msg_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "AND msg_id=?");
             select.setLong(1, guildId);
             select.setLong(2, tcId);
             select.setLong(3, msgId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) authorId = resultSet.getLong("author_id");
+            if (resultSet.next()) authorId = resultSet.getLong("author_id");
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Giveaway#getAuthorId"));
         } finally {
@@ -88,14 +88,12 @@ public class Giveaway {
                             "FROM giveaways " +
                             "WHERE guild_id=? " +
                             "AND tc_id=? " +
-                            "AND msg_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "AND msg_id=?");
             select.setLong(1, guildId);
             select.setLong(2, tcId);
             select.setLong(3, msgId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) prize = resultSet.getString("prize");
+            if (resultSet.next()) prize = resultSet.getString("prize");
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Giveaway#getPrize"));
         } finally {
@@ -116,14 +114,12 @@ public class Giveaway {
                             "FROM giveaways " +
                             "WHERE guild_id=? " +
                             "AND tc_id=? " +
-                            "AND msg_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "AND msg_id=?");
             select.setLong(1, guildId);
             select.setLong(2, tcId);
             select.setLong(3, msgId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) eventTime = resultSet.getTimestamp("event_time").toInstant();
+            if (resultSet.next()) eventTime = resultSet.getTimestamp("event_time").toInstant();
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Giveaway#getEventTime"));
         } finally {
@@ -144,14 +140,12 @@ public class Giveaway {
                             "FROM giveaways " +
                             "WHERE guild_id=? " +
                             "AND tc_id=? " +
-                            "AND msg_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "AND msg_id=?");
             select.setLong(1, guildId);
             select.setLong(2, tcId);
             select.setLong(3, msgId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) amountWinners = resultSet.getInt("amount_winners");
+            if (resultSet.next()) amountWinners = resultSet.getInt("amount_winners");
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Giveaway#getAmountWinners"));
         } finally {
@@ -172,9 +166,7 @@ public class Giveaway {
                     "DELETE FROM giveaways " +
                             "WHERE guild_id=? " +
                             "AND tc_id=? " +
-                            "AND msg_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "AND msg_id=?");
             delete.setLong(1, guildId);
             delete.setLong(2, tcId);
             delete.setLong(3, msgId);
@@ -183,9 +175,7 @@ public class Giveaway {
             // Giveaway entries
             delete = connection.prepareStatement(
                     "DELETE FROM tmp_giveaway_participants " +
-                            "WHERE msg_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE msg_id=?");
             delete.setLong(1, msgId);
             delete.executeUpdate();
         } catch (SQLException e) {
@@ -205,16 +195,10 @@ public class Giveaway {
                 var preparedStatement = connection.prepareStatement(
                         "SELECT user_id " +
                                 "FROM tmp_giveaway_participants " +
-                                "WHERE msg_id=?",
-                        ResultSet.TYPE_SCROLL_SENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE);
+                                "WHERE msg_id=?");
                 preparedStatement.setLong(1, msgId);
                 var resultSet = preparedStatement.executeQuery();
-                if (resultSet.first()) {
-                    do {
-                        participants.add(resultSet.getLong("user_id"));
-                    } while (resultSet.next());
-                }
+                while (resultSet.next()) participants.add(resultSet.getLong("user_id"));
             } catch (SQLException e) {
                 Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Giveaway#getParticipants"));
             } finally {
@@ -233,9 +217,7 @@ public class Giveaway {
                 connection = Servant.db.getHikari().getConnection();
                 var insert = connection.prepareStatement(
                         "INSERT INTO tmp_giveaway_participants (msg_id,user_id,guild_id,tc_id) " +
-                                "VALUES (?,?,?,?)",
-                        ResultSet.TYPE_SCROLL_SENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE);
+                                "VALUES (?,?,?,?)");
                 insert.setLong(1, msgId);
                 insert.setLong(2, userId);
                 insert.setLong(3, guildId);
@@ -419,18 +401,14 @@ public class Giveaway {
 
         try {
             connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT * FROM giveaways",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+            var select = connection.prepareStatement("SELECT * FROM giveaways");
             var resultSet = select.executeQuery();
-            if (resultSet.first()) {
-                do {
-                    var guildId = resultSet.getLong("guild_id");
-                    var guild = jda.getGuildById(guildId);
-                    if (guild == null) continue;
-                    var lang = new MyGuild(guild).getLanguageCode();
-                    giveaways.add(new Giveaway(jda, lang, guildId, resultSet.getLong("tc_id"), resultSet.getLong("msg_id")));
-                } while (resultSet.next());
+            while (resultSet.next()) {
+                var guildId = resultSet.getLong("guild_id");
+                var guild = jda.getGuildById(guildId);
+                if (guild == null) continue;
+                var lang = new MyGuild(guild).getLanguageCode();
+                giveaways.add(new Giveaway(jda, lang, guildId, resultSet.getLong("tc_id"), resultSet.getLong("msg_id")));
             }
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Giveaway#getList"));

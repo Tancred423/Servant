@@ -48,7 +48,7 @@ public class GuildMemberRoleAddListener extends ListenerAdapter {
                             new EmbedBuilder()
                                     .setColor(myUser.getColor())
                                     .setTitle(LanguageHandler.get(lang, "log_role_add_title"))
-                                    .addField(LanguageHandler.get(lang, "member"), event.getMember().getUser().getName() + "#" + event.getMember().getUser().getDiscriminator(), false)
+                                    .addField(LanguageHandler.get(lang, "member"), event.getMember().getUser().getName() + "#" + event.getMember().getUser().getDiscriminator() + "\n" + event.getMember().getIdLong(), false)
                                     .addField(LanguageHandler.get(lang, "role_s"), sb.toString(), false)
                                     .setFooter(LanguageHandler.get(lang, "log_at"), ImageUtil.getUrl(jda, "clock"))
                                     .setTimestamp(Instant.now())

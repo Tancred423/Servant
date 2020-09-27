@@ -28,12 +28,10 @@ public class MyTextChannel {
             var preparedStatement = connection.prepareStatement(
                     "SELECT list_tc_id " +
                             "FROM guild_birthdays " +
-                            "WHERE guild_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE guild_id=?");
             preparedStatement.setLong(1, guildId);
             var resultSet = preparedStatement.executeQuery();
-            if (resultSet.first()) contains = tcId == resultSet.getLong("list_tc_id");
+            if (resultSet.next()) contains = tcId == resultSet.getLong("list_tc_id");
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyTextChannel#containsBirthdayList"));
         } finally {
@@ -52,12 +50,10 @@ public class MyTextChannel {
             var preparedStatement = connection.prepareStatement(
                     "SELECT announcement_tc_id " +
                             "FROM guild_birthdays " +
-                            "WHERE guild_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE guild_id=?");
             preparedStatement.setLong(1, guildId);
             var resultSet = preparedStatement.executeQuery();
-            if (resultSet.first()) contains = tcId == resultSet.getLong("announcement_tc_id");
+            if (resultSet.next()) contains = tcId == resultSet.getLong("announcement_tc_id");
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyTextChannel#isBirthdayAnnouncementTc"));
         } finally {

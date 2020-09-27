@@ -7,7 +7,6 @@ import servant.LoggingTask;
 import servant.Servant;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,17 +22,14 @@ public class ImageUtil {
 
         try {
             connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT image_url FROM const_images WHERE image_name=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+            var select = connection.prepareStatement("SELECT image_url FROM const_images WHERE image_name=?");
             select.setString(1, imageName);
             var resultSet = select.executeQuery();
             var imageUrls = new ArrayList<String>();
-            if (resultSet.first()) {
-                do {
-                    imageUrls.add(resultSet.getString("image_url"));
-                } while (resultSet.next());
+            while (resultSet.next()) imageUrls.add(resultSet.getString("image_url"));
 
+            if (imageUrls.size() == 0) System.out.println("Image not found for: " + imageName);
+            else {
                 var randomIndex = ThreadLocalRandom.current().nextInt(Math.max(imageUrls.size() - 1, 1));
                 imageUrl = imageUrls.get(randomIndex);
             }
@@ -130,6 +126,8 @@ public class ImageUtil {
                     put("frog", servantEmotes2.getEmoteById(737297654345760769L));
                     put("wolf", servantEmotes2.getEmoteById(737297654412869753L));
                     put("f", servantEmotes2.getEmoteById(747417182014537798L));
+                    put("fennec", servantEmotes2.getEmoteById(756512706214756353L));
+                    put("tictactoe", servantEmotes2.getEmoteById(756525713129209877L));
                 }
             }
         }};

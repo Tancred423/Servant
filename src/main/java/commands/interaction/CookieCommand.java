@@ -4,7 +4,7 @@ package commands.interaction;
 import net.dv8tion.jda.api.Permission;
 import utilities.Constants;
 
-public class CookieCommand extends InteractionInterface {
+public class CookieCommand extends InteractionCommand {
     public CookieCommand() {
         this.name = "cookie";
         this.aliases = new String[] { "biscuit" };

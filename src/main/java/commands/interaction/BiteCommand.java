@@ -5,7 +5,7 @@ package commands.interaction;
 import net.dv8tion.jda.api.Permission;
 import utilities.Constants;
 
-public class BiteCommand extends InteractionInterface {
+public class BiteCommand extends InteractionCommand {
     public BiteCommand() {
         this.name = "bite";
         this.aliases = new String[] { "nibble", "nom", "munch" };

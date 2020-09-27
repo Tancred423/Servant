@@ -32,7 +32,7 @@ public class PollCommand extends Command {
 
     public PollCommand(EventWaiter waiter) {
         this.name = "poll";
-        this.aliases = new String[] { "vote" };
+        this.aliases = new String[] { "vote", "voting" };
         this.help = "Host a poll";
         this.category = new Category("Utility");
         this.arguments = null;

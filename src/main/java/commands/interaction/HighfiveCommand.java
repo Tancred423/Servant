@@ -4,7 +4,7 @@ package commands.interaction;
 import net.dv8tion.jda.api.Permission;
 import utilities.Constants;
 
-public class HighfiveCommand extends InteractionInterface {
+public class HighfiveCommand extends InteractionCommand {
     public HighfiveCommand() {
         this.name = "highfive";
         this.aliases = new String[0];

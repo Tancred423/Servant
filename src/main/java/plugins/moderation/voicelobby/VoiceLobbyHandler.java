@@ -33,9 +33,7 @@ public class VoiceLobbyHandler {
             connection = Servant.db.getHikari().getConnection();
             var insert = connection.prepareStatement(
                     "INSERT INTO tmp_voice_lobbies_active (vc_id,guild_id) " +
-                            "VALUES (?,?)",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "VALUES (?,?)");
             insert.setLong(1, channelId);
             insert.setLong(2, guildId);
             insert.executeUpdate();
@@ -53,9 +51,7 @@ public class VoiceLobbyHandler {
             connection = Servant.db.getHikari().getConnection();
             var delete = connection.prepareStatement(
                     "DELETE FROM tmp_voice_lobbies_active " +
-                            "WHERE vc_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE vc_id=?");
             delete.setLong(1, channelId);
             delete.executeUpdate();
         } catch (SQLException e) {
@@ -73,11 +69,9 @@ public class VoiceLobbyHandler {
             connection = Servant.db.getHikari().getConnection();
             var select = connection.prepareStatement(
                     "SELECT * " +
-                            "FROM tmp_voice_lobbies_active",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "FROM tmp_voice_lobbies_active");
             var resultSet = select.executeQuery();
-            if (resultSet.first())
+            if (resultSet.next())
                 do activeLobbies.add(resultSet.getLong("vc_id"));
                 while (resultSet.next());
         } catch (SQLException e) {
@@ -98,12 +92,10 @@ public class VoiceLobbyHandler {
             connection = Servant.db.getHikari().getConnection();
             var select = connection.prepareStatement(
                     "SELECT * FROM guild_voice_lobbies " +
-                            "WHERE guild_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE guild_id=?");
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
-            hasEntry = resultSet.first();
+            hasEntry = resultSet.next();
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "VoiceLobby#lobbyHasEntry"));
         } finally {
@@ -122,13 +114,11 @@ public class VoiceLobbyHandler {
             var select = connection.prepareStatement(
                     "SELECT * FROM guild_voice_lobbies " +
                             "WHERE guild_id=? " +
-                            "AND vc_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "AND vc_id=?");
             select.setLong(1, guildId);
             select.setLong(2, channelId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) isLobby = true;
+            if (resultSet.next()) isLobby = true;
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "VoiceLobby#isVoiceLobby"));
         } finally {
@@ -145,9 +135,7 @@ public class VoiceLobbyHandler {
             connection = Servant.db.getHikari().getConnection();
             var insert = connection.prepareStatement(
                     "INSERT INTO guild_voice_lobbies (guild_id,vc_id) " +
-                            "VALUES (?,?)",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "VALUES (?,?)");
             insert.setLong(1, guildId);
             insert.setLong(2, channelId);
             insert.executeUpdate();
@@ -168,9 +156,7 @@ public class VoiceLobbyHandler {
                 var delete = connection.prepareStatement(
                         "DELETE FROM guild_voice_lobbies " +
                                 "WHERE guild_id=? " +
-                                "AND vc_id=?",
-                        ResultSet.TYPE_SCROLL_SENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE);
+                                "AND vc_id=?");
                 delete.setLong(1, guildId);
                 delete.setLong(2, channelId);
                 delete.executeUpdate();

@@ -4,7 +4,7 @@ package commands.interaction;
 import net.dv8tion.jda.api.Permission;
 import utilities.Constants;
 
-public class KissCommand extends InteractionInterface {
+public class KissCommand extends InteractionCommand {
     public KissCommand() {
         this.name = "kiss";
         this.aliases = new String[] { "smooch" };

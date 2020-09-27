@@ -11,7 +11,6 @@ import servant.Servant;
 import utilities.EmoteUtil;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -45,12 +44,10 @@ public class Poll {
             var select = connection.prepareStatement(
                     "SELECT ending_date " +
                             "FROM polls " +
-                            "WHERE msg_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE msg_id=?");
             select.setLong(1, msgId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) eventTime = resultSet.getTimestamp("ending_date").toInstant();
+            if (resultSet.next()) eventTime = resultSet.getTimestamp("ending_date").toInstant();
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Poll#getPollTypeIdByType"));
         } finally {
@@ -69,12 +66,10 @@ public class Poll {
             var select = connection.prepareStatement(
                     "SELECT amount_answers " +
                             "FROM polls " +
-                            "WHERE msg_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE msg_id=?");
             select.setLong(1, msgId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) {
+            if (resultSet.next()) {
                 amountAnswers = resultSet.getInt("amount_answers");
             }
         } catch (SQLException e) {
@@ -95,12 +90,10 @@ public class Poll {
             var select = connection.prepareStatement(
                     "SELECT id " +
                             "FROM const_poll_types " +
-                            "WHERE poll_type=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE poll_type=?");
             select.setString(1, type);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) pollTypeId = resultSet.getInt("id");
+            if (resultSet.next()) pollTypeId = resultSet.getInt("id");
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Poll#getPollTypeIdByType"));
         } finally {
@@ -117,9 +110,7 @@ public class Poll {
             connection = Servant.db.getHikari().getConnection();
             var insert = connection.prepareStatement(
                     "INSERT INTO polls (guild_id,tc_id,msg_id,author_id,poll_type_id,ending_date,amount_answers) " +
-                            "VALUES (?,?,?,?,?,?,?)",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "VALUES (?,?,?,?,?,?,?)");
             insert.setLong(1, guildId);
             insert.setLong(2, tcId);
             insert.setLong(3, msgId);
@@ -142,9 +133,7 @@ public class Poll {
             connection = Servant.db.getHikari().getConnection();
             var delete = connection.prepareStatement(
                     "DELETE FROM polls " +
-                            "WHERE msg_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE msg_id=?");
             delete.setLong(1, msgId);
             delete.executeUpdate();
         } catch (SQLException e) {
@@ -157,9 +146,7 @@ public class Poll {
             connection = Servant.db.getHikari().getConnection();
             var delete = connection.prepareStatement(
                     "DELETE FROM tmp_poll_participants " +
-                            "WHERE msg_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE msg_id=?");
             delete.setLong(1, msgId);
             delete.executeUpdate();
         } catch (SQLException e) {
@@ -180,12 +167,10 @@ public class Poll {
                             "FROM polls AS p " +
                             "INNER JOIN const_poll_types AS c " +
                             "ON p.poll_type_id = c.id " +
-                            "WHERE p.msg_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE p.msg_id=?");
             select.setLong(1, msgId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) if (resultSet.getString("poll_type").equals("check")) isPoll = true;
+            if (resultSet.next()) if (resultSet.getString("poll_type").equals("check")) isPoll = true;
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Poll#isCheck"));
         } finally {
@@ -206,12 +191,10 @@ public class Poll {
                             "FROM polls AS p " +
                             "INNER JOIN const_poll_types AS c " +
                             "ON p.poll_type_id = c.id " +
-                            "WHERE p.msg_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE p.msg_id=?");
             select.setLong(1, msgId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) if (resultSet.getString("poll_type").equals("radio")) isRadiovote = true;
+            if (resultSet.next()) if (resultSet.getString("poll_type").equals("radio")) isRadiovote = true;
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Poll#isRadio"));
         } finally {
@@ -230,12 +213,10 @@ public class Poll {
             var select = connection.prepareStatement(
                     "SELECT author_id " +
                             "FROM polls " +
-                            "WHERE msg_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE msg_id=?");
             select.setLong(1, msgId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) authorId = resultSet.getLong("author_id");
+            if (resultSet.next()) authorId = resultSet.getLong("author_id");
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Poll#getAuthorId"));
         } finally {
@@ -253,9 +234,7 @@ public class Poll {
             connection = Servant.db.getHikari().getConnection();
             var insert = connection.prepareStatement(
                     "INSERT INTO tmp_poll_participants (msg_id,user_id,reaction,guild_id,tc_id) " +
-                            "VALUES (?,?,?,?,?)",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "VALUES (?,?,?,?,?)");
             insert.setLong(1, msgId);
             insert.setLong(2, userId);
             insert.setString(3, emoji);
@@ -278,9 +257,7 @@ public class Poll {
                     "DELETE FROM tmp_poll_participants " +
                             "WHERE msg_id=? " +
                             "AND user_id=? " +
-                            "AND reaction=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "AND reaction=?");
             delete.setLong(1, msgId);
             delete.setLong(2, userId);
             delete.setString(3, emoji);
@@ -301,13 +278,11 @@ public class Poll {
             var select = connection.prepareStatement(
                     "SELECT * FROM tmp_poll_participants " +
                             "WHERE msg_id=? " +
-                            "AND user_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "AND user_id=?");
             select.setLong(1, msgId);
             select.setLong(2, userId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) hasVoted = true;
+            if (resultSet.next()) hasVoted = true;
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Poll#hasVoted"));
         } finally {
@@ -327,13 +302,11 @@ public class Poll {
                     "SELECT reaction " +
                             "FROM tmp_poll_participants " +
                             "WHERE msg_id=? " +
-                            "AND user_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "AND user_id=?");
             select.setLong(1, msgId);
             select.setLong(2, userId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) emote = resultSet.getString("reaction");
+            if (resultSet.next()) emote = resultSet.getString("reaction");
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Poll#getEmoji"));
         } finally {
@@ -442,16 +415,11 @@ public class Poll {
                 var preparedStatement = connection.prepareStatement(
                         "SELECT user_id, reaction " +
                                 "FROM tmp_poll_participants " +
-                                "WHERE msg_id=?",
-                        ResultSet.TYPE_SCROLL_SENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE);
+                                "WHERE msg_id=?");
                 preparedStatement.setLong(1, msgId);
                 var resultSet = preparedStatement.executeQuery();
-                if (resultSet.first()) {
-                    do {
-                        participants.add(new Vote(resultSet.getLong("user_id"), resultSet.getString("reaction")));
-                    } while (resultSet.next());
-                }
+                while (resultSet.next())
+                    participants.add(new Vote(resultSet.getLong("user_id"), resultSet.getString("reaction")));
             } catch (SQLException e) {
                 Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Poll#getParticipants"));
             } finally {
@@ -526,50 +494,46 @@ public class Poll {
                     "SELECT * " +
                             "FROM polls AS p " +
                             "INNER JOIN const_poll_types AS c " +
-                            "ON p.poll_type_id = c.id",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "ON p.poll_type_id = c.id");
             var resultSet = select.executeQuery();
-            if (resultSet.first()) {
-                do {
-                    var guildId = resultSet.getLong("guild_id");
-                    var tcId = resultSet.getLong("tc_id");
-                    var msgId = resultSet.getLong("msg_id");
-                    var type = resultSet.getString("poll_type");
-                    var endingDate = resultSet.getTimestamp("ending_date");
-                    var endingDateMillis = endingDate.getTime();
-                    var nowMillis = OffsetDateTime.now(ZoneOffset.UTC).toInstant().toEpochMilli();
+            while (resultSet.next()) {
+                var guildId = resultSet.getLong("guild_id");
+                var tcId = resultSet.getLong("tc_id");
+                var msgId = resultSet.getLong("msg_id");
+                var type = resultSet.getString("poll_type");
+                var endingDate = resultSet.getTimestamp("ending_date");
+                var endingDateMillis = endingDate.getTime();
+                var nowMillis = OffsetDateTime.now(ZoneOffset.UTC).toInstant().toEpochMilli();
 
-                    var guild1 = jda.getGuildById(guildId);
-                    if (guild1 == null) return;
+                var guild1 = jda.getGuildById(guildId);
+                if (guild1 == null) return;
 
-                    var lang = new MyGuild(guild1).getLanguageCode();
-                    var poll = new Poll(jda, lang, guildId, tcId, msgId);
+                var lang = new MyGuild(guild1).getLanguageCode();
+                var poll = new Poll(jda, lang, guildId, tcId, msgId);
 
-                    if (nowMillis >= endingDateMillis) {
-                        guild1 = jda.getGuildById(guildId);
-                        if (guild1 == null) {
+                if (nowMillis >= endingDateMillis) {
+                    guild1 = jda.getGuildById(guildId);
+                    if (guild1 == null) {
+                        poll.purge();
+                    } else {
+                        var textChannel = guild1.getTextChannelById(tcId);
+                        if (textChannel == null) {
                             poll.purge();
                         } else {
-                            var textChannel = guild1.getTextChannelById(tcId);
-                            if (textChannel == null) {
-                                poll.purge();
-                            } else {
-                                switch (type) {
-                                    case "quick":
-                                    case "radio":
-                                    case "check":
-                                        poll.end();
-                                        break;
+                            switch (type) {
+                                case "quick":
+                                case "radio":
+                                case "check":
+                                    poll.end();
+                                    break;
 
-                                    default:
-                                        poll.purge();
-                                        break;
-                                }
+                                default:
+                                    poll.purge();
+                                    break;
                             }
                         }
                     }
-                } while (resultSet.next());
+                }
             }
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "PollUtil#check"));
@@ -605,19 +569,15 @@ public class Poll {
                             "FROM polls AS p " +
                             "INNER JOIN const_poll_types AS t " +
                             "ON p.poll_type_id=t.id " +
-                            "WHERE poll_type=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE poll_type=?");
             select.setString(1, type);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) {
-                do {
-                    var guildId = resultSet.getLong("guild_id");
-                    var guild = jda.getGuildById(guildId);
-                    if (guild == null) continue;
-                    var lang = new MyGuild(guild).getLanguageCode();
-                    polls.add(new Poll(jda, lang, guildId, resultSet.getLong("tc_id"), resultSet.getLong("msg_id")));
-                } while (resultSet.next());
+            while (resultSet.next()) {
+                var guildId = resultSet.getLong("guild_id");
+                var guild = jda.getGuildById(guildId);
+                if (guild == null) continue;
+                var lang = new MyGuild(guild).getLanguageCode();
+                polls.add(new Poll(jda, lang, guildId, resultSet.getLong("tc_id"), resultSet.getLong("msg_id")));
             }
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Poll#getList"));

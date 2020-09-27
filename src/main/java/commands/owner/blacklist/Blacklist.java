@@ -18,7 +18,7 @@ import java.util.List;
 import static servant.Database.closeQuietly;
 
 public class Blacklist {
-    private JDA jda;
+    private final JDA jda;
 
     public Blacklist(JDA jda) {
         this.jda = jda;
@@ -30,12 +30,10 @@ public class Blacklist {
 
         try {
             connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT * FROM blacklist_global",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+            var select = connection.prepareStatement("SELECT user_or_guild_id FROM global_blacklist");
             var resultSet = select.executeQuery();
-            if (resultSet.first())
-                do blacklistedIds.add(resultSet.getLong("id")); while (resultSet.next());
+            if (resultSet.next())
+                do blacklistedIds.add(resultSet.getLong("user_or_guild_id")); while (resultSet.next());
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Blacklist#getIds"));
         } finally {

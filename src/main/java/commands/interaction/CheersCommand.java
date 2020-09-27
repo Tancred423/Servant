@@ -5,7 +5,7 @@ package commands.interaction;
 import net.dv8tion.jda.api.Permission;
 import utilities.Constants;
 
-public class CheersCommand extends InteractionInterface {
+public class CheersCommand extends InteractionCommand {
     public CheersCommand() {
         this.name = "cheers";
         this.aliases = new String[] { "toast", "prost", "prosit" };

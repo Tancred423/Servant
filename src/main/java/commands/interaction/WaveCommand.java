@@ -4,7 +4,7 @@ package commands.interaction;
 import net.dv8tion.jda.api.Permission;
 import utilities.Constants;
 
-public class WaveCommand extends InteractionInterface {
+public class WaveCommand extends InteractionCommand {
     public WaveCommand() {
         this.name = "wave";
         this.aliases = new String[] { "greet" };

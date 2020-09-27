@@ -35,12 +35,10 @@ public class MyMessage {
             var preparedStatement = connection.prepareStatement(
                     "SELECT list_msg_id " +
                             "FROM guild_birthdays " +
-                            "WHERE guild_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE guild_id=?");
             preparedStatement.setLong(1, guildId);
             var resultSet = preparedStatement.executeQuery();
-            if (resultSet.first()) isBirthdayList = msgId == resultSet.getLong("list_msg_id");
+            if (resultSet.next()) isBirthdayList = msgId == resultSet.getLong("list_msg_id");
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyMessage#isBirthdayList"));
         } finally {
@@ -59,12 +57,10 @@ public class MyMessage {
             var preparedStatement = connection.prepareStatement(
                     "SELECT msg_id " +
                             "FROM tmp_best_of_image_bl " +
-                            "WHERE msg_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE msg_id=?");
             preparedStatement.setLong(1, msgId);
             var resultSet = preparedStatement.executeQuery();
-            isBl = resultSet.first();
+            isBl = resultSet.next();
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyMessage#isBestOfImageBlacklisted"));
         } finally {
@@ -83,12 +79,10 @@ public class MyMessage {
             var preparedStatement = connection.prepareStatement(
                     "SELECT msg_id " +
                             "FROM tmp_best_of_quote_bl " +
-                            "WHERE msg_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE msg_id=?");
             preparedStatement.setLong(1, msgId);
             var resultSet = preparedStatement.executeQuery();
-            isBl = resultSet.first();
+            isBl = resultSet.next();
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyMessage#isBestOfQuoteBlacklisted"));
         } finally {
@@ -109,14 +103,12 @@ public class MyMessage {
                             "FROM giveaways " +
                             "WHERE guild_id=? " +
                             "AND tc_id=? " +
-                            "AND msg_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "AND msg_id=?");
             preparedStatement.setLong(1, guildId);
             preparedStatement.setLong(2, tcId);
             preparedStatement.setLong(3, msgId);
             var resultSet = preparedStatement.executeQuery();
-            isGiveaway = resultSet.first();
+            isGiveaway = resultSet.next();
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyMessage#isGiveaway"));
         } finally {
@@ -140,14 +132,12 @@ public class MyMessage {
                             "WHERE p.guild_id=? " +
                             "AND p.tc_id=? " +
                             "AND p.msg_id=? " +
-                            "AND t.poll_type='quick'",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "AND t.poll_type='quick'");
             preparedStatement.setLong(1, guildId);
             preparedStatement.setLong(2, tcId);
             preparedStatement.setLong(3, msgId);
             var resultSet = preparedStatement.executeQuery();
-            isQuickpoll = resultSet.first();
+            isQuickpoll = resultSet.next();
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyMessage#isQuickpoll"));
         } finally {
@@ -171,14 +161,12 @@ public class MyMessage {
                             "WHERE p.guild_id=? " +
                             "AND p.tc_id=? " +
                             "AND p.msg_id=? " +
-                            "AND t.poll_type='check'",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "AND t.poll_type='check'");
             preparedStatement.setLong(1, guildId);
             preparedStatement.setLong(2, tcId);
             preparedStatement.setLong(3, msgId);
             var resultSet = preparedStatement.executeQuery();
-            isCheckpoll = resultSet.first();
+            isCheckpoll = resultSet.next();
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyMessage#isCheckpoll"));
         } finally {
@@ -202,14 +190,12 @@ public class MyMessage {
                             "WHERE p.guild_id=? " +
                             "AND p.tc_id=? " +
                             "AND p.msg_id=? " +
-                            "AND t.poll_type='radio'",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "AND t.poll_type='radio'");
             preparedStatement.setLong(1, guildId);
             preparedStatement.setLong(2, tcId);
             preparedStatement.setLong(3, msgId);
             var resultSet = preparedStatement.executeQuery();
-            isRadiopoll = resultSet.first();
+            isRadiopoll = resultSet.next();
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyMessage#isRadiopoll"));
         } finally {
@@ -228,12 +214,10 @@ public class MyMessage {
             var preparedStatement = connection.prepareStatement(
                     "SELECT id " +
                             "FROM remind_mes " +
-                            "WHERE msg_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE msg_id=?");
             preparedStatement.setLong(1, msgId);
             var resultSet = preparedStatement.executeQuery();
-            isRemindMe = resultSet.first();
+            isRemindMe = resultSet.next();
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyMessage#isRemindMe"));
         } finally {
@@ -252,12 +236,10 @@ public class MyMessage {
             var preparedStatement = connection.prepareStatement(
                     "SELECT id " +
                             "FROM signups " +
-                            "WHERE msg_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE msg_id=?");
             preparedStatement.setLong(1, msgId);
             var resultSet = preparedStatement.executeQuery();
-            isSignup = resultSet.first();
+            isSignup = resultSet.next();
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyMessage#isSignup"));
         } finally {
@@ -276,12 +258,10 @@ public class MyMessage {
             var preparedStatement = connection.prepareStatement(
                     "SELECT id " +
                             "FROM ratings " +
-                            "WHERE msg_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE msg_id=?");
             preparedStatement.setLong(1, msgId);
             var resultSet = preparedStatement.executeQuery();
-            isRemindMe = resultSet.first();
+            isRemindMe = resultSet.next();
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyMessage#isRating"));
         } finally {
@@ -300,12 +280,10 @@ public class MyMessage {
             var preparedStatement = connection.prepareStatement(
                     "SELECT id " +
                             "FROM reaction_role_messages " +
-                            "WHERE msg_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE msg_id=?");
             preparedStatement.setLong(1, msgId);
             var resultSet = preparedStatement.executeQuery();
-            isRemindMe = resultSet.first();
+            isRemindMe = resultSet.next();
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyMessage#isReactionRole"));
         } finally {

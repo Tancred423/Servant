@@ -22,13 +22,11 @@ public class EmoteUtil {
             var select = connection.prepareStatement(
                     "SELECT emote_guild_id, emote_id " +
                             "FROM const_emotes " +
-                            "WHERE name=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE name=?");
             select.setString(1, name);
             var resultSet = select.executeQuery();
 
-            if (resultSet.first()) {
+            if (resultSet.next()) {
                 var sm = jda.getShardManager();
                 if (sm != null) {
                     var thisGuild = sm.getGuildById(resultSet.getLong("emote_guild_id"));
@@ -53,12 +51,10 @@ public class EmoteUtil {
             var select = connection.prepareStatement(
                     "SELECT emoji " +
                             "FROM const_emojis " +
-                            "WHERE name=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE name=?");
             select.setString(1, name);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) emoji = resultSet.getString("emoji");
+            if (resultSet.next()) emoji = resultSet.getString("emoji");
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "EmoteUtil#getEmoji"));
         } finally {

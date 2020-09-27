@@ -4,7 +4,7 @@ package commands.interaction;
 import net.dv8tion.jda.api.Permission;
 import utilities.Constants;
 
-public class DabCommand extends InteractionInterface {
+public class DabCommand extends InteractionCommand {
     public DabCommand() {
         this.name = "dab";
         this.aliases = new String[] { "yeet" };

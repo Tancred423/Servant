@@ -20,6 +20,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.TextChannel;
 import servant.MyGuild;
+import servant.MyUser;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -47,7 +48,7 @@ public abstract class Command {
 
     protected abstract void execute(CommandEvent event);
 
-    public final void run(CommandEvent event) {
+    public final void run(CommandEvent event, Command command) {
         var lang = LanguageHandler.getLanguage(event);
 
         // child check
@@ -60,7 +61,7 @@ public abstract class Command {
             for (Command cmd : children) {
                 if (cmd.isCommandFor(parts[0])) {
                     event.setArgs(parts[1] == null ? "" : parts[1]);
-                    cmd.run(event);
+                    cmd.run(event, command);
                     return;
                 }
             }
@@ -173,6 +174,10 @@ public abstract class Command {
                 throw t;
             }
         });
+
+        // Statistics
+        new MyUser(event.getAuthor()).incrementCommandCount(command.getName());
+        if (event.getGuild() != null) new MyGuild(event.getGuild()).incrementCommandCount(command.getName()); // Guild will be null in DM's
 
         if (event.getClient().getListener() != null) event.getClient().getListener().onCompletedCommand(event, this);
     }

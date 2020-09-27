@@ -7,7 +7,6 @@ import servant.*;
 
 import java.awt.*;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -37,12 +36,10 @@ public class Signup {
             var select = connection.prepareStatement(
                     "SELECT author_id " +
                             "FROM signups " +
-                            "WHERE msg_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE msg_id=?");
             select.setLong(1, msgId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) authorId = resultSet.getLong("author_id");
+            if (resultSet.next()) authorId = resultSet.getLong("author_id");
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Signup#getAuthorId"));
         } finally {
@@ -61,12 +58,10 @@ public class Signup {
             var select = connection.prepareStatement(
                     "SELECT amount_participants " +
                             "FROM signups " +
-                            "WHERE msg_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE msg_id=?");
             select.setLong(1, msgId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) amount = resultSet.getInt("amount_participants");
+            if (resultSet.next()) amount = resultSet.getInt("amount_participants");
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Signup#getAmountParticipants"));
         } finally {
@@ -85,12 +80,10 @@ public class Signup {
             var select = connection.prepareStatement(
                     "SELECT title " +
                             "FROM signups " +
-                            "WHERE msg_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE msg_id=?");
             select.setLong(1, msgId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) authorId = resultSet.getString("title");
+            if (resultSet.next()) authorId = resultSet.getString("title");
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Signup#getTitle"));
         } finally {
@@ -109,12 +102,10 @@ public class Signup {
             var select = connection.prepareStatement(
                     "SELECT event_time " +
                             "FROM signups " +
-                            "WHERE msg_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE msg_id=?");
             select.setLong(1, msgId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) expiration = resultSet.getTimestamp("event_time");
+            if (resultSet.next()) expiration = resultSet.getTimestamp("event_time");
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Signup#getEventTime"));
         } finally {
@@ -131,9 +122,7 @@ public class Signup {
             connection = Servant.db.getHikari().getConnection();
             var insert = connection.prepareStatement(
                     "INSERT INTO signups (guild_id,tc_id,msg_id,author_id,amount_participants,title,event_time) " +
-                            "VALUES (?,?,?,?,?,?,?)",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "VALUES (?,?,?,?,?,?,?)");
             insert.setLong(1, guildId);
             insert.setLong(2, tcId);
             insert.setLong(3, msgId);
@@ -154,9 +143,7 @@ public class Signup {
 
         try {
             connection = Servant.db.getHikari().getConnection();
-            var delete = connection.prepareStatement("DELETE FROM signups WHERE msg_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+            var delete = connection.prepareStatement("DELETE FROM signups WHERE msg_id=?");
             delete.setLong(1, msgId);
             delete.executeUpdate();
         } catch (SQLException e) {
@@ -169,9 +156,7 @@ public class Signup {
             connection = Servant.db.getHikari().getConnection();
             var delete = connection.prepareStatement(
                     "DELETE FROM tmp_signup_participants " +
-                            "WHERE msg_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE msg_id=?");
             delete.setLong(1, msgId);
             delete.executeUpdate();
         } catch (SQLException e) {
@@ -257,16 +242,10 @@ public class Signup {
                 var preparedStatement = connection.prepareStatement(
                         "SELECT user_id " +
                                 "FROM tmp_signup_participants " +
-                                "WHERE msg_id=?",
-                        ResultSet.TYPE_SCROLL_SENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE);
+                                "WHERE msg_id=?");
                 preparedStatement.setLong(1, msgId);
                 var resultSet = preparedStatement.executeQuery();
-                if (resultSet.first()) {
-                    do {
-                        participants.add(resultSet.getLong("user_id"));
-                    } while (resultSet.next());
-                }
+                while (resultSet.next()) participants.add(resultSet.getLong("user_id"));
             } catch (SQLException e) {
                 Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Signup#getParticipants"));
             } finally {
@@ -285,19 +264,15 @@ public class Signup {
             connection = Servant.db.getHikari().getConnection();
             var select = connection.prepareStatement(
                     "SELECT * " +
-                            "FROM signups",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "FROM signups");
             var resultSet = select.executeQuery();
-            if (resultSet.first()) {
-                do {
-                    signups.add(new Signup(
-                            jda,
-                            resultSet.getLong("guild_id"),
-                            resultSet.getLong("tc_id"),
-                            resultSet.getLong("msg_id")
-                    ));
-                } while (resultSet.next());
+            while (resultSet.next()) {
+                signups.add(new Signup(
+                        jda,
+                        resultSet.getLong("guild_id"),
+                        resultSet.getLong("tc_id"),
+                        resultSet.getLong("msg_id")
+                ));
             }
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Signup#getList"));
@@ -316,9 +291,7 @@ public class Signup {
                 connection = Servant.db.getHikari().getConnection();
                 var insert = connection.prepareStatement(
                         "INSERT INTO tmp_signup_participants (msg_id,user_id,guild_id,tc_id) " +
-                                "VALUES (?,?,?,?)",
-                        ResultSet.TYPE_SCROLL_SENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE);
+                                "VALUES (?,?,?,?)");
                 insert.setLong(1, msgId);
                 insert.setLong(2, userId);
                 insert.setLong(3, guildId);
@@ -342,9 +315,7 @@ public class Signup {
             var delete = connection.prepareStatement(
                     "DELETE FROM tmp_signup_participants " +
                             "WHERE msg_id=? " +
-                            "AND user_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "AND user_id=?");
             delete.setLong(1, msgId);
             delete.setLong(2, userId);
             delete.executeUpdate();

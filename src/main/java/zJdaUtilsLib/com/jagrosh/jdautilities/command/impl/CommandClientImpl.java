@@ -517,11 +517,8 @@ public class CommandClientImpl implements CommandClient, EventListener {
                                 var myGuild = new MyGuild(event.getGuild());
                                 if (myGuild.commandIsEnabled(command.getName()) && myGuild.categoryIsEnabled(command.getCategory().getName()))
                                     startCommand(event, cevent, command, myGuild, name);
-                            } else startCommand(event, cevent, command, null, name);
 
-                            // Statistics
-                            new MyUser(event.getAuthor()).incrementCommandCount(command.getName());
-                            if (event.isFromGuild()) new MyGuild(event.getGuild()).incrementCommandCount(command.getName());
+                            } else startCommand(event, cevent, command, null, name);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -539,7 +536,7 @@ public class CommandClientImpl implements CommandClient, EventListener {
 
         if (listener != null) listener.onCommand(cevent, command);
         uses.put(command.getName(), uses.getOrDefault(command.getName(), 0) + 1);
-        command.run(cevent);
+        command.run(cevent, command);
 
         if (event.isFromGuild()) {
             if (myGuild.featureIsEnabled("cmddeletion")) {

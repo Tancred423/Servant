@@ -1,22 +1,20 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package listeners;
 
+import commands.owner.blacklist.Blacklist;
 import files.language.LanguageHandler;
-import servant.MyGuild;
-import servant.MyUser;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
-import commands.owner.blacklist.Blacklist;
+import servant.MyGuild;
+import servant.MyUser;
 import servant.Servant;
+import utilities.Console;
 import utilities.Constants;
-import utilities.ImageUtil;
 
 import java.awt.*;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.util.concurrent.CompletableFuture;
 
 public class GuildJoinListener extends ListenerAdapter {
@@ -39,11 +37,9 @@ public class GuildJoinListener extends ListenerAdapter {
     }
 
     private static void processInvite(GuildJoinEvent event, net.dv8tion.jda.api.entities.Guild guild, Member guildOwner) {
-        if (guildOwner == null) return;
         var guildOwnerUser = guildOwner.getUser();
 
-        System.out.println("[" + OffsetDateTime.now(ZoneId.of(Constants.LOG_OFFSET)).toString().replaceAll("T", " ").substring(0, 19) + "] " +
-                "Servant was invited to " + guild.getName() + " (" + guild.getIdLong() + "). Owner: " + guildOwnerUser + "#" + guildOwnerUser.getDiscriminator() + " (" + guildOwner.getIdLong() + ").");
+        Console.log("Servant was invited to " + guild.getName() + " (" + guild.getIdLong() + ") | Guild size: " + guild.getMemberCount() + " | Owner: " + guildOwnerUser + "#" + guildOwnerUser.getDiscriminator() + " (" + guildOwner.getIdLong() + ").");
 
         if (Blacklist.isBlacklisted(guild, guildOwnerUser)) {
             event.getGuild().leave().queue();
@@ -54,7 +50,6 @@ public class GuildJoinListener extends ListenerAdapter {
         guildOwnerUser.openPrivateChannel().queue(privateChannel -> {
             var myOwner = new MyUser(guildOwnerUser);
             var language = new MyGuild(guild).getLanguageCode();
-            var p = Servant.config.getDefaultPrefix();
             var botOwner = event.getJDA().getUserById(Servant.config.getBotOwnerId());
             if (botOwner == null) return;
             var bot = event.getJDA().getSelfUser();
@@ -64,7 +59,6 @@ public class GuildJoinListener extends ListenerAdapter {
             eb.setAuthor(String.format(LanguageHandler.get(language, "invite_author"), bot.getName()), null, bot.getEffectiveAvatarUrl());
             eb.setThumbnail(guild.getIconUrl());
             eb.setDescription(String.format(LanguageHandler.get(language, "invite_description"), Constants.WEBSITE, Constants.SUPPORT));
-            eb.setImage(ImageUtil.getUrl(event.getJDA(), "invite"));
             eb.setFooter(String.format(LanguageHandler.get(language, "invite_footer"), guild.getName()), null);
 
             privateChannel.sendMessage(eb.build()).queue();

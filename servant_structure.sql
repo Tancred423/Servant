@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Sep 10, 2020 at 04:33 PM
+-- Generation Time: Sep 27, 2020 at 09:52 PM
 -- Server version: 10.1.41-MariaDB-0+deb9u1
 -- PHP Version: 5.5.9-1ubuntu4
 
@@ -871,6 +871,19 @@ CREATE TABLE `user_interaction_counts` (
   `received` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_ttt_statistics`
+--
+
+CREATE TABLE `user_ttt_statistics` (
+  `user_id` bigint(18) NOT NULL,
+  `wins` int(11) NOT NULL,
+  `draws` int(11) NOT NULL,
+  `loses` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 --
 -- Indexes for dumped tables
 --
@@ -1246,6 +1259,12 @@ ALTER TABLE `user_exp`
 --
 ALTER TABLE `user_interaction_counts`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `user_ttt_statistics`
+--
+ALTER TABLE `user_ttt_statistics`
+  ADD PRIMARY KEY (`user_id`);
 
 --
 -- AUTO_INCREMENT for dumped tables

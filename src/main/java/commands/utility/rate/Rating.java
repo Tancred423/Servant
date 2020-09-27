@@ -12,7 +12,6 @@ import utilities.EmoteUtil;
 
 import java.awt.*;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -65,12 +64,10 @@ public class Rating {
             var select = connection.prepareStatement(
                     "SELECT author_id " +
                             "FROM ratings " +
-                            "WHERE msg_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE msg_id=?");
             select.setLong(1, msgId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) authorId = resultSet.getLong("author_id");
+            if (resultSet.next()) authorId = resultSet.getLong("author_id");
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Rating#getAuthorId"));
         } finally {
@@ -99,12 +96,10 @@ public class Rating {
             var select = connection.prepareStatement(
                     "SELECT event_time " +
                             "FROM ratings " +
-                            "WHERE msg_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE msg_id=?");
             select.setLong(1, msgId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) eventTime = resultSet.getTimestamp("event_time").toInstant();
+            if (resultSet.next()) eventTime = resultSet.getTimestamp("event_time").toInstant();
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Rating#getEndingDate"));
         } finally {
@@ -123,12 +118,10 @@ public class Rating {
             var select = connection.prepareStatement(
                     "SELECT topic " +
                             "FROM ratings " +
-                            "WHERE msg_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE msg_id=?");
             select.setLong(1, msgId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) {
+            if (resultSet.next()) {
                 topic = resultSet.getString("topic");
                 if (topic.isEmpty()) topic = null;
             }
@@ -151,16 +144,11 @@ public class Rating {
                 var preparedStatement = connection.prepareStatement(
                         "SELECT user_id, reaction " +
                                 "FROM tmp_rating_participants " +
-                                "WHERE msg_id=?",
-                        ResultSet.TYPE_SCROLL_SENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE);
+                                "WHERE msg_id=?");
                 preparedStatement.setLong(1, msgId);
                 var resultSet = preparedStatement.executeQuery();
-                if (resultSet.first()) {
-                    do {
-                        participants.add(new Vote(resultSet.getLong("user_id"), resultSet.getString("reaction")));
-                    } while (resultSet.next());
-                }
+                while (resultSet.next())
+                    participants.add(new Vote(resultSet.getLong("user_id"), resultSet.getString("reaction")));
             } catch (SQLException e) {
                 Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Rating#getParticipants"));
             } finally {
@@ -179,9 +167,7 @@ public class Rating {
             connection = Servant.db.getHikari().getConnection();
             var insert = connection.prepareStatement(
                     "INSERT INTO ratings (guild_id,tc_id,msg_id,author_id,event_time,topic) " +
-                            "VALUES (?,?,?,?,?,?)",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "VALUES (?,?,?,?,?,?)");
             insert.setLong(1, guildId);
             insert.setLong(2, tcId);
             insert.setLong(3, msgId);
@@ -204,9 +190,7 @@ public class Rating {
             connection = Servant.db.getHikari().getConnection();
             var insert = connection.prepareStatement(
                     "INSERT INTO tmp_rating_participants (msg_id,user_id,reaction,guild_id,tc_id) " +
-                            "VALUES (?,?,?,?,?)",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "VALUES (?,?,?,?,?)");
             insert.setLong(1, msgId);
             insert.setLong(2, userId);
             insert.setString(3, emoji);
@@ -229,9 +213,7 @@ public class Rating {
                     "DELETE FROM tmp_rating_participants " +
                             "WHERE msg_id=? " +
                             "AND user_id=? " +
-                            "AND reaction=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "AND reaction=?");
             delete.setLong(1, msgId);
             delete.setLong(2, userId);
             delete.setString(3, emoji);
@@ -252,13 +234,11 @@ public class Rating {
             var select = connection.prepareStatement(
                     "SELECT * FROM tmp_rating_participants " +
                             "WHERE msg_id=? " +
-                            "AND user_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "AND user_id=?");
             select.setLong(1, msgId);
             select.setLong(2, userId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) hasVoted = true;
+            if (resultSet.next()) hasVoted = true;
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Rating#hasParticipated"));
         } finally {
@@ -278,13 +258,11 @@ public class Rating {
                     "SELECT reaction " +
                             "FROM tmp_rating_participants " +
                             "WHERE msg_id=? " +
-                            "AND user_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "AND user_id=?");
             select.setLong(1, msgId);
             select.setLong(2, userId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) emote = resultSet.getString("reaction");
+            if (resultSet.next()) emote = resultSet.getString("reaction");
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Rating#getParticipantEmoji"));
         } finally {
@@ -364,9 +342,7 @@ public class Rating {
             connection = Servant.db.getHikari().getConnection();
             var delete = connection.prepareStatement(
                     "DELETE FROM ratings " +
-                            "WHERE msg_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE msg_id=?");
             delete.setLong(1, msgId);
             delete.executeUpdate();
         } catch (SQLException e) {
@@ -379,9 +355,7 @@ public class Rating {
             connection = Servant.db.getHikari().getConnection();
             var delete = connection.prepareStatement(
                     "DELETE FROM tmp_rating_participants " +
-                            "WHERE msg_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE msg_id=?");
             delete.setLong(1, msgId);
             delete.executeUpdate();
         } catch (SQLException e) {
@@ -398,18 +372,14 @@ public class Rating {
 
         try {
             connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT * FROM ratings",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+            var select = connection.prepareStatement("SELECT * FROM ratings");
             var resultSet = select.executeQuery();
-            if (resultSet.first()) {
-                do {
-                    var guildId = resultSet.getLong("guild_id");
-                    var guild = jda.getGuildById(guildId);
-                    if (guild == null) continue;
-                    var lang = new MyGuild(guild).getLanguageCode();
-                    ratings.add(new Rating(jda, lang, guildId, resultSet.getLong("tc_id"), resultSet.getLong("msg_id")));
-                } while (resultSet.next());
+            while (resultSet.next()) {
+                var guildId = resultSet.getLong("guild_id");
+                var guild = jda.getGuildById(guildId);
+                if (guild == null) continue;
+                var lang = new MyGuild(guild).getLanguageCode();
+                ratings.add(new Rating(jda, lang, guildId, resultSet.getLong("tc_id"), resultSet.getLong("msg_id")));
             }
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "Rating#getList"));

@@ -37,12 +37,11 @@ public class RoleDeleteListener extends ListenerAdapter {
                     logChannel.sendMessage(new EmbedBuilder()
                             .setColor(myGuildOwnerUser.getColor())
                             .setTitle(LanguageHandler.get(lang, "log_role_delete_title"))
-                            .addField(LanguageHandler.get(lang, "log_role_name"), event.getRole().getName(), true)
-                            .addField(LanguageHandler.get(lang, "role_id"), event.getRole().getId(), true)
+                            .addField(LanguageHandler.get(lang, "log_role_name"), event.getRole().getName() + "\n" + event.getRole().getId(), true)
                             .setFooter(LanguageHandler.get(lang, "log_at"), ImageUtil.getUrl(jda, "clock"))
                             .setTimestamp(Instant.now())
                             .build()
-                    ).queue();
+                    ).queue(s -> {}, f -> {});
                 }
             }
         }, Servant.fixedThreadPool);

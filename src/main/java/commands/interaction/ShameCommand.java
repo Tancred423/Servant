@@ -5,7 +5,7 @@ package commands.interaction;
 import net.dv8tion.jda.api.Permission;
 import utilities.Constants;
 
-public class ShameCommand extends InteractionInterface {
+public class ShameCommand extends InteractionCommand {
     public ShameCommand() {
         this.name = "shame";
         this.aliases = new String[] { "cersei" };

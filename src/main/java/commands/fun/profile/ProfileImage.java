@@ -628,6 +628,7 @@ public class ProfileImage {
             add("flip");
             add("love");
             add("profile");
+            add("tictactoe");
             add("random");
             add("bird");
             add("cat");

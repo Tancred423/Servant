@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import servant.MyGuild;
 import servant.Servant;
+import utilities.Console;
 import utilities.Constants;
 
 import java.util.concurrent.CompletableFuture;
@@ -24,6 +25,9 @@ public class GuildLeaveListener extends ListenerAdapter {
 
         CompletableFuture.runAsync(() -> {
             var myGuild = new MyGuild(guild);
+            var guildOwnerUser = guildOwner.getUser();
+
+            Console.log("Servant was kicked from " + guild.getName() + " (" + guild.getIdLong() + ") | Guild size: " + guild.getMemberCount() + " | Owner: " + guildOwnerUser + "#" + guildOwnerUser.getDiscriminator() + " (" + guildOwner.getIdLong() + ").");
 
             // PURGES
             myGuild.purge();

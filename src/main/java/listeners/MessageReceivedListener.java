@@ -42,8 +42,8 @@ public class MessageReceivedListener extends ListenerAdapter {
             myMessage.setContent(message.getContentDisplay());
             myMessage.setAuthor(message.getAuthor());
 
-            if (message.getContentRaw().equals("<@!" + event.getJDA().getSelfUser().getIdLong() + ">")
-                    || message.getContentRaw().equals("<@" + event.getJDA().getSelfUser().getIdLong() + ">")) {
+            if (message.getContentRaw().equals("<@!" + event.getJDA().getSelfUser().getIdLong() + "> prefix")
+                    || message.getContentRaw().equals("<@" + event.getJDA().getSelfUser().getIdLong() + "> prefix")) {
                 processPrefix(event, author); // @Servant - Show current prefix
             } else {
                 var gotPurged = false;

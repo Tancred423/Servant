@@ -5,7 +5,7 @@ package commands.interaction;
 import net.dv8tion.jda.api.Permission;
 import utilities.Constants;
 
-public class BegCommand extends InteractionInterface {
+public class BegCommand extends InteractionCommand {
     public BegCommand() {
         this.name = "beg";
         this.aliases = new String[] { "please", "pls", "plz" };

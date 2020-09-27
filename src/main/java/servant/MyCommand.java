@@ -38,12 +38,10 @@ public class MyCommand {
                             "FROM const_commands AS com " +
                             "INNER JOIN const_categories AS cat " +
                             "ON com.category_id = cat.id " +
-                            "WHERE com.name=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE com.name=?");
             select.setString(1, name);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) {
+            if (resultSet.next()) {
                 this.id = resultSet.getInt("id");
                 this.isModCommand = resultSet.getBoolean("is_mod");
                 this.isToggleable = resultSet.getBoolean("is_toggleable");

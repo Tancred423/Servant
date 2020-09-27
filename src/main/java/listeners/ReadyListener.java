@@ -135,7 +135,7 @@ public class ReadyListener extends ListenerAdapter {
             // Birthday
             BirthdayHandler.checkBirthdays(jda);
             BirthdayHandler.updateLists(jda);
-        }, 0, 15 * 60 * 1000, TimeUnit.MILLISECONDS); // todo: delayToNextQuarter
+        }, delayToNextQuarter, 15 * 60 * 1000, TimeUnit.MILLISECONDS);
 
         // 24 Hour Period
         Servant.periodService.scheduleAtFixedRate(() -> {

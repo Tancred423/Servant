@@ -2,6 +2,7 @@
 package servant;
 
 import commands.fun.baguette.Baguette;
+import commands.fun.tictactoe.TicTacToeStatistic;
 import commands.interaction.Interaction;
 import files.language.LanguageHandler;
 import net.dv8tion.jda.api.JDA;
@@ -12,7 +13,6 @@ import utilities.Constants;
 import java.awt.*;
 import java.sql.Connection;
 import java.sql.Date;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -21,9 +21,9 @@ import java.util.LinkedList;
 import static servant.Database.closeQuietly;
 
 public class MyUser {
-    private User user;
-    private long userId;
-    private JDA jda;
+    private final User user;
+    private final long userId;
+    private final JDA jda;
 
     public MyUser(User user) {
         this.user = user;
@@ -45,12 +45,10 @@ public class MyUser {
             var select = connection.prepareStatement(
                     "SELECT prefix " +
                             "FROM users " +
-                            "WHERE user_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE user_id=?");
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) prefix = resultSet.getString("prefix");
+            if (resultSet.next()) prefix = resultSet.getString("prefix");
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyUser#getPrefix"));
         } finally {
@@ -72,12 +70,10 @@ public class MyUser {
             var select = connection.prepareStatement(
                     "SELECT language_code " +
                             "FROM users " +
-                            "WHERE user_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE user_id=?");
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) languageCode = resultSet.getString("language_code");
+            if (resultSet.next()) languageCode = resultSet.getString("language_code");
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyUser#getLanguageCode"));
         } finally {
@@ -97,12 +93,10 @@ public class MyUser {
             var select = connection.prepareStatement(
                     "SELECT color_code " +
                             "FROM users " +
-                            "WHERE user_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE user_id=?");
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) colorCode = resultSet.getString("color_code");
+            if (resultSet.next()) colorCode = resultSet.getString("color_code");
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyUser#getColorCode"));
         } finally {
@@ -121,12 +115,10 @@ public class MyUser {
             var select = connection.prepareStatement(
                     "SELECT color_code " +
                             "FROM users " +
-                            "WHERE user_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE user_id=?");
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) colorCode = resultSet.getString("color_code");
+            if (resultSet.next()) colorCode = resultSet.getString("color_code");
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyUser#getColorCode"));
         } finally {
@@ -146,12 +138,10 @@ public class MyUser {
             var select = connection.prepareStatement(
                     "SELECT bio " +
                             "FROM users " +
-                            "WHERE user_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE user_id=?");
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) bio = resultSet.getString("bio");
+            if (resultSet.next()) bio = resultSet.getString("bio");
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyUser#getBio"));
         } finally {
@@ -171,12 +161,10 @@ public class MyUser {
             var select = connection.prepareStatement(
                     "SELECT birthday " +
                             "FROM users " +
-                            "WHERE user_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE user_id=?");
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) birthday = resultSet.getDate("birthday");
+            if (resultSet.next()) birthday = resultSet.getDate("birthday");
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyUser#getBirthday"));
         } finally {
@@ -224,12 +212,10 @@ public class MyUser {
                             "FROM users AS u " +
                             "INNER JOIN const_profile_images AS p " +
                             "ON u.profile_bg_id=p.id " +
-                            "WHERE user_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE user_id=?");
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) url = resultSet.getString("image_url");
+            if (resultSet.next()) url = resultSet.getString("image_url");
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyUser#getProfileBgImageUrl"));
         } finally {
@@ -242,12 +228,10 @@ public class MyUser {
                 var select = connection.prepareStatement(
                         "SELECT image_url " +
                                 "FROM const_profile_images " +
-                                "WHERE id=?",
-                        ResultSet.TYPE_SCROLL_SENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE);
+                                "WHERE id=?");
                 select.setInt(1, 1);
                 var resultSet = select.executeQuery();
-                if (resultSet.first()) url = resultSet.getString("image_url");
+                if (resultSet.next()) url = resultSet.getString("image_url");
             } catch (SQLException e) {
                 Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyUser#getProfileBgImageUrl"));
             } finally {
@@ -268,12 +252,10 @@ public class MyUser {
             var select = connection.prepareStatement(
                     "SELECT * " +
                             "FROM global_blacklist " +
-                            "WHERE user_or_guild_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE user_or_guild_id=?");
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) isBlacklisted = true;
+            if (resultSet.next()) isBlacklisted = true;
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyUser#isBlacklisted"));
         } finally {
@@ -291,9 +273,7 @@ public class MyUser {
                 connection = Servant.db.getHikari().getConnection();
                 var insert = connection.prepareStatement(
                         "INSERT INTO global_blacklist (user_or_guild_id) " +
-                                "VALUES (?)",
-                        ResultSet.TYPE_SCROLL_SENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE);
+                                "VALUES (?)");
                 insert.setLong(1, userId);
                 insert.executeUpdate();
             }
@@ -312,9 +292,7 @@ public class MyUser {
                 connection = Servant.db.getHikari().getConnection();
                 var delete = connection.prepareStatement(
                         "DELETE FROM global_blacklist " +
-                                "WHERE user_or_guild_id=?",
-                        ResultSet.TYPE_SCROLL_SENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE);
+                                "WHERE user_or_guild_id=?");
                 delete.setLong(1, userId);
                 delete.executeUpdate();
             }
@@ -338,12 +316,10 @@ public class MyUser {
                             "INNER JOIN const_achievements AS a " +
                             "ON u.achievement_id=a.id " +
                             "WHERE u.user_id=? " +
-                            "ORDER BY a.ap DESC",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "ORDER BY a.ap DESC");
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) {
+            if (resultSet.next()) {
                 do achievements.put(resultSet.getString("name"), resultSet.getInt("ap"));
                 while (resultSet.next());
             }
@@ -367,16 +343,13 @@ public class MyUser {
                             "FROM user_achievements AS u " +
                             "INNER JOIN const_achievements AS a " +
                             "ON u.achievement_id=a.id " +
-                            "WHERE u.user_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE u.user_id=?");
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
-            if (resultSet.first())
-                do {
+            while (resultSet.next()) {
                     var achievement = resultSet.getString("name");
                     if (achievement.startsWith("level")) achievements.add(achievement);
-                } while (resultSet.next());
+                }
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyUser#getLevelAchievements"));
         } finally {
@@ -398,13 +371,11 @@ public class MyUser {
                             "INNER JOIN const_achievements AS a " +
                             "ON u.achievement_id=a.id " +
                             "WHERE u.user_id=? " +
-                            "AND a.name=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "AND a.name=?");
             select.setLong(1, userId);
             select.setString(2, achievement.toLowerCase());
             var resultSet = select.executeQuery();
-            hasAchievement = resultSet.first();
+            hasAchievement = resultSet.next();
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyUser#hasAchievement"));
         } finally {
@@ -423,12 +394,10 @@ public class MyUser {
             var select = connection.prepareStatement(
                     "SELECT id " +
                             "FROM const_achievements " +
-                            "WHERE name=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE name=?");
             select.setString(1, name);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) achievementId = resultSet.getInt("id");
+            if (resultSet.next()) achievementId = resultSet.getInt("id");
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyUser#getAchievementIdByName"));
         } finally {
@@ -446,9 +415,7 @@ public class MyUser {
                 connection = Servant.db.getHikari().getConnection();
                 var insert = connection.prepareStatement(
                         "INSERT INTO user_achievements (user_id,achievement_id) " +
-                                "VALUES (?,?)",
-                        ResultSet.TYPE_SCROLL_SENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE);
+                                "VALUES (?,?)");
                 insert.setLong(1, userId);
                 insert.setInt(2, getAchievementIdByName(achievement));
                 insert.executeUpdate();
@@ -469,9 +436,7 @@ public class MyUser {
                 var delete = connection.prepareStatement(
                         "DELETE FROM user_achievements " +
                                 "WHERE user_id=? " +
-                                "AND achievement_id=?",
-                        ResultSet.TYPE_SCROLL_SENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE);
+                                "AND achievement_id=?");
                 delete.setLong(1, userId);
                 delete.setInt(2, getAchievementIdByName(achievement));
                 delete.executeUpdate();
@@ -494,12 +459,10 @@ public class MyUser {
                             "FROM user_achievements AS u " +
                             "INNER JOIN const_achievements AS a " +
                             "ON u.achievement_id=a.id " +
-                            "WHERE u.user_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE u.user_id=?");
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) do ap += resultSet.getInt("ap"); while (resultSet.next());
+            if (resultSet.next()) do ap += resultSet.getInt("ap"); while (resultSet.next());
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyUser#getTotalAP"));
         } finally {
@@ -520,13 +483,11 @@ public class MyUser {
                     "SELECT * " +
                             "FROM user_exp " +
                             "WHERE user_id=? " +
-                            "AND guild_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "AND guild_id=?");
             select.setLong(1, userId);
             select.setLong(2, guildId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) exp = resultSet.getInt("exp");
+            if (resultSet.next()) exp = resultSet.getInt("exp");
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyUser#getExp"));
         } finally {
@@ -544,9 +505,7 @@ public class MyUser {
             if (getExp(guildId) == 0) {
                 var insert = connection.prepareStatement(
                         "INSERT INTO user_exp(user_id,guild_id,exp) " +
-                                "VALUES(?,?,?)",
-                        ResultSet.TYPE_SCROLL_SENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE);
+                                "VALUES(?,?,?)");
                 insert.setLong(1, userId);
                 insert.setLong(2, guildId);
                 insert.setInt(3, exp);
@@ -558,9 +517,7 @@ public class MyUser {
                         "UPDATE user_exp " +
                                 "SET exp=? " +
                                 "WHERE user_id=? " +
-                                "AND guild_id=?",
-                        ResultSet.TYPE_SCROLL_SENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE);
+                                "AND guild_id=?");
                 update.setInt(1, exp);
                 update.setLong(2, userId);
                 update.setLong(3, guildId);
@@ -584,13 +541,11 @@ public class MyUser {
                     "SELECT id " +
                             "FROM tmp_birthday_gratulated " +
                             "WHERE user_id=? " +
-                            "AND guild_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "AND guild_id=?");
             select.setLong(1, userId);
             select.setLong(2, guildId);
             var resultSet = select.executeQuery();
-            wasGratulated = resultSet.first();
+            wasGratulated = resultSet.next();
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyUser#wasGratulated"));
         } finally {
@@ -608,9 +563,7 @@ public class MyUser {
                 connection = Servant.db.getHikari().getConnection();
                 var insert = connection.prepareStatement(
                         "INSERT INTO tmp_birthday_gratulated (user_id,guild_id) " +
-                                "VALUES(?,?)",
-                        ResultSet.TYPE_SCROLL_SENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE);
+                                "VALUES(?,?)");
                 insert.setLong(1, userId);
                 insert.setLong(2, guildId);
                 insert.executeUpdate();
@@ -631,9 +584,7 @@ public class MyUser {
                 var delete = connection.prepareStatement(
                         "DELETE FROM tmp_birthday_gratulated " +
                                 "WHERE user_id=? " +
-                                "AND guild_id=?",
-                        ResultSet.TYPE_SCROLL_SENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE);
+                                "AND guild_id=?");
                 delete.setLong(1, userId);
                 delete.setLong(2, guildId);
                 delete.executeUpdate();
@@ -658,18 +609,14 @@ public class MyUser {
                             "INNER JOIN const_commands AS c " +
                             "ON u.command_id=c.id " +
                             "WHERE u.user_id=? " +
-                            "ORDER BY u.count DESC",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "ORDER BY u.count DESC");
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) {
-                do {
-                    var command = resultSet.getString("name");
-                    var myCommand = new MyCommand(jda, command);
-                    if (!myCommand.isOwnerCommand())
-                        commandCounts.put(command, resultSet.getInt("count"));
-                } while (resultSet.next());
+            while (resultSet.next()) {
+                var command = resultSet.getString("name");
+                var myCommand = new MyCommand(jda, command);
+                if (!myCommand.isOwnerCommand())
+                    commandCounts.put(command, resultSet.getInt("count"));
             }
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyUser#getCommandCounts"));
@@ -697,13 +644,11 @@ public class MyUser {
                     "SELECT count " +
                             "FROM user_command_counts " +
                             "WHERE user_id=? " +
-                            "AND command_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "AND command_id=?");
             select.setLong(1, userId);
             select.setInt(2, commandId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) featureCount = resultSet.getInt("count");
+            if (resultSet.next()) featureCount = resultSet.getInt("count");
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyUser#getCommandCount"));
         } finally {
@@ -723,13 +668,11 @@ public class MyUser {
                     "SELECT id " +
                             "FROM user_command_counts " +
                             "WHERE user_id=? " +
-                            "AND command_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "AND command_id=?");
             select.setLong(1, userId);
             select.setInt(2, commandId);
             var resultSet = select.executeQuery();
-            userCommandCountsHasEntry = resultSet.first();
+            userCommandCountsHasEntry = resultSet.next();
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyUser#userCommandCountsHasEntry"));
         } finally {
@@ -754,9 +697,7 @@ public class MyUser {
                         "UPDATE user_command_counts " +
                                 "SET count=? " +
                                 "WHERE user_id=? " +
-                                "AND command_id=?",
-                        ResultSet.TYPE_SCROLL_SENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE);
+                                "AND command_id=?");
                 update.setInt(1, count + 1);
                 update.setLong(2, userId);
                 update.setInt(3, myCommand.getId());
@@ -764,9 +705,7 @@ public class MyUser {
             } else {
                 var insert = connection.prepareStatement(
                         "INSERT INTO user_command_counts (user_id,command_id,count) " +
-                                "VALUES (?,?,?)",
-                        ResultSet.TYPE_SCROLL_SENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE);
+                                "VALUES (?,?,?)");
                 insert.setLong(1, userId);
                 insert.setInt(2, myCommand.getId());
                 insert.setInt(3, 1);
@@ -803,12 +742,10 @@ public class MyUser {
                             "OR c.name='redpanda' " +
                             "OR c.name='sloth' " +
                             "OR c.name='wolf' ) " +
-                            "ORDER BY u.count DESC",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "ORDER BY u.count DESC");
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) {
+            if (resultSet.next()) {
                 if (resultSet.getInt("count") == 0)
                     favoriteAnimal = LanguageHandler.get(lang, "profile_nofavourite");
                 else
@@ -835,12 +772,10 @@ public class MyUser {
                             "FROM user_interaction_counts AS u " +
                             "INNER JOIN const_interactions AS i " +
                             "ON u.interaction_id=i.id " +
-                            "WHERE u.user_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE u.user_id=?");
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
-            if (resultSet.first())
+            if (resultSet.next())
                 do interactions.add(new Interaction(
                         resultSet.getString("name"),
                         resultSet.getInt("shared"),
@@ -868,13 +803,11 @@ public class MyUser {
                             "INNER JOIN const_interactions AS i " +
                             "ON u.interaction_id=i.id " +
                             "WHERE u.user_id=? " +
-                            "AND i.name=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "AND i.name=?");
             select.setLong(1, userId);
             select.setString(2, interaction.toLowerCase());
             var resultSet = select.executeQuery();
-            if (resultSet.first()) commandCount = resultSet.getInt(isShared ? "shared" : "received");
+            if (resultSet.next()) commandCount = resultSet.getInt(isShared ? "shared" : "received");
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyUser#getInteractionCount"));
         } finally {
@@ -896,13 +829,11 @@ public class MyUser {
                             "INNER JOIN const_interactions AS i " +
                             "ON u.interaction_id = i.id " +
                             "WHERE u.user_id=? " +
-                            "AND i.name=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "AND i.name=?");
             select.setLong(1, userId);
             select.setString(2, interaction.toLowerCase());
             var resultSet = select.executeQuery();
-            if (resultSet.first())
+            if (resultSet.next())
                 if (resultSet.getInt("shared") != 0 || resultSet.getInt("received") != 0)
                     hasEntry = true;
         } catch (SQLException e) {
@@ -923,12 +854,10 @@ public class MyUser {
             var select = connection.prepareStatement(
                     "SELECT id " +
                             "FROM const_interactions " +
-                            "WHERE name=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE name=?");
             select.setString(1, name);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) interactionId = resultSet.getInt("id");
+            if (resultSet.next()) interactionId = resultSet.getInt("id");
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyUser#getInteractionIdByName"));
         } finally {
@@ -950,9 +879,7 @@ public class MyUser {
                         "UPDATE user_interaction_counts " +
                                 "SET " + (isShared ? "shared" : "received") + "=? " +
                                 "WHERE user_id=? " +
-                                "AND interaction_id=?",
-                        ResultSet.TYPE_SCROLL_SENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE);
+                                "AND interaction_id=?");
                 update.setInt(1, count + 1);
                 update.setLong(2, userId);
                 update.setInt(3, interactionId);
@@ -960,9 +887,7 @@ public class MyUser {
             } else {
                 var insert = connection.prepareStatement(
                         "INSERT INTO user_interaction_counts (user_id,interaction_id,shared,received) " +
-                                "VALUES (?,?,?,?)",
-                        ResultSet.TYPE_SCROLL_SENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE);
+                                "VALUES (?,?,?,?)");
                 insert.setLong(1, userId);
                 insert.setInt(2, interactionId);
                 if (isShared) {
@@ -991,12 +916,10 @@ public class MyUser {
             var select = connection.prepareStatement(
                     "SELECT size, counter " +
                             "FROM user_baguettes " +
-                            "WHERE user_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE user_id=?");
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) baguette = new Baguette(resultSet.getInt("size"), resultSet.getInt("counter"));
+            if (resultSet.next()) baguette = new Baguette(resultSet.getInt("size"), resultSet.getInt("counter"));
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyUser#getBaguette"));
         } finally {
@@ -1015,12 +938,10 @@ public class MyUser {
             var select = connection.prepareStatement(
                     "SELECT user_id " +
                             "FROM user_baguettes " +
-                            "WHERE user_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE user_id=?");
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
-            hasEntry = resultSet.first();
+            hasEntry = resultSet.next();
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyUser#userBaguettesHasEntry"));
         } finally {
@@ -1039,9 +960,7 @@ public class MyUser {
                 var update = connection.prepareStatement(
                         "UPDATE user_baguettes " +
                                 "SET size=?, counter=? " +
-                                "WHERE user_id=?",
-                        ResultSet.TYPE_SCROLL_SENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE);
+                                "WHERE user_id=?");
                 update.setInt(1, baguetteSize);
                 update.setInt(2, sizeCounter);
                 update.setLong(3, userId);
@@ -1049,9 +968,7 @@ public class MyUser {
             } else {
                 var insert = connection.prepareStatement(
                         "INSERT INTO user_baguettes (user_id,size,counter) " +
-                                "VALUES (?,?,?)",
-                        ResultSet.TYPE_SCROLL_SENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE);
+                                "VALUES (?,?,?)");
                 insert.setLong(1, userId);
                 insert.setInt(2, baguetteSize);
                 insert.setInt(3, sizeCounter);
@@ -1074,5 +991,140 @@ public class MyUser {
         }
 
         return false;
+    }
+
+    // TicTacToe
+    public TicTacToeStatistic getTttStatistic() {
+        Connection connection = null;
+        TicTacToeStatistic tttStatistics = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement(
+                    "SELECT wins, draws, loses " +
+                            "FROM user_ttt_statistics " +
+                            "WHERE user_id=?");
+            select.setLong(1, userId);
+            var resultSet = select.executeQuery();
+            if (resultSet.next()) tttStatistics = new TicTacToeStatistic(userId, resultSet.getInt("wins"), resultSet.getInt("draws"), resultSet.getInt("loses"));
+        } catch (SQLException e) {
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyUser#getTttStatistic"));
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return tttStatistics;
+    }
+
+    private boolean tttStatisticsHasEntry() {
+        Connection connection = null;
+        var hasEntry = false;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement(
+                    "SELECT user_id " +
+                            "FROM user_ttt_statistics " +
+                            "WHERE user_id=?");
+            select.setLong(1, userId);
+            var resultSet = select.executeQuery();
+            hasEntry = resultSet.next();
+        } catch (SQLException e) {
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyUser#tttStatisticsHasEntry"));
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return hasEntry;
+    }
+
+    public void incrementTttWin() {
+        Connection connection = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            if (tttStatisticsHasEntry()) {
+                var update = connection.prepareStatement(
+                        "UPDATE user_ttt_statistics " +
+                                "SET wins=? " +
+                                "WHERE user_id=?");
+                update.setInt(1, getTttStatistic().getWins() + 1);
+                update.setLong(2, userId);
+                update.executeUpdate();
+            } else {
+                var insert = connection.prepareStatement(
+                        "INSERT INTO user_ttt_statistics (user_id,wins,draws,loses) " +
+                                "VALUES (?,?,?,?)");
+                insert.setLong(1, userId);
+                insert.setInt(2, 1);
+                insert.setInt(3, 0);
+                insert.setInt(4, 0);
+                insert.executeUpdate();
+            }
+        } catch (SQLException e) {
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyUser#incrementTttWin"));
+        } finally {
+            closeQuietly(connection);
+        }
+    }
+
+    public void incrementTttDraw() {
+        Connection connection = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            if (tttStatisticsHasEntry()) {
+                var update = connection.prepareStatement(
+                        "UPDATE user_ttt_statistics " +
+                                "SET draws=? " +
+                                "WHERE user_id=?");
+                update.setInt(1, getTttStatistic().getDraws() + 1);
+                update.setLong(2, userId);
+                update.executeUpdate();
+            } else {
+                var insert = connection.prepareStatement(
+                        "INSERT INTO user_ttt_statistics (user_id,wins,draws,loses) " +
+                                "VALUES (?,?,?,?)");
+                insert.setLong(1, userId);
+                insert.setInt(2, 0);
+                insert.setInt(3, 1);
+                insert.setInt(4, 0);
+                insert.executeUpdate();
+            }
+        } catch (SQLException e) {
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyUser#incrementTttDraw"));
+        } finally {
+            closeQuietly(connection);
+        }
+    }
+
+    public void incrementTttLose() {
+        Connection connection = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            if (tttStatisticsHasEntry()) {
+                var update = connection.prepareStatement(
+                        "UPDATE user_ttt_statistics " +
+                                "SET loses=? " +
+                                "WHERE user_id=?");
+                update.setInt(1, getTttStatistic().getLoses() + 1);
+                update.setLong(2, userId);
+                update.executeUpdate();
+            } else {
+                var insert = connection.prepareStatement(
+                        "INSERT INTO user_ttt_statistics (user_id,wins,draws,loses) " +
+                                "VALUES (?,?,?,?)");
+                insert.setLong(1, userId);
+                insert.setInt(2, 0);
+                insert.setInt(3, 0);
+                insert.setInt(4, 1);
+                insert.executeUpdate();
+            }
+        } catch (SQLException e) {
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyUser#incrementTttLose"));
+        } finally {
+            closeQuietly(connection);
+        }
     }
 }

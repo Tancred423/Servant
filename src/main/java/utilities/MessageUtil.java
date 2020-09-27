@@ -82,12 +82,10 @@ public class MessageUtil {
             var preparedStatement = connection.prepareStatement(
                     "SELECT prefix " +
                             "FROM " + (isFromGuild ? "guilds" : "users") + " " +
-                            "WHERE " + (isFromGuild ? "guild_id" : "user_id") + "=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE " + (isFromGuild ? "guild_id" : "user_id") + "=?");
             preparedStatement.setLong(1, id);
             var resultSet = preparedStatement.executeQuery();
-            if (resultSet.first()) {
+            if (resultSet.next()) {
                 var tmpPrefix = resultSet.getString("prefix");
                 if (!tmpPrefix.trim().isEmpty()) prefix = tmpPrefix;
             }

@@ -2,7 +2,7 @@
 package utilities;
 
 public class Constants {
-    final public static String VERSION = "6.4.2";
+    final public static String VERSION = "6.5.0";
     final public static String LOG_OFFSET = "+02:00";
 
     // in seconds
@@ -14,7 +14,7 @@ public class Constants {
     final public static String WEBSITE = "https://servant.gg/";
     final public static String WEBSITE_HELP = "https://servant.gg/help/";
     final public static String WEBSITE_FAQ = "https://servant.gg/faq/";
-    final public static String WEBSITE_FAQ_GETTING_STARTED = "https://servant.gg/faq#how_to_get_started";
+    final public static String WEBSITE_FAQ_GETTING_STARTED = "https://servant.gg/faq#how-to-get-started";
     final public static String WEBSITE_DASHBOARD = "https://servant.gg/dashboard/";
     final public static String INVITE = "https://invite.servant.gg/";
     final public static String SUPPORT = "https://support.servant.gg/";

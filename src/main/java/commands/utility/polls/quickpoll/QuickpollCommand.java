@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 public class QuickpollCommand extends Command {
     public QuickpollCommand() {
         this.name = "quickpoll";
-        this.aliases = new String[] { "quickvote" };
+        this.aliases = new String[] { "quickvote", "quickvoting" };
         this.help = "Smol poll with yes/no";
         this.category = new Category("Utility");
         this.arguments = null;

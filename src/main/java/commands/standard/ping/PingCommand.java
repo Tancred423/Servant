@@ -33,16 +33,28 @@ public class PingCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        var eb = new EmbedBuilder()
+        var messageEmbed = new EmbedBuilder()
                 .setColor(Color.decode(new MyUser(event.getAuthor()).getColorCode()))
-                .setDescription("Ping: ...");
-        event.reply(eb.build(), message -> {
-            var ping = event.getMessage().getTimeCreated().until(message.getTimeCreated(), ChronoUnit.MILLIS);
-            var membed = message.getEmbeds().get(0);
-            var ueb = new EmbedBuilder()
-                    .setColor(membed.getColor())
-                    .setDescription("Ping: " + ping + "ms | Websocket: " + event.getJDA().getGatewayPing() + "ms");
-            message.editMessage(ueb.build()).queue();
+                .setDescription("Measuring ...")
+                .build();
+
+        event.reply(messageEmbed, message -> {
+            var servantPing = event.getMessage().getTimeCreated().until(message.getTimeCreated(), ChronoUnit.MILLIS);
+            var webSocketPing = event.getJDA().getGatewayPing();
+            var sm = event.getJDA().getShardManager();
+            var avgWebSocketPing = sm == null ? 0 : (int) Math.round(sm.getAverageGatewayPing());
+            event.getJDA().getRestPing().queue(restPing -> {
+                var membed = message.getEmbeds().get(0);
+                var messageEmbedEdited = new EmbedBuilder()
+                        .setColor(membed.getColor())
+                        .addField("Servant Ping: " + servantPing + " ms", "The time that Servant took to respond to your ping command.", false)
+                        .addField("REST Ping: " + restPing + " ms", "The time that Discord took to respond to an API request.", false)
+                        .addField("WebSocket Ping (Shard: " + event.getJDA().getShardInfo().getShardId() + "): " + webSocketPing + " ms", "The time that Discord took to respond to the current shard's last heartbeat.", false)
+                        .addField("Avg. WebSocket Ping (All " + (sm == null ? "" : sm.getShardsTotal()) + " shards): " + avgWebSocketPing + " ms", "The average time that Discord took to respond to all shard's last heatbeats.", false)
+                        .build();
+
+                message.editMessage(messageEmbedEdited).queue();
+            });
         });
     }
 }

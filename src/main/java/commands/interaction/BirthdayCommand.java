@@ -4,7 +4,7 @@ package commands.interaction;
 import net.dv8tion.jda.api.Permission;
 import utilities.Constants;
 
-public class BirthdayCommand extends InteractionInterface {
+public class BirthdayCommand extends InteractionCommand {
     public BirthdayCommand() {
         this.name = "birthday";
         this.aliases = new String[] { "bday", "happybirthday", "happybday" };

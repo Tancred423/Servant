@@ -4,7 +4,7 @@ package commands.interaction;
 import net.dv8tion.jda.api.Permission;
 import utilities.Constants;
 
-public class PatCommand extends InteractionInterface {
+public class PatCommand extends InteractionCommand {
     public PatCommand() {
         this.name = "pat";
         this.aliases = new String[] { "pet" };

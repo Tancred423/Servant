@@ -23,7 +23,7 @@ public class RemindMeHandler {
                             "WHERE id=?");
             select.setInt(1, aiNumber);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) {
+            if (resultSet.next()) {
                 remindMe = new RemindMe(
                         jda,
                         resultSet.getLong("guild_id"),

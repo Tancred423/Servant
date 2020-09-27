@@ -4,7 +4,7 @@ package commands.interaction;
 import net.dv8tion.jda.api.Permission;
 import utilities.Constants;
 
-public class HugCommand extends InteractionInterface {
+public class HugCommand extends InteractionCommand {
     public HugCommand() {
         this.name = "hug";
         this.aliases = new String[]{ "cuddle" };

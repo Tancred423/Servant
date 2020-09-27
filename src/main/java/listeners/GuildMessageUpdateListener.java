@@ -44,7 +44,7 @@ public class GuildMessageUpdateListener extends ListenerAdapter {
                     logChannel.sendMessage(new EmbedBuilder()
                             .setColor(myAuthor.getColor())
                             .setTitle(LanguageHandler.get(lang, "log_msg_update_title"))
-                            .addField(LanguageHandler.get(lang, "author"), author.getName() + "#" + author.getDiscriminator(), true)
+                            .addField(LanguageHandler.get(lang, "author"), author.getName() + "#" + author.getDiscriminator() + "\n" + author.getIdLong(), true)
                             .addField(LanguageHandler.get(lang, "msg_id"), String.valueOf(msgId), true)
                             .addField(LanguageHandler.get(lang, "log_msg_old_content"), contentRaw == null ? "_" + LanguageHandler.get(lang, "log_msg_too_old_content") + "..._" : contentRaw, false)
                             .addField(LanguageHandler.get(lang, "log_msg_new_content"), message.getContentRaw(), false)

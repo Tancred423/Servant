@@ -16,7 +16,9 @@ public class Console {
 
     public static void logCmd(MessageReceivedEvent event, boolean isCustomCommand) {
         Console.log((isCustomCommand ? "Custom command" : "Command") + " executed: " + event.getMessage().getContentDisplay() + " | " +
-                "Guild: " + (event.isFromGuild() ? event.getGuild().getName() + " (" + event.getGuild().getIdLong() + ")" : "DM") + " | " +
-                "User: " + event.getAuthor().getName() + "#" + event.getAuthor().getDiscriminator() + " (" + event.getAuthor().getIdLong() + ")");
+                "User: " + event.getAuthor().getName() + "#" + event.getAuthor().getDiscriminator() + " (" + event.getAuthor().getIdLong() + ")" + " | " +
+                (event.isFromGuild() ? "TC: #" + event.getTextChannel().getName() + " (" + event.getTextChannel().getIdLong() + ")  | " +
+                        "Guild: " + event.getGuild().getName() + " (" + event.getGuild().getIdLong() + ")" : "DM")
+        );
     }
 }

@@ -5,7 +5,7 @@ package commands.interaction;
 import net.dv8tion.jda.api.Permission;
 import utilities.Constants;
 
-public class CopCommand extends InteractionInterface {
+public class CopCommand extends InteractionCommand {
     public CopCommand() {
         this.name = "cop";
         this.aliases = new String[] { "police", "jail", "arrest" };

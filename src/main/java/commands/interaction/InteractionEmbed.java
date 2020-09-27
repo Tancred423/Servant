@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import servant.MyUser;
-import utilities.Console;
 import utilities.EmoteUtil;
 
 import java.awt.*;
@@ -34,7 +33,6 @@ class InteractionEmbed {
         eb.setDescription("**" + author.getName() + "** " + emoteMention + " **" + mentioned.getName() + "**\n\n" +
                 String.format(shared, author.getAsMention(), authorCount) + "\n" +
                 String.format(received, mentioned.getAsMention(), mentionedCount));
-        Console.log(name + " GIF URL: " + gif);
         eb.setImage(gif);
         if (name.equalsIgnoreCase("birthday")) {
             eb.setFooter(LanguageHandler.get(lang, "dashboard_birthday_settings"));

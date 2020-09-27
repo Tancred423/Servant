@@ -5,7 +5,6 @@ import files.language.LanguageHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import servant.LoggingTask;
@@ -29,19 +28,18 @@ public class BirthdayHandler {
         var guilds = jda.getGuilds();
         for (var guild : guilds) {
             if (guild.getIdLong() == 264445053596991498L) continue; // Discord Bot List
-            var server = new MyGuild(guild);
-                var channelId = server.getBirthdayListTcId();
-                var messageId = server.getBirthdayListMsgId();
-                var authorId = server.getBirthdayListAuthorId();
+            var myGuild = new MyGuild(guild);
+                var channelId = myGuild.getBirthdayListTcId();
+                var messageId = myGuild.getBirthdayListMsgId();
+                var authorId = myGuild.getBirthdayListAuthorId();
                 var tc = guild.getTextChannelById(channelId);
                 if (tc != null) {
                     var authorMember = guild.getMemberById(authorId);
                     if (authorMember != null) {
                         tc.retrieveMessageById(messageId).queue(message -> {
                             try {
-                                var list = createList(guild, authorMember.getUser(), tc);
-                                if (list == null) server.unsetBirthdayList();
-                                else message.editMessage(list).queue();
+                                var list = createList(guild, authorMember.getUser());
+                                message.editMessage(list).queue(s -> {}, f -> myGuild.unsetBirthdayList());
                             } catch (ParseException e) {
                                 Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "BirthdayHandler#updateLists"));
                             }
@@ -90,7 +88,7 @@ public class BirthdayHandler {
         ).queue();
     }
     
-    private static MessageEmbed createList(Guild guild, User author, MessageChannel channel) throws ParseException {
+    private static MessageEmbed createList(Guild guild, User author) throws ParseException {
         var myGuild = new MyGuild(guild);
         var myUser = new MyUser(author);
 

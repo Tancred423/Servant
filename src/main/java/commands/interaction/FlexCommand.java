@@ -4,7 +4,7 @@ package commands.interaction;
 import net.dv8tion.jda.api.Permission;
 import utilities.Constants;
 
-public class FlexCommand extends InteractionInterface {
+public class FlexCommand extends InteractionCommand {
     public FlexCommand() {
         this.name = "flex";
         this.aliases = new String[0];

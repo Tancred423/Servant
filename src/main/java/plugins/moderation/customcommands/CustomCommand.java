@@ -12,7 +12,6 @@ import utilities.Console;
 
 import java.awt.*;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -62,12 +61,10 @@ public class CustomCommand {
             var preparedStatement = connection.prepareStatement(
                     "SELECT id " +
                             "FROM custom_commands " +
-                            "WHERE invoke=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE invoke=?");
             preparedStatement.setString(1, invoke);
             var resultSet = preparedStatement.executeQuery();
-            if (resultSet.first()) ccId = resultSet.getInt("id");
+            if (resultSet.next()) ccId = resultSet.getInt("id");
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "CustomCommand#getCcId"));
         } finally {
@@ -86,12 +83,10 @@ public class CustomCommand {
             var preparedStatement = connection.prepareStatement(
                     "SELECT normal_msg " +
                             "FROM custom_commands " +
-                            "WHERE invoke=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE invoke=?");
             preparedStatement.setString(1, invoke);
             var resultSet = preparedStatement.executeQuery();
-            if (resultSet.first()) normalMsg = resultSet.getString("normal_msg").trim();
+            if (resultSet.next()) normalMsg = resultSet.getString("normal_msg").trim();
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "CustomCommand#getNormalMessage"));
         } finally {
@@ -110,12 +105,10 @@ public class CustomCommand {
             var preparedStatement = connection.prepareStatement(
                     "SELECT * " +
                             "FROM custom_commands_embeds " +
-                            "WHERE cc_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE cc_id=?");
             preparedStatement.setInt(1, getCcId());
             var resultSet = preparedStatement.executeQuery();
-            if (resultSet.first()) {
+            if (resultSet.next()) {
                 var colorCode = resultSet.getString("colorcode");
                 var authorName = resultSet.getString("author_name");
                 var authorUrl = resultSet.getString("author_url");
@@ -158,18 +151,14 @@ public class CustomCommand {
                     "SELECT * " +
                             "FROM custom_commands_fields " +
                             "WHERE cc_id=? " +
-                            "ORDER BY field_no ASC",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "ORDER BY field_no ASC");
             preparedStatement.setInt(1, getCcId());
             resultSet = preparedStatement.executeQuery();
-            if (resultSet.first()) {
-                do {
-                    var name = resultSet.getString("title");
-                    var desc = resultSet.getString("description");
-                    var isInline = resultSet.getBoolean("inline");
-                    if (!name.isEmpty() || !desc.isEmpty()) eb.addField(name, desc, isInline);
-                } while (resultSet.next());
+            while (resultSet.next()) {
+                var name = resultSet.getString("title");
+                var desc = resultSet.getString("description");
+                var isInline = resultSet.getBoolean("inline");
+                if (!name.isEmpty() || !desc.isEmpty()) eb.addField(name, desc, isInline);
             }
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "CustomCommand#getEmbedMessage"));

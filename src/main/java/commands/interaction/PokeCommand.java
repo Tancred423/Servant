@@ -4,7 +4,7 @@ package commands.interaction;
 import net.dv8tion.jda.api.Permission;
 import utilities.Constants;
 
-public class PokeCommand extends InteractionInterface {
+public class PokeCommand extends InteractionCommand {
     public PokeCommand() {
         this.name = "poke";
         this.aliases = new String[] { "boop" };

@@ -1,8 +1,8 @@
 package commands.fun.baguette;
 
 public class Baguette {
-    private int size;
-    private int counter;
+    private final int size;
+    private final int counter;
 
     public Baguette(int size, int counter) {
         this.size = size;

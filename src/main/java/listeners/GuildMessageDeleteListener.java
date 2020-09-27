@@ -48,7 +48,7 @@ public class GuildMessageDeleteListener extends ListenerAdapter {
                             logChannel.sendMessage(new EmbedBuilder()
                                     .setColor(myAuthor == null ? Color.decode(Servant.config.getDefaultColorCode()) : myAuthor.getColor())
                                     .setTitle(LanguageHandler.get(lang, "log_msg_delete_title"))
-                                    .addField(LanguageHandler.get(lang, "author"), author == null ? "_" + LanguageHandler.get(lang, "log_msg_too_old_author") + "..._" : author.getName() + "#" + author.getDiscriminator(), true)
+                                    .addField(LanguageHandler.get(lang, "author"), author == null ? "_" + LanguageHandler.get(lang, "log_msg_too_old_author") + "..._" : author.getName() + "#" + author.getDiscriminator() + "\n" + author.getIdLong(), true)
                                     .addField(LanguageHandler.get(lang, "msg_id"), String.valueOf(msgId), true)
                                     .addField(LanguageHandler.get(lang, "log_msg_old_content"), contentRaw == null ? "_" + LanguageHandler.get(lang, "log_msg_too_old_content") + "..._" : contentRaw, false)
                                     .setFooter(LanguageHandler.get(lang, "log_at"), ImageUtil.getUrl(jda, "clock"))

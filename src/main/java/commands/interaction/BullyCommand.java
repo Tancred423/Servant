@@ -5,7 +5,7 @@ package commands.interaction;
 import net.dv8tion.jda.api.Permission;
 import utilities.Constants;
 
-public class BullyCommand extends InteractionInterface {
+public class BullyCommand extends InteractionCommand {
     public BullyCommand() {
         this.name = "bully";
         this.aliases = new String[] { "booli" };

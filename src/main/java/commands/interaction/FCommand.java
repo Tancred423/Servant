@@ -4,7 +4,7 @@ package commands.interaction;
 import net.dv8tion.jda.api.Permission;
 import utilities.Constants;
 
-public class FCommand extends InteractionInterface {
+public class FCommand extends InteractionCommand {
     public FCommand() {
         this.name = "f";
         this.aliases = new String[] { "respect", "respects" };

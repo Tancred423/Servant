@@ -51,7 +51,6 @@ public class LanguageFile {
         en_gb.setProperty("role_s", "Role(s)");
         en_gb.setProperty("author", "Author");
         en_gb.setProperty("msg_id", "Message ID");
-        en_gb.setProperty("category_id", "Category ID");
         en_gb.setProperty("emote_id", "Emote ID");
         en_gb.setProperty("emote", "Emote");
         en_gb.setProperty("invite", "Invite");
@@ -200,6 +199,21 @@ public class LanguageFile {
         en_gb.setProperty("profile_title_creator", "Creator");
         en_gb.setProperty("profile_title_supporter", "Supporter");
         en_gb.setProperty("profile_title_normal", "Master");
+
+        // TicTacToe
+        en_gb.setProperty("ttt_timeout_request", "This match request timed out.");
+        en_gb.setProperty("ttt_timeout_match", "This match timed out.");
+        en_gb.setProperty("ttt_ping", "Please ping the one you want to challenge:");
+        en_gb.setProperty("ttt_vs", "VS");
+        en_gb.setProperty("ttt_draw", "It's a draw!");
+        en_gb.setProperty("ttt_won", "%s won!");
+        en_gb.setProperty("ttt_turn", "%s, it is your turn! Select a field:");
+        en_gb.setProperty("ttt_turn_ai", "%s is thinking...");
+        en_gb.setProperty("ttt_challenge_self", "You cannot challenge yourself!");
+        en_gb.setProperty("ttt_challenge_bot", "You cannot challenge a bot... or can you?");
+        en_gb.setProperty("ttt_challenge_user", "%s, you got challenged by %s to a TicTacToe match!\nWill you accept?");
+        en_gb.setProperty("ttt_challenge_denied", "Challenge denied.");
+        en_gb.setProperty("ttt_error", "Oops! An error occured. That's not your fault, don't worry. Just try again.");
 
         ////////////////// Interaction //////////////////
 
@@ -449,6 +463,7 @@ public class LanguageFile {
         // CustomCommands
         en_gb.setProperty("customcommands_empty", "There are no custom commands on this server!");
         en_gb.setProperty("customcommands_title", "Custom Commands on %s");
+        en_gb.setProperty("customcommands_dashboard", "Custom commands can be created in the dashboard.");
 
         // Giveaway
         en_gb.setProperty("giveaway_description", "Start a giveaway that draws a given amount of people as winners after a given time.\n" +
@@ -646,15 +661,14 @@ public class LanguageFile {
 
         en_gb.setProperty("log_category_create_title", "Category created");
         en_gb.setProperty("log_category_delete_title", "Category deleted");
-        en_gb.setProperty("log_category_name", "Category Name");
+        en_gb.setProperty("log_category", "Category");
 
         en_gb.setProperty("log_emote_add_title", "Emote added");
         en_gb.setProperty("log_emote_remove_title", "Emote removed");
-        en_gb.setProperty("log_emote_name", "Emote Name");
+        en_gb.setProperty("log_emote", "Emote Name");
 
         en_gb.setProperty("log_user_ban_title", "User banned");
         en_gb.setProperty("log_banned_user", "Banned User");
-        en_gb.setProperty("log_banned_user_id", "Banned User ID");
 
         en_gb.setProperty("log_invite_create_title", "Invite created");
         en_gb.setProperty("log_invite_delete_title", "Invite deleted");
@@ -675,7 +689,6 @@ public class LanguageFile {
 
         en_gb.setProperty("log_user_unban_title", "User unbanned");
         en_gb.setProperty("log_unbanned_user", "Unbanned User");
-        en_gb.setProperty("log_unbanned_user_id", "Unbanned User ID");
 
         en_gb.setProperty("log_boost_count_title", "Boost count updated");
         en_gb.setProperty("log_boost_tier_title", "Boost tier updated");
@@ -827,7 +840,6 @@ public class LanguageFile {
         de_de.setProperty("role_s", "Rolle(n)");
         de_de.setProperty("author", "Autor");
         de_de.setProperty("msg_id", "Nachrichten ID");
-        de_de.setProperty("category_id", "Kategorie ID");
         de_de.setProperty("emote_id", "Emote ID");
         de_de.setProperty("emote", "Emote");
         de_de.setProperty("invite", "Einladung");
@@ -976,6 +988,21 @@ public class LanguageFile {
         de_de.setProperty("profile_title_creator", "Erschaffer");
         de_de.setProperty("profile_title_supporter", "Unterstützer");
         de_de.setProperty("profile_title_normal", "Meister");
+
+        // TicTacToe
+        de_de.setProperty("ttt_timeout_request", "Diese Spielanfrage ist abgelaufen.");
+        de_de.setProperty("ttt_timeout_match", "Dieses Spiel ist zeitlich abgelaufen.");
+        de_de.setProperty("ttt_ping", "Bitte pinge Deinen gewünschten Gegner:");
+        de_de.setProperty("ttt_vs", "gegen");
+        de_de.setProperty("ttt_draw", "Unentschieden!");
+        de_de.setProperty("ttt_won", "%s gewann!");
+        de_de.setProperty("ttt_turn", "%s, Du bist an der Reihe! Wähle ein Feld aus:");
+        de_de.setProperty("ttt_turn_ai", "%s denkt nach...");
+        de_de.setProperty("ttt_challenge_self", "Du kannst dich nicht selbst herausfordern!");
+        de_de.setProperty("ttt_challenge_bot", "Du kannst keinen Bot herausfordern... oder?");
+        de_de.setProperty("ttt_challenge_user", "%s, Du wurdest von %s zu einem TicTacToe-Spiel herausgefordert!\nMöchtest Du die Herausforderung annehmen?");
+        de_de.setProperty("ttt_challenge_denied", "Herausforderung abgelehnt.");
+        de_de.setProperty("ttt_error", "Ups! Es ist ein Fehler aufgetreten. Das ist nicht Deine Schuld, keine Sorge. Versuche es einfach noch einmal.");
 
         ////////////////// Interaction //////////////////
 
@@ -1225,6 +1252,7 @@ public class LanguageFile {
         // CustomCommands
         de_de.setProperty("customcommands_empty", "Auf diesem Server sind keine benutzerdefinierten Befehle!");
         de_de.setProperty("customcommands_title", "Benutzerdefinierte Befehle in %s");
+        de_de.setProperty("customcommands_dashboard", "Benutzerdefinierte Befehle können im Dashboard erstellt werden.");
 
         // Giveaway
         de_de.setProperty("giveaway_description", "Verantstalte ein Giveaway, das eine gegebene Anzahl an Leuten als Gewinner nach einer gewissen Zeit ermittelt.\n" +
@@ -1422,15 +1450,14 @@ public class LanguageFile {
 
         de_de.setProperty("log_category_create_title", "Kategorie erstellt");
         de_de.setProperty("log_category_delete_title", "Kategorie gelöscht");
-        de_de.setProperty("log_category_name", "Kategoriename");
+        de_de.setProperty("log_category", "Kategorie");
 
         de_de.setProperty("log_emote_add_title", "Emote hinzugefügt");
         de_de.setProperty("log_emote_remove_title", "Emote gelöscht");
-        de_de.setProperty("log_emote_name", "Emotename");
+        de_de.setProperty("log_emote", "Emotename");
 
         de_de.setProperty("log_user_ban_title", "Nutzer gebannt");
         de_de.setProperty("log_banned_user", "Gebannter Nutzer");
-        de_de.setProperty("log_banned_user_id", "Gebannter Nutzer ID");
 
         de_de.setProperty("log_invite_create_title", "Einladung erstellt");
         de_de.setProperty("log_invite_delete_title", "Einladung gelöscht");
@@ -1451,7 +1478,6 @@ public class LanguageFile {
 
         de_de.setProperty("log_user_unban_title", "Nutzer entbannt");
         de_de.setProperty("log_unbanned_user", "Entbannter Nutzer");
-        de_de.setProperty("log_unbanned_user_id", "Entbannter Nutzer ID");
 
         de_de.setProperty("log_boost_count_title", "Boost-Anzahl aktualisiert");
         de_de.setProperty("log_boost_tier_title", "Boost-Rang aktualisiert");

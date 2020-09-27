@@ -8,7 +8,6 @@ import utilities.ImageUtil;
 
 import java.awt.*;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -42,12 +41,10 @@ public class RemindMe {
             var select = connection.prepareStatement(
                     "SELECT author_id " +
                             "FROM remind_mes " +
-                            "WHERE msg_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE msg_id=?");
             select.setLong(1, msgId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) authorId = resultSet.getLong("author_id");
+            if (resultSet.next()) authorId = resultSet.getLong("author_id");
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "RemindMe#getAuthorId"));
         } finally {
@@ -66,12 +63,10 @@ public class RemindMe {
             var select = connection.prepareStatement(
                     "SELECT event_time " +
                             "FROM remind_mes " +
-                            "WHERE msg_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE msg_id=?");
             select.setLong(1, msgId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) eventTime = resultSet.getTimestamp("event_time");
+            if (resultSet.next()) eventTime = resultSet.getTimestamp("event_time");
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "RemindMe#getEventTime"));
         } finally {
@@ -90,12 +85,10 @@ public class RemindMe {
             var select = connection.prepareStatement(
                     "SELECT topic " +
                             "FROM remind_mes " +
-                            "WHERE msg_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE msg_id=?");
             select.setLong(1, msgId);
             var resultSet = select.executeQuery();
-            if (resultSet.first()) topic = resultSet.getString("topic");
+            if (resultSet.next()) topic = resultSet.getString("topic");
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "RemindMe#getTopic"));
         } finally {
@@ -113,19 +106,15 @@ public class RemindMe {
             connection = Servant.db.getHikari().getConnection();
             var select = connection.prepareStatement(
                     "SELECT * " +
-                            "FROM remind_mes",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "FROM remind_mes");
             var resultSet = select.executeQuery();
-            if (resultSet.first()) {
-                do {
-                    remindMes.add(new RemindMe(
-                            jda,
-                            resultSet.getLong("guild_id"),
-                            resultSet.getLong("tc_id"),
-                            resultSet.getLong("msg_id")
-                    ));
-                } while (resultSet.next());
+            while (resultSet.next()) {
+                remindMes.add(new RemindMe(
+                        jda,
+                        resultSet.getLong("guild_id"),
+                        resultSet.getLong("tc_id"),
+                        resultSet.getLong("msg_id")
+                ));
             }
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "RemindMe#getList"));
@@ -144,9 +133,7 @@ public class RemindMe {
                 connection = Servant.db.getHikari().getConnection();
                 var preparedStatement = connection.prepareStatement(
                         "INSERT INTO tmp_remindme_participants (msg_id,user_id) " +
-                                "VALUES (?,?)",
-                        ResultSet.TYPE_SCROLL_SENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE);
+                                "VALUES (?,?)");
                 preparedStatement.setLong(1, msgId);
                 preparedStatement.setLong(2, userId);
                 preparedStatement.executeUpdate();
@@ -170,16 +157,10 @@ public class RemindMe {
                 var preparedStatement = connection.prepareStatement(
                         "SELECT user_id " +
                                 "FROM tmp_remindme_participants " +
-                                "WHERE msg_id=?",
-                        ResultSet.TYPE_SCROLL_SENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE);
+                                "WHERE msg_id=?");
                 preparedStatement.setLong(1, msgId);
                 var resultSet = preparedStatement.executeQuery();
-                if (resultSet.first()) {
-                    do {
-                        participants.add(resultSet.getLong("user_id"));
-                    } while (resultSet.next());
-                }
+                while (resultSet.next()) participants.add(resultSet.getLong("user_id"));
             } catch (SQLException e) {
                 Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "RemindMe#getParticipants"));
             } finally {
@@ -197,9 +178,7 @@ public class RemindMe {
             connection = Servant.db.getHikari().getConnection();
             var insert = connection.prepareStatement(
                     "INSERT INTO remind_mes (guild_id,tc_id,msg_id,author_id,event_time,topic) " +
-                            "VALUES (?,?,?,?,?,?)",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "VALUES (?,?,?,?,?,?)");
             insert.setLong(1, guildId);
             insert.setLong(2, tcId);
             insert.setLong(3, msgId);
@@ -221,9 +200,7 @@ public class RemindMe {
             connection = Servant.db.getHikari().getConnection();
             var insert = connection.prepareStatement(
                     "DELETE FROM remind_mes " +
-                            "WHERE msg_id=?",
-                    ResultSet.TYPE_SCROLL_SENSITIVE,
-                    ResultSet.CONCUR_UPDATABLE);
+                            "WHERE msg_id=?");
             insert.setLong(1, msgId);
             insert.executeUpdate();
         } catch (SQLException e) {

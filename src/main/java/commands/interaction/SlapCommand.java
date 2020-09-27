@@ -4,7 +4,7 @@ package commands.interaction;
 import net.dv8tion.jda.api.Permission;
 import utilities.Constants;
 
-public class SlapCommand extends InteractionInterface {
+public class SlapCommand extends InteractionCommand {
     public SlapCommand() {
         this.name = "slap";
         this.aliases = new String[] { "hit", "punch" };

@@ -5,7 +5,7 @@ package commands.interaction;
 import net.dv8tion.jda.api.Permission;
 import utilities.Constants;
 
-public class LickCommand extends InteractionInterface {
+public class LickCommand extends InteractionCommand {
     public LickCommand() {
         this.name = "lick";
         this.aliases = new String[0];

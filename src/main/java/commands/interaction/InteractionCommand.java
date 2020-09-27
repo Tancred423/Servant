@@ -15,7 +15,7 @@ import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public abstract class InteractionInterface extends Command {
+public abstract class InteractionCommand extends Command {
     String emoji;
     String shared;
     String received;

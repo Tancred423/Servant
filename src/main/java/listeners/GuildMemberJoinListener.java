@@ -83,7 +83,7 @@ public class GuildMemberJoinListener extends ListenerAdapter {
                             new EmbedBuilder()
                                     .setColor(myGuildOwnerUser.getColor())
                                     .setTitle(LanguageHandler.get(lang, "log_user_join_title"))
-                                    .addField(LanguageHandler.get(lang, "user"), event.getMember().getUser().getName() + "#" + event.getMember().getUser().getDiscriminator(), true)
+                                    .addField(LanguageHandler.get(lang, "user"), event.getMember().getUser().getName() + "#" + event.getMember().getUser().getDiscriminator() + "\n" + event.getMember().getIdLong(), true)
                                     .setFooter(LanguageHandler.get(lang, "log_at"), ImageUtil.getUrl(jda, "clock"))
                                     .setTimestamp(Instant.now())
                                     .build()
