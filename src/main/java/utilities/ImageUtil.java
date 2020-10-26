@@ -103,7 +103,7 @@ public class ImageUtil {
                     put("quickpoll", servantEmotes2.getEmoteById(673449569077428225L));
                     put("reactionrole", servantEmotes2.getEmoteById(673449568930627584L));
                     put("redpanda", servantEmotes2.getEmoteById(673449568964313088L));
-                    put("reminder", servantEmotes2.getEmoteById(673449568993804350L));
+                    put("remindme", servantEmotes2.getEmoteById(767720936618197042L));
                     put("role", servantEmotes2.getEmoteById(673449569023164437L));
                     put("serverinfo", servantEmotes2.getEmoteById(673449568678969345L));
                     put("serversetup", servantEmotes2.getEmoteById(673449568796540963L));

@@ -64,6 +64,7 @@ public class TimezoneCommand extends Command {
 
         var date = args[0];
         var time = args[1];
+        if (time.length() == 4) time = "0" + time; // 3:00 to 03:00
         var zone = TimezoneUtil.getOffset(args[2]);
         var targetZone = TimezoneUtil.getOffset(args[3]);
 
@@ -85,7 +86,7 @@ public class TimezoneCommand extends Command {
             var offsetStart = start.getOffset().toString().replaceAll(":", "");
             formatStart = formatStart.replaceAll(Pattern.quote(offsetStart), args[2].toUpperCase());
 
-            var target = start.withOffsetSameInstant(ZoneOffset.of(targetZone));
+            var target = start.withOffsetSameInstant(ZoneOffset.of(targetZone.equals("00:00") ? "Z" : targetZone));
             var formatTarget = target.format(DateTimeFormatter.RFC_1123_DATE_TIME);
             var offsetTarget = target.getOffset().toString().replaceAll(":", "");
             formatTarget = formatTarget.replaceAll(Pattern.quote(offsetTarget), args[3].toUpperCase());

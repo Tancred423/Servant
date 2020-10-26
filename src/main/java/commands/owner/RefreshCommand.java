@@ -57,7 +57,7 @@ public class RefreshCommand extends Command {
                 for (var member : members) {
                     var myUser = new MyUser(member.getUser());
 
-                    var level = Parser.getLevelFromExp(myUser.getExp(guild.getIdLong()));
+                    var level = Parser.getLevelFromExp(myUser.getLevelTotalExp(guild.getIdLong()));
                     if (level >= 100) myUser.setAchievement("level100");
                     else if (level >= 90) myUser.setAchievement("level90");
                     else if (level >= 80) myUser.setAchievement("level80");

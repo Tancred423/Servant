@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import utilities.Constants;
+import utilities.Parser;
 
 import java.awt.*;
 import java.sql.Connection;
@@ -473,7 +474,7 @@ public class MyUser {
     }
 
     // EXP
-    public int getExp(long guildId) {
+    public int getLevelTotalExp(long guildId) {
         Connection connection = null;
         var exp = 0;
 
@@ -497,12 +498,33 @@ public class MyUser {
         return exp;
     }
 
+     public int getLevel(long guildId) {
+         return Parser.getLevelFromExp(getLevelTotalExp(guildId));
+     }
+
+     public int getLevelNeededExp(long guildId) {
+         var currentLevel = getLevel(guildId);
+         return Parser.getLevelExp(currentLevel);
+     }
+
+     public int getLevelCurrentExp(long guildId) {
+         var exp = getLevelTotalExp(guildId);
+         var level = getLevel(guildId);
+         return exp - Parser.getTotalLevelExp(level - 1);
+     }
+
+     public float getLevelPercent(long guildId) {
+         var currentExp = getLevelCurrentExp(guildId);
+         var neededExp = getLevelNeededExp(guildId);
+         return ((float) currentExp) / neededExp;
+     }
+
     public void setExp(long guildId, int exp) {
         Connection connection = null;
 
         try {
             connection = Servant.db.getHikari().getConnection();
-            if (getExp(guildId) == 0) {
+            if (getLevelTotalExp(guildId) == 0) {
                 var insert = connection.prepareStatement(
                         "INSERT INTO user_exp(user_id,guild_id,exp) " +
                                 "VALUES(?,?,?)");
@@ -511,7 +533,7 @@ public class MyUser {
                 insert.setInt(3, exp);
                 insert.executeUpdate();
             } else {
-                var currentExp = getExp(guildId);
+                var currentExp = getLevelTotalExp(guildId);
                 exp += currentExp;
                 var update = connection.prepareStatement(
                         "UPDATE user_exp " +

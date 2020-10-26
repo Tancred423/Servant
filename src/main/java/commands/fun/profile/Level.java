@@ -23,7 +23,7 @@ public class Level {
     public static Map<Guild, Map<User, Instant>> guildCds = new HashMap<>();
 
     public static int getLevel(User user, long guildId) {
-        return Parser.getLevelFromExp(new MyUser(user).getExp(guildId));
+        return Parser.getLevelFromExp(new MyUser(user).getLevelTotalExp(guildId));
     }
 
     public static List<String> checkForNewRole(int level, MessageReceivedEvent event, String lang) throws HierarchyException {

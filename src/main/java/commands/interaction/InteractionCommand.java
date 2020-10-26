@@ -12,7 +12,6 @@ import utilities.Parser;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.Command;
 import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public abstract class InteractionCommand extends Command {
@@ -54,10 +53,9 @@ public abstract class InteractionCommand extends Command {
                 gif = json.get("imageUrl").toString();
                 if (!gif.isEmpty()) break;
             }
-        } catch (FileNotFoundException ignored) {
         } catch (IOException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, event.getJDA(), name, event));
-            return;
+            gif = null; // Not needed, but just being explicit here
         }
 
         if (gif != null && gif.isEmpty()) gif = null;

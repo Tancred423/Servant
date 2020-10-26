@@ -4,10 +4,12 @@ package commands.utility.polls;
 import files.language.LanguageHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.Permission;
 import servant.LoggingTask;
 import servant.MyGuild;
 import servant.MyMessage;
 import servant.Servant;
+import utilities.Console;
 import utilities.EmoteUtil;
 
 import java.sql.Connection;
@@ -391,7 +393,7 @@ public class Poll {
             message.editMessage(eb.build()).queue();
             message.clearReactions().queue();
             purge();
-        });
+        }, f -> new MyGuild(guild).purgeMsg(tc.getIdLong(), msgId));
     }
 
     private String shortenTitle(String title) {
@@ -476,9 +478,15 @@ public class Poll {
             eb.addField(downvoteEmoji, String.valueOf(finalDownvoteCount), true);
             eb.setFooter(LanguageHandler.get(lang, "poll_ended"), null);
 
-            message.editMessage(eb.build()).queue();
-            message.clearReactions().queue();
-            purge();
+            var selfMember = guild.getMemberById(jda.getSelfUser().getIdLong());
+            if (selfMember != null && selfMember.hasPermission(Permission.MESSAGE_WRITE) && message.getTextChannel().canTalk(selfMember)) {
+                message.editMessage(eb.build()).queue();
+                message.clearReactions().queue();
+                purge();
+            } else {
+                Console.log("Missing permissions MESSAGE_WRITE (Poll). Guild: " + guild.getName() + " (" + guild.getIdLong() + ") | TC: " + tc.getName() + " (" + tc.getIdLong() + ")");
+//                new MyGuild(guild).purgeMsg(tcId, msgId);
+            }
         }, f -> {});
     }
 

@@ -3,11 +3,13 @@ package commands.utility.rate;
 import files.language.LanguageHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import servant.*;
+import utilities.Console;
 import utilities.EmoteUtil;
 
 import java.awt.*;
@@ -328,10 +330,17 @@ public class Rating {
             for (var count : counts.entrySet()) eb.addField(count.getKey(), String.valueOf(count.getValue()), true);
             eb.setFooter(LanguageHandler.get(lang, "rate_ended"), null);
 
-            message.editMessage(eb.build()).queue();
-            message.clearReactions().queue();
-            purge();
-        });
+            var guild = message.getGuild();
+            var selfMember = guild.getMemberById(jda.getSelfUser().getIdLong());
+            if (selfMember != null && selfMember.hasPermission(Permission.MESSAGE_WRITE) && message.getTextChannel().canTalk(selfMember)) {
+                message.editMessage(eb.build()).queue();
+                message.clearReactions().queue();
+                purge();
+            } else {
+                Console.log("Missing permissions MESSAGE_WRITE (Rating). Guild: " + guild.getName() + " (" + guild.getIdLong() + ") | TC: " + tc.getName() + " (" + tc.getIdLong() + ")");
+//                new MyGuild(guild).purgeMsg(tcId, msgId);
+            }
+        }, f -> new MyGuild(tc.getGuild()).purgeMsg(tc.getIdLong(), msgId));
     }
 
     // Purge

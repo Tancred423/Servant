@@ -4,6 +4,7 @@ package commands.fun.profile;
 import files.language.LanguageHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import servant.MyGuild;
 import servant.MyUser;
 import utilities.Constants;
@@ -79,7 +80,7 @@ public class CommandsCommand extends Command {
 
         var i = 0;
         for (var fieldValue : fieldValues) {
-            if (i == 24) break; // Max 25 fields
+            if (i == 24 || (eb.length() + fieldValue.length() >= MessageEmbed.EMBED_MAX_LENGTH_BOT)) break; // Max 25 fields and 6000 characters
             eb.addField(" ", fieldValue, true);
             i++;
         }

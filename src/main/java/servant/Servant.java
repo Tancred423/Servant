@@ -13,6 +13,7 @@ import commands.fun.love.LoveCommand;
 import commands.fun.mirror.MirrorCommand;
 import commands.fun.profile.AchievementsCommand;
 import commands.fun.profile.CommandsCommand;
+import commands.fun.profile.NewProfileCommand;
 import commands.fun.profile.ProfileCommand;
 import commands.fun.tictactoe.TicTacToeCommand;
 import commands.interaction.*;
@@ -165,6 +166,7 @@ public class Servant {
                 new LoveCommand(),
                 new MirrorCommand(),
                 new ProfileCommand(),
+                new NewProfileCommand(),
                 new TicTacToeCommand(waiter),
 
                 // Interaction

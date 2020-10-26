@@ -77,7 +77,7 @@ public class ProfileImage {
         }
 
         // EXP
-        var currentExp = myUser.getExp(guild.getIdLong());
+        var currentExp = myUser.getLevelTotalExp(guild.getIdLong());
         var currentLevel = Parser.getLevelFromExp(currentExp);
         var neededExp = Parser.getLevelExp(currentLevel);
         var currentExpOnThisLevel = currentExp - Parser.getTotalLevelExp(currentLevel - 1);

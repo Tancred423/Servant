@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import servant.MyGuild;
 import servant.MyUser;
 import servant.Servant;
+import utilities.Console;
 import utilities.Constants;
 import utilities.ImageUtil;
 
@@ -88,7 +89,7 @@ public class GuildVoiceJoinListener extends ListenerAdapter {
                             }
                         }, 3000
                 );
-            });
+            }, f -> Console.log("Missing permission to copy voice channel! Guild: " + guild.getName() + " (" + guild.getIdLong() + ")"));
         }
     }
 }

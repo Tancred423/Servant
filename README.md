@@ -19,7 +19,7 @@ I will help you to moderate, organize and entertain your Discord server by provi
 
 ## Built with
 * [Java 12](https://openjdk.java.net/projects/jdk/11/) - Programming Language
-* [JDA 4.1.1_110](https://github.com/DV8FromTheWorld/JDA) - Java Wrapper for Discord API
+* [JDA 4.2.0_209](https://github.com/DV8FromTheWorld/JDA) - Java Wrapper for Discord API
 * [JDA-Utilities 3.0.2](https://github.com/JDA-Applications/JDA-Utilities) - JDA Commands Extension
 * [Maven](https://maven.apache.org/) - Dependency Management
 * Heart ❤
