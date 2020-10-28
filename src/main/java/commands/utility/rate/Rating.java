@@ -338,7 +338,7 @@ public class Rating {
                 purge();
             } else {
                 Console.log("Missing permissions MESSAGE_WRITE (Rating). Guild: " + guild.getName() + " (" + guild.getIdLong() + ") | TC: " + tc.getName() + " (" + tc.getIdLong() + ")");
-//                new MyGuild(guild).purgeMsg(tcId, msgId);
+                new MyGuild(guild).purgeMsg(tcId, msgId);
             }
         }, f -> new MyGuild(tc.getGuild()).purgeMsg(tc.getIdLong(), msgId));
     }

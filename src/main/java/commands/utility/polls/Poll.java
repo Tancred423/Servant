@@ -485,7 +485,7 @@ public class Poll {
                 purge();
             } else {
                 Console.log("Missing permissions MESSAGE_WRITE (Poll). Guild: " + guild.getName() + " (" + guild.getIdLong() + ") | TC: " + tc.getName() + " (" + tc.getIdLong() + ")");
-//                new MyGuild(guild).purgeMsg(tcId, msgId);
+                new MyGuild(guild).purgeMsg(tcId, msgId);
             }
         }, f -> {});
     }

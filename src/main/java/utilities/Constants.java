@@ -2,8 +2,8 @@
 package utilities;
 
 public class Constants {
-    final public static String VERSION = "6.5.1";
-    final public static String LOG_OFFSET = "+02:00";
+    final public static String VERSION = "6.5.2";
+    final public static String LOG_OFFSET = "+01:00";
 
     // in seconds
     final public static int USER_COOLDOWN = 3;

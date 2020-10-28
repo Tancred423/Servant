@@ -777,7 +777,7 @@ public class LanguageFile {
         en_gb.setProperty("presence_1", "%s users | %shelp");
         en_gb.setProperty("presence_2", "%s servers | %shelp");
         en_gb.setProperty("presence_3", "%ssupporter | %shelp");
-        en_gb.setProperty("presence_4", "DASHBOARD: %s");
+        en_gb.setProperty("presence_4", "%s | %shelp");
         en_gb.setProperty("presence_5", "#StayAtHome | %shelp");
         en_gb.setProperty("presence_6", "#BLM | %shelp");
 

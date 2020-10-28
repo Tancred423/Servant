@@ -73,7 +73,7 @@ public class GuildVoiceLeaveListener extends ListenerAdapter {
         }
 
         if (active.contains(channel) && channel.getMembers().size() == 0) {
-            channel.delete().queue();
+            channel.delete().queue(s -> {}, f -> {});
             active.remove(channel);
         }
     }

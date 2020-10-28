@@ -62,30 +62,26 @@ public class GuildVoiceJoinListener extends ListenerAdapter {
         }, Servant.fixedThreadPool);
     }
 
-    private static void processVoiceLobby(GuildVoiceJoinEvent event, net.dv8tion.jda.api.entities.Guild guild, User user, MyGuild myGuild, Member member, VoiceChannel channel, String lang) {
+    private static void processVoiceLobby(GuildVoiceJoinEvent event, net.dv8tion.jda.api.entities.Guild guild, User user, MyGuild myGuild, Member member, VoiceChannel lobby, String lang) {
         var channels = myGuild.getVoiceLobbies();
-        if (channels.contains(channel.getIdLong())) {
-            channel.createCopy().queue(newChannel -> {
-                new VoiceLobbyHandler(event.getJDA(), guild.getIdLong(), newChannel.getIdLong()).setActive();
-                newChannel.getManager().setParent(channel.getParent()).queue(
-                        parent -> newChannel.getManager().setName(VoiceLobbyHandler.getVoiceLobbyName(member, lang)).queue(
-                                name -> guild.modifyVoiceChannelPositions().selectPosition(newChannel).moveTo(channel.getPosition() + 1).queue(
-                                        position -> {
-                                            try {
-                                                guild.moveVoiceMember(member, newChannel).queue();
-                                            } catch (Exception ignored) { }
-                                        }
-                                )
-                        ),
-                        failure -> System.out.println("Couldn't create new voice channel. User: " + user.getName() + "#" + user.getDiscriminator() + " (" + user.getIdLong() + ") Guild: " + guild.getName() + " (" + guild.getIdLong() + ")")
-                );
+        if (channels.contains(lobby.getIdLong())) {
+            lobby.createCopy().queue(tmpVc -> {
+                new VoiceLobbyHandler(event.getJDA(), guild.getIdLong(), tmpVc.getIdLong()).setActive();
+                tmpVc.getManager()
+                        .setParent(lobby.getParent())
+                        .setName(VoiceLobbyHandler.getVoiceLobbyName(member, lang))
+                        .queue(parentAndName ->
+                                guild.modifyVoiceChannelPositions().selectPosition(tmpVc).moveTo(lobby.getPosition() + 1).queue(position ->
+                                        guild.moveVoiceMember(member, tmpVc).queue()));
 
                 new java.util.Timer().schedule(
                         new java.util.TimerTask() {
                             @Override
                             public void run() {
-                                if (newChannel.getMembers().size() == 0)
-                                    newChannel.delete().queue(s -> {}, f -> {});
+                                if (tmpVc.getMembers().size() == 0)
+                                    tmpVc.delete().queue(s -> {
+                                    }, f -> {
+                                    });
                             }
                         }, 3000
                 );

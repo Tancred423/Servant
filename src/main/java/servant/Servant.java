@@ -44,6 +44,7 @@ import files.language.LanguageHandler;
 import listeners.*;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
 import net.jodah.expiringmap.ExpiringMap;
 import plugins.moderation.livestream.LivestreamHandler;
@@ -207,8 +208,7 @@ public class Servant {
                 new WolfCommand()
         );
 
-        new DefaultShardManagerBuilder()
-                .setToken(config.getBotToken())
+        DefaultShardManagerBuilder.createDefault(config.getBotToken(), GatewayIntent.getIntents(GatewayIntent.ALL_INTENTS))
                 .setStatus(OnlineStatus.DO_NOT_DISTURB)
                 .setActivity(Activity.playing("loading..."))
                 .addEventListeners(client.build())
@@ -252,6 +252,7 @@ public class Servant {
                 .addEventListeners(new UserActivityStartListener()) // Livestream
                 .addEventListeners(new VoiceChannelCreateListener()) // Log
                 .addEventListeners(new VoiceChannelDeleteListener()) // Log, Purges
-        .build();
+
+                .build();
     }
 }

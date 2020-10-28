@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import servant.MyGuild;
 import servant.MyUser;
 import servant.Servant;
+import utilities.Console;
 import utilities.Constants;
 import utilities.ImageUtil;
 
@@ -75,32 +76,27 @@ public class GuildVoiceMoveListener extends ListenerAdapter {
         var channels = myGuild.getVoiceLobbies();
         var joinedChannel = event.getChannelJoined();
         if (channels.contains(joinedChannel.getIdLong())) {
-            // Join
-            joinedChannel.createCopy().queue(newChannel -> {
-                new VoiceLobbyHandler(event.getJDA(), guild.getIdLong(), newChannel.getIdLong()).setActive();
-                newChannel.getManager().setParent(joinedChannel.getParent()).queue(
-                        parent -> newChannel.getManager().setName(VoiceLobbyHandler.getVoiceLobbyName(member, lang)).queue(
-                                name -> guild.modifyVoiceChannelPositions().selectPosition(newChannel).moveTo(joinedChannel.getPosition() + 1).queue(
-                                        position -> {
-                                            try {
-                                                guild.moveVoiceMember(member, newChannel).queue();
-                                            } catch (Exception ignored) { }
-                                        }
-                                )
-                        ),
-                        failure -> System.out.println("Couldn't create new voice channel. User: " + user.getName() + "#" + user.getDiscriminator() + " (" + user.getIdLong() + ") Guild: " + guild.getName() + " (" + guild.getIdLong() + ")")
-                );
+            joinedChannel.createCopy().queue(tmpVc -> {
+                new VoiceLobbyHandler(event.getJDA(), guild.getIdLong(), tmpVc.getIdLong()).setActive();
+                tmpVc.getManager()
+                        .setParent(joinedChannel.getParent())
+                        .setName(VoiceLobbyHandler.getVoiceLobbyName(member, lang))
+                        .queue(parentAndName ->
+                                guild.modifyVoiceChannelPositions().selectPosition(tmpVc).moveTo(joinedChannel.getPosition() + 1).queue(position ->
+                                        guild.moveVoiceMember(member, tmpVc).queue()));
 
                 new java.util.Timer().schedule(
                         new java.util.TimerTask() {
                             @Override
                             public void run() {
-                                if (newChannel.getMembers().size() == 0)
-                                    newChannel.delete().queue(s -> {}, f -> {});
+                                if (tmpVc.getMembers().size() == 0)
+                                    tmpVc.delete().queue(s -> {
+                                    }, f -> {
+                                    });
                             }
                         }, 3000
                 );
-            });
+            }, f -> Console.log("Missing permission to copy voice channel! Guild: " + guild.getName() + " (" + guild.getIdLong() + ")"));
         }
 
         // Leave
