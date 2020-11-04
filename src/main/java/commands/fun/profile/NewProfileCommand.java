@@ -68,7 +68,6 @@ public class NewProfileCommand extends Command {
 
         eb.setDescription(description);
 
-
         event.reply(eb.build());
     }
 

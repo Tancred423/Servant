@@ -716,7 +716,7 @@ public class LanguageFile {
         // MediaOnlyChannel
         en_gb.setProperty("mediaonlychannel_warning", "%s, this is a media only channel!\n" +
                 "You are allowed to:\n" +
-                "- Send upload files with an optional description.\n" +
+                "- Upload files with an optional description.\n" +
                 "- Post a valid url with an optional description.\n" +
                 "*This message will be deleted in 30 seconds.*");
 
