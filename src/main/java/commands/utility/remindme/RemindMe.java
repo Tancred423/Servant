@@ -3,6 +3,7 @@ package commands.utility.remindme;
 import files.language.LanguageHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.MessageBuilder;
 import servant.*;
 import utilities.ImageUtil;
 
@@ -28,9 +29,17 @@ public class RemindMe {
         this.msgId = msgId;
     }
 
-    public long getGuildId() { return guildId; }
-    public long getTcId() { return tcId; }
-    public long getMsgId() { return msgId; }
+    public long getGuildId() {
+        return guildId;
+    }
+
+    public long getTcId() {
+        return tcId;
+    }
+
+    public long getMsgId() {
+        return msgId;
+    }
 
     public long getAuthorId() {
         Connection connection = null;
@@ -94,6 +103,8 @@ public class RemindMe {
         } finally {
             closeQuietly(connection);
         }
+
+        if (topic != null && topic.isEmpty()) topic = null;
 
         return topic;
     }
@@ -243,35 +254,38 @@ public class RemindMe {
             participants.add(authorId);
             var topic = getTopic();
 
-
             var myAuthor = new MyUser(author);
             var myGuild = new MyGuild(guild);
             var lang = myGuild.getLanguageCode();
 
-            message.editMessage(new EmbedBuilder()
+            var eb = new EmbedBuilder()
                     .setColor(Color.decode(myAuthor.getColorCode()))
-                    .setAuthor(String.format(LanguageHandler.get(lang, "remindme_of"), author.getName()), null, author.getEffectiveAvatarUrl())
+                    .setAuthor(String.format(LanguageHandler.get(lang, "remindme_of"), author.getName()), author.getEffectiveAvatarUrl())
                     .setThumbnail(ImageUtil.getUrl(jda, "pinged"))
-                    .setDescription((topic.isEmpty() ? "" : String.format(LanguageHandler.get(lang, "remindme_topic"), topic)) + "\n" +
-                            String.format(LanguageHandler.get(lang, "remindme_success"), ""))
-                    .build()
-            ).queue();
+                    .setDescription((topic == null ? "" : String.format(LanguageHandler.get(lang, "remindme_topic"), topic)) + "\n" +
+                            String.format(LanguageHandler.get(lang, "remindme_success"), ""));
 
+            message.editMessage(eb.build()).queue();
 
             for (var participant : participants) {
                 var member = guild.getMemberById(participant);
                 if (member == null) continue;
                 var user = member.getUser();
                 user.openPrivateChannel().queue(
-                        pc -> pc.sendMessage(new EmbedBuilder()
-                                .setColor(Color.decode(myAuthor.getColorCode()))
-                                .setAuthor(LanguageHandler.get(lang, "remindme_remind"), null, null)
-                                .setThumbnail(ImageUtil.getUrl(jda, "pinged"))
-                                .setDescription((topic.isEmpty() ? "" : String.format(LanguageHandler.get(lang, "remindme_topic"), topic) + "\n") +
-                                        "[" + LanguageHandler.get(lang, "remindme_jump") + "](" + message.getJumpUrl() + ")")
-                                .build()).queue(),
-                        failure -> {
-                        });
+                        pc -> pc.sendMessage(
+                                new MessageBuilder()
+                                        .setContent(String.format(LanguageHandler.get(lang, "remindme_remind"), user.getAsMention()))
+                                        .setEmbed(
+                                                new EmbedBuilder()
+                                                        .setColor(Color.decode(myAuthor.getColorCode()))
+                                                        .setThumbnail(ImageUtil.getUrl(jda, "pinged"))
+                                                        .setDescription(topic)
+                                                        .addField("", "[" + LanguageHandler.get(lang, "remindme_jump") + "](" + message.getJumpUrl() + ")", false)
+                                                        .build())
+                                        .build()
+                        ).queue(s -> {
+                        }, f -> {
+                        }));
             }
 
             message.clearReactions().queue();

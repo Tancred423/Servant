@@ -139,6 +139,10 @@ public class Parser {
         }
     }
 
+    public static boolean isValidDate(String input) {
+        return isValidDateTime(input + " 00:00");
+    }
+
     public static boolean hasMentionedUser(Message message) {
         return !message.getMentionedUsers().isEmpty();
     }
@@ -154,7 +158,7 @@ public class Parser {
     }
 
     public static int getLevelExp(int level) {
-        return 5*(level*level)+50*level+100;
+        return 5 * (level * level) + 50 * level + 100;
     }
 
     public static int getLevelFromExp(int exp) {

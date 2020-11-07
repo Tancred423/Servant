@@ -32,9 +32,40 @@ public class MyUser {
         this.jda = user.getJDA();
     }
 
-    public User getUser() { return user; }
-    public long getUserId() { return userId; }
-    public JDA getJDA() { return jda; }
+    public User getUser() {
+        return user;
+    }
+
+    public long getUserId() {
+        return userId;
+    }
+
+    public JDA getJDA() {
+        return jda;
+    }
+
+    // User
+    private boolean userHasEntry() {
+        Connection connection = null;
+        var userHasEntry = false;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement(
+                    "SELECT user_id " +
+                            "FROM users " +
+                            "WHERE user_id=?");
+            select.setLong(1, userId);
+            var resultSet = select.executeQuery();
+            userHasEntry = resultSet.next();
+        } catch (SQLException e) {
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyUser#userHasEntry"));
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return userHasEntry;
+    }
 
     // Prefix
     public String getPrefix() {
@@ -173,6 +204,83 @@ public class MyUser {
         }
 
         return birthday;
+    }
+
+    public void setBirthday(String birthday) {
+        Connection connection = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            if (userHasEntry()) {
+                var update = connection.prepareStatement(
+                        "UPDATE users " +
+                                "SET birthday=? " +
+                                "WHERE user_id=?");
+                update.setString(1, birthday);
+                update.setLong(2, userId);
+                update.executeUpdate();
+            } else {
+                var insert = connection.prepareStatement(
+                        "INSERT INTO users (user_id,prefix,language_code,color_code,bio,birthday,profile_bg_id) " +
+                                "VALUES (?,?,?,?,?,?,?)");
+                insert.setLong(1, userId);
+                insert.setString(2, "");
+                insert.setString(3, Servant.config.getDefaultLanguage());
+                insert.setString(4, Servant.config.getDefaultColorCode().replace("0x", "#"));
+                insert.setString(5, "");
+                insert.setString(6, birthday);
+                insert.setInt(7, 1);
+                insert.executeUpdate();
+            }
+        } catch (SQLException e) {
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyUser#setBirthday"));
+        } finally {
+            closeQuietly(connection);
+        }
+    }
+
+    public boolean isBirthdayGuild(long guildId) {
+        Connection connection = null;
+        var isBirthdayGuild = false;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement(
+                    "SELECT id " +
+                            "FROM user_birthday_guilds " +
+                            "WHERE user_id=? " +
+                            "AND guild_id=?");
+            select.setLong(1, userId);
+            select.setLong(2, guildId);
+            var resultSet = select.executeQuery();
+            isBirthdayGuild = resultSet.next();
+        } catch (SQLException e) {
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyUser#getBirthdayGuild"));
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return isBirthdayGuild;
+    }
+
+    public void addBirthdayGuild(long guildId) {
+        Connection connection = null;
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            if (!isBirthdayGuild(guildId)) {
+                var insert = connection.prepareStatement(
+                        "INSERT INTO user_birthday_guilds (user_id,guild_id) " +
+                                "VALUES (?,?)");
+                insert.setLong(1, userId);
+                insert.setLong(2, guildId);
+                insert.executeUpdate();
+            }
+        } catch (SQLException e) {
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyUser#addBirthdayGuild"));
+        } finally {
+            closeQuietly(connection);
+        }
     }
 
     // Creator
@@ -348,9 +456,9 @@ public class MyUser {
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
             while (resultSet.next()) {
-                    var achievement = resultSet.getString("name");
-                    if (achievement.startsWith("level")) achievements.add(achievement);
-                }
+                var achievement = resultSet.getString("name");
+                if (achievement.startsWith("level")) achievements.add(achievement);
+            }
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyUser#getLevelAchievements"));
         } finally {
@@ -498,26 +606,26 @@ public class MyUser {
         return exp;
     }
 
-     public int getLevel(long guildId) {
-         return Parser.getLevelFromExp(getLevelTotalExp(guildId));
-     }
+    public int getLevel(long guildId) {
+        return Parser.getLevelFromExp(getLevelTotalExp(guildId));
+    }
 
-     public int getLevelNeededExp(long guildId) {
-         var currentLevel = getLevel(guildId);
-         return Parser.getLevelExp(currentLevel);
-     }
+    public int getLevelNeededExp(long guildId) {
+        var currentLevel = getLevel(guildId);
+        return Parser.getLevelExp(currentLevel);
+    }
 
-     public int getLevelCurrentExp(long guildId) {
-         var exp = getLevelTotalExp(guildId);
-         var level = getLevel(guildId);
-         return exp - Parser.getTotalLevelExp(level - 1);
-     }
+    public int getLevelCurrentExp(long guildId) {
+        var exp = getLevelTotalExp(guildId);
+        var level = getLevel(guildId);
+        return exp - Parser.getTotalLevelExp(level - 1);
+    }
 
-     public float getLevelPercent(long guildId) {
-         var currentExp = getLevelCurrentExp(guildId);
-         var neededExp = getLevelNeededExp(guildId);
-         return ((float) currentExp) / neededExp;
-     }
+    public float getLevelPercent(long guildId) {
+        var currentExp = getLevelCurrentExp(guildId);
+        var neededExp = getLevelNeededExp(guildId);
+        return ((float) currentExp) / neededExp;
+    }
 
     public void setExp(long guildId, int exp) {
         Connection connection = null;
@@ -1028,7 +1136,8 @@ public class MyUser {
                             "WHERE user_id=?");
             select.setLong(1, userId);
             var resultSet = select.executeQuery();
-            if (resultSet.next()) tttStatistics = new TicTacToeStatistic(userId, resultSet.getInt("wins"), resultSet.getInt("draws"), resultSet.getInt("loses"));
+            if (resultSet.next())
+                tttStatistics = new TicTacToeStatistic(userId, resultSet.getInt("wins"), resultSet.getInt("draws"), resultSet.getInt("loses"));
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyUser#getTttStatistic"));
         } finally {

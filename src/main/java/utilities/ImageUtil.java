@@ -128,6 +128,7 @@ public class ImageUtil {
                     put("f", servantEmotes2.getEmoteById(747417182014537798L));
                     put("fennec", servantEmotes2.getEmoteById(756512706214756353L));
                     put("tictactoe", servantEmotes2.getEmoteById(756525713129209877L));
+                    put("setbirthday", servantEmotes2.getEmoteById(774651584344752159L));
                 }
             }
         }};

@@ -18,7 +18,7 @@ import java.util.ArrayList;
 public class CommandsCommand extends Command {
     public CommandsCommand() {
         this.name = "commands";
-        this.aliases = new String[] { "mostusedcommands", "mostusedcommand", "muc" };
+        this.aliases = new String[]{"command", "mostusedcommands", "mostusedcommand", "muc"};
         this.help = "Displays a detailed list of your most used commands";
         this.category = new Category("Fun");
         this.arguments = null;
@@ -28,7 +28,7 @@ public class CommandsCommand extends Command {
         this.modCommand = false;
         this.cooldown = 0;
         this.cooldownScope = CooldownScope.USER;
-        this.botPermissions = new Permission[] {
+        this.botPermissions = new Permission[]{
                 Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY,
                 Permission.MESSAGE_EMBED_LINKS
         };
@@ -57,7 +57,7 @@ public class CommandsCommand extends Command {
                         LanguageHandler.get(lang, "commands_title"),
                         user.getName(),
                         user.getName().endsWith("s") ? LanguageHandler.get(lang, "apostrophe") : LanguageHandler.get(lang, "apostrophe_s")
-                        ), null, user.getEffectiveAvatarUrl())
+                ), null, user.getEffectiveAvatarUrl())
                 .setDescription(LanguageHandler.get(lang, "commands_used") + ": " + myUser.getCommandsTotalCount());
 
         var sb = new StringBuilder();
@@ -73,14 +73,16 @@ public class CommandsCommand extends Command {
             }
 
             var emote = featureEmotes.get(entry.getKey());
-            if (emote != null) sb.append(emote.getAsMention()).append(" ").append(prefix).append(entry.getKey()).append(": ").append(entry.getValue()).append(" ").append(LanguageHandler.get(lang, "times")).append("\n");
+            if (emote != null)
+                sb.append(emote.getAsMention()).append(" ").append(prefix).append(entry.getKey()).append(": ").append(entry.getValue()).append(" ").append(LanguageHandler.get(lang, "times")).append("\n");
         }
 
         fieldValues.add(sb.toString());
 
         var i = 0;
         for (var fieldValue : fieldValues) {
-            if (i == 24 || (eb.length() + fieldValue.length() >= MessageEmbed.EMBED_MAX_LENGTH_BOT)) break; // Max 25 fields and 6000 characters
+            if (i == 24 || (eb.length() + fieldValue.length() >= MessageEmbed.EMBED_MAX_LENGTH_BOT))
+                break; // Max 25 fields and 6000 characters
             eb.addField(" ", fieldValue, true);
             i++;
         }

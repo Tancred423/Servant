@@ -174,7 +174,7 @@ public class LanguageFile {
         en_gb.setProperty("profile_noachievements", "No achievements");
 
         en_gb.setProperty("profile_level", "Level");
-        en_gb.setProperty("profile_rank",  "Rank");
+        en_gb.setProperty("profile_rank", "Rank");
 
         en_gb.setProperty("profile_baguette", "Biggest Baguette");
         en_gb.setProperty("profile_nobaguette", "No baguette yet");
@@ -564,10 +564,10 @@ public class LanguageFile {
         en_gb.setProperty("remindme_30_days", "RemindMe must not be further in the future than 30 days.");
         en_gb.setProperty("remindme_of", "RemindMe of %s");
         en_gb.setProperty("remindme_topic", "Topic: %s");
-        en_gb.setProperty("remindme_also",  "If you also want to be reminded, just click %s");
+        en_gb.setProperty("remindme_also", "If you also want to be reminded, just click %s");
         en_gb.setProperty("remindme_at", "RemindMe at");
-        en_gb.setProperty("remindme_success",  "You've been reminded %s");
-        en_gb.setProperty("remindme_remind", "Hi master, here is your requested reminder.");
+        en_gb.setProperty("remindme_success", "You've been reminded %s");
+        en_gb.setProperty("remindme_remind", "%s, here is your requested reminder.");
         en_gb.setProperty("remindme_jump", "Click here to jump to the context.");
 
         // Signup
@@ -628,6 +628,17 @@ public class LanguageFile {
         en_gb.setProperty("birthday_guild", "%s birthdays");
         en_gb.setProperty("birthday_howtoadd", "Add your birthday in the [dashboard](%s)!");
         en_gb.setProperty("birthday_as_of", "As of");
+        en_gb.setProperty("setbirthday_success", "Your birthday was set to \"%s\" and the server \"%s\" can now access it.");
+
+        en_gb.setProperty("setbirthday_description", "Set or update your birthday and the allowed servers.\n" +
+                "If you already have a birthday set in the Dashboard, it will be updated.\n" +
+                "The current server will be added as allowed Birthday-Server.");
+        en_gb.setProperty("setbirthday_usage", "**Set or update your birthday and allow this server to access it**\n" +
+                "Command: `%s%s yyyy-mm-dd`\n" +
+                "Exmaple: `%s%s 1990-12-31`");
+        en_gb.setProperty("setbirthday_hint", "This is just a quick way of setting a birthday and birthday server.\n" +
+                "To fully manage your birthday settings, please visit the [Dashboard](%s).");
+        en_gb.setProperty("setbirthday_invalid", "The given date \"%s\" is invalid.");
 
         // Giveaway
         en_gb.setProperty("giveaway_dm", "I counted your entry for [this](%s) giveaway!");
@@ -963,7 +974,7 @@ public class LanguageFile {
         de_de.setProperty("profile_noachievements", "Keine Errungenschaften");
 
         de_de.setProperty("profile_level", "Stufe");
-        de_de.setProperty("profile_rank",  "Rang");
+        de_de.setProperty("profile_rank", "Rang");
 
         de_de.setProperty("profile_baguette", "Größtes Baguette");
         de_de.setProperty("profile_nobaguette", "Bisher keine Baguettes");
@@ -1353,10 +1364,10 @@ public class LanguageFile {
         de_de.setProperty("remindme_30_days", "Diese Erinnerung darf nicht weiter in der Zukunft sein als 30 Tage.");
         de_de.setProperty("remindme_of", "Erinnerung von %s");
         de_de.setProperty("remindme_topic", "Thema: %s");
-        de_de.setProperty("remindme_also",  "Wenn Du auch erinnert werden möchtest, drücke %s");
+        de_de.setProperty("remindme_also", "Wenn Du auch erinnert werden möchtest, drücke %s");
         de_de.setProperty("remindme_at", "Erinnerung am");
-        de_de.setProperty("remindme_success",  "Du wurdest erinnert %s");
-        de_de.setProperty("remindme_remind", "Hi Meister, hier ist deine angeforderte Erinnerung.");
+        de_de.setProperty("remindme_success", "Du wurdest erinnert %s");
+        de_de.setProperty("remindme_remind", "%s, hier ist deine angeforderte Erinnerung.");
         de_de.setProperty("remindme_jump", "Hier drücken um zum Kontext zu gelangen.");
 
         // Signup
@@ -1417,6 +1428,17 @@ public class LanguageFile {
         de_de.setProperty("birthday_guild", "%s Geburtstage");
         de_de.setProperty("birthday_howtoadd", "Füge deinen Geburtstag im [Dashboard](%s) hinzu!");
         de_de.setProperty("birthday_as_of", "Stand");
+
+        de_de.setProperty("setbirthday_description", "Aktualisiere oder stelle Dein Geburtstag und die erlaubten Server ein.\n" +
+                "Falls Du Deinen Geburtstag bereits im Dashboard eingestellt hat, wird dieser aktualisiert.\n" +
+                "Der aktuelle Server wird als erlaubter Geburtstags-Server hinzugefügt.");
+        de_de.setProperty("setbirthday_usage", "**Aktualisiere oder stelle Dein Geburtstag und erlaube diesem Server darauf zuzugreifen**\n" +
+                "Befehl: `%s%s yyyy-mm-dd`\n" +
+                "Beispiel: `%s%s 1990-12-31`");
+        de_de.setProperty("setbirthday_hint", "Dies ist lediglich ein schneller Weg einen Geburtstag und Geburtstagsserver hinzuzufügen.\n" +
+                "Um Deine Geburtstagseinstellungen im vollen Umfang einzustellen, benutze bitte das [Dashboard](%s).");
+        de_de.setProperty("setbirthday_invalid", "Das mitgegebene Datum \"%s\" ist ungültig.");
+        de_de.setProperty("setbirthday_success", "Dein Geburtstag wurde auf \"%s\" gesetzt und der Server \"%s\" kann nun darauf zugreifen.");
 
         // Giveaway
         de_de.setProperty("giveaway_dm", "Ich habe deine Teilnahme für [dieses](%s) Giveaway gezählt!");

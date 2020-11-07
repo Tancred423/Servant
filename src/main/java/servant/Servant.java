@@ -32,6 +32,7 @@ import commands.standard.help.HelpCommand;
 import commands.standard.ping.PingCommand;
 import commands.standard.supporter.SupporterCommand;
 import commands.utility.TimezoneCommand;
+import commands.utility.birthday.SetBirthdayCommand;
 import commands.utility.customCommands.CustomCommandsCommand;
 import commands.utility.giveaway.GiveawayCommand;
 import commands.utility.polls.poll.PollCommand;
@@ -46,6 +47,8 @@ import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import net.jodah.expiringmap.ExpiringMap;
 import plugins.moderation.livestream.LivestreamHandler;
 import servant.guild.GuildManager;
@@ -153,6 +156,7 @@ public class Servant {
                 new QuickpollCommand(),
                 new RateCommand(),
                 new RemindMeCommand(),
+                new SetBirthdayCommand(),
                 new SignupCommand(),
                 new TimezoneCommand(),
 
@@ -209,6 +213,8 @@ public class Servant {
         );
 
         DefaultShardManagerBuilder.createDefault(config.getBotToken(), GatewayIntent.getIntents(GatewayIntent.ALL_INTENTS))
+                .enableCache(CacheFlag.ACTIVITY)
+                .setMemberCachePolicy(MemberCachePolicy.ALL)
                 .setStatus(OnlineStatus.DO_NOT_DISTURB)
                 .setActivity(Activity.playing("loading..."))
                 .addEventListeners(client.build())

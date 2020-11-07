@@ -617,6 +617,7 @@ public class ProfileImage {
             add("quickpoll");
             add("rate");
             add("remindme");
+            add("setbirthday");
             add("signup");
             add("timezone");
             add("achievements");
