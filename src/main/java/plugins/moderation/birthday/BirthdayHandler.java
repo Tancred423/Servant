@@ -5,8 +5,8 @@ import files.language.LanguageHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.User;
 import servant.LoggingTask;
 import servant.MyGuild;
 import servant.MyUser;
@@ -29,23 +29,23 @@ public class BirthdayHandler {
         for (var guild : guilds) {
             if (guild.getIdLong() == 264445053596991498L) continue; // Discord Bot List
             var myGuild = new MyGuild(guild);
-                var channelId = myGuild.getBirthdayListTcId();
-                var messageId = myGuild.getBirthdayListMsgId();
-                var authorId = myGuild.getBirthdayListAuthorId();
-                var tc = guild.getTextChannelById(channelId);
-                if (tc != null) {
-                    var authorMember = guild.getMemberById(authorId);
-                    if (authorMember != null) {
-                        tc.retrieveMessageById(messageId).queue(message -> {
-                            try {
-                                var list = createList(guild, authorMember.getUser());
-                                message.editMessage(list).queue(s -> {}, f -> myGuild.unsetBirthdayList());
-                            } catch (ParseException e) {
-                                Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "BirthdayHandler#updateLists"));
-                            }
-                        }, f -> {});
+            var channelId = myGuild.getBirthdayListTcId();
+            var messageId = myGuild.getBirthdayListMsgId();
+            var authorId = myGuild.getBirthdayListAuthorId();
+            var tc = guild.getTextChannelById(channelId);
+            if (tc != null) {
+                var authorMember = guild.getMemberById(authorId);
+                tc.retrieveMessageById(messageId).queue(message -> {
+                    try {
+                        var list = createList(guild, authorMember);
+                        message.editMessage(list).queue(s -> {
+                        }, f -> myGuild.unsetBirthdayList());
+                    } catch (ParseException e) {
+                        Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "BirthdayHandler#updateLists"));
                     }
-                }
+                }, f -> {
+                });
+            }
         }
     }
 
@@ -62,7 +62,7 @@ public class BirthdayHandler {
 
             for (var birthday : birthdays.entrySet()) {
                 var userId = birthday.getKey();
-                var member =  guild.getMemberById(userId);
+                var member = guild.getMemberById(userId);
                 if (member == null) continue;
                 var user = member.getUser();
                 var myUser = new MyUser(user);
@@ -83,14 +83,13 @@ public class BirthdayHandler {
         var birthdayMember = guild.getMemberById(userId);
         var birthdayTc = myGuild.getBirthdayAnnouncementTc();
         if (birthdayTc != null && birthdayMember != null)
-        birthdayTc.sendMessage(
-                String.format(LanguageHandler.get(myGuild.getLanguageCode(), "birthday_gratulation"), birthdayMember.getAsMention())
-        ).queue();
+            birthdayTc.sendMessage(
+                    String.format(LanguageHandler.get(myGuild.getLanguageCode(), "birthday_gratulation"), birthdayMember.getAsMention())
+            ).queue();
     }
-    
-    private static MessageEmbed createList(Guild guild, User author) throws ParseException {
+
+    private static MessageEmbed createList(Guild guild, Member authorMember) throws ParseException {
         var myGuild = new MyGuild(guild);
-        var myUser = new MyUser(author);
 
         var lang = myGuild.getLanguageCode();
         var countdown = StringUtil.fillWithWhitespace(LanguageHandler.get(lang, "birthday_countdown"),
@@ -119,7 +118,6 @@ public class BirthdayHandler {
             sb.append("```c\n")
                     .append(countdown).append(" ").append(date).append(" ").append(name).append("\n")
                     .append("-".repeat(countdown.length())).append(" ").append("-".repeat(date.length())).append(" ").append("-".repeat(16)).append("\n");
-
 
 
             // Birthdays
@@ -156,7 +154,7 @@ public class BirthdayHandler {
         var footer = LanguageHandler.get(lang, "birthday_as_of");
 
         var eb = new EmbedBuilder()
-                .setColor(Color.decode(myUser.getColorCode()))
+                .setColor(Color.decode(authorMember == null ? Servant.config.getDefaultColorCode() : new MyUser(authorMember.getUser()).getColorCode()))
                 .setAuthor(authorName, null, guild.getIconUrl())
                 .setDescription(description)
                 .setTimestamp(OffsetDateTime.now())
@@ -180,11 +178,11 @@ public class BirthdayHandler {
         calendar.setTime(today);
 
         int todayDay = calendar.get(Calendar.DAY_OF_MONTH);
-        int todayMonth = calendar.get(Calendar.MONTH)+1;
+        int todayMonth = calendar.get(Calendar.MONTH) + 1;
         int todayYear = calendar.get(Calendar.YEAR);
 
-        int bdayDay = Integer.parseInt(date.substring(8,10));
-        int bdayMonth = Integer.parseInt(date.substring(5,7));
+        int bdayDay = Integer.parseInt(date.substring(8, 10));
+        int bdayMonth = Integer.parseInt(date.substring(5, 7));
         int bdayYear;
 
         /* If the date (day and month) is before today, the year will be set to the next year. */

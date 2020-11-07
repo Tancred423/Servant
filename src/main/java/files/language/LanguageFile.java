@@ -628,14 +628,14 @@ public class LanguageFile {
         en_gb.setProperty("birthday_guild", "%s birthdays");
         en_gb.setProperty("birthday_howtoadd", "Add your birthday in the [dashboard](%s)!");
         en_gb.setProperty("birthday_as_of", "As of");
-        en_gb.setProperty("setbirthday_success", "Your birthday was set to \"%s\" and the server \"%s\" can now access it.");
+        en_gb.setProperty("setbirthday_success", "%s, your birthday was set to \"%s\" and the server \"%s\" can now access it.");
 
         en_gb.setProperty("setbirthday_description", "Set or update your birthday and the allowed servers.\n" +
                 "If you already have a birthday set in the Dashboard, it will be updated.\n" +
                 "The current server will be added as allowed Birthday-Server.");
         en_gb.setProperty("setbirthday_usage", "**Set or update your birthday and allow this server to access it**\n" +
                 "Command: `%s%s yyyy-mm-dd`\n" +
-                "Exmaple: `%s%s 1990-12-31`");
+                "Example: `%s%s 1990-12-31`");
         en_gb.setProperty("setbirthday_hint", "This is just a quick way of setting a birthday and birthday server.\n" +
                 "To fully manage your birthday settings, please visit the [Dashboard](%s).");
         en_gb.setProperty("setbirthday_invalid", "The given date \"%s\" is invalid.");
@@ -1438,7 +1438,7 @@ public class LanguageFile {
         de_de.setProperty("setbirthday_hint", "Dies ist lediglich ein schneller Weg einen Geburtstag und Geburtstagsserver hinzuzufügen.\n" +
                 "Um Deine Geburtstagseinstellungen im vollen Umfang einzustellen, benutze bitte das [Dashboard](%s).");
         de_de.setProperty("setbirthday_invalid", "Das mitgegebene Datum \"%s\" ist ungültig.");
-        de_de.setProperty("setbirthday_success", "Dein Geburtstag wurde auf \"%s\" gesetzt und der Server \"%s\" kann nun darauf zugreifen.");
+        de_de.setProperty("setbirthday_success", "%s, Dein Geburtstag wurde auf \"%s\" gesetzt und der Server \"%s\" kann nun darauf zugreifen.");
 
         // Giveaway
         de_de.setProperty("giveaway_dm", "Ich habe deine Teilnahme für [dieses](%s) Giveaway gezählt!");

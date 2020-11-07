@@ -31,7 +31,6 @@ public class SetBirthdayCommand extends Command {
 
     @Override
     protected void execute(CommandEvent event) {
-        var jda = event.getJDA();
         var guild = event.getGuild();
         var myGuild = new MyGuild(guild);
         var user = event.getAuthor();
@@ -56,7 +55,7 @@ public class SetBirthdayCommand extends Command {
             myUser.setBirthday(birthday);
             myUser.addBirthdayGuild(guild.getIdLong());
 
-            event.replySuccess(String.format(LanguageHandler.get(lang, "setbirthday_success"), birthday, guild.getName()));
+            event.replySuccess(String.format(LanguageHandler.get(lang, "setbirthday_success"), user.getAsMention(), birthday, guild.getName()));
         }
     }
 }
