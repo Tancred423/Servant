@@ -8,7 +8,10 @@ import net.dv8tion.jda.api.entities.*;
 import utilities.Console;
 import utilities.ToggleUtil;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.*;
 
 import static servant.Database.closeQuietly;
@@ -24,12 +27,17 @@ public class MyGuild {
         this.jda = guild.getJDA();
     }
 
-    public Guild getGuild() { return guild; }
-    public long getGuildId() { return guildId; }
+    public Guild getGuild() {
+        return guild;
+    }
+
+    public long getGuildId() {
+        return guildId;
+    }
 
     // Purge
     public void purge() {
-      Console.log("Purging guild... Guild ID: " + guildId);
+        Console.log("Purging guild... Guild ID: " + guildId);
         Connection connection = null;
 
         try {
@@ -820,7 +828,8 @@ public class MyGuild {
             if (resultSet.next()) {
                 var birthdayTcId = resultSet.getLong("announcement_tc_id");
                 birthdayTc = guild.getTextChannelById(birthdayTcId);
-                if (birthdayTc == null) unsetBirthdayAnnouncementTc(); // Unsetting it because the role doesn't exist anymore.
+                if (birthdayTc == null)
+                    unsetBirthdayAnnouncementTc(); // Unsetting it because the role doesn't exist anymore.
             }
 
         } catch (SQLException e) {
@@ -840,8 +849,8 @@ public class MyGuild {
                 connection = Servant.db.getHikari().getConnection();
                 var update = connection.prepareStatement(
                         "UPDATE guild_birthdays " +
-                            "SET announcement_tc_id=? " +
-                            "WHERE guild_id=?");
+                                "SET announcement_tc_id=? " +
+                                "WHERE guild_id=?");
                 update.setLong(1, 0L);
                 update.setLong(2, guildId);
                 update.executeUpdate();
@@ -928,8 +937,8 @@ public class MyGuild {
                 connection = Servant.db.getHikari().getConnection();
                 var update = connection.prepareStatement(
                         "UPDATE guild_birthdays " +
-                            "SET list_tc_id=?, list_msg_id=?, list_author_id=? " +
-                            "WHERE guild_id=?");
+                                "SET list_tc_id=?, list_msg_id=?, list_author_id=? " +
+                                "WHERE guild_id=?");
                 update.setLong(1, 0L);
                 update.setLong(2, 0L);
                 update.setLong(3, 0L);
@@ -1670,7 +1679,7 @@ public class MyGuild {
             connection = Servant.db.getHikari().getConnection();
             var select = connection.prepareStatement(
                     "UPDATE guild_joins " +
-                            "SET tc_id=?" +
+                            "SET tc_id=? " +
                             "WHERE guild_id=?");
             select.setLong(1, tcId);
             select.setLong(2, guildId);
@@ -2027,7 +2036,7 @@ public class MyGuild {
             var resultSet = select.executeQuery();
 
             var giveaways = new StringBuilder();
-            while (resultSet.next()){
+            while (resultSet.next()) {
                 var tc = guild.getTextChannelById(resultSet.getLong("tc_id"));
                 if (tc == null) continue;
                 giveaways.append("- ")
