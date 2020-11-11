@@ -13,7 +13,6 @@ import commands.utility.remindme.RemindMeSenderTask;
 import commands.utility.signup.Signup;
 import commands.utility.signup.SignupSenderTask;
 import files.language.LanguageHandler;
-import plugins.moderation.birthday.BirthdayHandler;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
@@ -23,7 +22,9 @@ import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import plugins.moderation.birthday.BirthdayHandler;
 import servant.Servant;
+import utilities.Console;
 import utilities.Constants;
 import utilities.TimeUtil;
 
@@ -69,7 +70,8 @@ public class ReadyListener extends ListenerAdapter {
         startRemindMe(jda);
         startSignup(jda);
 
-        System.out.println(jda.getSelfUser().getName() + " ready on " + jda.getShardInfo());
+        Console.log(jda.getSelfUser().getName() + " ready on " + jda.getShardInfo());
+        Console.log("Unavailable guilds: " + event.getGuildUnavailableCount());
     }
 
     private void startRating(JDA jda) {
@@ -133,8 +135,11 @@ public class ReadyListener extends ListenerAdapter {
         // 15 Minute Period
         Servant.periodService.scheduleAtFixedRate(() -> {
             // Birthday
-            BirthdayHandler.checkBirthdays(jda);
-            BirthdayHandler.updateLists(jda);
+            var sm = jda.getShardManager();
+            if (sm != null) {
+                BirthdayHandler.checkBirthdays(sm);
+                BirthdayHandler.updateLists(sm, jda);
+            }
         }, delayToNextQuarter, 15 * 60 * 1000, TimeUnit.MILLISECONDS);
 
         // 24 Hour Period

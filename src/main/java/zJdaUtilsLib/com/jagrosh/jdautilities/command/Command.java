@@ -177,123 +177,131 @@ public abstract class Command {
 
         // Statistics
         new MyUser(event.getAuthor()).incrementCommandCount(command.getName());
-        if (event.getGuild() != null) new MyGuild(event.getGuild()).incrementCommandCount(command.getName()); // Guild will be null in DM's
+        if (event.getGuild() != null)
+            new MyGuild(event.getGuild()).incrementCommandCount(command.getName()); // Guild will be null in DM's
 
         if (event.getClient().getListener() != null) event.getClient().getListener().onCompletedCommand(event, this);
     }
 
     public boolean isCommandFor(String input) {
-        if(name.equals(input)) return true;
+        if (name.equals(input)) return true;
         for (var alias : aliases) if (alias.equalsIgnoreCase(input)) return true;
         return false;
     }
 
     public boolean isAllowed(TextChannel channel) {
-        if(!usesTopicTags) return true;
-        if(channel==null) return true;
+        if (!usesTopicTags) return true;
+        if (channel == null) return true;
         String topic = channel.getTopic();
-        if(topic==null || topic.isEmpty()) return true;
+        if (topic == null || topic.isEmpty()) return true;
         topic = topic.toLowerCase();
         String lowerName = name.toLowerCase();
-        if(topic.contains("{"+lowerName+"}")) return true;
-        if(topic.contains("{-"+lowerName+"}")) return false;
-        String lowerCat = category==null ? null : category.getName().toLowerCase();
-        if(lowerCat!=null) {
-            if(topic.contains("{"+lowerCat+"}")) return true;
-            if(topic.contains("{-"+lowerCat+"}")) return false;
+        if (topic.contains("{" + lowerName + "}")) return true;
+        if (topic.contains("{-" + lowerName + "}")) return false;
+        String lowerCat = category == null ? null : category.getName().toLowerCase();
+        if (lowerCat != null) {
+            if (topic.contains("{" + lowerCat + "}")) return true;
+            if (topic.contains("{-" + lowerCat + "}")) return false;
         }
         return !topic.contains("{-all}");
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
-    public String getHelp()
-    {
+
+    public String getHelp() {
         return help;
     }
+
     public Category getCategory() {
         return category;
     }
-    public String getArguments()
-    {
+
+    public String getArguments() {
         return arguments;
     }
-    public boolean isGuildOnly()
-    {
+
+    public boolean isGuildOnly() {
         return guildOnly;
     }
-    public String getRequiredRole()
-    {
+
+    public String getRequiredRole() {
         return requiredRole;
     }
-    public int getCooldown()
-    {
+
+    public int getCooldown() {
         return cooldown;
     }
-    public Permission[] getUserPermissions()
-    {
+
+    public Permission[] getUserPermissions() {
         return userPermissions;
     }
-    public Permission[] getBotPermissions()
-    {
+
+    public Permission[] getBotPermissions() {
         return botPermissions;
     }
-    public String[] getAliases()
-    {
+
+    public String[] getAliases() {
         return aliases;
     }
-    public Command[] getChildren()
-    {
+
+    public Command[] getChildren() {
         return children;
     }
-    public boolean isOwnerCommand()
-    {
+
+    public boolean isOwnerCommand() {
         return ownerCommand;
     }
-    public boolean isHidden()
-    {
+
+    public boolean isHidden() {
         return hidden;
     }
 
     private void terminate(CommandEvent event, String message) {
-        if(message!=null) event.reply(message);
-        if(event.getClient().getListener()!=null)
+        if (message != null) event.reply(message);
+        if (event.getClient().getListener() != null)
             event.getClient().getListener().onTerminatedCommand(event, this);
     }
 
     public String getCooldownKey(CommandEvent event) {
         switch (cooldownScope) {
-            case USER:         return cooldownScope.genKey(name,event.getAuthor().getIdLong());
-            case USER_GUILD:   return event.getGuild()!=null ? cooldownScope.genKey(name,event.getAuthor().getIdLong(),event.getGuild().getIdLong()) :
-                    CooldownScope.USER_CHANNEL.genKey(name,event.getAuthor().getIdLong(), event.getChannel().getIdLong());
-            case USER_CHANNEL: return cooldownScope.genKey(name,event.getAuthor().getIdLong(),event.getChannel().getIdLong());
-            case GUILD:        return event.getGuild()!=null ? cooldownScope.genKey(name,event.getGuild().getIdLong()) :
-                    CooldownScope.CHANNEL.genKey(name,event.getChannel().getIdLong());
-            case CHANNEL:      return cooldownScope.genKey(name,event.getChannel().getIdLong());
+            case USER:
+                return cooldownScope.genKey(name, event.getAuthor().getIdLong());
+            case USER_GUILD:
+                return event.getGuild() != null ? cooldownScope.genKey(name, event.getAuthor().getIdLong(), event.getGuild().getIdLong()) :
+                        CooldownScope.USER_CHANNEL.genKey(name, event.getAuthor().getIdLong(), event.getChannel().getIdLong());
+            case USER_CHANNEL:
+                return cooldownScope.genKey(name, event.getAuthor().getIdLong(), event.getChannel().getIdLong());
+            case GUILD:
+                return event.getGuild() != null ? cooldownScope.genKey(name, event.getGuild().getIdLong()) :
+                        CooldownScope.CHANNEL.genKey(name, event.getChannel().getIdLong());
+            case CHANNEL:
+                return cooldownScope.genKey(name, event.getChannel().getIdLong());
             case SHARD:
                 event.getJDA().getShardInfo();
                 return cooldownScope.genKey(name, event.getJDA().getShardInfo().getShardId());
             case USER_SHARD:
                 event.getJDA().getShardInfo();
-                return cooldownScope.genKey(name,event.getAuthor().getIdLong(),event.getJDA().getShardInfo().getShardId());
-            case GLOBAL:       return cooldownScope.genKey(name, 0);
-            default:           return "";
+                return cooldownScope.genKey(name, event.getAuthor().getIdLong(), event.getJDA().getShardInfo().getShardId());
+            case GLOBAL:
+                return cooldownScope.genKey(name, 0);
+            default:
+                return "";
         }
     }
 
     public String getCooldownError(CommandEvent event, int remaining) {
         var lang = LanguageHandler.getLanguage(event);
-        if(remaining<=0) return null;
+        if (remaining <= 0) return null;
         String front = event.getClient().getWarning() + " " + String.format(LanguageHandler.get(lang, "cooldown_warning"), remaining);
-        if(cooldownScope.equals(CooldownScope.USER)) return front+"!";
-        else if(cooldownScope.equals(CooldownScope.USER_GUILD) && event.getGuild()==null)
-            return front+" "+CooldownScope.USER_CHANNEL.errorSpecification+"!";
-        else if(cooldownScope.equals(CooldownScope.GUILD) && event.getGuild()==null)
-            return front+" "+CooldownScope.CHANNEL.errorSpecification+"!";
+        if (cooldownScope.equals(CooldownScope.USER)) return front + "!";
+        else if (cooldownScope.equals(CooldownScope.USER_GUILD) && event.getGuild() == null)
+            return front + " " + CooldownScope.USER_CHANNEL.errorSpecification + "!";
+        else if (cooldownScope.equals(CooldownScope.GUILD) && event.getGuild() == null)
+            return front + " " + CooldownScope.CHANNEL.errorSpecification + "!";
         else
-            return front+" "+cooldownScope.errorSpecification+"!";
+            return front + " " + cooldownScope.errorSpecification + "!";
     }
 
     public static class Category {
@@ -318,24 +326,24 @@ public abstract class Command {
             this.failResponse = failResponse;
             this.predicate = predicate;
         }
-        
 
-        public String getName()
-        {
+
+        public String getName() {
             return name;
         }
-        public String getFailureResponse()
-        {
+
+        public String getFailureResponse() {
             return failResponse;
         }
+
         public boolean test(CommandEvent event) {
-            return predicate==null || predicate.test(event);
+            return predicate == null || predicate.test(event);
         }
 
         @Override
         public boolean equals(Object obj) {
-            if(!(obj instanceof Category)) return false;
-            Category other = (Category)obj;
+            if (!(obj instanceof Category)) return false;
+            Category other = (Category) obj;
             return Objects.equals(name, other.name) && Objects.equals(predicate, other.predicate) && Objects.equals(failResponse, other.failResponse);
         }
 
@@ -350,8 +358,8 @@ public abstract class Command {
     }
 
     public enum CooldownScope {
-        USER("U:%d",""),
-        CHANNEL("C:%d","in this channel"),
+        USER("U:%d", ""),
+        CHANNEL("C:%d", "in this channel"),
         USER_CHANNEL("U:%d|C:%d", "in this channel"),
         GUILD("G:%d", "in this server"),
         USER_GUILD("U:%d|G:%d", "in this server"),
@@ -367,15 +375,14 @@ public abstract class Command {
             this.errorSpecification = errorSpecification;
         }
 
-        String genKey(String name, long id)
-        {
+        String genKey(String name, long id) {
             return genKey(name, id, -1);
         }
 
         String genKey(String name, long idOne, long idTwo) {
-            if(this.equals(GLOBAL)) return name+"|"+format;
-            else if(idTwo==-1) return name+"|"+String.format(format,idOne);
-            else return name+"|"+String.format(format,idOne,idTwo);
+            if (this.equals(GLOBAL)) return name + "|" + format;
+            else if (idTwo == -1) return name + "|" + String.format(format, idOne);
+            else return name + "|" + String.format(format, idOne, idTwo);
         }
     }
 }

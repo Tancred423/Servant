@@ -44,10 +44,11 @@ public class UserActivityStartListener extends ListenerAdapter {
         var isPublic = myGuild.streamIsPublic();
         var myUser = new MyUser(user);
         var isStreamer = myUser.isStreamer(guild);
+        var member = event.getMember();
 
         if (!isPublic && !isStreamer) return;
 
-        var isStreaming = event.getMember().getActivities().stream().map(Activity::getType).anyMatch(it -> it == Activity.ActivityType.STREAMING);
+        var isStreaming = member.getActivities().stream().map(Activity::getType).anyMatch(it -> it == Activity.ActivityType.STREAMING);
         var isActiveStreamer = false;
 
         for (var activeStreamer : LivestreamHandler.activeStreamers) {
@@ -58,7 +59,8 @@ public class UserActivityStartListener extends ListenerAdapter {
         }
 
         if (isStreaming && !isActiveStreamer) {
-            if (isStreamer) LivestreamHandler.sendNotification(user, newActivity, guild, new MyGuild(guild), lang);
+            if (isStreamer)
+                LivestreamHandler.sendNotification(user, member, newActivity, guild, new MyGuild(guild), lang);
             LivestreamHandler.addRole(guild, event.getMember(), guild.getRoleById(new MyGuild(guild).getStreamRoleId()));
 
             // Tracker

@@ -813,6 +813,38 @@ public class MyGuild {
         return hasEntry;
     }
 
+    public ArrayList<Long> getBirthdayRoleIds() {
+        Connection connection = null;
+        var birthdayRoleIds = new ArrayList<Long>();
+
+        try {
+            connection = Servant.db.getHikari().getConnection();
+            var select = connection.prepareStatement(
+                    "SELECT role_id " +
+                            "FROM guild_birthday_roles " +
+                            "WHERE guild_id=?");
+            select.setLong(1, guildId);
+            var resultSet = select.executeQuery();
+            while (resultSet.next()) birthdayRoleIds.add(resultSet.getLong("role_id"));
+        } catch (SQLException e) {
+            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyGuild#getBirthdayRoleIds"));
+        } finally {
+            closeQuietly(connection);
+        }
+
+        return birthdayRoleIds;
+    }
+
+    public ArrayList<Role> getBirthdayRoles() {
+        var birthdayRoles = new ArrayList<Role>();
+        var birthdayRoleIds = getBirthdayRoleIds();
+        for (var roleId : birthdayRoleIds) {
+            var role = guild.getRoleById(roleId);
+            if (role != null) birthdayRoles.add(role);
+        }
+        return birthdayRoles;
+    }
+
     public TextChannel getBirthdayAnnouncementTc() {
         Connection connection = null;
         TextChannel birthdayTc = null;
@@ -988,9 +1020,8 @@ public class MyGuild {
                             "WHERE b.guild_id=?");
             select.setLong(1, guildId);
             var resultSet = select.executeQuery();
-            if (resultSet.next())
-                do birthdays.put(resultSet.getLong("user_id"), resultSet.getString("birthday"));
-                while (resultSet.next());
+            while (resultSet.next())
+                birthdays.put(resultSet.getLong("user_id"), resultSet.getString("birthday"));
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyGuild#getBirthdays"));
         } finally {
@@ -998,7 +1029,7 @@ public class MyGuild {
         }
 
         if (usesServantBirthday()) birthdays.put(jda.getSelfUser().getIdLong(), "2018-04-06");
-
+        
         return birthdays;
     }
 
@@ -1832,26 +1863,48 @@ public class MyGuild {
         return isPublicMode;
     }
 
-    public long getStreamPingRoleId() {
+    public ArrayList<Long> getStreamPingRoleIds(ArrayList<Long> streamerRoleIds) {
         Connection connection = null;
-        var pingRoleId = 0L;
+        var pingRoleIds = new ArrayList<Long>();
 
         try {
             connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement(
-                    "SELECT ping_role_id " +
-                            "FROM guild_livestreams " +
-                            "WHERE guild_id=?");
-            select.setLong(1, guildId);
-            var resultSet = select.executeQuery();
-            if (resultSet.next()) pingRoleId = resultSet.getLong("ping_role_id");
+
+            for (var streamerRoleId : streamerRoleIds) {
+                var select = connection.prepareStatement(
+                        "SELECT ping_role_id " +
+                                "FROM guild_livestream_ping_roles " +
+                                "WHERE guild_id=? " +
+                                "AND streamer_role_id=?");
+                select.setLong(1, guildId);
+                select.setLong(2, streamerRoleId);
+                var resultSet = select.executeQuery();
+                while (resultSet.next()) {
+                    var pingRoleId = resultSet.getLong("ping_role_id");
+                    if (!pingRoleIds.contains(pingRoleId))
+                        pingRoleIds.add(pingRoleId);
+                }
+            }
         } catch (SQLException e) {
             Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "MyGuild#getStreamPingRoleId"));
         } finally {
             closeQuietly(connection);
         }
 
-        return pingRoleId;
+        return pingRoleIds;
+    }
+
+    public ArrayList<Role> getStreamPingRoles(ArrayList<Long> streamerRoleIds) {
+        var pingRoleIds = getStreamPingRoleIds(streamerRoleIds);
+        var pingRoles = new ArrayList<Role>();
+
+        for (var pingRoleId : pingRoleIds) {
+            var role = guild.getRoleById(pingRoleId);
+            if (role != null)
+                pingRoles.add(role);
+        }
+
+        return pingRoles;
     }
 
     public long getStreamTcId() {

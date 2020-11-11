@@ -47,6 +47,7 @@ import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
+import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import net.jodah.expiringmap.ExpiringMap;
@@ -59,6 +60,7 @@ import zJdaUtilsLib.com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -212,8 +214,9 @@ public class Servant {
                 new WolfCommand()
         );
 
-        DefaultShardManagerBuilder.createDefault(config.getBotToken(), GatewayIntent.getIntents(GatewayIntent.ALL_INTENTS))
-                .enableCache(CacheFlag.ACTIVITY)
+        DefaultShardManagerBuilder.create(config.getBotToken(), EnumSet.allOf(GatewayIntent.class))
+                .enableCache(CacheFlag.ACTIVITY, CacheFlag.CLIENT_STATUS, CacheFlag.EMOTE, CacheFlag.MEMBER_OVERRIDES, CacheFlag.VOICE_STATE)
+                .setChunkingFilter(ChunkingFilter.ALL)
                 .setMemberCachePolicy(MemberCachePolicy.ALL)
                 .setStatus(OnlineStatus.DO_NOT_DISTURB)
                 .setActivity(Activity.playing("loading..."))

@@ -10,16 +10,16 @@ Greetings master! I am Servant, your multifunctional Discord bot.
 I will help you to moderate, organize and entertain your Discord server by providing over 50 unique features.
 
 ## Links
-* Detailed Information: [Visit Website](https://servant.tanc.red/)
-* Get The Bot: [Invite Servant](https://inviteservant.tanc.red)
-* Get Support: [Join Servant's Kingdom](https://servantskingdom.tanc.red)
+* Detailed Information: [Visit Website](https://servant.gg/)
+* Get The Bot: [Invite Servant](https://invite.servant.gg)
+* Get Support: [Join Servant's Kingdom](https://support.servant.gg)
 
 ## Author
 * [Tancred#9056](https://github.com/Tancred423)
 
 ## Built with
-* [Java 12](https://openjdk.java.net/projects/jdk/11/) - Programming Language
-* [JDA 4.2.0_209](https://github.com/DV8FromTheWorld/JDA) - Java Wrapper for Discord API
+* [Java 11](https://openjdk.java.net/projects/jdk/11/) - Programming Language
+* [JDA 4.2.0_214](https://github.com/DV8FromTheWorld/JDA) - Java Wrapper for Discord API
 * [JDA-Utilities 3.0.2](https://github.com/JDA-Applications/JDA-Utilities) - JDA Commands Extension
 * [Maven](https://maven.apache.org/) - Dependency Management
 * Heart ❤
@@ -28,5 +28,3 @@ I will help you to moderate, organize and entertain your Discord server by provi
 * [NavuArt](https://twitter.com/navuart) - Servant Emotes
 * [Maselkov](https://github.com/Maselkov) - Motivation & Support
 * fschill - Support
-* [MEE6](https://mee6.xyz/) - Inspiration
-* [John Grosh](https://github.com/jagrosh) - Inspiration & Libraries

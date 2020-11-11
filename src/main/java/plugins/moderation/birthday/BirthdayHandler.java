@@ -6,11 +6,13 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.sharding.ShardManager;
 import servant.LoggingTask;
 import servant.MyGuild;
 import servant.MyUser;
 import servant.Servant;
+import utilities.Console;
 import utilities.Constants;
 import utilities.ImageUtil;
 import utilities.StringUtil;
@@ -24,8 +26,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class BirthdayHandler {
-    public static void updateLists(JDA jda) {
-        var guilds = jda.getGuilds();
+    public static void updateLists(ShardManager sm, JDA jda) {
+        var guilds = sm.getGuilds();
         for (var guild : guilds) {
             if (guild.getIdLong() == 264445053596991498L) continue; // Discord Bot List
             var myGuild = new MyGuild(guild);
@@ -33,15 +35,49 @@ public class BirthdayHandler {
             var messageId = myGuild.getBirthdayListMsgId();
             var authorId = myGuild.getBirthdayListAuthorId();
             var tc = guild.getTextChannelById(channelId);
-            if (tc != null) {
-                var authorMember = guild.getMemberById(authorId);
-                tc.retrieveMessageById(messageId).queue(message -> {
-                    try {
-                        var list = createList(guild, authorMember);
-                        message.editMessage(list).queue(s -> {
-                        }, f -> myGuild.unsetBirthdayList());
-                    } catch (ParseException e) {
-                        Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "BirthdayHandler#updateLists"));
+            if (tc != null && messageId != 0L) {
+                guild.retrieveMemberById(authorId).queue(authorMember -> {
+                    tc.retrieveMessageById(messageId).queue(message -> {
+                        try {
+                            updateList(guild, authorMember, message);
+                        } catch (ParseException e) {
+                            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "BirthdayHandler#updateLists"));
+                        }
+                    }, f -> {
+                    });
+                });
+            }
+        }
+    }
+
+    public static void checkBirthdays(ShardManager sm) {
+        var guilds = sm.getGuilds();
+        for (var guild : guilds) {
+            if (guild.getIdLong() == 264445053596991498L) continue; // Discord Bot List
+            var myGuild = new MyGuild(guild);
+
+            var now = OffsetDateTime.now(myGuild.getTimezone().toZoneId());
+            var nowString = now.toString().substring(4, 10);
+            var yday = now.minusDays(1);
+            var ydayString = yday.toString().substring(4, 10);
+
+            var birthdays = myGuild.getBirthdays();
+
+            for (var birthday : birthdays.entrySet()) {
+                var userId = birthday.getKey();
+                guild.retrieveMemberById(userId).queue(member -> {
+                    var user = member.getUser();
+                    var myUser = new MyUser(user);
+
+                    if (nowString.equals(birthday.getValue().substring(4))) {
+                        if (!myUser.wasGratulated(guild.getIdLong())) {
+                            myUser.setGratulated(guild.getIdLong());
+                            gratulate(guild, userId);
+                            grantOrRevokeBirthdayRoles(guild, userId, true);
+                        }
+                    } else if (ydayString.equals(birthday.getValue().substring(4))) {
+                        myUser.unsetGratulated(guild.getIdLong());
+                        grantOrRevokeBirthdayRoles(guild, userId, false);
                     }
                 }, f -> {
                 });
@@ -49,46 +85,32 @@ public class BirthdayHandler {
         }
     }
 
-    public static void checkBirthdays(JDA jda) {
-        var guilds = jda.getGuilds();
-        for (var guild : guilds) {
-            if (guild.getIdLong() == 264445053596991498L) continue; // Discord Bot List
-            var myGuild = new MyGuild(guild);
-
-            var now = OffsetDateTime.now(myGuild.getTimezone().toZoneId());
-            var nowString = now.toString().substring(4, 10);
-
-            var birthdays = myGuild.getBirthdays();
-
-            for (var birthday : birthdays.entrySet()) {
-                var userId = birthday.getKey();
-                var member = guild.getMemberById(userId);
-                if (member == null) continue;
-                var user = member.getUser();
-                var myUser = new MyUser(user);
-                if (nowString.equals(birthday.getValue().substring(4))) {
-                    if (!myUser.wasGratulated(guild.getIdLong())) {
-                        gratulate(guild, userId);
-                        myUser.setGratulated(guild.getIdLong());
-                    }
-                } else myUser.unsetGratulated(guild.getIdLong());
-            }
-        }
-    }
-
     private static void gratulate(Guild guild, long userId) {
-        var guildOwner = guild.getOwner();
-        if (guildOwner == null) return;
         var myGuild = new MyGuild(guild);
-        var birthdayMember = guild.getMemberById(userId);
-        var birthdayTc = myGuild.getBirthdayAnnouncementTc();
-        if (birthdayTc != null && birthdayMember != null)
-            birthdayTc.sendMessage(
-                    String.format(LanguageHandler.get(myGuild.getLanguageCode(), "birthday_gratulation"), birthdayMember.getAsMention())
-            ).queue();
+        guild.retrieveMemberById(userId).queue(birthdayMember -> {
+            var birthdayTc = myGuild.getBirthdayAnnouncementTc();
+            if (birthdayTc != null && birthdayMember != null) {
+                birthdayTc.sendMessage(
+                        String.format(LanguageHandler.get(myGuild.getLanguageCode(), "birthday_gratulation"), birthdayMember.getAsMention())
+                ).queue();
+            }
+        });
     }
 
-    private static MessageEmbed createList(Guild guild, Member authorMember) throws ParseException {
+    private static void grantOrRevokeBirthdayRoles(Guild guild, long userId, boolean grant) {
+        var myGuild = new MyGuild(guild);
+        var birthdayRoles = myGuild.getBirthdayRoles();
+        guild.retrieveMemberById(userId).queue(birthdayMember -> {
+            if (birthdayMember != null) {
+                if (grant)
+                    guild.modifyMemberRoles(birthdayMember, birthdayRoles, null).queue();
+                else if (birthdayMember.getRoles().contains(birthdayRoles.get(0)))
+                    guild.modifyMemberRoles(birthdayMember, null, birthdayRoles).queue();
+            }
+        });
+    }
+
+    private static void updateList(Guild guild, Member authorMember, Message message) throws ParseException {
         var myGuild = new MyGuild(guild);
 
         var lang = myGuild.getLanguageCode();
@@ -113,63 +135,74 @@ public class BirthdayHandler {
                     .sorted(Map.Entry.comparingByValue())
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
 
-            var sb = new StringBuilder();
-            // Title Row
-            sb.append("```c\n")
-                    .append(countdown).append(" ").append(date).append(" ").append(name).append("\n")
-                    .append("-".repeat(countdown.length())).append(" ").append("-".repeat(date.length())).append(" ").append("-".repeat(16)).append("\n");
+            guild.retrieveMembersByIds(birthCountdowns.keySet())
+                    .onSuccess(members -> {
+                        var memberMap = new HashMap<Long, Member>();
+                        for (var member : members) memberMap.put(member.getIdLong(), member);
 
+                        var sb = new StringBuilder();
+                        // Title Row
+                        sb.append("```c\n")
+                                .append(countdown).append(" ").append(date).append(" ").append(name).append("\n")
+                                .append("-".repeat(countdown.length())).append(" ").append("-".repeat(date.length())).append(" ").append("-".repeat(16)).append("\n");
 
-            // Birthdays
-            for (var entry : birthCountdownsSorted.entrySet()) {
-                var birthdayMember = guild.getMemberById(entry.getKey());
-                if (birthdayMember != null) {
-                    var birthdayUser = birthdayMember.getUser();
+                        // Birthdays
 
-                    /* Max length for a field is 1024. 57 is the max length of one row. 3 is the length of ```.
-                     * In case this list is getting too long, we will make a new one.
-                     */
-                    if (sb.length() >= 1024 - 57 - 3) {
+                        for (var entry : birthCountdownsSorted.entrySet()) {
+                            var birthdayMember = memberMap.get(entry.getKey());
+                            if (birthdayMember != null) {
+                                var birthdayUser = birthdayMember.getUser();
+
+                                /* Max length for a field is 1024. 57 is the max length of one row. 3 is the length of ```.
+                                 * In case this list is getting too long, we will make a new one.
+                                 */
+                                if (sb.length() >= 1024 - 57 - 3) {
+                                    fieldValues.add(sb.append("```").toString());
+                                    sb = new StringBuilder().append("```c\n");
+                                }
+
+                                // in %s days
+                                sb.append(String.format(entry.getValue() == 1 ? LanguageHandler.get(lang, "birthday_countdown_value_sin") : LanguageHandler.get(lang, "birthday_countdown_value"), StringUtil.pushWithWhitespace(String.valueOf(entry.getValue()), 3)))
+                                        .append(" ")
+                                        // date
+                                        .append(birthDates.get(entry.getKey()))
+                                        .append(" ")
+                                        // name
+                                        .append(birthdayUser.getName())
+                                        .append("\n");
+                            }
+                        }
+
                         fieldValues.add(sb.append("```").toString());
-                        sb = new StringBuilder().append("```c\n");
-                    }
 
-                    // in %s days
-                    sb.append(String.format(entry.getValue() == 1 ? LanguageHandler.get(lang, "birthday_countdown_value_sin") : LanguageHandler.get(lang, "birthday_countdown_value"), StringUtil.pushWithWhitespace(String.valueOf(entry.getValue()), 3)))
-                            .append(" ")
-                            // date
-                            .append(birthDates.get(entry.getKey()))
-                            .append(" ")
-                            // name
-                            .append(birthdayUser.getName())
-                            .append("\n");
-                }
-            }
+                        var authorName = String.format(LanguageHandler.get(lang, "birthday_guild"), guild.getName() + (guild.getName().toLowerCase().endsWith("s") ? "'" : "'s"));
+                        var description = String.format(LanguageHandler.get(lang, "birthday_howtoadd"), Constants.WEBSITE_DASHBOARD);
+                        var footer = LanguageHandler.get(lang, "birthday_as_of");
 
-            fieldValues.add(sb.append("```").toString());
+                        var eb = new EmbedBuilder()
+                                .setColor(Color.decode(authorMember == null ? Servant.config.getDefaultColorCode() : new MyUser(authorMember.getUser()).getColorCode()))
+                                .setAuthor(authorName, null, guild.getIconUrl())
+                                .setDescription(description)
+                                .setTimestamp(OffsetDateTime.now())
+                                .setFooter(footer, ImageUtil.getUrl(guild.getJDA(), "clock"));
+
+                        var currentEmbedLength = authorName.length() + description.length() + footer.length();
+
+                        var i = 0;
+                        for (var fieldValue : fieldValues) {
+                            if (i == 24 || currentEmbedLength + fieldValue.length() > 6000)
+                                break; // Max 25 fields or 6000 characters
+                            eb.addField(" ", fieldValue, false);
+                            i++;
+                        }
+
+                        message.editMessage(eb.build()).queue(s -> {
+                        }, f -> myGuild.unsetBirthdayList());
+                    })
+                    .onError(error -> {
+                        Console.log(error.getMessage());
+                    });
         }
-
-        var authorName = String.format(LanguageHandler.get(lang, "birthday_guild"), guild.getName() + (guild.getName().toLowerCase().endsWith("s") ? "'" : "'s"));
-        var description = String.format(LanguageHandler.get(lang, "birthday_howtoadd"), Constants.WEBSITE_DASHBOARD);
-        var footer = LanguageHandler.get(lang, "birthday_as_of");
-
-        var eb = new EmbedBuilder()
-                .setColor(Color.decode(authorMember == null ? Servant.config.getDefaultColorCode() : new MyUser(authorMember.getUser()).getColorCode()))
-                .setAuthor(authorName, null, guild.getIconUrl())
-                .setDescription(description)
-                .setTimestamp(OffsetDateTime.now())
-                .setFooter(footer, ImageUtil.getUrl(guild.getJDA(), "clock"));
-
-        var currentEmbedLength = authorName.length() + description.length() + footer.length();
-
-        var i = 0;
-        for (var fieldValue : fieldValues) {
-            if (i == 24 || currentEmbedLength + fieldValue.length() > 6000) break; // Max 25 fields or 6000 characters
-            eb.addField(" ", fieldValue, false);
-            i++;
-        }
-
-        return eb.build();
     }
 
     private static long getCountdown(String date) throws ParseException {

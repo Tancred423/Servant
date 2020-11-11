@@ -35,13 +35,29 @@ public class LivestreamHandler {
             guild.removeRoleFromMember(member, role).queue();
     }
 
-    public static void sendNotification(User user, Activity newActivity, net.dv8tion.jda.api.entities.Guild guild, MyGuild myGuild, String lang) {
+    public static void sendNotification(User user, Member member, Activity newActivity, net.dv8tion.jda.api.entities.Guild guild, MyGuild myGuild, String lang) {
         var tc = guild.getTextChannelById(myGuild.getStreamTcId());
         if (tc != null) {
-            var pingRole = guild.getRoleById(myGuild.getStreamPingRoleId());
+            var streamerRoleIdsUser = new ArrayList<Long>();
+            var streamerRoleIds = myGuild.getStreamerRoleIds();
+            var memberRoles = member.getRoles();
+
+            for (var streamerRoleId : streamerRoleIds) {
+                for (var memberRole : memberRoles) {
+                    var memberRoleId = memberRole.getIdLong();
+
+                    if (memberRoleId == streamerRoleId)
+                        streamerRoleIdsUser.add(streamerRoleId);
+                }
+            }
+
+            var pingRoles = myGuild.getStreamPingRoles(streamerRoleIdsUser);
+
+            var sb = new StringBuilder();
+            for (var pingRole : pingRoles) sb.append(pingRole.getAsMention()).append(" ");
 
             var mb = new MessageBuilder();
-            mb.setContent(pingRole != null ? pingRole.getAsMention() : "");
+            mb.setContent(sb.toString());
 
             var eb = new EmbedBuilder();
             eb.setColor(new MyUser(user).getColor());
@@ -50,7 +66,7 @@ public class LivestreamHandler {
             eb.setDescription(String.format(LanguageHandler.get(lang, "livestream_announcement"), user.getAsMention(), newActivity.getUrl()));
             eb.setThumbnail(user.getAvatarUrl());
             var rp = newActivity.asRichPresence();
-            eb.setFooter(String.format(LanguageHandler.get(lang, "livestream_announcement_game"), rp == null ? "" :  rp.getDetails()), null);
+            eb.setFooter(String.format(LanguageHandler.get(lang, "livestream_announcement_game"), rp == null ? "" : rp.getDetails()), null);
 
             mb.setEmbed(eb.build());
             tc.sendMessage(mb.build()).queue();

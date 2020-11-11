@@ -17,7 +17,7 @@ public class EvalCommand extends Command {
 
     public EvalCommand() {
         this.name = "eval";
-        this.aliases = new String[] { "e" };
+        this.aliases = new String[]{"e"};
         this.help = "Evaluates groovy code";
         this.category = new Category("Owner");
         this.arguments = "[code]";
@@ -27,7 +27,7 @@ public class EvalCommand extends Command {
         this.modCommand = false;
         this.cooldown = Constants.OWNER_COOLDOWN;
         this.cooldownScope = CooldownScope.USER;
-        this.botPermissions = new Permission[] {
+        this.botPermissions = new Permission[]{
                 Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY
         };
 
@@ -63,6 +63,7 @@ public class EvalCommand extends Command {
                     engine.setProperty("jda", event.getJDA());
                     engine.setProperty("guild", event.getGuild());
                     engine.setProperty("member", event.getMember());
+                    engine.setProperty("shardManager", event.getJDA().getShardManager());
 
                     var script = imports + event.getMessage().getContentRaw().split("\\s+", 2)[1];
                     var out = engine.evaluate(script);
