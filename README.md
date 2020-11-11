@@ -25,6 +25,6 @@ I will help you to moderate, organize and entertain your Discord server by provi
 * Heart ❤
 
 ## Shout-Outs
-* [NavuArt](https://twitter.com/navuart) - Servant Emotes
+* [NavuArt](https://twitter.com/navuzu) - Servant Emotes
 * [Maselkov](https://github.com/Maselkov) - Motivation & Support
 * fschill - Support
