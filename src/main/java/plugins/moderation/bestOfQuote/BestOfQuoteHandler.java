@@ -1,13 +1,12 @@
 // Author: Tancred423 (https://github.com/Tancred423)
 package plugins.moderation.bestOfQuote;
+
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.entities.TextChannel;
 import servant.LoggingTask;
 import servant.Servant;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static servant.Database.closeQuietly;
@@ -19,51 +18,6 @@ public class BestOfQuoteHandler {
     public BestOfQuoteHandler(JDA jda, long guildId) {
         this.jda = jda;
         this.guildId = guildId;
-    }
-
-    private boolean hasEntry() {
-        Connection connection = null;
-        var hasEntry = false;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT * FROM guild_best_of_quotes WHERE guild_id=?");
-            select.setLong(1, guildId);
-            var resultSet = select.executeQuery();
-            hasEntry = resultSet.next();
-        } catch (SQLException e) {
-            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "BestOfQuote#hasEntry"));
-        } finally {
-            closeQuietly(connection);
-        }
-
-        return hasEntry;
-    }
-
-    public Emote getEmote() {
-        Connection connection = null;
-        Emote emote = null;
-
-        var thisGuild = jda.getGuildById(guildId);
-        if (thisGuild == null) return null;
-
-        try {
-            connection = Servant.db.getHikari().getConnection();
-            var select = connection.prepareStatement("SELECT * FROM guild_best_of_quotes WHERE guild_id=?");
-            select.setLong(1, guildId);
-            var resultSet = select.executeQuery();
-            if (resultSet.next()) {
-                var guildId = resultSet.getLong("emote_guild_id");
-                var emoteId = resultSet.getLong("emote_id");
-                if (guildId != 0 && emoteId != 0) emote = thisGuild.getEmoteById(emoteId);
-            }
-        } catch (SQLException e) {
-            Servant.fixedThreadPool.submit(new LoggingTask(e, jda, "BestOfQuote#getEmote"));
-        } finally {
-            closeQuietly(connection);
-        }
-
-        return emote;
     }
 
     public String getEmoji() {

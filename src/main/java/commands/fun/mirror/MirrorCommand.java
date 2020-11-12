@@ -13,7 +13,7 @@ import zJdaUtilsLib.com.jagrosh.jdautilities.command.CommandEvent;
 public class MirrorCommand extends Command {
     public MirrorCommand() {
         this.name = "mirror";
-        this.aliases = new String[] { "unmirror" };
+        this.aliases = new String[]{"unmirror"};
         this.help = "Mirror a user or text";
         this.category = new Category("Fun");
         this.arguments = null;
@@ -23,7 +23,7 @@ public class MirrorCommand extends Command {
         this.modCommand = false;
         this.cooldown = Constants.USER_COOLDOWN;
         this.cooldownScope = CooldownScope.USER;
-        this.botPermissions = new Permission[] {
+        this.botPermissions = new Permission[]{
                 Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY,
                 Permission.NICKNAME_MANAGE
         };

@@ -7,7 +7,6 @@ import servant.LoggingTask;
 import servant.Servant;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static servant.Database.closeQuietly;
@@ -30,7 +29,8 @@ public class EmoteUtil {
                 var sm = jda.getShardManager();
                 if (sm != null) {
                     var thisGuild = sm.getGuildById(resultSet.getLong("emote_guild_id"));
-                    if (thisGuild != null) emote = thisGuild.getEmoteById(resultSet.getLong("emote_id"));
+                    if (thisGuild != null)
+                        emote = thisGuild.retrieveEmoteById(resultSet.getLong("emote_id")).complete(); // todo: fuck complete
                 }
             }
         } catch (SQLException e) {
