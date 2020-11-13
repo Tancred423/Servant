@@ -3,16 +3,16 @@ package listeners;
 
 import commands.owner.blacklist.Blacklist;
 import commands.utility.polls.Poll;
-import commands.utility.rate.Rating;
+import commands.utility.rating.Rating;
 import commands.utility.signup.Signup;
 import files.language.LanguageHandler;
-import plugins.moderation.reactionRole.ReactionRole;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionRemoveEvent;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
+import plugins.moderation.reactionRole.ReactionRole;
 import servant.MyGuild;
 import servant.MyMessage;
 import servant.Servant;

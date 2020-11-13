@@ -4,12 +4,10 @@ package listeners;
 import commands.owner.blacklist.Blacklist;
 import commands.utility.giveaway.Giveaway;
 import commands.utility.polls.Poll;
-import commands.utility.rate.Rating;
+import commands.utility.rating.Rating;
 import commands.utility.remindme.RemindMe;
 import commands.utility.signup.Signup;
 import files.language.LanguageHandler;
-import plugins.moderation.bestOfQuote.BestOfQuoteHandler;
-import plugins.moderation.reactionRole.ReactionRole;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Guild;
@@ -20,6 +18,8 @@ import net.dv8tion.jda.api.exceptions.HierarchyException;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
+import plugins.moderation.bestOfQuote.BestOfQuoteHandler;
+import plugins.moderation.reactionRole.ReactionRole;
 import servant.MyGuild;
 import servant.MyMessage;
 import servant.MyUser;
@@ -129,25 +129,35 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
                 for (int i = 1; i <= amountAnswers; i++) {
                     String name = null;
                     switch (i) {
-                        case 1: name = "one";
+                        case 1:
+                            name = "one";
                             break;
-                        case 2: name = "two";
+                        case 2:
+                            name = "two";
                             break;
-                        case 3: name = "three";
+                        case 3:
+                            name = "three";
                             break;
-                        case 4: name = "four";
+                        case 4:
+                            name = "four";
                             break;
-                        case 5: name = "five";
+                        case 5:
+                            name = "five";
                             break;
-                        case 6: name = "six";
+                        case 6:
+                            name = "six";
                             break;
-                        case 7: name = "seven";
+                        case 7:
+                            name = "seven";
                             break;
-                        case 8: name = "eight";
+                        case 8:
+                            name = "eight";
                             break;
-                        case 9: name = "nine";
+                        case 9:
+                            name = "nine";
                             break;
-                        case 10: name = "ten";
+                        case 10:
+                            name = "ten";
                             break;
                     }
                     reactions.add(EmoteUtil.getEmoji(jda, name));
@@ -157,7 +167,8 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
                     // Add user vote
                     event.getChannel().retrieveMessageById(msgId).queue(message -> {
                         var userId = user.getIdLong();
-                        if (poll.hasVoted(userId) && myMessage.isRadiopoll()) event.getReaction().removeReaction(user).queue();
+                        if (poll.hasVoted(userId) && myMessage.isRadiopoll())
+                            event.getReaction().removeReaction(user).queue();
                         else poll.setVote(userId, reactionEmote.getName());
                     });
                 } else if (reactionEmote.getName().equals(EmoteUtil.getEmoji(jda, "end"))) {
@@ -241,10 +252,11 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
                 return;
             }
 
-            for (var attachment : attachments) if (!attachment.isImage()) {
-                temporaryBlacklistImage.remove(messageId);
-                return;
-            }
+            for (var attachment : attachments)
+                if (!attachment.isImage()) {
+                    temporaryBlacklistImage.remove(messageId);
+                    return;
+                }
 
             var voteEmoji = myGuild.getBestOfImageEmoji();
             var reactionCount = 0;

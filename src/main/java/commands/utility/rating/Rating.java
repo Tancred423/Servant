@@ -1,4 +1,4 @@
-package commands.utility.rate;
+package commands.utility.rating;
 
 import files.language.LanguageHandler;
 import net.dv8tion.jda.api.EmbedBuilder;

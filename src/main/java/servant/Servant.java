@@ -26,7 +26,6 @@ import commands.owner.ShutdownCommand;
 import commands.owner.blacklist.BlacklistCommand;
 import commands.owner.statsForNerds.ThreadCommand;
 import commands.random.*;
-import commands.random.randomImgur.RandomCommand;
 import commands.standard.bofInfo.BotInfoCommand;
 import commands.standard.help.HelpCommand;
 import commands.standard.ping.PingCommand;
@@ -37,7 +36,7 @@ import commands.utility.customCommands.CustomCommandsCommand;
 import commands.utility.giveaway.GiveawayCommand;
 import commands.utility.polls.poll.PollCommand;
 import commands.utility.polls.quickpoll.QuickpollCommand;
-import commands.utility.rate.RateCommand;
+import commands.utility.rating.RatingCommand;
 import commands.utility.remindme.RemindMeCommand;
 import commands.utility.signup.SignupCommand;
 import files.ConfigFile;
@@ -156,7 +155,7 @@ public class Servant {
                 new GiveawayCommand(),
                 new PollCommand(waiter),
                 new QuickpollCommand(),
-                new RateCommand(),
+                new RatingCommand(),
                 new RemindMeCommand(),
                 new SetBirthdayCommand(),
                 new SignupCommand(),
@@ -199,7 +198,6 @@ public class Servant {
                 new WinkCommand(),
 
                 // Random
-                new RandomCommand(),
                 new BirdCommand(),
                 new CatCommand(),
                 new DogCommand(),
@@ -216,53 +214,56 @@ public class Servant {
 
         DefaultShardManagerBuilder.create(config.getBotToken(), EnumSet.allOf(GatewayIntent.class))
                 .disableIntents(GatewayIntent.GUILD_MESSAGE_TYPING, GatewayIntent.DIRECT_MESSAGE_TYPING, GatewayIntent.DIRECT_MESSAGE_REACTIONS)
-                .enableCache(CacheFlag.ACTIVITY)
+                .enableCache(CacheFlag.ACTIVITY, CacheFlag.EMOTE)
                 .setChunkingFilter(ChunkingFilter.ALL)
                 .setMemberCachePolicy(MemberCachePolicy.ALL)
                 .setStatus(OnlineStatus.DO_NOT_DISTURB)
                 .setActivity(Activity.playing("loading..."))
-                .addEventListeners(client.build())
-                .addEventListeners(waiter)
+                .addEventListeners(
+                        client.build(),
+                        waiter
+                )
 
                 /* To not block the main thread, we will run CompletableFuture#runAsync
                  * with our own thread-pool.
                  * To reduce the amount of thrown events and created threads, we will
                  * handle all commands from the same event type in the same class and thread.
                  */
-                .addEventListeners(new CategoryCreateListener()) // Log
-                .addEventListeners(new CategoryDeleteListener()) // Log
-                .addEventListeners(new EmoteAddedListener()) // Log
-                .addEventListeners(new EmoteRemovedListener()) // Log
-                .addEventListeners(new GuildBanListener()) // Log
-                .addEventListeners(new GuildInviteCreateListener()) // Log
-                .addEventListeners(new GuildInviteDeleteListener()) // Log
-                .addEventListeners(new GuildJoinListener()) // Invite
-                .addEventListeners(new GuildLeaveListener()) // Purges
-                .addEventListeners(new GuildMemberJoinListener()) // AutoRole, Join, Log
-                .addEventListeners(new GuildMemberLeaveListener()) // Leave, Log
-                .addEventListeners(new GuildMemberRoleAddListener()) // Log, Patreon
-                .addEventListeners(new GuildMemberRoleRemoveListener()) // Log, Patreon
-                .addEventListeners(new GuildMessageDeleteListener())  // Log, Purges
-                .addEventListeners(new GuildMessageReactionAddListener()) // BestOfImage, BestOfQuote, Giveaway, Quickpoll, Poll, Rating, Reaction Role, RemindMe, Signup
-                .addEventListeners(new GuildMessageReactionRemoveListener()) // Quickpoll, Poll, Rating, ReactionRole, Signup
-                .addEventListeners(new GuildMessageUpdateListener()) // Log
-                .addEventListeners(new GuildUnbanListener()) // Log
-                .addEventListeners(new GuildUpdateBoostCountListener()) // Log
-                .addEventListeners(new GuildUpdateBoostTierListener()) // Log
-                .addEventListeners(new GuildVoiceJoinListener()) // VoiceLobby, Log
-                .addEventListeners(new GuildVoiceLeaveListener()) // VoiceLobby, Log
-                .addEventListeners(new GuildVoiceMoveListener()) // Voicelobby, Log
-                .addEventListeners(new MessageReceivedListener()) // Prefix, MediaOnlyChannel, Cache, CustomCommands, Level, EasterEggs
-                .addEventListeners(new ReadyListener()) // Presence, Birthday, Giveaway, Poll, Quickpoll, Rating, RemindMe, Signup
-                .addEventListeners(new RoleCreateListener()) // Log
-                .addEventListeners(new RoleDeleteListener()) // Log
-                .addEventListeners(new TextChannelCreateListener()) // Log
-                .addEventListeners(new TextChannelDeleteListener()) // Log, Purges
-                .addEventListeners(new UserActivityEndListener()) // Livestream
-                .addEventListeners(new UserActivityStartListener()) // Livestream
-                .addEventListeners(new VoiceChannelCreateListener()) // Log
-                .addEventListeners(new VoiceChannelDeleteListener()) // Log, Purges
-
+                .addEventListeners(
+                        new CategoryCreateListener(), // Log
+                        new CategoryDeleteListener(), // Log
+                        new EmoteAddedListener(), // Log
+                        new EmoteRemovedListener(), // Log
+                        new GuildBanListener(), // Log
+                        new GuildInviteCreateListener(), // Log
+                        new GuildInviteDeleteListener(), // Log
+                        new GuildJoinListener(), // Invite
+                        new GuildLeaveListener(), // Purges
+                        new GuildMemberJoinListener(), // AutoRole, Join, Log
+                        new GuildMemberLeaveListener(), // Leave, Log
+                        new GuildMemberRoleAddListener(), // Log, Patreon
+                        new GuildMemberRoleRemoveListener(), // Log, Patreon
+                        new GuildMessageDeleteListener(),  // Log, Purges
+                        new GuildMessageReactionAddListener(), // BestOfImage, BestOfQuote, Giveaway, Quickpoll, Poll, Rating, Reaction Role, RemindMe, Signup
+                        new GuildMessageReactionRemoveListener(), // Quickpoll, Poll, Rating, ReactionRole, Signup
+                        new GuildMessageUpdateListener(), // Log
+                        new GuildUnbanListener(), // Log
+                        new GuildUpdateBoostCountListener(), // Log
+                        new GuildUpdateBoostTierListener(), // Log
+                        new GuildVoiceJoinListener(), // VoiceLobby, Log
+                        new GuildVoiceLeaveListener(), // VoiceLobby, Log
+                        new GuildVoiceMoveListener(), // Voicelobby, Log
+                        new MessageReceivedListener(), // Prefix, MediaOnlyChannel, Cache, CustomCommands, Level, EasterEggs
+                        new ReadyListener(), // Presence, Birthday, Giveaway, Poll, Quickpoll, Rating, RemindMe, Signup
+                        new RoleCreateListener(), // Log
+                        new RoleDeleteListener(), // Log
+                        new TextChannelCreateListener(), // Log
+                        new TextChannelDeleteListener(), // Log, Purges
+                        new UserActivityEndListener(), // Livestream
+                        new UserActivityStartListener(), // Livestream
+                        new VoiceChannelCreateListener(), // Log
+                        new VoiceChannelDeleteListener() // Log, Purges
+                )
                 .build();
     }
 }

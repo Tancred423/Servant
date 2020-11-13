@@ -1,4 +1,4 @@
-package commands.utility.rate;
+package commands.utility.rating;
 
 import files.language.LanguageHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -16,10 +16,10 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
-public class RateCommand extends Command {
-    public RateCommand() {
-        this.name = "rate";
-        this.aliases = new String[] { "rating" };
+public class RatingCommand extends Command {
+    public RatingCommand() {
+        this.name = "rating";
+        this.aliases = new String[]{"rate"};
         this.help = "User rating out of 5";
         this.category = new Category("Utility");
         this.arguments = null;
@@ -29,7 +29,7 @@ public class RateCommand extends Command {
         this.modCommand = false;
         this.cooldown = Constants.USER_COOLDOWN;
         this.cooldownScope = CooldownScope.USER;
-        this.botPermissions = new Permission[] {
+        this.botPermissions = new Permission[]{
                 Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY,
                 Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_ADD_REACTION
         };

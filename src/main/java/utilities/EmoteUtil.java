@@ -30,7 +30,7 @@ public class EmoteUtil {
                 if (sm != null) {
                     var thisGuild = sm.getGuildById(resultSet.getLong("emote_guild_id"));
                     if (thisGuild != null)
-                        emote = thisGuild.retrieveEmoteById(resultSet.getLong("emote_id")).complete(); // todo: fuck complete
+                        emote = thisGuild.getEmoteById(resultSet.getLong("emote_id"));
                 }
             }
         } catch (SQLException e) {

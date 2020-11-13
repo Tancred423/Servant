@@ -1,4 +1,4 @@
-package commands.utility.rate;
+package commands.utility.rating;
 
 public class Vote {
     private final long userId;
