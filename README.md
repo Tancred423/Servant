@@ -15,7 +15,7 @@ I will help you to moderate, organize and entertain your Discord server by provi
 * Get Support: [Join Servant's Kingdom](https://support.servant.gg)
 
 ## Author
-* [Tancred#9056](https://github.com/Tancred423)
+* [Tancred#0001](https://github.com/Tancred423)
 
 ## Built with
 * [Java 11](https://openjdk.java.net/projects/jdk/11/) - Programming Language
